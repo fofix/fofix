@@ -56,6 +56,7 @@ from constants import *
 #variables in the rockmeter.ini for you no longer have to use self
 #to refer to theme, instead it has a more friendly and logical setup.
 player = None
+part = "Guitar"         #the player's part/instrument
 
 score = 0               #player's score
 streak = 0              #player's streak
@@ -882,9 +883,10 @@ class Rockmeter(ConfigGetMixin):
   #this updates all the usual global variables that are handled by the rockmeter
   #these are all player specific
   def updateVars(self, playerNum):
-    global score, rock, streak, streakMax, power, stars, partialStars, multiplier, bassgroove, boost, player
+    global score, rock, streak, streakMax, power, stars, partialStars, multiplier, bassgroove, boost, player, part
     scene = self.scene
     player = scene.instruments[playerNum]
+    part = player.__class__.__name__
 
     #this is here for when I finally get coOp worked in
     if self.coOp:
