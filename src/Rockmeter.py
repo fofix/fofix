@@ -434,7 +434,8 @@ class IncrementEffect(Effect):
     self.current = []       #the current value
     
     #rate at which values will increment between start and end
-    self.rates = []
+    self.inRates = []       #incoming rates
+    self.outRates = []      #outgoing rates (if reverse is enabled)
     
     #catches flickering between 2 values
     self.counter = 0
@@ -442,26 +443,37 @@ class IncrementEffect(Effect):
 
     #how long it takes for the transition to take place
     self.transitionTime = 512.0
+    self.transitionTimeOut = 512.0
     
   #gets the rate at which time is passing, usable in finding the rates of things in
   #terms of milliseconds instead of frames
-  def getTime(self):
-    t = self.transitionTime * (max(self.engine.clock.get_fps(), _minFPS)) / 1000.0
-    self.countRate = 1.0/t
-    return t
+  def getTime(self, time):
+    t = time * (max(self.engine.clock.get_fps(), _minFPS)) / 1000.0
+    self.countRate = 1.0/max(t, 1.0)
+    return max(t, 1.0)
    
   #updates the rates at which values between start and end should change to reach
   # the desired point
   def updateRates(self):
     try:
-      t = self.getTime()
+      t = self.getTime(self.transitionTime)
       for i in range(len(self.start)):
         if self.end[i] < self.start[i]:
-          self.rates[i] = (self.start[i] - self.end[i])/t
+          self.inRates[i] = (self.start[i] - self.end[i])/t
         else:
-          self.rates[i] = (self.end[i] - self.start[i])/t
+          self.inRates[i] = (self.end[i] - self.start[i])/t
+      if self.reverse and not bool(eval(self.condition)):
+        t = self.getTime(self.transitionTimeOut)
+        for i in range(len(self.start)):
+          if self.end[i] < self.start[i]:
+            self.outRates[i] = (self.start[i] - self.end[i])/t
+          else:
+            self.outRates[i] = (self.end[i] - self.start[i])/t
     except:
-      self.rates = [0 for i in range(len(self.start))]
+      #catches if rates have been declared or if they're proper size
+      # then tries updating them again now that they're proper
+      self.inRates = [0 for i in range(len(self.start))]
+      self.outRates = self.inRates[:]
       self.updateRates()
 
   #updates the values with the rates and returns the current saved value
@@ -472,12 +484,12 @@ class IncrementEffect(Effect):
       for i in range(len(self.start)):
         if self.current[i] > self.end[i]:
           if self.end[i] < self.start[i]:
-            self.current[i] -= self.rates[i]
+            self.current[i] -= self.inRates[i]
           else:
             self.current[i] = self.end[i]
         elif self.current[i] < self.end[i]:
           if self.end[i] > self.start[i]:
-            self.current[i] += self.rates[i]
+            self.current[i] += self.inRates[i]
           else:
             self.current[i] = self.end[i]
       if self.counter >= self.transitionTime:
@@ -488,12 +500,12 @@ class IncrementEffect(Effect):
         for i in range(len(self.start)):
           if self.current[i] > self.start[i]:
             if self.end[i] > self.start[i]:
-              self.current[i] -= self.rates[i]
+              self.current[i] -= self.outRates[i]
             else:
               self.current[i] = self.start[i]
           elif self.current[i] < self.start[i]:
             if self.end[i] < self.start[i]:
-              self.current[i] += self.rates[i]
+              self.current[i] += self.outRates[i]
             else:
               self.current[i] = self.start[i]
         if self.counter <= 0.0:
@@ -579,7 +591,8 @@ class Slide(IncrementEffect):
     self.reverse = bool(eval(self.getexpr("reverse", "True")))    
     self.condition = self.getexpr("condition", "True")    
     self.transitionTime = self.get("transitionTime", float, 512.0)
-
+    self.transitionTimeOut = self.get("transitionTimeOut", float, self.transitionTime)
+    
   def updateValues(self):
     #reverse the processing for font layer handling
     if isinstance(self.layer, FontLayer):
@@ -615,6 +628,7 @@ class Scale(IncrementEffect):
     self.inPixels  = self.get("inPixels", str, "").split("|")   #variables in terms of pixels
 
     self.transitionTime = self.get("transitionTime", float, 512.0)
+    self.transitionTimeOut = self.get("transitionTimeOut", float, self.transitionTime)
     self.condition = self.getexpr("condition", "True")
     self.reverse = bool(eval(self.getexpr("reverse", "True")))
 
@@ -678,6 +692,7 @@ class Fade(IncrementEffect):
     self.current = self.start[:]
     
     self.transitionTime = self.get("transitionTime", float, 512.0)
+    self.transitionTimeOut = self.get("transitionTimeOut", float, self.transitionTime)
     self.condition = self.getexpr("condition", "True")
     self.reverse = bool(eval(self.getexpr("reverse", "True")))
     
