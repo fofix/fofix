@@ -121,8 +121,8 @@ class Layer(ConfigGetMixin):
       return player.boardWidth / math.sqrt((self.stage.scene.camera.origin[1] + x)**2+((self.stage.scene.camera.origin[2] + x)-0.5)**2) * scaleCoef
 
   def __init__(self, stage, section):
-    self.stage       = stage			#The rockmeter
-    self.engine      = stage.engine		#Game Engine
+    self.stage       = stage			      #The rockmeter
+    self.engine      = stage.engine		  #Game Engine
     self.config      = stage.config     #the rockmeter.ini
     self.section     = section          #the section of the rockmeter.ini involving this layer
 
@@ -415,6 +415,27 @@ class Effect(ConfigGetMixin):
     self.section = section
     
     self.condition = True
+
+  def smoothstep(self, min, max, x):
+    if x < min:
+      return 0
+    if x > max:
+      return 1
+    def f(x):
+      return -2 * x**3 + 3*x**2
+    return f((x - min) / (max - min))
+    
+  def triggerPick(self):
+    if not self.stage.lastPickPos:
+      return 0.0
+    t = position - self.stage.lastPickPos
+    return (1.0 - self.smoothstep(0, 500.0, t))
+
+  def triggerMiss(self):
+    if not self.stage.lastMissPos:
+      return 0.0
+    t = position - self.stage.lastMissPos
+    return (1.0 - self.smoothstep(0, 500.0, t))
 
   def update(self):
     pass
@@ -850,6 +871,12 @@ class Rockmeter(ConfigGetMixin):
             self.createImage(self.section, i)
           break
 
+    self.reset()
+    
+  def reset(self):
+    self.playedNotes        = []
+    self.averageNotes       = [0.0]
+    
   #adds a layer to the rockmeter's list
   def addLayer(self, layer, number, shared = False):
     if shared:
@@ -991,7 +1018,16 @@ class Rockmeter(ConfigGetMixin):
     #force bassgroove to false if it's not enabled
     if not scene.bassGrooveEnabled:
         bassgroove = False
-        
+  
+  def triggerPick(self, pos, notes):
+    if notes:
+      self.lastPickPos      = pos
+      self.playedNotes      = self.playedNotes[-3:] + [sum(notes) / float(len(notes))]
+      self.averageNotes[-1] = sum(self.playedNotes) / float(len(self.playedNotes))
+
+  def triggerMiss(self, pos):
+    self.lastMissPos = pos
+            
   def render(self, visibility):
     self.updateTime()
 

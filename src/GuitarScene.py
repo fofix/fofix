@@ -2268,6 +2268,7 @@ class GuitarScene(Scene):
     for player in self.playerList:
       player.reset()
     self.stage.reset()
+    self.stage.rockmeter.reset()
     self.enteredCode     = []
     self.jurgPlayer       = [False for i in self.playerList] #Jurgen hasn't played the restarted song =P
     
