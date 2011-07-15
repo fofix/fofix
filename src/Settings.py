@@ -1182,7 +1182,6 @@ class BasicSettingsMenu(Menu.Menu):
     
     InGameDisplaySettings = [
       ConfigChoice(engine, engine.config, "game", "accuracy_mode", autoApply = True),
-      ConfigChoice(engine, engine.config, "game", "game_time", autoApply = True),  
       ConfigChoice(engine, engine.config, "video", "counting", autoApply = True, isQuickset = 2),
     ]
     InGameDisplayMenu = Menu.Menu(engine, InGameDisplaySettings, pos = (self.opt_text_x, self.opt_text_y), textColor = self.opt_text_color, selectedColor = self.opt_selected_color)
