@@ -273,6 +273,7 @@ class FontLayer(Layer):
     self.text        = ""                                       #the text that will be rendered to screen 
     self.textexpr    = self.getexpr("text", "''")               #the text from the ini that will be evalutated
     self.replace     = ""                                       #replace character a character in the string with this
+    self.replace     = self.get("replace", "").split("_")       #replace character a character in the string with this
     self.alignment   = halign(self.get("alignment", str, "LEFT"), 'left')
                                                                 #alignment of the text
     self.useComma    = self.get("useComma", bool, False)        #use commas when drawing numbers
@@ -289,6 +290,9 @@ class FontLayer(Layer):
     else:
       text = str(text)
 
+    if self.replace.strip() is not "" or "None":
+      text.replace(self.replace[0], self.replace[1])
+      
     wid, hgt = self.font.getStringSize(str(text))
 
     #needs to be done later because of values that may be dependant on the text's properties
