@@ -280,6 +280,8 @@ class FontLayer(Layer):
     self.shadow      = self.get("shadow",   bool, False)        #show a shadow on the text
     self.outline     = self.get("outline",  bool, False)        #give the text an outline
 
+    self.shadowOpacity = self.get("shadowOpacity", float, 1.0)  #the opacity of the shadow on the text
+    
   def updateLayer(self, playerNum):
     w, h, = self.engine.view.geometry[2:4]
     
@@ -330,7 +332,7 @@ class FontLayer(Layer):
     if bool(eval(self.condition)):
         glColor4f(*color)
         self.font.render(self.text, position, align = alignment, 
-                         shadow = self.shadow, outline = self.outline)
+                         shadow = self.shadow, outline = self.outline, shadowOpacity = self.shadowOpacity)
     
         
 #creates a layer that is shaped like a pie-slice/circle instead of a rectangle
