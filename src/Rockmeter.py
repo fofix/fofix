@@ -272,7 +272,6 @@ class FontLayer(Layer):
     self.font        = self.engine.data.fontDict[font]          #the font to use
     self.text        = ""                                       #the text that will be rendered to screen 
     self.textexpr    = self.getexpr("text", "''")               #the text from the ini that will be evalutated
-    self.replace     = ""                                       #replace character a character in the string with this
     self.replace     = self.get("replace", "").split("_")       #replace character a character in the string with this
     self.alignment   = halign(self.get("alignment", str, "LEFT"), 'left')
                                                                 #alignment of the text
@@ -291,7 +290,7 @@ class FontLayer(Layer):
       text = locale.format("%d", text, grouping=True)
     else:
       text = str(text)
-
+      
     if self.replace.strip() is not "" or "None":
       text.replace(self.replace[0], self.replace[1])
       
@@ -422,7 +421,7 @@ class Effect(ConfigGetMixin):
     
     self.condition = True
 
-  def smoothstep(self, min, max, x):
+  def _smoothstep(self, min, max, x):
     if x < min:
       return 0
     if x > max:
@@ -435,13 +434,13 @@ class Effect(ConfigGetMixin):
     if not self.stage.lastPickPos:
       return 0.0
     t = position - self.stage.lastPickPos
-    return (1.0 - self.smoothstep(0, 500.0, t))
+    return (1.0 - self._smoothstep(0, 500.0, t))
 
   def triggerMiss(self):
     if not self.stage.lastMissPos:
       return 0.0
     t = position - self.stage.lastMissPos
-    return (1.0 - self.smoothstep(0, 500.0, t))
+    return (1.0 - self._smoothstep(0, 500.0, t))
 
   def update(self):
     pass
@@ -880,6 +879,8 @@ class Rockmeter(ConfigGetMixin):
     self.reset()
     
   def reset(self):
+    self.lastMissPos        = None
+    self.lastPickPos        = None
     self.playedNotes        = []
     self.averageNotes       = [0.0]
     
