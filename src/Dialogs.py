@@ -2087,8 +2087,54 @@ class LoadingSplashScreen(Layer, KeyListener):
         else:
           wrapCenteredText(font, (x,y), self.text, scale = self.fScale, rightMargin = self.rMargin, linespace = self.lspacing)
 
+#nhydock - expanding on LoadingSplashScreen so there can be overlay and song dependant backgrounds
+class SongLoadingSplashScreen(LoadingSplashScreen):
+  def __init__(self, engine, text, songName, libraryName):
+    super(SongLoadingSplashScreen, self).__init__(engine, text)
+    
+    self.engine.loadImgDrawing(self, "songBack", os.path.join(libraryName, songName, "loading.png"))
+    if self.songBack:
+      self.engine.loadImgDrawing(self, "loadingImg", os.path.join("themes", self.engine.data.themeLabel, "loading_overlay.png"))
+          
+  def render(self, visibility, topMost):
+    self.engine.view.setViewport(1,0)
+    font = self.engine.data.loadingFont   #MFH - new font support
+
+    if not font:
+      return
+
+    with self.engine.view.orthogonalProjection(normalize = True):
+      v = (1 - visibility) ** 2
+      fadeScreen(v)
+      w, h = self.engine.view.geometry[2:4]
+      
+      self.engine.theme.setBaseColor(1 - v)
+      self.engine.drawImage(self.songBack, scale = (1.0,-1.0), coord = (w/2,h/2), stretched = 3)
+      self.engine.drawImage(self.loadingImg, scale = (1.0,-1.0), coord = (w/2,h/2), stretched = 3)
+      w, h = font.getStringSize(self.text, scale=self.fScale)
+      
+      x = self.loadingx
+      y = self.loadingy - h / 2 + v * .5
+      
+      #akedrou - support for Loading Text Color
+      c1,c2,c3 = self.textColor
+      glColor3f(c1,c2,c3)
+      
+      # evilynux - Made text about 2 times smaller (as requested by worldrave)
+      if self.allowtext:
+        if self.theme == 1:
+          wrapCenteredText(font, (x,y), self.text, scale = self.fScale, rightMargin = self.rMargin, linespace = self.lspacing, allowshadowoffset = True, shadowoffset = (self.engine.theme.shadowoffsetx, self.engine.theme.shadowoffsety))
+        else:
+          wrapCenteredText(font, (x,y), self.text, scale = self.fScale, rightMargin = self.rMargin, linespace = self.lspacing)
+    
 def showLoadingSplashScreen(engine, text = _("Loading...")):
   splash = LoadingSplashScreen(engine, text)
+  engine.view.pushLayer(splash)
+  engine.run()
+  return splash
+
+def showSongLoadingSplashScreen(engine, songName, libraryName, text = _("Loading...")):
+  splash = SongLoadingSplashScreen(engine, text,  songName, libraryName)
   engine.view.pushLayer(splash)
   engine.run()
   return splash

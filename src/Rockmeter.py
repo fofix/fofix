@@ -56,6 +56,7 @@ from constants import *
 #variables in the rockmeter.ini for you no longer have to use self
 #to refer to theme, instead it has a more friendly and logical setup.
 player = None
+part = "Guitar"         #the player's part/instrument
 
 score = 0               #player's score
 streak = 0              #player's streak
@@ -120,8 +121,8 @@ class Layer(ConfigGetMixin):
       return player.boardWidth / math.sqrt((self.stage.scene.camera.origin[1] + x)**2+((self.stage.scene.camera.origin[2] + x)-0.5)**2) * scaleCoef
 
   def __init__(self, stage, section):
-    self.stage       = stage			#The rockmeter
-    self.engine      = stage.engine		#Game Engine
+    self.stage       = stage			      #The rockmeter
+    self.engine      = stage.engine		  #Game Engine
     self.config      = stage.config     #the rockmeter.ini
     self.section     = section          #the section of the rockmeter.ini involving this layer
 
@@ -191,7 +192,7 @@ class ImageLayer(Layer):
     self.rectexpr = self.getexpr("rect", "(0.0,1.0,0.0,1.0)")
                                     #how much of the image do you want rendered
                                     # (left, right, top, bottom)
-                                    
+    self.rect = [0.0,1.0,0.0,1.0]
   def updateLayer(self, playerNum):
     #don't try to update an image layer if the texture doesn't even exist
     if not self.drawing:
@@ -218,7 +219,7 @@ class ImageLayer(Layer):
     if "yscale" in self.inPixels:
       scale[1] /= texture.pixelSize[1]
 
-    scale[1] = -scale[1]
+    scale[1] *= -1
     scale[0] *= w/vpc[0]
     scale[1] *= h/vpc[1]
     
@@ -271,13 +272,16 @@ class FontLayer(Layer):
     self.font        = self.engine.data.fontDict[font]          #the font to use
     self.text        = ""                                       #the text that will be rendered to screen 
     self.textexpr    = self.getexpr("text", "''")               #the text from the ini that will be evalutated
-    self.replace     = ""                                       #replace character a character in the string with this
+    self.replace     = [r.strip() for r in self.get("replace", str, "_").split("_")]
+                                                                #replace character a character in the string with this
     self.alignment   = halign(self.get("alignment", str, "LEFT"), 'left')
                                                                 #alignment of the text
     self.useComma    = self.get("useComma", bool, False)        #use commas when drawing numbers
     self.shadow      = self.get("shadow",   bool, False)        #show a shadow on the text
     self.outline     = self.get("outline",  bool, False)        #give the text an outline
 
+    self.shadowOpacity = self.get("shadowOpacity", float, 1.0)  #the opacity of the shadow on the text
+    
   def updateLayer(self, playerNum):
     w, h, = self.engine.view.geometry[2:4]
     
@@ -287,7 +291,9 @@ class FontLayer(Layer):
       text = locale.format("%d", text, grouping=True)
     else:
       text = str(text)
-
+      
+    text.replace(self.replace[0], self.replace[1])
+      
     wid, hgt = self.font.getStringSize(str(text))
 
     #needs to be done later because of values that may be dependant on the text's properties
@@ -325,7 +331,7 @@ class FontLayer(Layer):
     if bool(eval(self.condition)):
         glColor4f(*color)
         self.font.render(self.text, position, align = alignment, 
-                         shadow = self.shadow, outline = self.outline)
+                         shadow = self.shadow, outline = self.outline, shadowOpacity = self.shadowOpacity)
     
         
 #creates a layer that is shaped like a pie-slice/circle instead of a rectangle
@@ -415,183 +421,311 @@ class Effect(ConfigGetMixin):
     
     self.condition = True
 
+  def _smoothstep(self, min, max, x):
+    if x < min:
+      return 0
+    if x > max:
+      return 1
+    def f(x):
+      return -2 * x**3 + 3*x**2
+    return f((x - min) / (max - min))
+    
+  def triggerPick(self):
+    if not self.stage.lastPickPos:
+      return 0.0
+    t = position - self.stage.lastPickPos
+    return (1.0 - self._smoothstep(0, 500.0, t))
+
+  def triggerMiss(self):
+    if not self.stage.lastMissPos:
+      return 0.0
+    t = position - self.stage.lastMissPos
+    return (1.0 - self._smoothstep(0, 500.0, t))
+
   def update(self):
     pass
 
+#this class extends effect and is a base for effects that deal with 
+#incrementing values that provide smooth transitions and animations
+class IncrementEffect(Effect):
+  def __init__(self, layer, section):
+    super(IncrementEffect, self).__init__(layer, section)
+    
+    self.reverse = False    #determines if the values should increment back when the 
+                            # condition is false or just jump back instantly
+                            
+    #can hold any number of values, as long as the amount matches
+    self.start = []         #starting set of values
+    self.end = []           #ending set of values
+    self.current = []       #the current value
+    
+    #rate at which values will increment between start and end
+    self.inRates = []       #incoming rates
+    self.outRates = []      #outgoing rates (if reverse is enabled)
+    
+    #catches flickering between 2 values
+    self.counter = 0
+    self.countRate = 0
+
+    #how long it takes for the transition to take place
+    self.transitionTime = 512.0
+    self.transitionTimeOut = 512.0
+    
+  #gets the rate at which time is passing, usable in finding the rates of things in
+  #terms of milliseconds instead of frames
+  def getTime(self, time):
+    t = time * (max(self.engine.clock.get_fps(), _minFPS)) / 1000.0
+    self.countRate = 1.0/max(t, 1.0)
+    return max(t, 1.0)
+   
+  #updates the rates at which values between start and end should change to reach
+  # the desired point
+  def updateRates(self):
+    try:
+      t = self.getTime(self.transitionTime)
+      for i in range(len(self.start)):
+        if self.end[i] < self.start[i]:
+          self.inRates[i] = (self.start[i] - self.end[i])/t
+        else:
+          self.inRates[i] = (self.end[i] - self.start[i])/t
+      if self.reverse and not bool(eval(self.condition)):
+        t = self.getTime(self.transitionTimeOut)
+        for i in range(len(self.start)):
+          if self.end[i] < self.start[i]:
+            self.outRates[i] = (self.start[i] - self.end[i])/t
+          else:
+            self.outRates[i] = (self.end[i] - self.start[i])/t
+    except:
+      #catches if rates have been declared or if they're proper size
+      # then tries updating them again now that they're proper
+      self.inRates = [0 for i in range(len(self.start))]
+      self.outRates = self.inRates[:]
+      self.updateRates()
+
+  #updates the values with the rates and returns the current saved value
+  def updateValues(self):
+    condition = bool(eval(self.condition))
+    if condition:
+      #slides to the end position
+      for i in range(len(self.start)):
+        if self.current[i] > self.end[i]:
+          if self.end[i] < self.start[i]:
+            self.current[i] -= self.inRates[i]
+          else:
+            self.current[i] = self.end[i]
+        elif self.current[i] < self.end[i]:
+          if self.end[i] > self.start[i]:
+            self.current[i] += self.inRates[i]
+          else:
+            self.current[i] = self.end[i]
+      if self.counter >= self.transitionTime:
+        self.current = self.end[:]
+    else:
+      #slides back to original position smoothly
+      if self.reverse:
+        for i in range(len(self.start)):
+          if self.current[i] > self.start[i]:
+            if self.end[i] > self.start[i]:
+              self.current[i] -= self.outRates[i]
+            else:
+              self.current[i] = self.start[i]
+          elif self.current[i] < self.start[i]:
+            if self.end[i] < self.start[i]:
+              self.current[i] += self.outRates[i]
+            else:
+              self.current[i] = self.start[i]
+        if self.counter <= 0.0:
+          self.current = self.start[:]
+      else:  #instant jump to starting value
+        self.current = self.start[:]
+        self.counter = 0.0
+        
+    return self.current
+    
+  #updates the counter, returns true if a change in value occurs
+  def updateCounter(self):
+    condition = bool(eval(self.condition))
+    if condition:
+      self.counter += self.countRate
+      if self.counter >= self.transitionTime:
+        self.counter = self.transitionTime
+        return False
+      return True
+    else:
+      self.counter -= self.countRate
+      if self.counter <= 0.0:
+        self.counter = 0.0
+        return False
+      return True
+    
+  #basic updating for the effect
+  def update(self):
+    self.updateRates()
+    self.updateValues()
+    self.updateCounter()
+    
 #slides the layer from one spot to another
 #in a set period of time when the condition is met
-class Slide(Effect):
+class Slide(IncrementEffect):
   def __init__(self, layer, section):
     super(Slide, self).__init__(layer, section)
 
-    self.startCoord = [eval(self.getexpr("startX", "0.0")), eval(self.getexpr("startY", "0.0"))]
+    w, h, = self.engine.view.geometry[2:4]
+    self.start = [eval(self.getexpr("startX", "0.0")), eval(self.getexpr("startY", "0.0"))]
                                                                 #starting position of the image
-    self.endCoord   = [eval(self.getexpr("endX",   "0.0")), eval(self.getexpr("endY",   "0.0"))]
+    self.end   = [eval(self.getexpr("endX",   "0.0")), eval(self.getexpr("endY",   "0.0"))]
                                                                 #ending position of the image
     self.inPixels  = self.get("inPixels", str, "").split("|")   #variables in terms of pixels
 
-    self.condition = self.getexpr("condition", "True")
-    
-    w, h, = self.engine.view.geometry[2:4]
-
     if isinstance(self.layer, FontLayer):
       if "startX" in self.inPixels:
-        self.startCoord[0] /= vpc[0]
+        self.start[0] /= vpc[0]
       if "endX" in self.inPixels:
-        self.endCoord[0] /= vpc[0]
+        self.end[0] /= vpc[0]
       if "startY" in self.inPixels:
-        self.startCoord[1] /= vpc[1]
+        self.start[1] /= vpc[1]
       if "endY" in self.inPixels:
-        self.endCoord[1] /= vpc[1]
+        self.end[1] /= vpc[1]
     else:
       if "startX" in self.inPixels:
-        self.startCoord[0] *= w/vpc[0]
+        self.start[0] *= w/vpc[0]
       else:
-        self.startCoord[0] *= w
+        self.start[0] *= w
 
       if "startY" in self.inPixels:
-        self.startCoord[1] *= h/vpc[1]
+        self.start[1] *= h/vpc[1]
       else:
-        self.startCoord[1] *= h
+        self.start[1] *= h
 
       if "endX" in self.inPixels:
-        self.endCoord[0] *= w/vpc[0]
+        self.end[0] *= w/vpc[0]
       else:
-        self.endCoord[0] *= w
+        self.end[0] *= w
 
       if "endY" in self.inPixels:
-        self.endCoord[1] *= h/vpc[1]
+        self.end[1] *= h/vpc[1]
       else:
-        self.endCoord[1] *= h
+        self.end[1] *= h
 
 
-    self.position = self.startCoord[:]
+    self.current = self.start[:]
     #y position needs to be flipped initially
     if isinstance(self.layer, FontLayer):
-      self.position[1] *= .75
-      self.position[1] = .75 - self.position[1]
+      self.current[1] *= .75
+      self.current[1] = .75 - self.current[1]
     
-    self.reverse = bool(eval(self.getexpr("reverse", "True")))
-
-    #how long it takes for the transition to take place
+    self.reverse = bool(eval(self.getexpr("reverse", "True")))    
+    self.condition = self.getexpr("condition", "True")    
     self.transitionTime = self.get("transitionTime", float, 512.0)
-
-    self.rates = [0,0]
-    self.updateRates()
+    self.transitionTimeOut = self.get("transitionTimeOut", float, self.transitionTime)
     
-  #updates the rate at which the layer will slide
-  def updateRates(self):
-    t = self.transitionTime * (max(self.engine.clock.get_fps(), _minFPS)) / 1000.0
-    for i in range(2):
-      if self.endCoord[i] < self.startCoord[i]:
-        self.rates[i] = (self.startCoord[i] - self.endCoord[i])/t
-      else:
-        self.rates[i] = (self.endCoord[i] - self.startCoord[i])/t
-              
-  def update(self):
-    condition = bool(eval(self.condition))
-
+  def updateValues(self):
     #reverse the processing for font layer handling
     if isinstance(self.layer, FontLayer):
-      self.position[1] = .75 - self.position[1]
-      self.position[1] /= .75
+      self.current[1] = .75 - self.current[1]
+      self.current[1] /= .75
 
-    self.updateRates()
-        
-    if condition:
-      for i in range(2):
-        if self.position[i] > self.endCoord[i]:
-          if self.endCoord[i] < self.startCoord[i]:
-            self.position[i] -= self.rates[i]
-          else:
-            self.position[i] = self.endCoord[i]
-        elif self.position[i] < self.endCoord[i]:
-          if self.endCoord[i] > self.startCoord[i]:
-            self.position[i] += self.rates[i]
-          else:
-            self.position[i] = self.endCoord[i]
-    else:
-      if self.reverse:
-        for i in range(2):
-          if self.position[i] > self.startCoord[i]:
-            if self.endCoord[i] > self.startCoord[i]:
-              self.position[i] -= self.rates[i]
-            else:
-              self.position[i] = self.startCoord[i]
-          elif self.position[i] < self.startCoord[i]:
-            if self.endCoord[i] < self.startCoord[i]:
-              self.position[i] += self.rates[i]
-            else:
-              self.position[i] = self.startCoord[i]
-      else:  
-        self.position = self.startCoord
-        
+    super(Slide, self).updateValues()
+
     #because of the y position being flipped on fonts it needs to be caught
     if isinstance(self.layer, FontLayer):
-      self.position[1] *= .75
-      self.position[1] = .75 - self.position[1]
+      self.current[1] *= .75
+      self.current[1] = .75 - self.current[1]
     
-    self.layer.position = self.position[:]
+  def update(self):
+    super(Slide, self).update()
+                
+    self.layer.position = self.current[:]
+
+#smoothly scales the layer from one size to another
+#in a set period of time when the condition is met
+class Scale(IncrementEffect):
+  def __init__(self, layer, section):
+    super(Scale, self).__init__(layer, section)
+
+    w, h, = self.engine.view.geometry[2:4]
+    self.start = [eval(self.getexpr("startX", "0.0")), eval(self.getexpr("startY", "0.0"))]
+                                                                #starting dimensions of the image
+    self.end   = [eval(self.getexpr("endX",   "0.0")), eval(self.getexpr("endY",   "0.0"))]
+                                                                #ending dimensions of the image
+    
+    self.current = self.start[:]
+    
+    self.inPixels  = self.get("inPixels", str, "").split("|")   #variables in terms of pixels
+
+    self.transitionTime = self.get("transitionTime", float, 512.0)
+    self.transitionTimeOut = self.get("transitionTimeOut", float, self.transitionTime)
+    self.condition = self.getexpr("condition", "True")
+    self.reverse = bool(eval(self.getexpr("reverse", "True")))
+
+    self.fixedScale = isinstance(self.layer, ImageLayer)
+
+  def fixScale(self):
+    w, h, = self.engine.view.geometry[2:4]
+    
+    self.start[0] *=  (self.layer.rect[1] - self.layer.rect[0])
+    self.start[1] *=  (self.layer.rect[3] - self.layer.rect[2])
+    self.end[0] *=  (self.layer.rect[1] - self.layer.rect[0])
+    self.end[1] *=  (self.layer.rect[3] - self.layer.rect[2])
+    
+    if "startX" in self.inPixels:
+      self.start[0] /= self.layer.drawing.pixelSize[0]
+    if "startY" in self.inPixels:
+      self.start[1] /= self.layer.drawing.pixelSize[1]
+    if "endX" in self.inPixels:
+      self.end[0] /= self.layer.drawing.pixelSize[0]
+    if "endY" in self.inPixels:
+      self.end[1] /= self.layer.drawing.pixelSize[1]
+
+    self.start[1] *= -1
+    self.end[1] *= -1
+    self.start[0] *= w/vpc[0]
+    self.end[0] *= w/vpc[0]
+    self.start[1] *= h/vpc[1]
+    self.end[1] *= h/vpc[1]
+    
+    self.current = self.start[:]
+      
+  def update(self):
+    if not self.fixedScale:
+      self.fixScale()
+      self.fixedScale = True
+      
+    super(Scale, self).update()
+    
+    self.layer.scale = self.current[:]
 
 #fades the color of the layer between this color and its original
 #in a set period of time when the condition is met
-class Fade(Effect):
+class Fade(IncrementEffect):
   def __init__(self, layer, section):
     super(Fade, self).__init__(layer, section)
-
     
     #starting color
-    color = self.engine.theme.hexToColor(self.get("color", str, "#FFFFFF"))
-    
-    #the current color of the image
-    self.currentColor = list(color)
-    if len(self.currentColor) == 3:
-      self.currentColor.append(1.0)
+    color = list(self.engine.theme.hexToColor(self.get("color", str, "#FFFFFF")))
+    self.start = list(color)
+    if len(self.start) == 3:
+      self.start.append(1.0)
     
     #the color to fade to
-    color = list(self.engine.theme.hexToColor(self.get("fadeTo", str, "#FFFFFF")))
+    self.end = list(self.engine.theme.hexToColor(self.get("fadeTo", str, "#FFFFFF")))
     #makes sure alpha is added
-    if len(color) == 3:
+    if len(self.end) == 3:
       color.append(1.0)
     
-    #the colors to alternate between
-    self.colors = [color, self.currentColor]
+      
+    #the current color of the image
+    self.current = self.start[:]
     
-    #how long it takes for the transition to take place
     self.transitionTime = self.get("transitionTime", float, 512.0)
-
-    self.updateRates()
-    
+    self.transitionTimeOut = self.get("transitionTimeOut", float, self.transitionTime)
     self.condition = self.getexpr("condition", "True")
     self.reverse = bool(eval(self.getexpr("reverse", "True")))
-
-  def updateRates(self):
-    t = self.transitionTime * (max(self.engine.clock.get_fps(), _minFPS)) / 1000.0
-    self.rates = [(self.colors[0][i] - self.colors[1][i])/t 
-                      for i in range(4)]
     
   def update(self):
-    condition = bool(eval(self.condition))
-
-    self.updateRates()
+    super(Fade, self).update()
     
-    if condition:
-      for i in range(len(self.currentColor)):
-        if self.currentColor[i] > self.colors[0][i]:
-          self.currentColor[i] -= self.rates[i]
-        elif self.currentColor[i] < self.colors[0][i]:
-          self.currentColor[i] += self.rates[i]
-    else:
-      if self.reverse:
-        for i in range(len(self.currentColor)):
-          if self.currentColor[i] > self.colors[1][i]:
-            self.currentColor[i] -= self.rates[i]
-          elif self.currentColor[i] < self.colors[1][i]:
-            self.currentColor[i] += self.rates[i]
-      else:  
-        self.currentColor[i] = self.colors[1]
-        
-    self.layer.color = self.currentColor
+    self.layer.color = self.current[:]
 
 #replaces the image of the layer when the condition is met
 class Replace(Effect):
@@ -742,6 +876,14 @@ class Rockmeter(ConfigGetMixin):
             self.createImage(self.section, i)
           break
 
+    self.reset()
+    
+  def reset(self):
+    self.lastMissPos        = None
+    self.lastPickPos        = None
+    self.playedNotes        = []
+    self.averageNotes       = [0.0]
+    
   #adds a layer to the rockmeter's list
   def addLayer(self, layer, number, shared = False):
     if shared:
@@ -752,24 +894,20 @@ class Rockmeter(ConfigGetMixin):
 
   def loadLayerFX(self, layer, section):
     section = section.split(":")[0]
-    types = ["Slide", "Rotate", "Replace", "Fade", "Animate"]
+    types = {"Slide": "Slide(layer, fxsection)",
+             "Rotate": "Rotate(layer, fxsection)",
+             "Replace": "Replace(layer, fxsection)",
+             "Fade": "Fade(layer, fxsection)",
+             "Animate": "Animate(layer, fxsection)",
+             "Scale": "Scale(layer, fxsection)"}
     for i in range(5):  #maximum of 5 effects per layer
-      for t in types:
+      for t in types.keys():
         fxsection = "%s:fx%d:%s" % (section, i, t)
         if not self.config.has_section(fxsection):
           continue
         else:
-          if t == types[0]:
-            layer.effects.append(Slide(layer, fxsection))
-#          elif t == types[1]:
-#            layer.effects.append(Rotate(layer, fxsection))
-          elif t == types[2]:
-            layer.effects.append(Replace(layer, fxsection))
-          elif t == types[3]:
-            layer.effects.append(Fade(layer, fxsection))
-          else:
-            layer.effects.append(Animate(layer, fxsection))
-          break #only allow type per effect number
+          layer.effects.append(eval(types[t]))
+          break
             
       
   def createFont(self, section, number):
@@ -842,9 +980,10 @@ class Rockmeter(ConfigGetMixin):
   #this updates all the usual global variables that are handled by the rockmeter
   #these are all player specific
   def updateVars(self, playerNum):
-    global score, rock, streak, streakMax, power, stars, partialStars, multiplier, bassgroove, boost, player
+    global score, rock, streak, streakMax, power, stars, partialStars, multiplier, bassgroove, boost, player, part
     scene = self.scene
     player = scene.instruments[playerNum]
+    part = player.__class__.__name__
 
     #this is here for when I finally get coOp worked in
     if self.coOp:
@@ -886,7 +1025,16 @@ class Rockmeter(ConfigGetMixin):
     #force bassgroove to false if it's not enabled
     if not scene.bassGrooveEnabled:
         bassgroove = False
-        
+  
+  def triggerPick(self, pos, notes):
+    if notes:
+      self.lastPickPos      = pos
+      self.playedNotes      = self.playedNotes[-3:] + [sum(notes) / float(len(notes))]
+      self.averageNotes[-1] = sum(self.playedNotes) / float(len(self.playedNotes))
+
+  def triggerMiss(self, pos):
+    self.lastMissPos = pos
+            
   def render(self, visibility):
     self.updateTime()
 

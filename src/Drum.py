@@ -155,6 +155,31 @@ class Drum(Instrument):
         engine.loadImgDrawing(self, "noteOpenAnimatedPower", get("animated_open_power.png"))
         engine.loadImgDrawing(self, "noteOpenAnimated", get("animated_open.png"))        
 
+      size = (self.boardWidth/1.9, (self.boardWidth/self.strings)/3.0)
+      self.openVtx = np.array([[-size[0],  .27, size[1]],
+                               [size[0],  .27, size[1]],
+                               [-size[0], -.27, -size[1]],
+                               [size[0], -.27, -size[1]]], 
+                               dtype=np.float32)
+
+      self.noteTexCoord = [[np.array([[i/float(self.strings), s/6.0],
+                                     [(i+1)/float(self.strings), s/6.0],
+                                     [i/float(self.strings), (s+1)/6.0],
+                                     [(i+1)/float(self.strings), (s+1)/6.0]], 
+                                     dtype=np.float32)
+                            for i in range(self.strings)] for s in range(0,5,2)]
+      self.openTexCoord = [np.array([[0.0, s/6.0],
+                                     [1.0, s/6.0],
+                                     [0.0, (s+1)/6.0],
+                                     [1.0, (s+1)/6.0]], dtype=np.float32) for s in range(1,6,2)]
+                            
+      self.animatedOpenTexCoord = [[np.array([[0.0, s/float(self.noteSpinFrames)],
+                                     [1.0, s/float(self.noteSpinFrames)],
+                                     [0.0, (s+1)/float(self.noteSpinFrames)],
+                                     [1.0, (s+1)/float(self.noteSpinFrames)]], 
+                                     dtype=np.float32)
+                            for i in range(self.strings)] for s in range(self.noteSpinFrames)]  
+
     else:
       defaultOpenNote = False
 
@@ -202,6 +227,123 @@ class Drum(Instrument):
       else:
         engine.loadImgDrawing(self, "keytexopen", get("keytex_open.png"))
 
+  def renderNote(self, length, sustain, color, tailOnly = False, isTappable = False, fret = 0, spNote = False, isOpen = False, spAct = False):
+
+    if tailOnly:
+      return
+
+    if self.twoDnote == True:
+      tailOnly = True
+
+      y = 0
+      if spNote:
+        y += 1
+      elif self.starPowerActive:
+        y += 2
+        
+      if isOpen:
+        vtx = self.openVtx
+        if self.noteSpin:
+          texCoord = self.animatedOpenTexCoord[self.noteSpinFrameIndex]
+          if spNote == True:
+            noteImage = self.noteOpenAnimatedPower
+          elif self.starPowerActive == True: #death_au: drum sp active notes.
+            noteImage = self.noteOpenAnimatedPowerActive
+          else:
+            noteImage = self.noteOpenAnimated
+          if not noteImage:
+            noteImage = self.noteButtons
+            texCoord = self.openTexCoord[y]
+        else:
+          if not noteImage:
+            noteImage = self.noteButtons
+            texCoord = self.noteTexCoord[y]
+      else:
+        fret -= 1
+        vtx = self.noteVtx
+        if self.noteSpin:
+          texCoord = self.animatedNoteTexCoord[self.noteSpinFrameIndex][fret]
+          if spNote:
+            noteImage = self.noteAnimatedPower
+          elif self.starPowerActive:
+            noteImage = self.noteAnimatedPowerActive
+          else:
+            noteImage = self.noteAnimatedNormal             
+          if not noteImage:
+            noteImage = self.noteButtons
+            texCoord = self.noteTexCoord[y][fret]
+        else:
+          noteImage = self.noteButtons
+          texCoord = self.noteTexCoord[y][fret]
+          
+      self.engine.draw3Dtex(noteImage, vertex = vtx, texcoord = texCoord,
+                            scale = (1,1,0), rot = (30,1,0,0), multiples = False, color = color)
+
+    else: #3d Notes
+      shaders.setVar("Material",color,"notes")
+
+      self.notepos = self.engine.theme.drumnotepos
+      self.noterot = self.engine.theme.drumnoterot
+      
+      if fret == 0:
+        fret = 4     #fret 4 is angled, get fret 2 :)
+        #fret = 2    #compensating for this in drum.
+      elif fret == 4:
+        fret = 0
+
+      if isOpen and self.openMesh is not None:
+        meshObj = self.openMesh
+      elif spNote and self.starMesh is not None:
+        meshObj = self.starMesh
+      else:
+        meshObj = self.noteMesh
+
+      glPushMatrix()
+      glEnable(GL_DEPTH_TEST)
+      glDepthMask(1)
+      glShadeModel(GL_SMOOTH)
+
+      if not isOpen:
+        if spNote and self.threeDspin:
+          glRotate(90 + self.time/3, 0, 1, 0)
+        elif not spNote and self.noterotate:
+          glRotatef(90, 0, 1, 0)
+          glRotatef(-90, 1, 0, 0)
+
+      if fret >= 0 and fret <= 4:
+        glRotate(self.noterot[fret], 0, 0, 1)
+        glTranslatef(0, self.notepos[fret], 0)
+      
+      texture = None
+      if self.notetex: 
+      
+        if isOpen:
+          if self.opentexture_star:
+            texture = self.opentexture_star
+          elif self.opentexture_stara and self.starPowerActive:
+            texture = self.opentexture_stara
+          elif self.opentexture:
+            texture = self.opentexture
+
+        elif self.startex and spNote:
+          texture = getattr(self,"startex"+chr(97+fret))
+
+        elif self.spActTex and spAct:
+          texture = self.spActTex        
+
+        elif self.staratex and self.starPowerActive:
+          texture = getattr(self,"staratex"+chr(97+fret))
+
+        else:
+          texture = getattr(self,"notetex"+chr(97+fret))
+
+      self.render3DNote(texture, meshObj, color, isTappable)
+
+      glDepthMask(0)
+      glPopMatrix()
+      glDisable(GL_DEPTH_TEST)
+
+  
   def renderFrets(self, visibility, song, controls):
     w = self.boardWidth / self.strings
     size = (.22, .22)

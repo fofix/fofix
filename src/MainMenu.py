@@ -150,14 +150,25 @@ class MainMenu(BackgroundLayer):
     ]
     
     self.opt_bkg_size = [float(i) for i in self.engine.theme.opt_bkg_size]
+    self.opt_text_color = self.engine.theme.hexToColor(self.engine.theme.opt_text_colorVar)
+    self.opt_selected_color = self.engine.theme.hexToColor(self.engine.theme.opt_selected_colorVar)
 
-    strCareer = ""
-    strQuickplay = ""
-    strSolo = ""
-    strMultiplayer = ""
-    strTraining = ""
-    strSettings = ""
-    strQuit = ""
+    if self.BGText:
+      strCareer = ""
+      strQuickplay = ""
+      strSolo = ""
+      strMultiplayer = ""
+      strTraining = ""
+      strSettings = ""
+      strQuit = ""
+    else:
+      strCareer = "Career"
+      strQuickplay = "Quickplay"
+      strSolo = "Solo"
+      strMultiplayer = "Multiplayer"
+      strTraining = "Training"
+      strSettings = "Settings"
+      strQuit = "Quit"
     
     multPlayerMenu = [
         (_("Face-Off"),     lambda: self.newLocalGame(multiplayer = FACEOFF)),
@@ -193,8 +204,9 @@ class MainMenu(BackgroundLayer):
       ]
 
 
+    w, h, = self.engine.view.geometry[2:4]
     
-    self.menu = Menu(self.engine, mainMenu, onClose = lambda: self.engine.view.popLayer(self), pos = (12,12), textColor = self.opt_text_color, selectedColor = self.opt_selected_color)
+    self.menu = Menu(self.engine, mainMenu, onClose = lambda: self.engine.view.popLayer(self), pos = (self.menux, .75-(.75*self.menuy)))
 
     engine.mainMenu = self    #Points engine.mainMenu to the one and only MainMenu object instance
 
@@ -359,27 +371,28 @@ class MainMenu(BackgroundLayer):
         #MFH - auto-scaling
         self.engine.drawImage(self.background, (1.0,-1.0), (w/2, h/2), stretched = 3)
 
-      numOfChoices = len(self.menu.choices)
-      for i in range(numOfChoices):
-        #Item selected
-        if self.menu.currentIndex == i:
-          xpos = (.5,1)
-        #Item unselected
-        else:
-          xpos = (0,.5)
-        #which item?
-        ypos = (1/float(numOfChoices) * i, 1/float(numOfChoices) * (i + 1)) 
+      if self.BGText:
+        numOfChoices = len(self.menu.choices)
+        for i in range(numOfChoices):
+          #Item selected
+          if self.menu.currentIndex == i:
+            xpos = (.5,1)
+          #Item unselected
+          else:
+            xpos = (0,.5)
+          #which item?
+          ypos = (1/float(numOfChoices) * i, 1/float(numOfChoices) * (i + 1)) 
 
-        textcoord = (w*self.menux,h*self.menuy-(h*self.main_menu_vspacing)*i)
-        sFactor = self.main_menu_scale
-        wFactor = xpos[1] - xpos[0]
-        hFactor = ypos[1] - ypos[0]
-        self.engine.drawImage(self.BGText, 
+          textcoord = (w*self.menux,h*self.menuy-(h*self.main_menu_vspacing)*i)
+          sFactor = self.main_menu_scale
+          wFactor = xpos[1] - xpos[0]
+          hFactor = ypos[1] - ypos[0]
+          self.engine.drawImage(self.BGText, 
                               scale = (wFactor*sFactor,-hFactor*sFactor), 
                               coord = textcoord,
                               rect  = (xpos[0],xpos[1],ypos[0],ypos[1]), stretched = 11)
-
-#racer: added version tag to main menu:
+        
+    #racer: added version tag to main menu:
     if self.version != None:
           wfactor = (w * self.engine.theme.versiontagScale) / self.version.width1()
           self.engine.drawImage(self.version,( wfactor, -wfactor ),(w*self.engine.theme.versiontagposX, h*self.engine.theme.versiontagposY)) #worldrave - Added theme settings to control X+Y positions of versiontag.

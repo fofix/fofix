@@ -434,6 +434,25 @@ class Instrument(object):
       else:
         engine.loadImgDrawing(self, "noteButtons", get("notes.png"))
         
+      size = (self.boardWidth/self.strings/2, self.boardWidth/self.strings/2)
+      self.noteVtx = np.array([[-size[0],  .27, size[1]],
+                               [size[0],  .27, size[1]],
+                               [-size[0], -.27, -size[1]],
+                               [size[0], -.27, -size[1]]], 
+                               dtype=np.float32)
+
+      self.noteTexCoord = [[np.array([[i/float(self.strings), s/6.0],
+                                     [(i+1)/float(self.strings), s/6.0],
+                                     [i/float(self.strings), (s+1)/6.0],
+                                     [(i+1)/float(self.strings), (s+1)/6.0]], 
+                                     dtype=np.float32)
+                            for i in range(self.strings)] for s in range(6)]
+      self.animatedNoteTexCoord = [[np.array([[i/float(self.strings), s/float(self.noteSpinFrames)],
+                                     [(i+1)/float(self.strings), s/float(self.noteSpinFrames)],
+                                     [i/float(self.strings), (s+1)/float(self.noteSpinFrames)],
+                                     [(i+1)/float(self.strings), (s+1)/float(self.noteSpinFrames)]], 
+                                     dtype=np.float32)
+                            for i in range(self.strings)] for s in range(self.noteSpinFrames)]  
     else:
       defaultNote = False
 
@@ -928,6 +947,59 @@ class Instrument(object):
     if self.hitflamesAnim and self.HCount2 > self.HFrameLimit2:
       self.HCount2 = 0
 
+  #group rendering of 2D notes into method
+  def render3DNote(self, texture, model, color, isTappable):
+    if texture: 
+      glColor3f(1,1,1)
+      glEnable(GL_TEXTURE_2D)
+      texture.texture.bind()
+      glMatrixMode(GL_TEXTURE)
+      glScalef(1, -1, 1)
+      glMatrixMode(GL_MODELVIEW)
+      glScalef(self.boardScaleX, self.boardScaleY, 1)
+
+      if isTappable:
+        mesh = "Mesh_001"
+      else:
+        mesh = "Mesh"
+
+      model.render(mesh)
+
+      if shaders.enable("notes"):
+        shaders.setVar("isTextured",True)
+        model.render(mesh)
+        shaders.disable() 
+          
+      glMatrixMode(GL_TEXTURE)
+      glLoadIdentity()
+      glMatrixMode(GL_MODELVIEW)
+      glDisable(GL_TEXTURE_2D)
+
+    else:
+      #mesh = outer ring (black) 
+      #mesh_001 = main note (key color) 
+      #mesh_002 = top (spot or hopo if no mesh_003) 
+      #mesh_003 = hopo bump (hopo color)
+
+      #death_au: fixed 3D note colours
+      glColor4f(*color)
+      if shaders.enable("notes"):
+        shaders.setVar("isTextured",False)
+      model.render("Mesh_001")
+      shaders.disable()
+      glColor3f(self.spotColor[0], self.spotColor[1], self.spotColor[2])
+      if isTappable:
+        if self.hopoColor[0] == -2:
+          glColor4f(*color)
+        else:
+          glColor3f(self.hopoColor[0], self.hopoColor[1], self.hopoColor[2])
+        if(model.find("Mesh_003")) == True:
+          model.render("Mesh_003")
+          glColor3f(self.spotColor[0], self.spotColor[1], self.spotColor[2])
+      model.render("Mesh_002")
+      glColor3f(self.meshColor[0], self.meshColor[1], self.meshColor[2])
+      model.render("Mesh")
+
   def renderNote(self, length, sustain, color, tailOnly = False, isTappable = False, fret = 0, spNote = False, isOpen = False, spAct = False):
 
     if tailOnly:
@@ -940,107 +1012,49 @@ class Instrument(object):
       noteImage = self.noteButtons
 
       tailOnly = True
-
-      if isOpen:
-        size = (self.boardWidth/1.9, (self.boardWidth/self.strings)/3.0)
-        texSize = (0,1)
-        if spNote == True:
-          if self.noteOpenAnimatedPower:
-            noteImage = self.noteDrumOpenAnimatedPower
-            texY = (self.noteSpinFrameIndex*.066667, (self.noteSpinFrameIndex - 1)*.066667)
+          
+      y = 0
+      if spNote:
+        y += 2
+      elif self.starPowerActive:
+        y += 4
+      if isTappable:
+        y += 1
+        
+      if self.noteSpin:
+        texCoord = self.animatedNoteTexCoord[self.noteSpinFrameIndex][fret]
+        if isTappable:
+          if spNote:
+            noteImage = self.noteAnimatedPowerHOPO
+          elif self.starPowerActive:
+            noteImage = self.noteAnimatedPowerActiveHOPO
           else:
-            texY = (3.0*0.166667,4.0*0.166667)
-
-        elif self.starPowerActive == True: #death_au: drum sp active notes.
-          if self.noteOpenAnimatedPowerActive:
-            noteImage = self.noteDrumOpenAnimatedPowerActive
-            texY = (self.noteSpinFrameIndex*.066667, (self.noteSpinFrameIndex - 1)*.066667)
-          else:
-            texY = (5.0*0.166667,1.0)
-
+            noteImage = self.noteAnimatedHOPO
         else:
-          if self.noteOpenAnimated:
-            noteImage = self.noteDrumOpenAnimated
-            texY = (self.noteSpinFrameIndex*.066667, (self.noteSpinFrameIndex - 1)*.066667)
+          if spNote:
+            noteImage = self.noteAnimatedPower
+          elif self.starPowerActive:
+            noteImage = self.noteAnimatedPowerActive
           else:
-            texY = (1.0*0.166667,2.0*0.166667)
-
+            noteImage = self.noteAnimatedNormal             
+        if not noteImage:
+          noteImage = self.noteButtons
+          texCoord = self.noteTexCoord[y][fret]
       else:
-        size = (self.boardWidth/self.strings/2, self.boardWidth/self.strings/2)
-        if self.isDrum:
-          fret -= 1
-        texSize = (fret/self.lanenumber,fret/self.lanenumber+1/self.lanenumber)
-        if spNote == True:
-          if isTappable:
-            if self.noteAnimatedPowerHOPO:
-              noteImage = self.noteAnimatedPowerHOPO
-              texY = (self.noteSpinFrameIndex*.066667, (self.noteSpinFrameIndex - 1)*.066667)
-            else:
-              texY = (3*0.166667, 4*0.166667)
-          else:
-            if self.noteAnimatedPower:
-              noteImage = self.noteAnimatedPower
-              texY = (self.noteSpinFrameIndex*.066667, (self.noteSpinFrameIndex - 1)*.066667)
-            else:
-              texY = (2*0.166667, 3*0.166667)
-
-        elif self.starPowerActive:
-          if isTappable:
-            if self.noteAnimatedPowerActiveHOPO:
-              noteImage = self.noteAnimatedPowerActiveHOPO
-              texY = (self.noteSpinFrameIndex*.066667, (self.noteSpinFrameIndex - 1)*.066667)
-            else:
-              texY = (5*0.166667, 1)
-          else:
-            if self.noteAnimatedPowerActive:
-              noteImage = self.noteAnimatedPowerActive
-              texY = (self.noteSpinFrameIndex*.066667, (self.noteSpinFrameIndex - 1)*.066667)
-            else:
-              texY = (4*0.166667, 5*0.166667)
-
-        else:
-          if isTappable:
-            if self.noteAnimatedHOPO:
-              noteImage = self.noteAnimatedHOPO
-              texY = (self.noteSpinFrameIndex*.066667, (self.noteSpinFrameIndex - 1)*.066667)
-            else:
-              texY = (1*0.166667, 2*0.166667)
-          else:
-            if self.noteAnimatedNormal:
-              noteImage = self.noteAnimatedNormal
-              texY = (self.noteSpinFrameIndex*.066667, (self.noteSpinFrameIndex - 1)*.066667)
-            else:
-              texY = (0, 1*0.166667)
-
-      self.engine.draw3Dtex(noteImage, vertex = (-size[0],size[1],size[0],-size[1]), texcoord = (texSize[0],texY[0],texSize[1],texY[1]),
-                            scale = (1,1,0), rot = (30,1,0,0), multiples = False, color = color, vertscale = .27)
+        noteImage = self.noteButtons
+        texCoord = self.noteTexCoord[y][fret]
+          
+      self.engine.draw3Dtex(noteImage, vertex = self.noteVtx, texcoord = texCoord,
+                            scale = (1,1,0), rot = (30,1,0,0), multiples = False, color = color)
 
     else: #3d Notes
       shaders.setVar("Material",color,"notes")
 
-      if self.isDrum:
-        self.notepos = self.engine.theme.drumnotepos
-        self.noterot = self.engine.theme.drumnoterot
-      else:
-        self.notepos = self.engine.theme.notepos
-        self.noterot = self.engine.theme.noterot
-
-      #mesh = outer ring (black) 
-      #mesh_001 = main note (key color) 
-      #mesh_002 = top (spot or hopo if no mesh_003) 
-      #mesh_003 = hopo bump (hopo color)
-
-      if self.isDrum:
-        if fret == 0:
-          fret = 4     #fret 4 is angled, get fret 2 :)
-          #fret = 2    #compensating for this in drum.
-        elif fret == 4:
-          fret = 0
-
-      if spNote == True and self.starMesh is not None and isOpen == False:
+      self.notepos = self.engine.theme.notepos
+      self.noterot = self.engine.theme.noterot
+      
+      if spNote == True and self.starMesh is not None:
         meshObj = self.starMesh
-      elif isOpen == True and self.openMesh is not None:
-        meshObj = self.openMesh
       else:
         meshObj = self.noteMesh
 
@@ -1049,95 +1063,28 @@ class Instrument(object):
       glDepthMask(1)
       glShadeModel(GL_SMOOTH)
 
-      if spNote == True and self.threeDspin == True and isOpen == False:
+      if spNote and self.threeDspin:
         glRotate(90 + self.time/3, 0, 1, 0)
-      if isOpen == False and spNote == False and self.noterotate == True:
+      elif not spNote and self.noterotate:
         glRotatef(90, 0, 1, 0)
         glRotatef(-90, 1, 0, 0)
 
-      if fret == 0: # green note/ drums open note
-        glRotate(self.noterot[0], 0, 0, 1), glTranslatef(0, self.notepos[0], 0)
-      elif fret == 1: # red note
-        glRotate(self.noterot[1], 0, 0, 1), glTranslatef(0, self.notepos[1], 0)
-      elif fret == 2: # yellow
-        glRotate(self.noterot[2], 0, 0, 1), glTranslatef(0, self.notepos[2], 0)
-      elif fret == 3:# blue note
-        glRotate(self.noterot[3], 0, 0, 1), glTranslatef(0, self.notepos[3], 0)
-      elif fret == 4:# orange note / green on drums
-        glRotate(self.noterot[4], 0, 0, 1), glTranslatef(0, self.notepos[4], 0)
-
-      if isOpen:
-        if self.opentexture_stara and spNote==False and self.starPowerActive:
-          self.noteTex = self.opentexture_stara
-		  
-        elif self.opentexture and spNote==False:
-          self.noteTex = self.opentexture
-
-        elif self.opentexture_star and spNote==True:
-          self.noteTex = self.opentexture_star
-
-      elif self.spActTex and isOpen == False and spNote == False and spAct and self.isDrum:
-        self.noteTex = self.spActTex
-
-      elif self.staratex == True and self.starPowerActive and spNote == False and isOpen == False:
-        self.noteTex = getattr(self,"staratex"+chr(97+fret))
-
-      elif self.notetex == True and spNote == False and isOpen == False:
-        self.noteTex = getattr(self,"notetex"+chr(97+fret))
-
-      elif self.startex == True and spNote == True and isOpen == False:
-        self.noteTex = getattr(self,"startex"+chr(97+fret))
-
-
-      glColor3f(1,1,1)
-      glEnable(GL_TEXTURE_2D)
-      self.noteTex.texture.bind()
-      glMatrixMode(GL_TEXTURE)
-      glScalef(1, -1, 1)
-      glMatrixMode(GL_MODELVIEW)
-      glScalef(self.boardScaleX, self.boardScaleY, 1)
-
-      if isTappable:
-        mesh = "Mesh_001"
+      if fret >= 0 and fret <= 4:
+        glRotate(self.noterot[fret], 0, 0, 1)
+        glTranslatef(0, self.notepos[fret], 0)
+        
+      if self.notetex:
+        if self.startex and spNote:
+          texture = getattr(self,"startex"+chr(97+fret))
+        elif self.staratex and self.starPowerActive:
+          texture = getattr(self,"staratex"+chr(97+fret))
+        else:
+          texture = getattr(self,"notetex"+chr(97+fret))
       else:
-        mesh = "Mesh"
-
-      meshObj.render(mesh)
-
-      if shaders.enable("notes"):
-        shaders.setVar("isTextured",True)
-        meshObj.render(mesh)
-        shaders.disable() 
-
-      glMatrixMode(GL_TEXTURE)
-      glLoadIdentity()
-      glMatrixMode(GL_MODELVIEW)
-      glDisable(GL_TEXTURE_2D)
-
-
-      if not self.noteTex: 
-        #death_au: fixed 3D note colours
-        glColor4f(*color)
-        if isOpen == True and self.starPowerActive == False:
-          glColor4f(self.opencolor[0],self.opencolor[1],self.opencolor[2], 1)
-        if shaders.enable("notes"):
-          shaders.setVar("isTextured",False)
-        meshObj.render("Mesh_001")
-        shaders.disable()
-        glColor3f(self.spotColor[0], self.spotColor[1], self.spotColor[2])
-        if isTappable:
-          if self.hopoColor[0] == -2:
-            glColor4f(*color)
-          else:
-            glColor3f(self.hopoColor[0], self.hopoColor[1], self.hopoColor[2])
-          if(meshObj.find("Mesh_003")) == True:
-            meshObj.render("Mesh_003")
-            glColor3f(self.spotColor[0], self.spotColor[1], self.spotColor[2])
-        meshObj.render("Mesh_002")
-        glColor3f(self.meshColor[0], self.meshColor[1], self.meshColor[2])
-        meshObj.render("Mesh")
-
-
+        texture = None
+        
+      self.render3DNote(texture, meshObj, color, isTappable)
+        
       glDepthMask(0)
       glPopMatrix()
       glDisable(GL_DEPTH_TEST)

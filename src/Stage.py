@@ -569,10 +569,12 @@ class Stage(object):
       self.lastPickPos      = pos
       self.playedNotes      = self.playedNotes[-3:] + [sum(notes) / float(len(notes))]
       self.averageNotes[-1] = sum(self.playedNotes) / float(len(self.playedNotes))
-
+      self.rockmeter.triggerPick(pos, notes)
+      
   def triggerMiss(self, pos):
     self.lastMissPos = pos
-
+    self.rockmeter.triggerMiss(pos)
+    
   def triggerQuarterBeat(self, pos, quarterBeat):
     self.lastQuarterBeatPos = pos
     self.quarterBeat        = quarterBeat

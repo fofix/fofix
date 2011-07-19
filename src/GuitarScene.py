@@ -88,7 +88,8 @@ class GuitarScene(Scene):
     phrase = self.sinfo.loadingPhrase
     if phrase == "":
       phrase = random.choice(self.engine.theme.loadingPhrase)
-    splash = Dialogs.showLoadingSplashScreen(self.engine, phrase + " \n " + _("Initializing...")) 
+    #splash = Dialogs.showLoadingSplashScreen(self.engine, phrase + " \n " + _("Initializing...")) 
+    splash = Dialogs.showSongLoadingSplashScreen(self.engine, songName, libraryName, phrase + " \n " + _("Initializing..."))
     Dialogs.changeLoadingSplashScreenText(self.engine, splash, phrase + " \n " + _("Initializing..."))
       
 
@@ -108,7 +109,8 @@ class GuitarScene(Scene):
       # self.gameMode2p = 6
       # self.gamePlayers = 2
 
-
+    if self.gameMode1p == 1:
+      self.practiceMode = True
     
     #MFH - check for party mode (akedrou TODO - fix/remove party mode!)
     # if self.gameMode2p == 2:
@@ -2226,6 +2228,7 @@ class GuitarScene(Scene):
     for player in self.playerList:
       player.reset()
     self.stage.reset()
+    self.stage.rockmeter.reset()
     self.enteredCode     = []
     self.jurgPlayer       = [False for i in self.playerList] #Jurgen hasn't played the restarted song =P
     
@@ -3071,12 +3074,7 @@ class GuitarScene(Scene):
 
   def rockmeterDecrease(self, playerNum, vScore = 0):
     i = playerNum
-    if self.instruments[i].isVocal:
-      rockMinusAmount = 500 * (3 - vScore)
-      self.rock[i] -= rockMinusAmount
-      if (not self.coOpRB) and (self.rock[i]/self.rockMax <= 0.667) and ((self.rock[i]+rockMinusAmount)/self.rockMax > 0.667): #akedrou
-        self.playersInGreen -= 1
-      return
+
     rockMinusAmount = 0 #akedrou - simplify the various incarnations of minusRock.
     if self.instruments[i].isDrum: 
       self.drumStart = True
@@ -3090,6 +3088,13 @@ class GuitarScene(Scene):
     if not self.failingEnabled or (self.gameMode == PRACTICE):
       return
 
+    if self.instruments[i].isVocal:
+      rockMinusAmount = 500 * (3 - vScore)
+      self.rock[i] -= rockMinusAmount
+      if (not self.coOpRB) and (self.rock[i]/self.rockMax <= 0.667) and ((self.rock[i]+rockMinusAmount)/self.rockMax > 0.667): #akedrou
+        self.playersInGreen -= 1
+      return
+      
     if self.battle and self.numOfPlayers > 1: #battle mode
       if self.notesMissed[i]:
         self.minusRock[i] += self.minGain/self.multi[i]

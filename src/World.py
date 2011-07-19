@@ -116,6 +116,7 @@ class World:
     player.controlType = self.engine.input.controls.type[player.controller]
     player.keyList = Player.playerkeys[playerNum]
     player.configController()
+    player.practiceMode = (self.gameMode == 1)
     self.players.append(player)
     self.songQueue.parts.append(player.part.id)
     self.songQueue.diffs.append(player.getDifficultyInt())

@@ -812,7 +812,6 @@ class SettingsMenu(Menu.Menu):
       ConfigChoice(self.engine, self.engine.config, "game", "noterotate", autoApply = True), #blazingamer
       ConfigChoice(self.engine, self.engine.config, "menu", "gfx_version_tag", autoApply = True), #MFH
       ConfigChoice(self.engine, self.engine.config, "video",  "multisamples", isQuickset = 1),
-      ConfigChoice(self.engine, self.engine.config, "game", "in_game_font_shadowing", autoApply = True),      #myfingershurt
       ConfigChoice(self.engine, self.engine.config, "performance", "static_strings", autoApply = True, isQuickset = 1),      #myfingershurt
       ConfigChoice(self.engine, self.engine.config, "performance", "killfx", autoApply = True, isQuickset = 1),   #blazingamer
       (_("More Effects"), self.shaderSettings, _("Change the settings of the shader system.")), #volshebnyi
@@ -838,27 +837,20 @@ class SettingsMenu(Menu.Menu):
     self.fretSettingsMenu = Menu.Menu(self.engine, self.fretSettings, pos = (self.opt_text_x, self.opt_text_y), textColor = self.opt_text_color, selectedColor = self.opt_selected_color)
 
     self.themeDisplaySettings = [
-      ConfigChoice(self.engine, self.engine.config, "game",   "small_rb_mult", autoApply = True), #blazingamer
-      ConfigChoice(self.engine, self.engine.config, "game", "starfx", autoApply = True),
       ConfigChoice(self.engine, self.engine.config, "performance", "animated_notes", autoApply = True, isQuickset = 1),
     ]
     self.themeDisplayMenu = Menu.Menu(self.engine, self.themeDisplaySettings, pos = (self.opt_text_x, self.opt_text_y), textColor = self.opt_text_color, selectedColor = self.opt_selected_color)
     
     self.inGameDisplaySettings = [
       (_("Theme Display Settings"), self.themeDisplayMenu, _("Change settings that only affect certain theme types.")),
-      ConfigChoice(self.engine, self.engine.config, "game", "in_game_stars", autoApply = True, isQuickset = 2),#myfingershurt
-      ConfigChoice(self.engine, self.engine.config, "game", "partial_stars", autoApply = True, isQuickset = 1),#myfingershurt
-      ConfigChoice(self.engine, self.engine.config, "performance", "star_continuous_fillup", autoApply = True, isQuickset = 1), #stump
       ConfigChoice(self.engine, self.engine.config, "game", "game_phrases", autoApply = True, isQuickset = 1),
       ConfigChoice(self.engine, self.engine.config, "game", "hopo_indicator", autoApply = True),
       ConfigChoice(self.engine, self.engine.config, "game", "accuracy_mode", autoApply = True),
-      ConfigChoice(self.engine, self.engine.config, "performance", "in_game_stats", autoApply = True, isQuickset = 1),#myfingershurt
       ConfigChoice(self.engine, self.engine.config, "game", "gsolo_accuracy_disp", autoApply = True, isQuickset = 1), #MFH
       ConfigChoice(self.engine, self.engine.config, "game", "solo_frame", autoApply = True),      #myfingershurt
       ConfigChoice(self.engine, self.engine.config, "video", "disable_fretsfx", autoApply = True),
       ConfigChoice(self.engine, self.engine.config, "video", "disable_flamesfx", autoApply = True),
       ConfigChoice(self.engine, self.engine.config, "video", "hitglow_color", autoApply = True),
-      ConfigChoice(self.engine, self.engine.config, "game", "game_time", autoApply = True),  
       ConfigChoice(self.engine, self.engine.config, "video", "counting", autoApply = True, isQuickset = 2),
     ]
     self.inGameDisplayMenu = Menu.Menu(self.engine, self.inGameDisplaySettings, pos = (self.opt_text_x, self.opt_text_y), textColor = self.opt_text_color, selectedColor = self.opt_selected_color)
@@ -1239,10 +1231,7 @@ class BasicSettingsMenu(Menu.Menu):
     self.keySettingsMenu = Menu.Menu(self.engine, self.keySettings, onClose = self.controlCheck, pos = (self.opt_text_x, self.opt_text_y), textColor = self.opt_text_color, selectedColor = self.opt_selected_color)
     
     InGameDisplaySettings = [
-      ConfigChoice(engine, engine.config, "game", "in_game_stars", autoApply = True, isQuickset = 2),#myfingershurt
       ConfigChoice(engine, engine.config, "game", "accuracy_mode", autoApply = True),
-      ConfigChoice(engine, engine.config, "performance", "in_game_stats", autoApply = True, isQuickset = 1),#myfingershurt
-      ConfigChoice(engine, engine.config, "game", "game_time", autoApply = True),  
       ConfigChoice(engine, engine.config, "video", "counting", autoApply = True, isQuickset = 2),
     ]
     InGameDisplayMenu = Menu.Menu(engine, InGameDisplaySettings, pos = (self.opt_text_x, self.opt_text_y), textColor = self.opt_text_color, selectedColor = self.opt_selected_color)
@@ -1433,7 +1422,6 @@ def quickset(config):
     config.set("game", "sp_notes_while_active", 1)
     config.set("game", "bass_groove_enable", 1)
     config.set("game", "big_rock_endings", 1)
-    config.set("game", "in_game_stars", 1)
     config.set("game", "mark_solo_sections", 2)
     Log.debug("Quickset Gameplay - Theme-Based")
     
@@ -1448,7 +1436,6 @@ def quickset(config):
     config.set("game", "sp_notes_while_active", 3)
     config.set("game", "bass_groove_enable", 3)
     config.set("game", "big_rock_endings", 2)
-    config.set("game", "in_game_stars", 2)
     config.set("game", "counting", True)
     config.set("game", "mark_solo_sections", 1)
     Log.debug("Quickset Gameplay - RB style")
@@ -1457,7 +1444,6 @@ def quickset(config):
     config.set("game", "sp_notes_while_active", 0)
     config.set("game", "bass_groove_enable", 0)
     config.set("game", "big_rock_endings", 0)
-    config.set("game", "in_game_stars", 0)
     config.set("game", "counting", False)
     config.set("game", "mark_solo_sections", 0)
     Log.debug("Quickset Gameplay - GH style")
@@ -1466,7 +1452,6 @@ def quickset(config):
     config.set("game", "sp_notes_while_active", 0)
     config.set("game", "bass_groove_enable", 0)
     config.set("game", "big_rock_endings", 0)
-    config.set("game", "in_game_stars", 0)
     config.set("game", "counting", True)
     config.set("game", "mark_solo_sections", 1)
     Log.debug("Quickset Gameplay - WT style")
@@ -1489,12 +1474,10 @@ def quickset(config):
     config.set("video", "multisamples", 0)
     config.set("video", "shader_use", False)
     config.set("game", "game_phrases", 0)
-    config.set("game", "partial_stars", 0)
     config.set("stage", "stage_animate", 0)
     config.set("game", "lyric_mode", 0)
     config.set("menu", "use_graphical_submenu", 0)
     config.set("audio", "enable_crowd_tracks", 0)
-    config.set("performance", "in_game_stats", 0)
     config.set("performance", "static_strings", True)
     config.set("performance", "disable_libcount", True)
     config.set("performance", "killfx", 2)
@@ -1519,7 +1502,6 @@ def quickset(config):
     config.set("game", "lyric_mode", 2)
     config.set("menu", "use_graphical_submenu", 0)
     config.set("audio", "enable_crowd_tracks", 1)
-    config.set("performance", "in_game_stats", 0)
     config.set("performance", "static_strings", True)
     config.set("performance", "disable_libcount", True)
     config.set("performance", "killfx", 0)
@@ -1543,7 +1525,6 @@ def quickset(config):
     config.set("game", "lyric_mode", 2)
     config.set("menu", "use_graphical_submenu", 1)
     config.set("audio", "enable_crowd_tracks", 1)
-    config.set("performance", "in_game_stats", 2)
     config.set("performance", "static_strings", True)
     config.set("performance", "disable_libcount", True)
     config.set("performance", "killfx", 0)
@@ -1568,7 +1549,6 @@ def quickset(config):
     config.set("game", "lyric_mode", 2)
     config.set("menu", "use_graphical_submenu", 1)
     config.set("audio", "enable_crowd_tracks", 1)
-    config.set("performance", "in_game_stats", 2)
     config.set("performance", "static_strings", False)
     config.set("performance", "disable_libcount", False)
     config.set("performance", "killfx", 0)

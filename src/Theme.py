@@ -656,35 +656,35 @@ class Theme(Task):
     self.result_star_type      = get("result_star_type", int, 0)
     
     #Submenus
-    allfiles = os.listdir(os.path.join(self.themePath,"menu"))
     self.submenuScale = {}
     self.submenuX = {}
     self.submenuY = {}
     self.submenuVSpace = {}
-    listmenu = []
-    for name in allfiles:
-      if name.find("text") > -1:
-        found = os.path.splitext(name)[0]
-        if found == "maintext":
+    if os.path.exists(os.path.join(self.themePath,"menu")):
+      allfiles = os.listdir(os.path.join(self.themePath,"menu"))
+      listmenu = []
+      for name in allfiles:
+        if name.find("text") > -1:
+          found = os.path.splitext(name)[0]
+          if found == "maintext":
+            continue
+          Config.define("theme", found, str, None)
+          self.submenuScale[found] = None
+          self.submenuX[found] = None
+          self.submenuY[found] = None
+          self.submenuVSpace[found] = None
+          listmenu.append(found)
+      for i in listmenu:
+        if i == "maintext":
           continue
-        Config.define("theme", found, str, None)
-        self.submenuScale[found] = None
-        self.submenuX[found] = None
-        self.submenuY[found] = None
-        self.submenuVSpace[found] = None
-        listmenu.append(found)
-    for i in listmenu:
-      if i == "maintext":
-        continue
-      if self.submenuX[i]:
-        self.submenuX[i] = get(i).split(",")[0].strip()
-      if self.submenuY[i]:
-        self.submenuY[i] = get(i).split(",")[1].strip()
-      if self.submenuScale[i]:
-        self.submenuScale[i] = get(i).split(",")[2].strip()
-      if self.submenuVSpace[i]:
-        self.submenuVSpace[i] = get(i).split(",")[3].strip()
-    
+        if self.submenuX[i]:
+          self.submenuX[i] = get(i).split(",")[0].strip()
+        if self.submenuY[i]:
+          self.submenuY[i] = get(i).split(",")[1].strip()
+        if self.submenuScale[i]:
+          self.submenuScale[i] = get(i).split(",")[2].strip()
+        if self.submenuVSpace[i]:
+          self.submenuVSpace[i] = get(i).split(",")[3].strip()
   
   def setSelectedColor(self, alpha = 1.0):
     glColor4f(*(self.selectedColor + (alpha,)))

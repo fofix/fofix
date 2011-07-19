@@ -279,24 +279,16 @@ Config.define("game",   "lyric_mode",           int,   2,   text = _("Script Lyr
 Config.define("game", "script_lyric_pos",      int,   0,   text = _("Script Lyric Position"),    options = {0: _("Bottom"), 1: _("Top")}, tipText = _("Display script lyrics at either the bottom or top of the screen.")) #MFH - script.txt lyric display position
 Config.define("game",   "hopo_indicator",          bool, False,  text = _("Show HO/PO Indicator"), options = {False: _("No"), True: _("Yes")}, tipText = _("If enabled, 'HOPO' will appear in game. When there are HOPO notes active, it will turn white."))
 Config.define("performance",   "star_score_updates",          int, 1,  text = _("Star Updates"), options = {0: _("On Hit"), 1: _("Score Change")}, tipText = _("If set to 'On Hit', your star score will only be checked when you hit a note. If set to 'Score Change', your star score will constantly update. (This is affected by the 'Performance' quickset)"))
-Config.define("performance",   "star_continuous_fillup",          bool, True,  text = _("Partial Star Continuous Fillup"), options = {False: _("No"), True: _("Yes")}, tipText = _("Sets whether your partial stars will fill up gradually ('Yes') or in chunks. (This is affected by the 'Performance' quickset)")) #stump
 Config.define("game", "kill_debug",      bool, False,  text = _("Effects Debug"), options = {False: _("Off"), True: _("On")}, tipText = _("If enabled, will show on-screen the raw data of your killswitch/whammy."))
 Config.define("game", "show_unused_text_events",      bool, False,  text = _("Show Unused Events"), options = {False: _("No"), True: _("Yes")}, tipText = _("If enabled, various MIDI events not used by the game will be shown on-screen."))
 Config.define("game", "rb_midi_lyrics",           int,  1,   text = _("Show Lyrics in All Modes"), options = {0: _("No"), 1: _("Single Player"), 2: _("Always")}, tipText = _("Sets whether or not MIDI lyrics will be displayed in modes without a vocalist. 'Single Player' will only show lyrics when in Solo modes."))
 Config.define("game", "rb_midi_sections",           int,  0,   text = _("Show MIDI Sections"), options = {0: _("No"), 1: _("Single Player"), 2: _("Always")}, tipText = _("Sets whether or not to scroll the names of sections as marked in the MIDI files."))
-Config.define("performance", "in_game_stats",      int, 0,  text = _("Show In-Game Stats"), options = {0: _("Off"), 1: _("By Theme"), 2: _("On")}, tipText = _("Sets whether or not to show detailed stats as you play. 'By Theme' leaves it to the theme creator."))
-Config.define("game", "in_game_stars",      int, 1,  text = _("Show Stars In-Game"), options = {0: _("Off"), 1: _("By Theme"), 2: _("On")}, tipText = _("Sets whether or not to show your star score as you play. 'By Theme' leaves it to the theme creator."))
-Config.define("game", "partial_stars",      int, 1,  text = _("Show Partial Stars"), options = {0: _("Off"), 1: _("On")}, tipText = _("Sets whether or not to show partial stars, if available"))
 Config.define("game", "hopo_debug_disp",      int, 0,  text = _("HO/PO Debug"), options = {0: _("Off"), 1: _("On")}, tipText = _("If enabled, various log messages will be recorded regarding the HO/PO system. Please leave this disabled if submitting logs for bug reports unless you are certain it is necessary."))
 Config.define("game", "gsolo_accuracy_disp",      int, 1,  text = _("Show Solo Stats"), options = {0: _("Off"), 1: _("Percent"), 2: _("Detail")}, tipText = _("Sets whether to show your solo results when you finish a solo. 'Percent' will only show the percentage, while 'Detail' includes additional information."))
 Config.define("game", "decimal_places",      int, 1,  text = _("Stat Decimal Places"), options = dict([(n, n) for n in range(0, 3)]), tipText = _("Determines how many decimal places will be noted in displaying stats."))
 Config.define("game", "star_scoring",       int, 3,     text = _("Star Scoring Style"), options = sortOptionsByKey({0: _("Accuracy"), 1: _("GH"), 2: _("RB"), 3: _("RB+GH"), 4: _("RB2")}), tipText = _("Sets which system to use to calculate your star score."))#MFH
 Config.define("game", "gsolo_acc_pos",       int, 3,     text = _("Solo Stat Positioning"), options = sortOptionsByKey({0: _("Right"), 1: _("Center"), 2: _("Left"), 3: _("Rock Band")}), tipText = _("Sets where your solo result stats will be displayed."))#MFH,(racer: added RB)
-Config.define("game", "game_time",       int, 1,     text = _("Time Display Format"), options = {0: _("Off"), 1: _("Countdown"), 2: _("Elapsed")}, tipText = _("Sets whether the song time is displayed as time elapsed, time remaining, or not at all")) #MFH
-Config.define("game", "in_game_font_shadowing",      bool, False,  text = _("In-Game Font Shadow"), options = {False: _("Off"), True: _("On")}, tipText = _("Sets whether or not a shadowed font will be used, if available."))
 Config.define("game",   "solo_frame",          int, 1,    text = _("Show Solo Frame"), options = {0: _("Off"), 1: _("On")}, tipText = _("Sets whether to show a frame around the solo stats, if available."))
-Config.define("game", "starfx",       bool, True,     text = _("GH SP Lights"),             options = {True: _("On"), False: _("Off")}, tipText = _("Sets whether to fade images over the starpower bulbs in GH themes when fully lit."))#blazingamer
-Config.define("game", "small_rb_mult",      int, 1,     text = _("RB Small 1x Multiplier"),             options = {0: _("Off"), 1: _("By Theme"), 2: _("On")}, tipText = _("When enabled, RB-type themes will have a smaller mult image when the multiplier is at 1x. 'By Theme' leaves it to the theme creator."))#blazingamer
 Config.define("game",   "midi_lyric_mode",     int, 2,     text = _("Lyric Display Mode"),  options = {0: _("Scrolling"), 1: _("Simple Lines"), 2: _("2-Line")}, tipText = _("Sets the display mode for MIDI lyrics. Both 'Simple Lines' and '2-Line' will show as single phrases when playing the vocal part."))
 Config.define("game",   "vocal_scroll",        int, 2,     text = _("Lyric Speed Mode"),    options = sortOptionsByKey({0: _("BPM"), 1: _("Difficulty"), 2: _("BPM & Diff")}), tipText = _("Sets what determines the speed of the scrolling lyrics."))
 Config.define("game",   "vocal_speed",         int, 100,   text = _("Lyric Speed Percent"), options = dict([(n, n) for n in range(10, 410, 10)]), tipText = _("Sets how quickly lyrics will scroll."))
@@ -957,19 +949,21 @@ class GameEngine(object):
     if depth == True:
       glDepthMask(1)
 
-    triangVtx = np.array(
+    if not isinstance(vertex, np.ndarray):
+      vertex = np.array(
         [[ vertex[0],  vertscale, vertex[1]],
          [ vertex[2],  vertscale, vertex[1]],
          [ vertex[0], -vertscale, vertex[3]],
          [ vertex[2], -vertscale, vertex[3]]], dtype=np.float32)
-
-    textriangVtx = np.array(
+    
+    if not isinstance(texcoord, np.ndarray):
+      texcoord = np.array(
         [[texcoord[0], texcoord[1]],
          [texcoord[2], texcoord[1]],
          [texcoord[0], texcoord[3]],
          [texcoord[2], texcoord[3]]], dtype=np.float32)
-
-    cmgl.drawArrays(GL_TRIANGLE_STRIP, vertices=triangVtx, colors=col_array, texcoords=textriangVtx)
+    
+    cmgl.drawArrays(GL_TRIANGLE_STRIP, vertices=vertex, colors=col_array, texcoords=texcoord)
     
     if depth == True:
       glDepthMask(0)

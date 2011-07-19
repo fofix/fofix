@@ -558,7 +558,13 @@ class SongInfo(object):
   @property
   def lyrics(self):
     return self._get("lyrics")
-
+    
+  @property
+  #because of how RB3 pro drums are formatted, this tag
+  #detects a way to properly read the cymbals notes in the midi
+  def prodrum(self):
+    return self._get("pro_drum")
+    
   def getHighscoresWithPartString(self, difficulty, part = str(parts[GUITAR_PART])):
     return self.getHighscores(difficulty, part)
 
@@ -1100,13 +1106,22 @@ class Track:    #MFH - Changing Track class to a base class.  NoteTrack and Temp
       if self.logClassInits == 1:
         Log.debug("Track class init (song.py)...")
 
-
   def __getitem__(self, index):
     return self.allEvents[index]
 
   def __len__(self):
     return len(self.allEvents)
 
+  @property
+  def length(self):
+    lastTime = 0
+    for time, event in self.getAllEvents():
+      if not isinstance(event, Note) and not isinstance(event, VocalPhrase):
+        continue
+      if time + event.length > lastTime:
+        lastTime = time + event.length
+    return round((lastTime+1000.0) / 1000.0) * 1000.0
+    
   def addEvent(self, time, event):
     for t in range(int(time / self.granularity), int((time + event.length) / self.granularity) + 1):
       if len(self.events) < t + 1:
@@ -2258,6 +2273,16 @@ class Song(object):
       scriptReader = ScriptReader(self, open(scriptFileName))
       scriptReader.read()
 
+  @property
+  def length(self):
+    length = 0
+    for t in self.tracks:
+      for n in t:          #note/vocal tracks
+        if n.length > length:
+          length += (n.length - length)
+    length += 3000.0
+    return length
+
   #myfingershurt: new function to re-retrieve the a/v delay setting so it can be changed in-game:
   def refreshAudioDelay(self):  
     self.delay        = self.engine.config.get("audio", "delay")
@@ -3320,7 +3345,7 @@ class MidiPartsDiffReader(midi.MidiOutStream):
     except KeyError:
       pass
 
-def loadSong(engine, name, library = DEFAULT_LIBRARY, seekable = False, playbackOnly = False, notesOnly = False, part = [parts[GUITAR_PART]], practiceMode = False, practiceSpeed = 1.0):
+def loadSong(engine, name, library = DEFAULT_LIBRARY, seekable = False, playbackOnly = False, notesOnly = False, part = [parts[GUITAR_PART]], practiceMode = False, practiceSpeed = .5):
 
   Log.debug("loadSong function call (song.py)...")
   crowdsEnabled = engine.config.get("audio", "crowd_tracks_enabled")
