@@ -510,18 +510,21 @@ class FileChooser(BackgroundLayer, KeyListener):
     self.time           = 0.0
     self.menu           = None
     
+    self.TOPLEVEL = "?top" #An invalid filesystem character so the top-level-ness is marked
+    
     self.driveLetters   = None
     if os.name == "nt":
       import win32api, win32file
       driveLetters=win32api.GetLogicalDriveStrings().split('\x00')[:-1]
       self.driveLetters = []
-      #Here we should filter some drives out. Unmounted drives for sure, but also optical drives and RAM disks.
-      #This leaves fixed, removable, and remote drives.
-      okDrives = [win32file.DRIVE_REMOVABLE, win32file.DRIVE_FIXED, win32file.DRIVE_REMOTE]
+      #Here we should filter some drives out. Anything inaccessible, or with no space.
       for drive in driveLetters:
-        driveType = win32file.GetDriveType(drive)
-        if driveType in okDrives:
-          self.driveLetters.append(drive)
+        try:
+          size = win32file.GetDiskFreeSpaceEx(drive)
+          if size > 0:
+            self.driveLetters.append(drive)
+        except:
+          pass
 
     if self.engine.data.logClassInits == 1:
       Log.debug("FileChooser class init (Dialogs.py)...")
@@ -535,7 +538,7 @@ class FileChooser(BackgroundLayer, KeyListener):
     f = os.path.join(self.path, fileName)
     if fileName == "..":
       return _("[Parent Folder]")
-    if self.path == "?toplevel":
+    if self.path == self.TOPLEVEL:
       return _("%s [Drive]") % fileName
     else:
       if self.dirSelect == True:
@@ -559,7 +562,7 @@ class FileChooser(BackgroundLayer, KeyListener):
           continue
       files.append(fn)
     files.sort()
-    if self.dirSelect == True and self.path!="?toplevel":
+    if self.dirSelect == True and self.path!=self.TOPLEVEL:
       files.insert(0, self.path)
     return files
 
@@ -570,17 +573,17 @@ class FileChooser(BackgroundLayer, KeyListener):
     if self.menu:
       self.engine.view.popLayer(self.menu)
 
-    if self.path == "?toplevel" and os.name != "nt":
+    if self.path == self.TOPLEVEL and os.name != "nt":
       self.path = "/"
       
-    if self.path == "?toplevel":
+    if self.path == self.TOPLEVEL:
       self.menu = Menu(self.engine, choices = [(self._getFileText(f), self._getFileCallback(f)) for f in self.getDisks()], onClose = self.close, onCancel = self.cancel)
     else:
       self.menu = Menu(self.engine, choices = [(self._getFileText(f), self._getFileCallback(f)) for f in self.getFiles()], onClose = self.close, onCancel = self.cancel)
     self.engine.view.pushLayer(self.menu)
 
   def chooseFile(self, fileName):
-    if self.dirSelect == True and self.path != "?toplevel":
+    if self.dirSelect == True and self.path != self.TOPLEVEL:
       for mask in self.masks:
         if fnmatch.fnmatch(fileName, mask):
           self.selectedFile = fileName
@@ -590,13 +593,13 @@ class FileChooser(BackgroundLayer, KeyListener):
           self.menu = None
           return
 
-    if self.path == "?toplevel":
+    if self.path == self.TOPLEVEL:
       self.path = ""
     path = os.path.abspath(os.path.join(self.path, fileName))
 
     if os.path.isdir(path):
       if path == self.path and fileName == "..":
-        self.path = "?toplevel"
+        self.path = self.TOPLEVEL
       else:
         self.path = path
       self.updateFiles()
