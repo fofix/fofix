@@ -272,7 +272,7 @@ class FontLayer(Layer):
     self.font        = self.engine.data.fontDict[font]          #the font to use
     self.text        = ""                                       #the text that will be rendered to screen 
     self.textexpr    = self.getexpr("text", "''")               #the text from the ini that will be evalutated
-    self.replace     = [r.strip() for r in self.get("replace", str, "_").split("_")]
+    self.replace     = [r.strip() for r in self.get("replace", str, "_").split("_")[:2]]
                                                                 #replace character a character in the string with this
     self.alignment   = halign(self.get("alignment", str, "LEFT"), 'left')
                                                                 #alignment of the text
@@ -292,7 +292,7 @@ class FontLayer(Layer):
     else:
       text = str(text)
       
-    text.replace(self.replace[0], self.replace[1])
+    text = text.replace(self.replace[0], self.replace[1])
       
     wid, hgt = self.font.getStringSize(str(text))
 
