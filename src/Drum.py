@@ -116,10 +116,6 @@ class Drum(Instrument):
     #myfingershurt:
     self.hopoStyle = 0    
 
-    if self.theme < 2:    #make board same size as guitar board if GH based theme so it rockmeters dont interfere
-      self.boardWidth     = 3.0
-      self.boardLength    = 9.0
-
     self.drumFretButtons = None
 
     #blazingamer
@@ -435,7 +431,6 @@ class Drum(Instrument):
         texture = None
         model = self.keyMesh
         if self.keytex:
-          model = self.keyMesh
           if n == 0:
             texture = self.keytexb.texture
           elif n == 1:
@@ -451,7 +446,7 @@ class Drum(Instrument):
           model = self.keyMeshOpen
               
         c = [.1 + .8 * c[0] + f, .1 + .8 * c[1] + f, .1 + .8 * c[2] + f, v]
-        self.render3DKey(texture, model, x, y, c, n)
+        self.render3DKey(texture, model, x, y, c, n, f)
           
     glDisable(GL_DEPTH_TEST)      
 
