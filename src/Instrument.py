@@ -251,7 +251,7 @@ class Instrument(object):
     self.hitglow_color = self.engine.config.get("video", "hitglow_color") #this should be global, not retrieved every fret render.
 
     #check if BRE enabled
-    if self.bigRockEndings == 2 or (self.theme == 2 and self.bigRockEndings == 1):
+    if self.bigRockEndings == 2 or self.bigRockEndings == 1:
       self.freestyleEnabled = True
 
     #blazingamer
@@ -336,6 +336,23 @@ class Instrument(object):
     self.coOpFailed = False #akedrou
     self.coOpRestart = False #akedrou
     self.starPowerActive = False
+
+    #Tail's base arrays will get modified overtime
+
+    self.tail_tex = np.array([[0.0, 0.0],
+                              [1.0, 0.0],
+                              [0.0, 1.0],
+                              [1.0, 1.0]], dtype=np.float32)
+
+    self.tail_col = np.array([[0,0,0,1],
+                              [0,0,0,1],
+                              [0,0,0,1],
+                              [0,0,0,1]], dtype=np.float32)
+
+    self.tail_vtx = np.array([[0, 0, 0],
+                             [0, 0, 0],
+                             [0, 0, 0],
+                             [0, 0, 0]], dtype=np.float32)
 
   #this checks to see if there is a "drum" or "bass" folder
   #inside the subdirectory for image replacement
@@ -1674,24 +1691,23 @@ class Instrument(object):
 
         glEnable(GL_TEXTURE_2D)
 
-        tail_tex  = np.array([[0.0, (project((offset * self.tailSpeed) * self.beatsPerUnit)*3)],
-                            [1.0, (project((offset * self.tailSpeed) * self.beatsPerUnit)*3)],
-                            [0.0, (project(((offset * self.tailSpeed) + s) * self.beatsPerUnit)*3)],
-                            [1.0, (project(((offset * self.tailSpeed) + s) * self.beatsPerUnit)*3)]], dtype=np.float32)
+        movement1 = (project((offset * self.tailSpeed) * self.beatsPerUnit)*3)
+        movement2 = (project(((offset * self.tailSpeed) + s) * self.beatsPerUnit)*3)
 
-        tail_col  = np.array([[tailcol[0],tailcol[1],tailcol[2], 1],
-                            [tailcol[0],tailcol[1],tailcol[2], 1],
-                            [tailcol[0],tailcol[1],tailcol[2], 1],
-                            [tailcol[0],tailcol[1],tailcol[2], 1]], dtype=np.float32)
+        self.tail_tex[0][1] = self.tail_tex[1][1] = movement1
+        self.tail_tex[2][1] = self.tail_tex[3][1] = movement2
 
-        tail_vtx = np.array([[-size[0], 0, size[1]],
-                            [size[0], 0, size[1]],
-                            [-size[0], 0, 0 ],
-                            [size[0], 0, 0]], dtype=np.float32)
+        self.tail_col[0][0] = self.tail_col[1][0] = self.tail_col[2][0] = self.tail_col[3][0] = tailcol[0]
+        self.tail_col[0][1] = self.tail_col[1][1] = self.tail_col[2][1] = self.tail_col[3][1] = tailcol[1]
+        self.tail_col[0][2] = self.tail_col[1][2] = self.tail_col[2][2] = self.tail_col[3][2] = tailcol[2]
+
+        self.tail_vtx[0][0] = self.tail_vtx[2][0] = -size[0]
+        self.tail_vtx[1][0] = self.tail_vtx[3][0] = size[0]
+        self.tail_vtx[0][2] = self.tail_vtx[1][2] = size[1]
 
         tex1.texture.bind()
 
-        cmgl.drawArrays(GL_TRIANGLE_STRIP, vertices=tail_vtx, colors=tail_col, texcoords=tail_tex)
+        cmgl.drawArrays(GL_TRIANGLE_STRIP, vertices=self.tail_vtx, colors=self.tail_col, texcoords=self.tail_tex)
           
         glDisable(GL_TEXTURE_2D)
 
