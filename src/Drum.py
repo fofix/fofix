@@ -663,8 +663,7 @@ class Drum(Instrument):
         self.renderFreestyleLanes(visibility, song, pos, controls) #MFH - render the lanes on top of the notes.
         self.renderFrets(visibility, song, controls)
 
-        if self.hitFlamesPresent: #MFH - only when present!
-          self.renderFreestyleFlames(visibility, controls)    #MFH - freestyle hit flames
+        self.renderFreestyleFlames(visibility, controls)    #MFH - freestyle hit flames
 
       else:
 
