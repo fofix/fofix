@@ -105,8 +105,13 @@ class Instrument(object):
     self.beatsPerUnit   = self.beatsPerBoard / self.boardLength
     self.fretColors     = self.engine.theme.noteColors
     self.spColor        = self.engine.theme.spNoteColor
-    self.killColor      = self.engine.theme.killNoteColor
     self.useFretColors  = self.engine.theme.use_fret_colors
+
+    if not self.engine.theme.killNoteColor == "frets":
+      kC = self.engine.theme.killNoteColor
+      self.killColor = [kC, kC, kC, kC, kC]
+    else:
+      self.killColor = self.fretColors
 
     self.playedNotes    = []
     self.missedNotes    = []
@@ -1629,8 +1634,7 @@ class Instrument(object):
     if kill and big == True:
       kEffect = ( math.sin( pos / 50 ) + 1 ) /2
       size = ((0.02 + (kEffect * 0.182) * 2), s)
-
-      c = [self.killColor[0],self.killColor[1],self.killColor[2]]
+      c = [self.killColor[fret][0],self.killColor[fret][1],self.killColor[fret][2]]
       if c != [0,0,0]:
         for i in range(0,3):
           c[i]=c[i]*kEffect+color[i]*(1-kEffect)

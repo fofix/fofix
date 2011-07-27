@@ -174,7 +174,11 @@ class Theme(Task):
     default_color = ["#22FF22", "#FF2222", "#FFFF22", "#3333FF", "#FF9933", "#CC22CC"]
     self.noteColors  = [get("fret%d_color" % i, "color", default_color[i]) for i in range(6)]
     self.spNoteColor =  get("fretS_color",      "color", "#4CB2E5")
-    self.killNoteColor =  get("fretK_color",      "color", "#FFFFFF")
+
+    #Color of the tails when whammied, default is set to the colors of the frets
+    self.killNoteColor  = get("fretK_color",       str,    "frets")
+    if not self.killNoteColor == "frets":
+      self.killNoteColor = self.hexToColor(self.killNoteColor)
 
     #just like glow_color, this allows you to have tails use either the color of the note
     #or the actual color of the tail
