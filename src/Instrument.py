@@ -1494,7 +1494,7 @@ class Instrument(object):
       glTranslatef(x, y + color[3] * 6, 0)
         
     if texture:
-      glColor4f(1,1,1,color[3])
+      glColor4f(1,1,1,color[3]+1.0)
       glEnable(GL_TEXTURE_2D)
       texture.bind()
       glMatrixMode(GL_TEXTURE)
@@ -1519,17 +1519,17 @@ class Instrument(object):
       #Key_002 - Bottom of fret (key2_color)
       #Glow_001 - Only rendered when a note is hit along with the glow.svg
 
-      if(model.find("Glow_001")):
-        model.render("Glow_001")
-      if(model.find("Key_001")):
-        glColor3f(self.keyColor[0], self.keyColor[1], self.keyColor[2])
-        model.render("Key_001")
-      if(model.find("Key_002")):
-        glColor3f(self.key2Color[0], self.key2Color[1], self.key2Color[2])
-        model.render("Key_002")
-      else:
+      if (model.find("Glow_001")):
         model.render("Mesh")
-
+        if (model.find("Key_001")):
+          glColor3f(self.keyColor[0], self.keyColor[1], self.keyColor[2])
+          model.render("Key_001")
+        if (model.find("Key_002")):
+          glColor3f(self.key2Color[0], self.key2Color[1], self.key2Color[2])
+          model.render("Key_002")
+      else:
+        model.render()
+        
     glDisable(GL_LIGHTING)
     glDisable(GL_LIGHT0)
     glDepthMask(0)
