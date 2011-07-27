@@ -369,22 +369,21 @@ class Instrument(object):
     engine = self.engine
     themename = self.engine.data.themeLabel
 
+    get = lambda file: self.checkPath("flames", file)
+
     self.HCount         = 0
     self.HCount2        = 0
     self.HFrameLimit	= self.engine.theme.HoldFlameFrameLimit
     self.HFrameLimit2	= self.engine.theme.HitFlameFrameLimit
-    self.Hitanim        = True
-    self.Hitanim2       = True
     self.HCountAni      = False
     
     if self.disableFretSFX != False:
       self.glowDrawing = None
     else:
-      engine.loadImgDrawing(self, "glowDrawing", os.path.join("themes",themename,"glow.png"),  textureSize = (128, 128))
+      engine.loadImgDrawing(self, "glowDrawing", get("glow.png"))
       if not self.glowDrawing:
         engine.loadImgDrawing(self, "glowDrawing", "glow.png")
 
-    self.hitFlamesPresent = True
     if self.disableFlameSFX == True:
       self.hitglow2Drawing = None
       self.hitglowDrawing = None
@@ -393,19 +392,13 @@ class Instrument(object):
       self.hitflames2Drawing = None
       self.hitflames1Drawing = None
     else:
-      engine.loadImgDrawing(self, "hitflames1Drawing", os.path.join("themes",themename,"hitflames1.png"),  textureSize = (128, 128))
-      engine.loadImgDrawing(self, "hitflames2Drawing", os.path.join("themes",themename,"hitflames2.png"),  textureSize = (128, 128))
-      
-      if not engine.loadImgDrawing(self, "hitflamesAnim", os.path.join("themes",themename,"hitflamesanimation.png"),  textureSize = (128, 128)):
-        self.Hitanim2 = False
-
-      engine.loadImgDrawing(self, "powerHitflamesAnim", os.path.join("themes",themename,"powerhitflamesanimation.png"),  textureSize = (128, 128))
-      
-      if not engine.loadImgDrawing(self, "hitglowAnim", os.path.join("themes",themename,"hitglowanimation.png"),  textureSize = (128, 128)):
-        self.Hitanim = False
-
-      engine.loadImgDrawing(self, "hitglowDrawing", os.path.join("themes",themename,"hitglow.png"),  textureSize = (128, 128))
-      engine.loadImgDrawing(self, "hitglow2Drawing", os.path.join("themes",themename,"hitglow2.png"),  textureSize = (128, 128))
+      engine.loadImgDrawing(self, "hitflames1Drawing", get("hitflames1.png"))
+      engine.loadImgDrawing(self, "hitflames2Drawing", get("hitflames2.png"))
+      engine.loadImgDrawing(self, "hitflamesAnim", get("hitflamesanimation.png"))
+      engine.loadImgDrawing(self, "powerHitflamesAnim", get("powerhitflamesanimation.png"))
+      engine.loadImgDrawing(self, "hitglowAnim", get("hitglowanimation.png"))
+      engine.loadImgDrawing(self, "hitglowDrawing", get("hitglow.png"))
+      engine.loadImgDrawing(self, "hitglow2Drawing", get("hitglow2.png"))
 
     engine.loadImgDrawing(self, "hitlightning", os.path.join("themes",themename,"lightning.png"),  textureSize = (128, 128))
 
@@ -806,7 +799,7 @@ class Instrument(object):
           color = tuple([color[ifc] + .38 for ifc in range(3)]) #to make sure the final color looks correct on any color set
 
           #Alarian: Animated hitflames
-          if self.Hitanim and self.hitglowAnim:
+          if self.hitglowAnim:
 
             self.HCount =+ 1
             if self.HCount > self.Animspeed-1:
@@ -896,7 +889,7 @@ class Instrument(object):
         
           vtx = flameSize * ff
 
-          if self.Hitanim2 == True and self.hitflamesAnim:
+          if self.hitflamesAnim:
             self.HCount2 += 1
             self.HCountAni = False
             if self.HCount2 >= self.HFrameLimit2:
