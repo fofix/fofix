@@ -1463,7 +1463,7 @@ class Instrument(object):
       self.isStarPhrase = Fals
 
   #group rendering of 3D keys/frets into method
-  def render3DKey(self, texture, model, x, y, color, fretNum):
+  def render3DKey(self, texture, model, x, y, color, fretNum, f):
     glPushMatrix()
     glDepthMask(1)
     glEnable(GL_LIGHTING)
@@ -1501,9 +1501,9 @@ class Instrument(object):
       glScalef(1, -1, 1)
       glMatrixMode(GL_MODELVIEW)
       glScalef(self.boardScaleX, self.boardScaleY, 1)
-      if not self.hit[keyNumb] and (f or pressed):
+      if not self.hit[fretNum] and f:
         model.render("Mesh_001")
-      elif self.hit[keyNumb]:
+      elif self.hit[fretNum]:
         model.render("Mesh_002")
       else:
         model.render("Mesh")
