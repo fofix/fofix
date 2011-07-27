@@ -213,8 +213,8 @@ class Drum(Instrument):
     else:
       defaultOpenKey = False
 
-      if self.engine.fileExists(get("open.dae")): #look in the frets folder for files
-        engine.resource.load(self,  "keyMeshOpen",  lambda: Mesh(engine.resource.fileName(get("open.dae"))))
+      if self.engine.fileExists(get("key_open.dae")): #look in the frets folder for files
+        engine.resource.load(self,  "keyMeshOpen",  lambda: Mesh(engine.resource.fileName(get("key_open.dae"))))
       else: #default to files in data folder
         engine.resource.load(self,  "keyMeshOpen",  lambda: Mesh(engine.resource.fileName("key_open.dae")))
         defaultOpenKey = True
