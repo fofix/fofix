@@ -1691,8 +1691,12 @@ class Instrument(object):
 
         glEnable(GL_TEXTURE_2D)
 
-        movement1 = (project((offset * self.tailSpeed) * self.beatsPerUnit)*3)
-        movement2 = (project(((offset * self.tailSpeed) + s) * self.beatsPerUnit)*3)
+        if length >= self.boardLength:
+          movement1 = (project((offset * self.tailSpeed) * self.beatsPerUnit)*3) - (project(offset * self.beatsPerUnit)*3)
+          movement2 = (project(((offset * self.tailSpeed) + s) * self.beatsPerUnit)*3) - (project(offset * self.beatsPerUnit)*3)
+        else:
+          movement1 = (project((offset * self.tailSpeed) * self.beatsPerUnit)*3)
+          movement2 = (project(((offset * self.tailSpeed) + s) * self.beatsPerUnit)*3)
 
         self.tail_tex[0][1] = self.tail_tex[1][1] = movement1
         self.tail_tex[2][1] = self.tail_tex[3][1] = movement2
