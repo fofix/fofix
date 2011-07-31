@@ -605,7 +605,7 @@ class Instrument(object):
 
   def hitNote(self, time, note):
     self.pickStartPos = max(self.pickStartPos, time)
-    self.playedNotes = [(time, note)]
+    self.playedNotes.append([time, note])
     note.played       = True
     return True
 
