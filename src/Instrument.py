@@ -308,10 +308,19 @@ class Instrument(object):
     self.keyColor = self.engine.theme.keyColor
     self.key2Color = self.engine.theme.key2Color
 
-    self.hitFlameYPos = self.engine.theme.hitFlameYPos
-    self.hitFlameSize = self.engine.theme.hitFlameSize
-    self.holdFlameYPos = self.engine.theme.holdFlameYPos
-    self.holdFlameSize = self.engine.theme.holdFlameSize
+    self.hitFlameYPos         = self.engine.theme.hitFlamePos[0]
+    self.hitFlameZPos         = self.engine.theme.hitFlamePos[1]
+    self.holdFlameYPos        = self.engine.theme.holdFlamePos[0]
+    self.holdFlameZPos        = self.engine.theme.holdFlamePos[1]
+    self.hitFlameSize         = self.engine.theme.hitFlameSize
+    self.holdFlameSize        = self.engine.theme.holdFlameSize
+    self.hitFlameBlackRemove  = self.engine.theme.hitFlameBlackRemove
+    self.hitGlowsBlackRemove  = self.engine.theme.hitGlowsBlackRemove
+    self.hitGlowOffset        = self.engine.theme.hitGlowOffset
+    self.hitFlameOffset       = self.engine.theme.hitFlameOffset
+    self.drumHitFlameOffset   = self.engine.theme.drumHitFlameOffset
+    self.hitGlowsRotation     = self.engine.theme.hitFlameRotation
+    self.hitFlameRotation     = self.engine.theme.hitFlameRotation
 
     #all flames/glows are set to there corresponding color else they are set to the fret colors
     if not self.engine.theme.flamesColor == "frets":
@@ -807,15 +816,32 @@ class Instrument(object):
           f += 0.25
 
         w = self.boardWidth / self.strings
+        x = (self.strings / 2 - n) * w
+
         y = f / 6
         y -= self.holdFlameYPos
-        x = (self.strings / 2 - n) * w
+
         flameSize = self.holdFlameSize
+
+        alphaEnabled = self.hitGlowsBlackRemove
 
         if self.fretActivity[n]:
           ms = math.sin(self.time) * .25 + 1
           ff = self.fretActivity[n] + 1.2
           vtx = flameSize * ff
+          s = ff/6
+
+          if not self.hitFlameYPos == 0:
+            y = s - self.holdFlameYPos
+          else:
+            y = 0
+
+          if not self.hitFlameZPos == 0:
+            z = s - self.holdFlameZPos
+          else:
+            z = 0
+
+          y -= self.hitGlowOffset[n]
 
           color = self.hitGlowColors[n]
           color = tuple([color[ifc] + .38 for ifc in range(3)]) #to make sure the final color looks correct on any color set
@@ -831,9 +857,9 @@ class Instrument(object):
               HIndex = 0
             texX = (HIndex*(1.0/self.HFrameLimit), HIndex*(1.0/self.HFrameLimit)+(1.0/self.HFrameLimit))
 
-            self.engine.draw3Dtex(self.hitglowAnim, coord = (x, y + .225, 0), rot = (90, 1, 0, 0), scale = (2.4, 1, 3.3),
-                                  vertex = (-vtx,-vtx,vtx,vtx),texcoord = (texX[0],0.0,texX[1],1.0), 
-                                  multiples = True, alpha = True, color = (1,1,1))
+            self.engine.draw3Dtex(self.hitglowAnim, coord = (x, y, z), rot = self.hitGlowsRotation, scale = (2.4, 1, 3.3),
+                                  vertex = (-vtx,-vtx,vtx,vtx),texcoord = (texX[0],0.0,texX[1],1.0), multiples = True, 
+                                  alpha = alphaEnabled, color = (1,1,1))
 
 
           if self.hitglowDrawing:
@@ -843,10 +869,10 @@ class Instrument(object):
             if self.starPowerActive or self.spNote == True:
               flamecol = self.spColor
 
-            self.engine.draw3Dtex(self.hitglowDrawing, coord = (x, y + .125, 0), rot = (90, 1, 0, 0),
+            self.engine.draw3Dtex(self.hitglowDrawing, coord = (x, y + .15, z), rot = self.hitGlowsRotation,
                                   scale = (0.5 + .6 * ms * ff, 1.5 + .6 * ms * ff, 1 + .6 * ms * ff),
                                   vertex = (-vtx,-vtx,vtx,vtx), texcoord = (0.0,0.0,1.0,1.0), 
-                                  multiples = True, alpha = True, color = flamecol)
+                                  multiples = True, alpha = alphaEnabled, color = flamecol)
 
 
           if self.hitglow2Drawing:
@@ -858,10 +884,10 @@ class Instrument(object):
 
             if self.starPowerActive or self.spNote == True:
               flamecol = self.spColor
-            self.engine.draw3Dtex(self.hitglow2Drawing, coord = (x, y + .25, .05), rot = (90, 1, 0, 0),
+            self.engine.draw3Dtex(self.hitglow2Drawing, coord = (x, y, z), rot = self.hitGlowsRotation,
                                   scale = (.40 + .6 * ms * ff, 1.5 + .6 * ms * ff, 1 + .6 * ms * ff),
                                   vertex = (-vtx,-vtx,vtx,vtx), texcoord = (0.0,0.0,1.0,1.0), 
-                                  multiples = True, alpha = True, color = flamecol)
+                                  multiples = True, alpha = alphaEnabled, color = flamecol)
 
   #renders the flames that appear when a note is struck
   def renderFlames(self, song, pos, controls):
@@ -874,6 +900,9 @@ class Instrument(object):
     flameLimit = 10.0
     flameLimitHalf = round(flameLimit/2.0)
     renderedNotes = self.getRequiredNotesForRender(song,pos)
+
+    alphaEnabled = self.hitFlameBlackRemove
+
     for time, event in renderedNotes:
       if not isinstance(event, Note):
         continue
@@ -902,16 +931,32 @@ class Instrument(object):
           ms = math.sin(self.time) * .25 + 1
 
           xlightning = (self.strings / 2 - event.number)*2.2*w
-          ff = 1 + 0.25       
-          y = ff / 6
+          ff = 1 + 0.25
+          s = ff/6
 
-          y -= self.hitFlameYPos
+          if not self.hitFlameYPos == 0:
+            y = s - self.hitFlameYPos
+          else:
+            y = 0
+
+          if not self.hitFlameZPos == 0:
+            z = s - self.hitFlameZPos
+          else:
+            z = 0
+
+          if self.isDrum:
+            y -= self.drumHitFlameOffset[event.number]
+          else:
+            y -= self.hitFlameOffset[event.number]
         
+          y + .665
+
           ff += 1.5 #ff first time is 2.75 after this
         
           vtx = flameSize * ff
 
           if self.hitflamesAnim:
+            
             self.HCount2 += 1
             self.HCountAni = False
             if self.HCount2 >= self.HFrameLimit2:
@@ -929,21 +974,22 @@ class Instrument(object):
               else:
                 texture = self.hitflamesAnim
 
-              self.engine.draw3Dtex(texture, coord = (x, y + .665, 0), rot = (90, 1, 0, 0), scale = (1.6, 1.6, 4.9),
-                                    vertex = (-vtx,-vtx,vtx,vtx), texcoord = (texX[0],0.0,texX[1],1.0), 
-                                    multiples = True, alpha = True, color = (1,1,1))
+              self.engine.draw3Dtex(texture, coord = (x, y + .665, z), rot = self.hitFlameRotation, 
+                                    scale = (1.6, 1.6, 4.9), vertex = (-vtx,-vtx,vtx,vtx), 
+                                    texcoord = (texX[0],0.0,texX[1],1.0),  multiples = True, 
+                                    alpha = alphaEnabled, color = (1,1,1))
           self.HCountAni = True
           if event.flameCount < flameLimitHalf and self.hitflames2Drawing:
-            self.engine.draw3Dtex(self.hitflames2Drawing, coord = (x, y + .20, 0), rot = (90, 1, 0, 0),
+            self.engine.draw3Dtex(self.hitflames2Drawing, coord = (x, y + .20, z), rot = self.hitFlameRotation,
                                   scale = (.25 + .6 * ms * ff, event.flameCount/6.0 + .6 * ms * ff, event.flameCount / 6.0 + .6 * ms * ff),
                                   vertex = (-vtx,-vtx,vtx,vtx), texcoord = (0.0,0.0,1.0,1.0),
-                                  multiples = True, alpha = True, color = flameColor)
+                                  multiples = True, alpha = alphaEnabled, color = flameColor)
 
             for i in range(3):
-              self.engine.draw3Dtex(self.hitflames2Drawing, coord = (x-.005, y + .255, 0), rot = (90, 1, 0, 0),
+              self.engine.draw3Dtex(self.hitflames2Drawing, coord = (x-.005, y + .255, z), rot = self.hitFlameRotation,
                                     scale = (.30 + i*0.05 + .6 * ms * ff, event.flameCount/(5.5 - i*0.4) + .6 * ms * ff, event.flameCount / (5.5 - i*0.4) + .6 * ms * ff),
                                     vertex = (-vtx,-vtx,vtx,vtx), texcoord = (0.0,0.0,1.0,1.0),
-                                    multiples = True, alpha = True, color = flameColor)
+                                    multiples = True, alpha = alphaEnabled, color = flameColor)
 
           flameColor = tuple([flameColor[ifc] + .38 for ifc in range(3)]) #to make sure the final color looks correct on any color set
           flameColorMod = 0.1 * (flameLimit - event.flameCount)
@@ -959,15 +1005,15 @@ class Instrument(object):
               yzscaleMod = (event.flameCount + 1)/ scaleChange[step]
 
             if self.hitflames1Drawing: 
-              self.engine.draw3Dtex(self.hitflames1Drawing, coord = (x - .005, y + yOffset[step], 0), rot = (90, 1, 0, 0),
+              self.engine.draw3Dtex(self.hitflames1Drawing, coord = (x - .005, y + yOffset[step], z), rot = self.hitFlameRotation,
                                     scale = (.25 + step*.05 + scaleMod, yzscaleMod + scaleMod, yzscaleMod + scaleMod),
                                     vertex = (-vtx,-vtx,vtx,vtx), texcoord = (0.0,0.0,1.0,1.0),
-                                    multiples = True, alpha = True, color = flamecol)
+                                    multiples = True, alpha = alphaEnabled, color = flamecol)
 
             #draw lightning in GH themes on SP gain
             if step == 0 and event.finalStar and self.spEnabled and self.hitlightning:
               self.engine.draw3Dtex(self.hitlightning, coord = (xlightning, ff / 6, 3.3), rot = (90, 1, 0, 0),
-                                    scale = (.15 + .5 * ms * ff, event.flameCount / 3.0 + .6 * ms * ff, 2), vertex = (.4,-2,-.4,2),
+                                    scale = (.15 + .5 * ms * ff, event.flameCount / 3.0 + .6 * ms * ff, 2), vertex = (.4,-2,.4,2),
                                     texcoord = (0.0,0.0,1.0,1.0), multiples = True, alpha = True, color = (1,1,1))
 
         event.flameCount += 1
