@@ -1036,6 +1036,7 @@ class Note(Event):
     self.hopod   = False
     self.skipped = False
     self.flameCount = 0
+    self.HCount2 = 0
     self.star = star
     self.finalStar = finalStar
     self.noteBpm = 0.0

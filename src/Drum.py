@@ -678,7 +678,8 @@ class Drum(Instrument):
           self.renderNotes(visibility, song, pos)
           self.renderFrets(visibility, song, controls)
 
-        self.renderFlames(song, pos, controls)    #MFH - only when freestyle inactive!
+        self.renderAnimatedFlames(song, pos)
+        self.renderFlames(song, pos)    #MFH - only when freestyle inactive!
         
 
   def playDrumSounds(self, controls, playBassDrumOnly = False):   #MFH - handles playing of drum sounds.  

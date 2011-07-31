@@ -403,7 +403,6 @@ class Instrument(object):
     get = lambda file: self.checkPath("flames", file)
 
     self.HCount         = 0
-    self.HCount2        = 0
     self.HFrameLimit	= self.engine.theme.HoldFlameFrameLimit
     self.HFrameLimit2	= self.engine.theme.HitFlameFrameLimit
     self.HCountAni      = False
@@ -890,7 +889,76 @@ class Instrument(object):
                                   multiples = True, alpha = alphaEnabled, color = flamecol)
 
   #renders the flames that appear when a note is struck
-  def renderFlames(self, song, pos, controls):
+  def renderAnimatedFlames(self, song, pos):
+    if not song or self.flameColors[0][0] == -1:
+      return
+
+    flameSize = self.hitFlameSize
+    w = self.boardWidth / self.strings
+    renderedNotes = self.getRequiredNotesForRender(song,pos)
+
+    alphaEnabled = self.hitFlameBlackRemove
+
+    for time, event in renderedNotes:
+      if not isinstance(event, Note):
+        continue
+
+      if (event.played or event.hopod):
+        if not self.disableFlameSFX:
+          if self.isDrum:
+            if event.number == 4: #make the bass drum not render a flame
+              continue
+
+            x  = (self.strings / 2 +.5 - event.number) * w
+          else:
+            x  = ((self.strings / 2 - event.number) * w)
+
+          ff = 1 + 0.25
+          s = ff/6
+
+          if not self.hitFlameYPos == 0:
+            y = s - self.hitFlameYPos
+          else:
+            y = 0
+
+          if not self.hitFlameZPos == 0:
+            z = s - self.hitFlameZPos
+          else:
+            z = 0
+
+          if self.isDrum:
+            y -= self.drumHitFlameOffset[event.number]
+          else:
+            y -= self.hitFlameOffset[event.number]
+        
+          y + .665
+
+          ff += 1.5 #ff first time is 2.75 after this
+        
+          vtx = flameSize * ff
+
+          if self.hitflamesAnim:
+            event.HCount2 += 1
+            self.HCountAni = False
+            if event.HCount2 >= 5.0:
+              self.HCountAni = True
+            if event.HCount2 < self.HFrameLimit2:
+
+              HIndex = (event.HCount2 * self.HFrameLimit2 - (event.HCount2 * self.HFrameLimit2) % self.HFrameLimit2) / self.HFrameLimit2
+                
+              texX = (HIndex*(1.0/self.HFrameLimit2), HIndex*(1.0/self.HFrameLimit2)+(1.0/self.HFrameLimit2))
+              if self.powerHitflamesAnim and self.starPowerActive:
+                texture = self.powerHitflamesAnim
+              else:
+                texture = self.hitflamesAnim
+
+              self.engine.draw3Dtex(texture, coord = (x, y + .665, z), rot = self.hitFlameRotation, 
+                                    scale = (1.6, 1.6, 4.9), vertex = (-vtx,-vtx,vtx,vtx), 
+                                    texcoord = (texX[0],0.0,texX[1],1.0),  multiples = True, 
+                                    alpha = alphaEnabled, color = (1,1,1))
+
+  #renders the flames that appear when a note is struck
+  def renderFlames(self, song, pos):
     if not song or self.flameColors[0][0] == -1:
       return
 
@@ -955,30 +1023,9 @@ class Instrument(object):
         
           vtx = flameSize * ff
 
-          if self.hitflamesAnim:
-            
-            self.HCount2 += 1
-            self.HCountAni = False
-            if self.HCount2 >= self.HFrameLimit2:
-              self.HCountAni = True
+          if not self.hitflamesAnim:
+            self.HCountAni = True
 
-            if self.HCount2 < self.HFrameLimit2:
-
-              HIndex = (self.HCount2 * self.HFrameLimit2 - (self.HCount2 * self.HFrameLimit2) % self.HFrameLimit2) / self.HFrameLimit2
-              if HIndex >= self.HFrameLimit2 and self.HCountAni != True:
-                HIndex = 0
-                
-              texX = (HIndex*(1.0/self.HFrameLimit2), HIndex*(1.0/self.HFrameLimit2)+(1.0/self.HFrameLimit2))
-              if self.powerHitflamesAnim and self.starPowerActive:
-                texture = self.powerHitflamesAnim
-              else:
-                texture = self.hitflamesAnim
-
-              self.engine.draw3Dtex(texture, coord = (x, y + .665, z), rot = self.hitFlameRotation, 
-                                    scale = (1.6, 1.6, 4.9), vertex = (-vtx,-vtx,vtx,vtx), 
-                                    texcoord = (texX[0],0.0,texX[1],1.0),  multiples = True, 
-                                    alpha = alphaEnabled, color = (1,1,1))
-          self.HCountAni = True
           if event.flameCount < flameLimitHalf and self.hitflames2Drawing:
             self.engine.draw3Dtex(self.hitflames2Drawing, coord = (x, y + .20, z), rot = self.hitFlameRotation,
                                   scale = (.25 + .6 * ms * ff, event.flameCount/6.0 + .6 * ms * ff, event.flameCount / 6.0 + .6 * ms * ff),
@@ -1017,9 +1064,6 @@ class Instrument(object):
                                     texcoord = (0.0,0.0,1.0,1.0), multiples = True, alpha = True, color = (1,1,1))
 
         event.flameCount += 1
-
-    if self.hitflamesAnim and self.HCount2 > self.HFrameLimit2:
-      self.HCount2 = 0
 
   #group rendering of 2D notes into method
   def render3DNote(self, texture, model, color, isTappable):
