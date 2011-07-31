@@ -823,7 +823,7 @@ class Instrument(object):
           #Alarian: Animated hitflames
           if self.hitglowAnim:
 
-            self.HCount =+ 1
+            self.HCount += 1
             if self.HCount > self.Animspeed-1:
               self.HCount = 0
             HIndex = (self.HCount * self.HFrameLimit - (self.HCount * self.HFrameLimit) % self.Animspeed) / self.Animspeed
