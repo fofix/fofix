@@ -867,6 +867,7 @@ class Group(Layer):
     glPushMatrix()
     glTranslatef(self.position[0], self.position[1], 1)
     glScalef(self.scale[0], self.scale[1], 1)
+    glRotatef(-self.angle, 0, 0, 1)
     glColor4f(*self.color)
     
     for layer in self.layers.values():
