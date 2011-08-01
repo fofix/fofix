@@ -462,10 +462,6 @@ class IncrementEffect(Effect):
     #rate at which values will increment between start and end
     self.inRates = []       #incoming rates
     self.outRates = []      #outgoing rates (if reverse is enabled)
-    
-    #catches flickering between 2 values
-    self.counter = 0
-    self.countRate = 0
 
     #how long it takes for the transition to take place
     self.transitionTime = 512.0
@@ -518,8 +514,9 @@ class IncrementEffect(Effect):
             self.current[i] += self.inRates[i]
           else:
             self.current[i] = self.end[i]
-      if self.counter >= self.transitionTime:
-        self.current = self.end[:]
+        if (self.current[i] > self.end[i] and self.start[i] < self.end[i]) or \
+           (self.current[i] < self.end[i] and self.start[i] > self.end[i]):
+          self.current[i] = self.end[i]
     else:
       #slides back to original position smoothly
       if self.reverse:
@@ -534,35 +531,18 @@ class IncrementEffect(Effect):
               self.current[i] += self.outRates[i]
             else:
               self.current[i] = self.start[i]
-        if self.counter <= 0.0:
-          self.current = self.start[:]
+        if (self.current[i] < self.start[i] and self.start[i] < self.end[i]) or \
+           (self.current[i] > self.start[i] and self.start[i] > self.end[i]):
+          self.current[i] = self.start[i]
       else:  #instant jump to starting value
         self.current = self.start[:]
-        self.counter = 0.0
         
     return self.current
-    
-  #updates the counter, returns true if a change in value occurs
-  def updateCounter(self):
-    condition = bool(eval(self.condition))
-    if condition:
-      self.counter += self.countRate
-      if self.counter >= self.transitionTime:
-        self.counter = self.transitionTime
-        return False
-      return True
-    else:
-      self.counter -= self.countRate
-      if self.counter <= 0.0:
-        self.counter = 0.0
-        return False
-      return True
-    
+        
   #basic updating for the effect
   def update(self):
     self.updateRates()
     self.updateValues()
-    self.updateCounter()
     
 #slides the layer from one spot to another
 #in a set period of time when the condition is met
