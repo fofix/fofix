@@ -846,7 +846,8 @@ class Group(Layer):
   # important if there is more than one player present.
   def render(self, visibility, playerNum):
     #here is where things are rather different compared to layers
-    
+    w, h, = self.engine.view.geometry[2:4]
+   
     self.updateLayer(playerNum)
     for effect in self.effects:
       effect.update()
@@ -855,7 +856,10 @@ class Group(Layer):
       layer.updateLayer(playerNum)
       for effect in layer.effects:
         effect.update()
-      layer.position = [layer.position[i] + self.position[i] for i in range(2)]
+      if isinstance(layer, FontLayer):
+        layer.position = [layer.position[0] + self.position[0]/w, layer.position[1] - (self.position[1]/h)*.75]
+      else:
+        layer.position = [layer.position[i] + self.position[i] for i in range(2)]
       layer.scale = [layer.scale[i]*self.scale[i] for i in range(2)]
       layer.angle *= self.angle
       layer.color = [layer.color[i]*self.color[i] for i in range(4)]
