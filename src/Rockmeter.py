@@ -239,10 +239,6 @@ class ImageLayer(Layer):
     self.position = position
 
   def render(self, visibility, playerNum):
-        
-    self.updateLayer(playerNum)
-    for effect in self.effects:
-      effect.update()
 
     #don't try to render an image layer if the texture doesn't even exist
     if not self.drawing:
@@ -318,11 +314,6 @@ class FontLayer(Layer):
     self.position = position
     
   def render(self, visibility, playerNum):
-    w, h, = self.stage.engine.view.geometry[2:4]
-
-    self.updateLayer(playerNum)
-    for effect in self.effects:
-      effect.update()
 
     position = self.position
     alignment = self.alignment
@@ -387,11 +378,6 @@ class CircleLayer(ImageLayer):
     super(CircleLayer, self).updateLayer(playerNum)
     
   def render(self, visibility, playerNum):
-    w, h, = self.stage.engine.view.geometry[2:4]
-
-    self.updateLayer(playerNum)
-    for effect in self.effects:
-      effect.update()
 
     #don't try to render image layer if the texture doesn't even exist
     if not self.drawing:
@@ -864,16 +850,15 @@ class Group(Layer):
     for effect in self.effects:
       effect.update()
     
-    glPushMatrix()
-    glTranslatef(self.position[0], self.position[1], 1)
-    glScalef(self.scale[0], self.scale[1], 1)
-    glRotatef(-self.angle, 0, 0, 1)
-    glColor4f(*self.color)
-    
     for layer in self.layers.values():
+      layer.updateLayer(playerNum)
+      for effect in layer.effects:
+        effect.update()
+      layer.position = [layer.position[i] + self.position[i] for i in range(2)]
+      layer.scale = [layer.scale[i]*self.scale[i] for i in range(2)]
+      layer.angle *= self.angle
+      layer.color = [layer.color[i]*self.color[i] for i in range(4)]
       layer.render(visibility, playerNum)
-      
-    glPopMatrix()
       
     
 class Rockmeter(ConfigGetMixin):
@@ -1112,10 +1097,14 @@ class Rockmeter(ConfigGetMixin):
           self.engine.view.setViewportHalf(self.scene.numberOfGuitars,p)
         else:
           self.engine.view.setViewportHalf(1,0)  
-        for layer in self.layersForRender.values():
-          layer.render(visibility, p)
         for group in self.layerGroups.values():
           group.render(visibility, p)
+        for layer in self.layersForRender.values():
+          layer.updateLayer(p)
+          for effect in layer.effects:
+            effect.update()
+          layer.render(visibility, p)
+
 
       self.engine.view.setViewportHalf(1,0)
       for layer in self.sharedlayers:
