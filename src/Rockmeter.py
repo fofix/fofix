@@ -320,10 +320,11 @@ class FontLayer(Layer):
     color = self.color
 
     if bool(eval(self.condition)):
-        glColor4f(*color)
-        self.font.render(self.text, position, align = alignment, 
+      glPushMatrix()
+      glColor4f(*color)
+      self.font.render(self.text, position, align = alignment, 
                          shadow = self.shadow, outline = self.outline, shadowOpacity = self.shadowOpacity)
-    
+      glPopMatrix()
         
 #creates a layer that is shaped like a pie-slice/circle instead of a rectangle
 class CircleLayer(ImageLayer): 
