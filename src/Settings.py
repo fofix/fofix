@@ -832,13 +832,7 @@ class SettingsMenu(Menu.Menu):
     ]
     self.fretSettingsMenu = Menu.Menu(self.engine, self.fretSettings, pos = (self.opt_text_x, self.opt_text_y), textColor = self.opt_text_color, selectedColor = self.opt_selected_color)
 
-    self.themeDisplaySettings = [
-      ConfigChoice(self.engine, self.engine.config, "performance", "animated_notes", autoApply = True, isQuickset = 1),
-    ]
-    self.themeDisplayMenu = Menu.Menu(self.engine, self.themeDisplaySettings, pos = (self.opt_text_x, self.opt_text_y), textColor = self.opt_text_color, selectedColor = self.opt_selected_color)
-    
     self.inGameDisplaySettings = [
-      (_("Theme Display Settings"), self.themeDisplayMenu, _("Change settings that only affect certain theme types.")),
       ConfigChoice(self.engine, self.engine.config, "game", "game_phrases", autoApply = True, isQuickset = 1),
       ConfigChoice(self.engine, self.engine.config, "game", "hopo_indicator", autoApply = True),
       ConfigChoice(self.engine, self.engine.config, "game", "accuracy_mode", autoApply = True),
@@ -847,6 +841,7 @@ class SettingsMenu(Menu.Menu):
       ConfigChoice(self.engine, self.engine.config, "video", "disable_fretsfx", autoApply = True),
       ConfigChoice(self.engine, self.engine.config, "video", "disable_flamesfx", autoApply = True),
       ConfigChoice(self.engine, self.engine.config, "video", "hitglow_color", autoApply = True),
+      ConfigChoice(self.engine, self.engine.config, "performance", "animated_notes", autoApply = True, isQuickset = 1),
       ConfigChoice(self.engine, self.engine.config, "video", "counting", autoApply = True, isQuickset = 2),
       ConfigChoice(self.engine, self.engine.config, "game", "accuracy_pos", autoApply = True),
       ConfigChoice(self.engine, self.engine.config, "game", "gsolo_acc_pos", autoApply = True, isQuickset = 1), #MFH
@@ -1007,7 +1002,7 @@ class SettingsMenu(Menu.Menu):
       (_("Gameplay Settings"),   self.basicSettingsMenu, _("Settings that affect the entire game.")),
       (_("Control Settings"),     self.keySettingsMenu, _("Create, delete, and edit your controls.")),
       (_("A/V Settings"),       self.avSettingsMenu, _("Resolution, sync, and volume are here.")),
-      (_("Display Settings"),     self.videoSettingsMenu, _("Theme, neck, resolution, etc.")),
+      (_("Display Settings"),     self.videoSettingsMenu, _("Theme, neck, and other game appearance things.")),
       (_("Setlist Settings"),   self.listSettingsMenu, _("Settings that affect the setlist.")),
       (_("Advanced Settings"), self.advancedSettingsMenu, _("Settings that probably don't need to be changed.")),
       (_("Mods, Cheats, AI"), self.cheatMenu, _("Set Jurgen to play for you, or other cheats.")),
@@ -1173,59 +1168,20 @@ class BasicSettingsMenu(Menu.Menu):
     else:
       self.modSettingsMenu = self.modSettings
 
-    self.battleObjectSettings = [
-      ConfigChoice(engine, engine.config, "game", "battle_Whammy", autoApply = True),
-      ConfigChoice(engine, engine.config, "game", "battle_Diff_Up", autoApply = True),
-      ConfigChoice(engine, engine.config, "game", "battle_String_Break", autoApply = True),
-      ConfigChoice(engine, engine.config, "game", "battle_Double", autoApply = True),
-      ConfigChoice(engine, engine.config, "game", "battle_Death_Drain", autoApply = True),
-      ConfigChoice(engine, engine.config, "game", "battle_Amp_Overload", autoApply = True),
-      ConfigChoice(engine, engine.config, "game", "battle_Switch_Controls", autoApply = True),
-      ConfigChoice(engine, engine.config, "game", "battle_Steal", autoApply = True),
-      ConfigChoice(engine, engine.config, "game", "battle_Tune", autoApply = True),
-    ]
-    
-    self.battleObjectSettingsMenu = Menu.Menu(self.engine, self.battleObjectSettings, pos = (self.opt_text_x, self.opt_text_y), textColor = self.opt_text_color, selectedColor = self.opt_selected_color)
-    
-    self.faceOffRules = [
-      ConfigChoice(engine, engine.config, "rules", "face_off_score", autoApply = True),
-      ConfigChoice(engine, engine.config, "rules", "face_off_handicap", autoApply = True),
-      ConfigChoice(engine, engine.config, "rules", "face_off_bonus", autoApply = True),
-      ConfigChoice(engine, engine.config, "rules", "face_off_black", autoApply = True),
-      ConfigChoice(engine, engine.config, "rules", "face_off_fail", autoApply = True),
-      (_("Battle Weapons"), self.battleObjectSettingsMenu, _("Change which weapons are available in battle."))
-    ]
-    
-    self.faceOffRulesMenu = Menu.Menu(self.engine, self.faceOffRules, pos = (self.opt_text_x, self.opt_text_y), textColor = self.opt_text_color, selectedColor = self.opt_selected_color)
-    
-    self.coOpRules = [
-      ConfigChoice(engine, engine.config, "rules", "coop_rockmeter", autoApply = True),
-      ConfigChoice(engine, engine.config, "rules", "coop_mult", autoApply = True),
-      ConfigChoice(engine, engine.config, "rules", "coop_bonus_activate", autoApply = True),
-      ConfigChoice(engine, engine.config, "rules", "coop_bonus_mult", autoApply = True),
-      ConfigChoice(engine, engine.config, "rules", "coop_unison", autoApply = True),
-      ConfigChoice(engine, engine.config, "rules", "coop_fail", autoApply = True),
-      ConfigChoice(engine, engine.config, "rules", "coop_save_chances", autoApply = True),
-      ConfigChoice(engine, engine.config, "rules", "coop_fail_drag", autoApply = True),
-    ]
-    
-    self.coOpRulesMenu = Menu.Menu(self.engine, self.coOpRules, pos = (self.opt_text_x, self.opt_text_y), textColor = self.opt_text_color, selectedColor = self.opt_selected_color)
-    
-    self.multiplayerRules = [
-      (_("Face-Off Rules"), self.faceOffRulesMenu, _("Change default Face-Off and Head-to-Head mode rules.")),
-      (_("Co-Op Rules"), self.coOpRulesMenu, _("Change default Co-Op mode rules."))
-    ]
-    
-    self.multiplayerRulesMenu = Menu.Menu(self.engine, self.multiplayerRules, pos = (self.opt_text_x, self.opt_text_y), textColor = self.opt_text_color, selectedColor = self.opt_selected_color)
-          
-    FoFiXBasicSettings = [
+    self.basicSettings = [
       ConfigChoice(self.engine, self.engine.config, "game",  "language"),
+      ConfigChoice(engine, engine.config, "engine", "theme"),
+      (_("Change Setlist Path >"), self.baseLibrarySelect, _("Set the path to a folder named 'songs' that contains your songs.")),
+      (_("Choose Default Neck >"), lambda: Dialogs.chooseNeck(self.engine), _("Choose your default neck. You still have to choose which neck you use for your character in the character select screen.")),
       ConfigChoice(self.engine, self.engine.config, "network",  "uploadscores", autoApply = True),
-      ConfigChoice(self.engine, self.engine.config, "game", "resume_countdown", autoApply = True), #akedrou
       ConfigChoice(self.engine, self.engine.config, "game", "star_scoring", autoApply = True),#myfingershurt
-      ConfigChoice(self.engine, self.engine.config, "audio",  "delay", autoApply = True),     #myfingershurt: so a/v delay can be set without restarting FoF
+      ConfigChoice(self.engine, self.engine.config, "fretboard", "neck_speed", autoApply = True),
+      ConfigChoice(self.engine, self.engine.config, "stage", "stage_mode", autoApply = True),   #myfingershurt
+      ConfigChoice(self.engine, self.engine.config, "video", "shader_use", autoApply = True), 
     ]
-    FoFiXBasicSettingsMenu = Menu.Menu(engine, FoFiXBasicSettings, pos = (self.opt_text_x, self.opt_text_y), textColor = self.opt_text_color, selectedColor = self.opt_selected_color)
+
+    self.basicSettingsMenu = Menu.Menu(self.engine, self.basicSettings, pos = (self.opt_text_x, self.opt_text_y), textColor = self.opt_text_color, selectedColor = self.opt_selected_color)
+    
     
     self.keyChangeSettings = [
       (_("Test Controller 1"), lambda: self.keyTest(0), _("Test the controller configured for slot 1.")),
@@ -1234,32 +1190,11 @@ class BasicSettingsMenu(Menu.Menu):
       (_("Test Controller 4"), lambda: self.keyTest(3), _("Test the controller configured for slot 4.")),
     ]
     self.keyChangeMenu = Menu.Menu(self.engine, self.keyChangeSettings, pos = (self.opt_text_x, self.opt_text_y), textColor = self.opt_text_color, selectedColor = self.opt_selected_color)
-
+    
     self.keySettings = self.refreshKeySettings(init = True)
     self.keySettingsMenu = Menu.Menu(self.engine, self.keySettings, onClose = self.controlCheck, pos = (self.opt_text_x, self.opt_text_y), textColor = self.opt_text_color, selectedColor = self.opt_selected_color)
     
-    InGameDisplaySettings = [
-      ConfigChoice(engine, engine.config, "game", "accuracy_mode", autoApply = True),
-      ConfigChoice(engine, engine.config, "video", "counting", autoApply = True, isQuickset = 2),
-    ]
-    InGameDisplayMenu = Menu.Menu(engine, InGameDisplaySettings, pos = (self.opt_text_x, self.opt_text_y), textColor = self.opt_text_color, selectedColor = self.opt_selected_color)
-      
-    modes = engine.video.getVideoModes()
-    modes.reverse()
-    Config.define("video",  "resolution", str,   "1024x768", text = _("Video Resolution"), options = ["%dx%d" % (m[0], m[1]) for m in modes], tipText = _("Set the resolution of the game. In windowed mode, higher values mean a larger screen."))
-    videoSettings = [
-      ConfigChoice(engine, engine.config, "engine", "theme"),
-      ConfigChoice(engine, engine.config, "video",  "resolution"),
-      ConfigChoice(engine, engine.config, "video",  "fullscreen"),
-      ConfigChoice(engine, engine.config, "stage", "stage_mode", autoApply = True),   #myfingershurt
-      ConfigChoice(engine, engine.config, "menu", "use_graphical_submenu", autoApply = True, isQuickset = 1),
-      (_("Choose Default Neck >"), lambda: Dialogs.chooseNeck(self.engine), _("Choose your default neck. You still have to choose which neck you use for your character in the character select screen.")),
-      (_("In-Game Display Settings"), InGameDisplayMenu, _("Change what and where things appear in-game.")),
-    ]
-    self.videoSettingsMenu = Menu.Menu(engine, videoSettings, pos = (self.opt_text_x, self.opt_text_y), textColor = self.opt_text_color, selectedColor = self.opt_selected_color)
-
-    
-    volumeSettings = [
+    self.volumeSettings = [
       VolumeConfigChoice(engine, engine.config, "audio",  "guitarvol", autoApply = True),
       VolumeConfigChoice(engine, engine.config, "audio",  "songvol", autoApply = True),
       VolumeConfigChoice(engine, engine.config, "audio",  "screwupvol", autoApply = True),
@@ -1270,50 +1205,41 @@ class BasicSettingsMenu(Menu.Menu):
       ActiveConfigChoice(engine, engine.config, "audio",  "SFX_volume", autoApply = True, onChange = self.engine.data.SetAllSoundFxObjectVolumes, volume = True), #MFH
       ActiveConfigChoice(engine, engine.config, "audio",  "menu_volume", autoApply = True, onChange = self.engine.mainMenu.setMenuVolume),
     ]
-    volumeSettingsMenu = Menu.Menu(engine, volumeSettings, pos = (self.opt_text_x, self.opt_text_y), textColor = self.opt_text_color, selectedColor = self.opt_selected_color)
-
-    audioSettings = [
-      (_("Volume Settings"),    volumeSettingsMenu, _("Change the volume of game sounds.")),
-      ConfigChoice(engine, engine.config, "game", "star_claps", autoApply = True),      #myfingershurt
-      ConfigChoice(engine, engine.config, "game", "beat_claps", autoApply = True), #racer
-      ConfigChoice(engine, engine.config, "audio",  "whammy_effect", autoApply = True),     #MFH
-      ConfigChoice(engine, engine.config, "audio", "enable_crowd_tracks", autoApply = True), #akedrou
-    ]
-    audioSettingsMenu = Menu.Menu(engine, audioSettings, pos = (self.opt_text_x, self.opt_text_y), textColor = self.opt_text_color, selectedColor = self.opt_selected_color)
+    self.volumeSettingsMenu = Menu.Menu(engine, self.volumeSettings, pos = (self.opt_text_x, self.opt_text_y), textColor = self.opt_text_color, selectedColor = self.opt_selected_color)
     
-    quickSettings = [
+    modes = self.engine.video.getVideoModes()
+    modes.reverse()
+    Config.define("video",  "resolution", str,   "1024x768", text = _("Video Resolution"), options = ["%dx%d" % (m[0], m[1]) for m in modes], tipText = _("Set the resolution of the game. In windowed mode, higher values mean a larger screen."))
+    self.avSettings = [
+      (_("Volume"),    self.volumeSettingsMenu, _("Change the volume of game sounds.")),
+      ConfigChoice(engine, engine.config, "video",  "resolution"),
+      ConfigChoice(engine, engine.config, "video",  "fullscreen"),
+      ConfigChoice(engine, engine.config, "video", "disable_screensaver"),  #stump
+      ConfigChoice(self.engine, self.engine.config, "audio",  "delay", autoApply = True),     #myfingershurt: so a/v delay can be set without restarting FoF
+    ]
+    self.avSettingsMenu = Menu.Menu(engine, self.avSettings, pos = (self.opt_text_x, self.opt_text_y), textColor = self.opt_text_color, selectedColor = self.opt_selected_color)
+    
+    self.quickSettings = [
       ConfigChoice(engine, engine.config, "quickset", "performance", autoApply = True),
       ConfigChoice(engine, engine.config, "quickset", "gameplay", autoApply = True),
     ]
-    quicksetMenu = Menu.Menu(engine, quickSettings, pos = (self.opt_text_x, self.opt_text_y), textColor = self.opt_text_color, selectedColor = self.opt_selected_color)
-
-    listSettings = [
-      (_("Change Setlist Path >"), self.baseLibrarySelect, _("Set the path to a folder named 'songs' that contains your songs.")),
-      ConfigChoice(engine, engine.config, "setlist",  "sort_order", autoApply = True),
-      ConfigChoice(engine, engine.config, "setlist", "sort_direction", autoApply = True),
-      ConfigChoice(engine, engine.config, "setlist", "quickplay_tiers", autoApply = True),  #myfingershurt
-      ConfigChoice(engine, engine.config, "setlist", "songlist_instrument", autoApply = True), #MFH
-      ConfigChoice(engine, engine.config, "setlist", "songlist_difficulty", autoApply = True), #evilynux
-    ]
-    listSettingsMenu = Menu.Menu(engine, listSettings, pos = (self.opt_text_x, self.opt_text_y), textColor = self.opt_text_color, selectedColor = self.opt_selected_color)
+    self.quicksetMenu = Menu.Menu(engine, self.quickSettings, pos = (self.opt_text_x, self.opt_text_y), textColor = self.opt_text_color, selectedColor = self.opt_selected_color)
 
     Cheats = self.refreshCheatSettings(init = True)
     self.cheatMenu = Menu.Menu(engine, Cheats, pos = (self.opt_text_x, self.opt_text_y), textColor = self.opt_text_color, selectedColor = self.opt_selected_color)
     
     settings = [
-      (_("Gameplay Settings"),   FoFiXBasicSettingsMenu, _("Settings that affect the rules of the game.")),
-      (_("Control Settings"),          self.keySettingsMenu, _("Create, delete, and edit your controls.")),
-      (_("Display Settings"),     self.videoSettingsMenu, _("Theme, neck, resolution, etc.")),
-      (_("Audio Settings"),      audioSettingsMenu, _("Volume controls, etc.")),
-      (_("Setlist Settings"),   listSettingsMenu, _("Settings that affect the setlist.")),
+      (_("Basic Settings"),   self.basicSettingsMenu, _("The most common controls.")),
+      (_("Control Settings"),     self.keySettingsMenu, _("Create, delete, and edit your controls.")),
+      (_("A/V Settings"),       self.avSettingsMenu, _("Resolution, sync, and volume are here.")),
       (_("Mods, Cheats, AI"), self.cheatMenu, _("Set Jurgen to play for you, or other cheats.")),
-      (_("%s Credits") % (engine.versionString), lambda: Dialogs.showCredits(engine), _("See who made this game.")), # evilynux - Show Credits!
-      (_("Quickset"), quicksetMenu, _("A quick way to set many advanced settings.")),
-      (_("See Advanced Options"), self.advancedSettings)
+      (_("%s Credits") % (Version.PROGRAM_NAME), lambda: Dialogs.showCredits(engine), _("See who made this game.")),
+      (_("Quickset"), self.quicksetMenu, _("A quick way to set many advanced settings.")),
+      (_("Show Advanced Options"), self.advancedSettings)
     ]
   
-    self.settingsToApply = FoFiXBasicSettings + \
-                           videoSettings + \
+    self.settingsToApply = self.basicSettings + \
+                           self.avSettings + \
                            self.modSettings
   
 
@@ -1339,9 +1265,7 @@ class BasicSettingsMenu(Menu.Menu):
       Menu.Choice(_("New Controller"),    lambda: createControl(self.engine, refresh = self.refreshKeySettings), tipText = _("Create a new controller to use.")),
       Menu.Choice(_("Edit Controller"),   lambda: chooseControl(self.engine, refresh = self.refreshKeySettings), tipText = _("Edit a controller you have created.")),
       Menu.Choice(_("Delete Controller"), lambda: chooseControl(self.engine, "delete", refresh = self.refreshKeySettings), tipText = _("Delete a controller you have created.")),
-      ActiveConfigChoice(self.engine, self.engine.config, "menu", "p2_menu_nav", onChange = self.engine.input.reloadControls),#myfingershurt
-      ActiveConfigChoice(self.engine, self.engine.config, "menu", "drum_navigation", onChange = self.engine.input.reloadControls),#myfingershurt
-      ActiveConfigChoice(self.engine, self.engine.config, "menu", "key_checker_mode", onChange = self.engine.input.reloadControls),#myfingershurt
+      ActiveConfigChoice(self.engine, self.engine.config, "performance", "max_players", onChange = self.refreshCheatSettings), #akedrou
     ]
     if init:
       return choices
@@ -1352,7 +1276,8 @@ class BasicSettingsMenu(Menu.Menu):
     maxplayers = self.engine.config.get("performance", "max_players")
     for i in range(maxplayers):
       choices.append(ConfigChoice(self.engine, self.engine.config, "jurgen", "jurg_p%d" % i, autoApply = True))
-    choicesb = [ConfigChoice(self.engine, self.engine.config, "game", "gh2_sloppy", autoApply = True),
+    choicesb = [
+      ConfigChoice(self.engine, self.engine.config, "game", "gh2_sloppy", autoApply = True),
       ConfigChoice(self.engine, self.engine.config, "game", "whammy_saves_starpower", autoApply = True),#myfingershurt
       ConfigChoice(self.engine, self.engine.config, "game",   "note_hit_window", autoApply = True), #alarian: defines hit window
       ConfigChoice(self.engine, self.engine.config, "game", "hopo_frequency", autoApply = True),
