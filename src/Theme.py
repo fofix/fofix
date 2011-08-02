@@ -114,7 +114,7 @@ class Theme(Task):
       if self.config:
         if self.config.has_option("theme", value):
           if type == bool:
-            return bool(value.lower() in ["1", "true", "yes", "on"])
+            return self.config.get("theme", value).lower() in ["1", "true", "yes", "on"]
           elif type == "color":
             return self.hexToColor(self.config.get("theme", value))
           else:
