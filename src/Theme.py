@@ -155,6 +155,11 @@ class Theme(Task):
     #since the original Frets on Fire.  What glow_color allows you to do is set it so
     #the glow is either the color of the fret it's over or it can be the color the image
     #actually is (if the image is white then no matter what key is hit the glow will be white)
+    self.hitGlowColor   = get("hit_glow_color",       str,    "frets")
+    if not self.hitGlowColor == "frets":
+      self.hitGlowColor = self.hexToColor(self.hitGlowColor)
+
+    #Sets the color of the glow.png
     self.glowColor   = get("glow_color",       str,    "frets")
     if not self.glowColor == "frets":
       self.glowColor = self.hexToColor(self.glowColor)
@@ -169,7 +174,11 @@ class Theme(Task):
     default_color = ["#22FF22", "#FF2222", "#FFFF22", "#3333FF", "#FF9933", "#CC22CC"]
     self.noteColors  = [get("fret%d_color" % i, "color", default_color[i]) for i in range(6)]
     self.spNoteColor =  get("fretS_color",      "color", "#4CB2E5")
-    self.killNoteColor =  get("fretK_color",      "color", "#FFFFFF")
+
+    #Color of the tails when whammied, default is set to the colors of the frets
+    self.killNoteColor  = get("fretK_color",       str,    "frets")
+    if not self.killNoteColor == "frets":
+      self.killNoteColor = self.hexToColor(self.killNoteColor)
 
     #just like glow_color, this allows you to have tails use either the color of the note
     #or the actual color of the tail
@@ -180,17 +189,31 @@ class Theme(Task):
     self.HitFlameFrameLimit    = get("hit_flame_frame_limit",  int, 13)
     self.HoldFlameFrameLimit   = get("hold_flame_frame_limit", int, 16)
 
-    #controls the size of the hitflames
-    self.hitFlameSize   = get("hit_flame_size", int, .075)
+    #Lets themers turn alpha = True to alpha = False making black not removed from the flames or glows.
+    self.hitFlameBlackRemove   = get("hit_flame_black_remove", bool, True)
+    self.hitGlowsBlackRemove   = get("hit_Glows_black_remove", bool, True)
 
-    #controls the y position of the hitflames
-    self.hitFlameYPos   = get("hit_flame_y_position", int, .3)
+    #Rotation in degrees for the hitFlames and hitGlows x y and z axix
+    self.hitFlameRotation     = (get("flame_rotation_base", float, 90), get("flame_rotation_x", float, 1), get("flame_rotation_y", float, 0), get("flame_rotation_z", float, 0))
+    self.hitGlowsRotation     = (get("hit_glow_rotation_base", float, 90), get("hit_glow_rotation_x", float, .5), get("hit_glow_rotation_y", float, 0), get("hit_glow_rotation_z", float, 0))
+
+    #The rotation offset will offset each flame/glow so that if the themer chooses so
+    #they can align them with the frets individually
+    self.hitGlowOffset     = (get("hit_glow_offset_0", float, 0), get("hit_glow_offset_1", float, 0), get("hit_glow_offset_2", float, 0), get("hit_glow_offset_3", float, 0), get("hit_glow_offset_4", float, 0))
+    self.hitFlameOffset     = (get("flame_offset_0", float, 0), get("flame_offset_1", float, 0), get("flame_offset_2", float, 0), get("flame_offset_3", float, 0), get("flame_offset_4", float, 0))
+    self.drumHitFlameOffset = (get("drum_flame_offset_0", float, 0), get("drum_flame_offset_1", float, 0), get("drum_flame_offset_2", float, 0), get("drum_flame_offset_3", float, 0), get("drum_flame_offset_4", float, 0))
+
+    #controls the size of the hitflames
+    self.hitFlameSize   = get("hit_flame_size", float, .075)
+
+    #controls the y and y position of the hitflames
+    self.hitFlamePos  = (get("hit_flame_y_position", float, .3), get("hit_flame_z_position", float, 0))
 
     #controls the size of the hitflame glows
-    self.holdFlameSize   = get("hold_flame_size", int, .075)
+    self.holdFlameSize   = get("hold_flame_size", float, .075)
 
     #controls the y position of the hitflames glows
-    self.holdFlameYPos   = get("hold_flame_y_position", int, 0)
+    self.holdFlamePos   = (get("hold_flame_y_position", int, 0), get("hold_flame_z_position", int, 0))
 
     self.fretPress = get("fretPress", bool, False)
     

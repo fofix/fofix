@@ -239,10 +239,6 @@ class ImageLayer(Layer):
     self.position = position
 
   def render(self, visibility, playerNum):
-        
-    self.updateLayer(playerNum)
-    for effect in self.effects:
-      effect.update()
 
     #don't try to render an image layer if the texture doesn't even exist
     if not self.drawing:
@@ -272,7 +268,7 @@ class FontLayer(Layer):
     self.font        = self.engine.data.fontDict[font]          #the font to use
     self.text        = ""                                       #the text that will be rendered to screen 
     self.textexpr    = self.getexpr("text", "''")               #the text from the ini that will be evalutated
-    self.replace     = [r.strip() for r in self.get("replace", str, "_").split("_")]
+    self.replace     = [r.strip() for r in self.get("replace", str, "_").split("_")[:2]]
                                                                 #replace character a character in the string with this
     self.alignment   = halign(self.get("alignment", str, "LEFT"), 'left')
                                                                 #alignment of the text
@@ -292,7 +288,7 @@ class FontLayer(Layer):
     else:
       text = str(text)
       
-    text.replace(self.replace[0], self.replace[1])
+    text = text.replace(self.replace[0], self.replace[1])
       
     wid, hgt = self.font.getStringSize(str(text))
 
@@ -318,21 +314,17 @@ class FontLayer(Layer):
     self.position = position
     
   def render(self, visibility, playerNum):
-    w, h, = self.stage.engine.view.geometry[2:4]
-
-    self.updateLayer(playerNum)
-    for effect in self.effects:
-      effect.update()
 
     position = self.position
     alignment = self.alignment
     color = self.color
 
     if bool(eval(self.condition)):
-        glColor4f(*color)
-        self.font.render(self.text, position, align = alignment, 
+      glPushMatrix()
+      glColor4f(*color)
+      self.font.render(self.text, position, align = alignment, 
                          shadow = self.shadow, outline = self.outline, shadowOpacity = self.shadowOpacity)
-    
+      glPopMatrix()
         
 #creates a layer that is shaped like a pie-slice/circle instead of a rectangle
 class CircleLayer(ImageLayer): 
@@ -387,11 +379,6 @@ class CircleLayer(ImageLayer):
     super(CircleLayer, self).updateLayer(playerNum)
     
   def render(self, visibility, playerNum):
-    w, h, = self.stage.engine.view.geometry[2:4]
-
-    self.updateLayer(playerNum)
-    for effect in self.effects:
-      effect.update()
 
     #don't try to render image layer if the texture doesn't even exist
     if not self.drawing:
@@ -462,10 +449,6 @@ class IncrementEffect(Effect):
     #rate at which values will increment between start and end
     self.inRates = []       #incoming rates
     self.outRates = []      #outgoing rates (if reverse is enabled)
-    
-    #catches flickering between 2 values
-    self.counter = 0
-    self.countRate = 0
 
     #how long it takes for the transition to take place
     self.transitionTime = 512.0
@@ -475,7 +458,6 @@ class IncrementEffect(Effect):
   #terms of milliseconds instead of frames
   def getTime(self, time):
     t = time * (max(self.engine.clock.get_fps(), _minFPS)) / 1000.0
-    self.countRate = 1.0/max(t, 1.0)
     return max(t, 1.0)
    
   #updates the rates at which values between start and end should change to reach
@@ -518,8 +500,9 @@ class IncrementEffect(Effect):
             self.current[i] += self.inRates[i]
           else:
             self.current[i] = self.end[i]
-      if self.counter >= self.transitionTime:
-        self.current = self.end[:]
+        if (self.current[i] > self.end[i] and self.start[i] < self.end[i]) or \
+           (self.current[i] < self.end[i] and self.start[i] > self.end[i]):
+          self.current[i] = self.end[i]
     else:
       #slides back to original position smoothly
       if self.reverse:
@@ -534,35 +517,18 @@ class IncrementEffect(Effect):
               self.current[i] += self.outRates[i]
             else:
               self.current[i] = self.start[i]
-        if self.counter <= 0.0:
-          self.current = self.start[:]
+        if (self.current[i] < self.start[i] and self.start[i] < self.end[i]) or \
+           (self.current[i] > self.start[i] and self.start[i] > self.end[i]):
+          self.current[i] = self.start[i]
       else:  #instant jump to starting value
         self.current = self.start[:]
-        self.counter = 0.0
         
     return self.current
-    
-  #updates the counter, returns true if a change in value occurs
-  def updateCounter(self):
-    condition = bool(eval(self.condition))
-    if condition:
-      self.counter += self.countRate
-      if self.counter >= self.transitionTime:
-        self.counter = self.transitionTime
-        return False
-      return True
-    else:
-      self.counter -= self.countRate
-      if self.counter <= 0.0:
-        self.counter = 0.0
-        return False
-      return True
-    
+        
   #basic updating for the effect
   def update(self):
     self.updateRates()
     self.updateValues()
-    self.updateCounter()
     
 #slides the layer from one spot to another
 #in a set period of time when the condition is met
@@ -841,14 +807,78 @@ class Animate(Effect):
     self.layer.rect = rect
     
     self.fixScale()
-        
+    
+#new object allowing multiple layers to be placed as a group
+# groups will allow all layers within to be centered at a certain point,
+# be scaled, be hued, and be rotated together
+# they can even be effected by the same effects that layers have minus
+# animate and replace
+# a group itself is a type of layer, think of it as a layer that holds layers
+class Group(Layer):
+  def __init__(self, stage, section):
+    super(Group, self).__init__(stage, section)
+    self.layers      = {}   #the layers the group controls
+    for num in self.get("layers", str, "").split(","):
+      self.layers[int(num)] = self.stage.layers[int(num)]
+                                        
+         
+  def updateLayer(self, playerNum):
+    w, h, = self.engine.view.geometry[2:4]
+    
+    super(Group, self).updateLayer(playerNum)
+      
+    position = self.position
+    if "xpos" in self.inPixels:
+      position[0] *= w/vpc[0]
+    else:        
+      position[0] *= w
+
+    if "ypos" in self.inPixels:
+      position[1] *= h/vpc[1]
+    else:        
+      position[1] *= h
+
+    self.position = position
+    
+  # should handle the final step of rendering the image
+  # be sure if you have variables being updated in updateVars
+  # to call updateVars and refresh them.  playerNum is *especially*
+  # important if there is more than one player present.
+  def render(self, visibility, playerNum):
+    #here is where things are rather different compared to layers
+    w, h, = self.engine.view.geometry[2:4]
+   
+    self.updateLayer(playerNum)
+    for effect in self.effects:
+      effect.update()
+    
+    for layer in self.layers.values():
+      layer.updateLayer(playerNum)
+      for effect in layer.effects:
+        effect.update()
+      if isinstance(layer, FontLayer):
+        layer.position = [layer.position[0] + self.position[0]/w, layer.position[1] - (self.position[1]/h)*.75]
+      else:
+        layer.position = [layer.position[i] + self.position[i] for i in range(2)]
+      layer.scale = [layer.scale[i]*self.scale[i] for i in range(2)]
+      layer.angle *= self.angle
+      layer.color = [layer.color[i]*self.color[i] for i in range(4)]
+      layer.render(visibility, playerNum)
+      
+    
 class Rockmeter(ConfigGetMixin):
+  
+  _layerLimit = 99    #limit to how many layers can be loaded
+  _groupLimit = 50    #limit to how many groups can be loaded
+  
   def __init__(self, guitarScene, configFileName, coOp = False):
 
     self.scene            = guitarScene
     self.engine           = guitarScene.engine
-    self.layers = {}
-    self.sharedlayers = [] #these layers are for coOp use only
+    self.layers = {}          #collection of all the layers in the rockmeter
+    self.layersForRender = {} #collection of layers that are rendered separate from any group
+    self.layerGroups = {}     #collection of layer groups
+    self.sharedlayers = []    #these layers are for coOp use only
 
     self.coOp = coOp
     self.config = LinedConfigParser()
@@ -857,7 +887,7 @@ class Rockmeter(ConfigGetMixin):
     self.themename = self.engine.data.themeLabel
     
     # Build the layers
-    for i in range(99):
+    for i in range(Rockmeter._layerLimit):
       types = [
                "Image",
                "Text",
@@ -875,7 +905,16 @@ class Rockmeter(ConfigGetMixin):
           else:
             self.createImage(self.section, i)
           break
-
+    
+    for i in range(Rockmeter._groupLimit):
+      self.section = "Group%d" % i
+      if not self.config.has_section(self.section): 
+        continue
+      else:
+        self.createGroup(self.section, i)
+        
+    print self.layerGroups
+    print self.layersForRender
     self.reset()
     
   def reset(self):
@@ -891,6 +930,7 @@ class Rockmeter(ConfigGetMixin):
     else:
       if layer:
         self.layers[number] = layer
+        self.layersForRender[number] = layer
 
   def loadLayerFX(self, layer, section):
     section = section.split(":")[0]
@@ -900,6 +940,11 @@ class Rockmeter(ConfigGetMixin):
              "Fade": "Fade(layer, fxsection)",
              "Animate": "Animate(layer, fxsection)",
              "Scale": "Scale(layer, fxsection)"}
+             
+    #makes sure groups don't load effects they can use
+    if isinstance(layer, Group):
+      types.pop("Animate"); types.pop("Replace")
+      
     for i in range(5):  #maximum of 5 effects per layer
       for t in types.keys():
         fxsection = "%s:fx%d:%s" % (section, i, t)
@@ -956,6 +1001,17 @@ class Rockmeter(ConfigGetMixin):
 
     self.addLayer(layer, number, layer.shared)
 
+  def createGroup(self, section, number):
+    group = Group(self, section)
+    self.loadLayerFX(group, section)
+    
+    #remove the layers in the group from the layers to be rendered
+    # independent of groups
+    for layer in group.layers.keys():
+      if layer in self.layersForRender.keys():
+        self.layersForRender.pop(layer)
+    self.layerGroups[number] = group
+    
   #because time is not player specific it's best to update it only once per cycle
   def updateTime(self):
     global songLength, minutesSongLength, secondsSongLength
@@ -1046,8 +1102,14 @@ class Rockmeter(ConfigGetMixin):
           self.engine.view.setViewportHalf(self.scene.numberOfGuitars,p)
         else:
           self.engine.view.setViewportHalf(1,0)  
-        for layer in self.layers.values():
+        for group in self.layerGroups.values():
+          group.render(visibility, p)
+        for layer in self.layersForRender.values():
+          layer.updateLayer(p)
+          for effect in layer.effects:
+            effect.update()
           layer.render(visibility, p)
+
 
       self.engine.view.setViewportHalf(1,0)
       for layer in self.sharedlayers:

@@ -105,8 +105,13 @@ class Instrument(object):
     self.beatsPerUnit   = self.beatsPerBoard / self.boardLength
     self.fretColors     = self.engine.theme.noteColors
     self.spColor        = self.engine.theme.spNoteColor
-    self.killColor      = self.engine.theme.killNoteColor
     self.useFretColors  = self.engine.theme.use_fret_colors
+
+    if not self.engine.theme.killNoteColor == "frets":
+      kC = self.engine.theme.killNoteColor
+      self.killColor = [kC, kC, kC, kC, kC]
+    else:
+      self.killColor = self.fretColors
 
     self.playedNotes    = []
     self.missedNotes    = []
@@ -251,7 +256,7 @@ class Instrument(object):
     self.hitglow_color = self.engine.config.get("video", "hitglow_color") #this should be global, not retrieved every fret render.
 
     #check if BRE enabled
-    if self.bigRockEndings == 2 or (self.theme == 2 and self.bigRockEndings == 1):
+    if self.bigRockEndings == 2 or self.bigRockEndings == 1:
       self.freestyleEnabled = True
 
     #blazingamer
@@ -303,10 +308,19 @@ class Instrument(object):
     self.keyColor = self.engine.theme.keyColor
     self.key2Color = self.engine.theme.key2Color
 
-    self.hitFlameYPos = self.engine.theme.hitFlameYPos
-    self.hitFlameSize = self.engine.theme.hitFlameSize
-    self.holdFlameYPos = self.engine.theme.holdFlameYPos
-    self.holdFlameSize = self.engine.theme.holdFlameSize
+    self.hitFlameYPos         = self.engine.theme.hitFlamePos[0]
+    self.hitFlameZPos         = self.engine.theme.hitFlamePos[1]
+    self.holdFlameYPos        = self.engine.theme.holdFlamePos[0]
+    self.holdFlameZPos        = self.engine.theme.holdFlamePos[1]
+    self.hitFlameSize         = self.engine.theme.hitFlameSize
+    self.holdFlameSize        = self.engine.theme.holdFlameSize
+    self.hitFlameBlackRemove  = self.engine.theme.hitFlameBlackRemove
+    self.hitGlowsBlackRemove  = self.engine.theme.hitGlowsBlackRemove
+    self.hitGlowOffset        = self.engine.theme.hitGlowOffset
+    self.hitFlameOffset       = self.engine.theme.hitFlameOffset
+    self.drumHitFlameOffset   = self.engine.theme.drumHitFlameOffset
+    self.hitGlowsRotation     = self.engine.theme.hitFlameRotation
+    self.hitFlameRotation     = self.engine.theme.hitFlameRotation
 
     #all flames/glows are set to there corresponding color else they are set to the fret colors
     if not self.engine.theme.flamesColor == "frets":
@@ -314,6 +328,12 @@ class Instrument(object):
       self.flameColors = [fC, fC, fC, fC, fC]
     else:
       self.flameColors = self.fretColors
+
+    if not self.engine.theme.hitGlowColor == "frets":
+      hGC = self.engine.theme.hitGlowColor
+      self.hitGlowColors = [hGC, hGC, hGC, hGC, hGC]
+    else:
+      self.hitGlowColors = self.fretColors
 
     if not self.engine.theme.glowColor == "frets":
       gC = self.engine.theme.glowColor
@@ -330,6 +350,23 @@ class Instrument(object):
     self.coOpFailed = False #akedrou
     self.coOpRestart = False #akedrou
     self.starPowerActive = False
+
+    #Tail's base arrays will get modified overtime
+
+    self.tail_tex = np.array([[0.0, 0.0],
+                              [1.0, 0.0],
+                              [0.0, 1.0],
+                              [1.0, 1.0]], dtype=np.float32)
+
+    self.tail_col = np.array([[0,0,0,1],
+                              [0,0,0,1],
+                              [0,0,0,1],
+                              [0,0,0,1]], dtype=np.float32)
+
+    self.tail_vtx = np.array([[0, 0, 0],
+                             [0, 0, 0],
+                             [0, 0, 0],
+                             [0, 0, 0]], dtype=np.float32)
 
   #this checks to see if there is a "drum" or "bass" folder
   #inside the subdirectory for image replacement
@@ -363,22 +400,20 @@ class Instrument(object):
     engine = self.engine
     themename = self.engine.data.themeLabel
 
+    get = lambda file: self.checkPath("flames", file)
+
     self.HCount         = 0
-    self.HCount2        = 0
     self.HFrameLimit	= self.engine.theme.HoldFlameFrameLimit
     self.HFrameLimit2	= self.engine.theme.HitFlameFrameLimit
-    self.Hitanim        = True
-    self.Hitanim2       = True
     self.HCountAni      = False
     
     if self.disableFretSFX != False:
       self.glowDrawing = None
     else:
-      engine.loadImgDrawing(self, "glowDrawing", os.path.join("themes",themename,"glow.png"),  textureSize = (128, 128))
+      engine.loadImgDrawing(self, "glowDrawing", get("glow.png"))
       if not self.glowDrawing:
         engine.loadImgDrawing(self, "glowDrawing", "glow.png")
 
-    self.hitFlamesPresent = True
     if self.disableFlameSFX == True:
       self.hitglow2Drawing = None
       self.hitglowDrawing = None
@@ -387,19 +422,13 @@ class Instrument(object):
       self.hitflames2Drawing = None
       self.hitflames1Drawing = None
     else:
-      engine.loadImgDrawing(self, "hitflames1Drawing", os.path.join("themes",themename,"hitflames1.png"),  textureSize = (128, 128))
-      engine.loadImgDrawing(self, "hitflames2Drawing", os.path.join("themes",themename,"hitflames2.png"),  textureSize = (128, 128))
-      
-      if not engine.loadImgDrawing(self, "hitflamesAnim", os.path.join("themes",themename,"hitflamesanimation.png"),  textureSize = (128, 128)):
-        self.Hitanim2 = False
-
-      engine.loadImgDrawing(self, "powerHitflamesAnim", os.path.join("themes",themename,"powerhitflamesanimation.png"),  textureSize = (128, 128))
-      
-      if not engine.loadImgDrawing(self, "hitglowAnim", os.path.join("themes",themename,"hitglowanimation.png"),  textureSize = (128, 128)):
-        self.Hitanim = False
-
-      engine.loadImgDrawing(self, "hitglowDrawing", os.path.join("themes",themename,"hitglow.png"),  textureSize = (128, 128))
-      engine.loadImgDrawing(self, "hitglow2Drawing", os.path.join("themes",themename,"hitglow2.png"),  textureSize = (128, 128))
+      engine.loadImgDrawing(self, "hitflames1Drawing", get("hitflames1.png"))
+      engine.loadImgDrawing(self, "hitflames2Drawing", get("hitflames2.png"))
+      engine.loadImgDrawing(self, "hitflamesAnim", get("hitflamesanimation.png"))
+      engine.loadImgDrawing(self, "powerHitflamesAnim", get("powerhitflamesanimation.png"))
+      engine.loadImgDrawing(self, "hitglowAnim", get("hitglowanimation.png"))
+      engine.loadImgDrawing(self, "hitglowDrawing", get("hitglow.png"))
+      engine.loadImgDrawing(self, "hitglow2Drawing", get("hitglow2.png"))
 
     engine.loadImgDrawing(self, "hitlightning", os.path.join("themes",themename,"lightning.png"),  textureSize = (128, 128))
 
@@ -584,7 +613,7 @@ class Instrument(object):
 
   def hitNote(self, time, note):
     self.pickStartPos = max(self.pickStartPos, time)
-    self.playedNotes = [(time, note)]
+    self.playedNotes.append([time, note])
     note.played       = True
     return True
 
@@ -775,128 +804,147 @@ class Instrument(object):
 
   #Renders the tail glow hitflame
   def renderHitTrails(self, controls):
-    if self.flameColors[0][0] == -1 or self.disableFlameSFX == True:
+    if self.hitGlowColors[0][0] == -1  or self.disableFlameSFX == True:
       return
 
-    w = self.boardWidth / self.strings
-
-    if self.starPowerActive or self.spNote == True:
-      flameColor = self.spColor
-    else:
-      flameColor = 0
-     
     if self.HCountAni:
       for n in range(self.strings):
         f = self.fretWeight[n]
 
-        if not flameColor == self.spColor:
-          flameColor = self.flameColors[n]
-
         if f and (controls.getState(self.actions[0]) or controls.getState(self.actions[1])):
           f += 0.25
 
+        w = self.boardWidth / self.strings
+        x = (self.strings / 2 - n) * w
+
         y = f / 6
         y -= self.holdFlameYPos
-        x = (self.strings / 2 - n) * w
+
         flameSize = self.holdFlameSize
+
+        alphaEnabled = self.hitGlowsBlackRemove
 
         if self.fretActivity[n]:
           ms = math.sin(self.time) * .25 + 1
           ff = self.fretActivity[n] + 1.2
-              
+          vtx = flameSize * ff
+          s = ff/6
+
+          if not self.hitFlameYPos == 0:
+            y = s - self.holdFlameYPos
+          else:
+            y = 0
+
+          if not self.hitFlameZPos == 0:
+            z = s - self.holdFlameZPos
+          else:
+            z = 0
+
+          y -= self.hitGlowOffset[n]
+
+          color = self.hitGlowColors[n]
+          color = tuple([color[ifc] + .38 for ifc in range(3)]) #to make sure the final color looks correct on any color set
+
           #Alarian: Animated hitflames
-          if self.Hitanim and self.hitglowAnim:
+          if self.hitglowAnim:
+
             self.HCount += 1
             if self.HCount > self.Animspeed-1:
               self.HCount = 0
             HIndex = (self.HCount * self.HFrameLimit - (self.HCount * self.HFrameLimit) % self.Animspeed) / self.Animspeed
-            if HIndex >= self.HFrameLimit:
+            if HIndex >= self.HFrameLimit-1:
               HIndex = 0
             texX = (HIndex*(1.0/self.HFrameLimit), HIndex*(1.0/self.HFrameLimit)+(1.0/self.HFrameLimit))
 
-            self.engine.draw3Dtex(self.hitglowAnim, coord = (x, y + .225, 0), rot = (90, 1, 0, 0), scale = (2.4, 1, 3.3),
-                                  vertex = (-flameSize * ff,-flameSize * ff,flameSize * ff,flameSize * ff),
-                                  texcoord = (texX[0],0.0,texX[1],1.0), multiples = True, alpha = True, color = (1,1,1))
+            self.engine.draw3Dtex(self.hitglowAnim, coord = (x, y, z), rot = self.hitGlowsRotation, scale = (2.4, 1, 3.3),
+                                  vertex = (-vtx,-vtx,vtx,vtx),texcoord = (texX[0],0.0,texX[1],1.0), multiples = True, 
+                                  alpha = alphaEnabled, color = (1,1,1))
 
-          ff += .3
-          vtx = flameSize * ff
 
-          if self.hitglow2Drawing:
-            self.engine.draw3Dtex(self.hitglowDrawing, coord = (x, y + .125, 0), rot = (90, 1, 0, 0),
+          if self.hitglowDrawing:
+            flameColorMod = (1.19, 1.97, 10.59)
+            flamecol = tuple([color[ifc]*flameColorMod[ifc] for ifc in range(3)])
+
+            if self.starPowerActive or self.spNote == True:
+              flamecol = self.spColor
+
+            self.engine.draw3Dtex(self.hitglowDrawing, coord = (x, y + .15, z), rot = self.hitGlowsRotation,
                                   scale = (0.5 + .6 * ms * ff, 1.5 + .6 * ms * ff, 1 + .6 * ms * ff),
                                   vertex = (-vtx,-vtx,vtx,vtx), texcoord = (0.0,0.0,1.0,1.0), 
-                                  multiples = True, alpha = True, color = flameColor)
+                                  multiples = True, alpha = alphaEnabled, color = flamecol)
+
 
           if self.hitglow2Drawing:
-            self.engine.draw3Dtex(self.hitglow2Drawing, coord = (x, y + .25, .05), rot = (90, 1, 0, 0),
+            ff += .3
+            vtx = flameSize * ff
+
+            flameColorMod = (1.19, 1.78, 12.22)
+            flamecol = tuple([color[ifc]*flameColorMod[ifc] for ifc in range(3)])
+
+            if self.starPowerActive or self.spNote == True:
+              flamecol = self.spColor
+            self.engine.draw3Dtex(self.hitglow2Drawing, coord = (x, y, z), rot = self.hitGlowsRotation,
                                   scale = (.40 + .6 * ms * ff, 1.5 + .6 * ms * ff, 1 + .6 * ms * ff),
                                   vertex = (-vtx,-vtx,vtx,vtx), texcoord = (0.0,0.0,1.0,1.0), 
-                                  multiples = True, alpha = True, color = flameColor)
-
+                                  multiples = True, alpha = alphaEnabled, color = flamecol)
 
   #renders the flames that appear when a note is struck
-  def renderFlames(self, song, pos, controls):
+  def renderAnimatedFlames(self, song, pos):
     if not song or self.flameColors[0][0] == -1:
       return
 
-    w = self.boardWidth / self.strings
     flameSize = self.hitFlameSize
-
-    if self.starPowerActive:
-      flameColor = self.spColor
-    else:
-      flameColor = 0
-
-    flameLimit = 10.0
-    flameLimitHalf = round(flameLimit/2.0)
+    w = self.boardWidth / self.strings
     renderedNotes = self.getRequiredNotesForRender(song,pos)
+
+    alphaEnabled = self.hitFlameBlackRemove
+
     for time, event in renderedNotes:
-      if isinstance(event, Tempo):
-        continue
-      
       if not isinstance(event, Note):
         continue
 
-      if (event.played or event.hopod) and event.flameCount < flameLimit:
+      if (event.played or event.hopod):
         if not self.disableFlameSFX:
-          if not flameColor == self.spColor:
-            if self.isDrum:
-              if event.number == 4:
-                continue
+          if self.isDrum:
+            if event.number == 4: #make the bass drum not render a flame
+              continue
 
-              if event.number == 0:
-                flameColor = self.flameColors[4]
-              else:
-                flameColor = self.flameColors[event.number]
-            else:
-              flameColor = self.flameColors[event.number]
+            x  = (self.strings / 2 +.5 - event.number) * w
+          else:
+            x  = ((self.strings / 2 - event.number) * w)
 
-          ms = math.sin(self.time) * .25 + 1
+          ff = 1 + 0.25
+          s = ff/6
+
+          if not self.hitFlameYPos == 0:
+            y = s - self.hitFlameYPos
+          else:
+            y = 0
+
+          if not self.hitFlameZPos == 0:
+            z = s - self.hitFlameZPos
+          else:
+            z = 0
 
           if self.isDrum:
-              x  = (self.strings / 2 +.5 - event.number) * w
+            y -= self.drumHitFlameOffset[event.number]
           else:
-            x  = (self.strings / 2 - event.number) * w
-
-          xlightning = (self.strings / 2 - event.number)*2.2*w
-          ff = 1 + 0.25       
-          y = ff / 6
-
-          y -= self.hitFlameYPos
+            y -= self.hitFlameOffset[event.number]
         
+          y + .665
+
           ff += 1.5 #ff first time is 2.75 after this
         
           vtx = flameSize * ff
 
-          if self.Hitanim2 == True and self.hitflamesAnim:
-            self.HCount2 += 1
+          if self.hitflamesAnim:
+            event.HCount2 += 1
             self.HCountAni = False
-            if self.HCount2 >= self.HFrameLimit2:
+            if event.HCount2 >= 5.0:
               self.HCountAni = True
-            if self.HCount2 < self.HFrameLimit2:
-              HIndex = (self.HCount2 * self.HFrameLimit2 - (self.HCount2 * self.HFrameLimit2) % self.HFrameLimit2) / self.HFrameLimit2
-              if HIndex >= self.HFrameLimit2 and self.HCountAni != True:
-                HIndex = 0
+            if event.HCount2 < self.HFrameLimit2:
+
+              HIndex = (event.HCount2 * self.HFrameLimit2 - (event.HCount2 * self.HFrameLimit2) % self.HFrameLimit2) / self.HFrameLimit2
                 
               texX = (HIndex*(1.0/self.HFrameLimit2), HIndex*(1.0/self.HFrameLimit2)+(1.0/self.HFrameLimit2))
               if self.powerHitflamesAnim and self.starPowerActive:
@@ -904,22 +952,95 @@ class Instrument(object):
               else:
                 texture = self.hitflamesAnim
 
-              self.engine.draw3Dtex(texture, coord = (x, y + .665, 0), rot = (90, 1, 0, 0), scale = (1.6, 1.6, 4.9),
-                                    vertex = (-vtx,-vtx,vtx,vtx), texcoord = (texX[0],0.0,texX[1],1.0), 
-                                    multiples = True, alpha = True, color = (1,1,1))
-          self.HCountAni = True
+              self.engine.draw3Dtex(texture, coord = (x, y + .665, z), rot = self.hitFlameRotation, 
+                                    scale = (1.6, 1.6, 4.9), vertex = (-vtx,-vtx,vtx,vtx), 
+                                    texcoord = (texX[0],0.0,texX[1],1.0),  multiples = True, 
+                                    alpha = alphaEnabled, color = (1,1,1))
+
+  #renders the flames that appear when a note is struck
+  def renderFlames(self, song, pos):
+    if not song or self.flameColors[0][0] == -1:
+      return
+
+    w = self.boardWidth / self.strings
+    flameSize = self.hitFlameSize
+
+    flameLimit = 10.0
+    flameLimitHalf = round(flameLimit/2.0)
+    renderedNotes = self.getRequiredNotesForRender(song,pos)
+
+    alphaEnabled = self.hitFlameBlackRemove
+
+    for time, event in renderedNotes:
+      if not isinstance(event, Note):
+        continue
+
+      if (event.played or event.hopod) and event.flameCount < flameLimit:
+        if not self.disableFlameSFX:
+
+          if self.isDrum:
+            if event.number == 4: #make the bass drum not render a flame
+              continue
+
+            if event.number == 0: #correct for colors on the drums
+              flameColor = self.flameColors[4]
+            else:
+              flameColor = self.flameColors[event.number]
+
+            x  = (self.strings / 2 +.5 - event.number) * w
+
+          else:
+            x  = (self.strings / 2 - event.number) * w
+            flameColor = self.flameColors[event.number]
+
+          if self.starPowerActive:
+            flameColor = self.spColor
+
+          ms = math.sin(self.time) * .25 + 1
+
+          xlightning = (self.strings / 2 - event.number)*2.2*w
+          ff = 1 + 0.25
+          s = ff/6
+
+          if not self.hitFlameYPos == 0:
+            y = s - self.hitFlameYPos
+          else:
+            y = 0
+
+          if not self.hitFlameZPos == 0:
+            z = s - self.hitFlameZPos
+          else:
+            z = 0
+
+          if self.isDrum:
+            y -= self.drumHitFlameOffset[event.number]
+          else:
+            y -= self.hitFlameOffset[event.number]
+        
+          y + .665
+
+          ff += 1.5 #ff first time is 2.75 after this
+        
+          vtx = flameSize * ff
+
+          if not self.hitflamesAnim:
+            self.HCountAni = True
+
           if event.flameCount < flameLimitHalf and self.hitflames2Drawing:
-            self.engine.draw3Dtex(self.hitflames2Drawing, coord = (x, y + .20, 0), rot = (90, 1, 0, 0),
+            self.engine.draw3Dtex(self.hitflames2Drawing, coord = (x, y + .20, z), rot = self.hitFlameRotation,
                                   scale = (.25 + .6 * ms * ff, event.flameCount/6.0 + .6 * ms * ff, event.flameCount / 6.0 + .6 * ms * ff),
                                   vertex = (-vtx,-vtx,vtx,vtx), texcoord = (0.0,0.0,1.0,1.0),
-                                  multiples = True, alpha = True, color = flameColor)
+                                  multiples = True, alpha = alphaEnabled, color = flameColor)
 
             for i in range(3):
-              self.engine.draw3Dtex(self.hitflames2Drawing, coord = (x-.005, y + .255, 0), rot = (90, 1, 0, 0),
+              self.engine.draw3Dtex(self.hitflames2Drawing, coord = (x-.005, y + .255, z), rot = self.hitFlameRotation,
                                     scale = (.30 + i*0.05 + .6 * ms * ff, event.flameCount/(5.5 - i*0.4) + .6 * ms * ff, event.flameCount / (5.5 - i*0.4) + .6 * ms * ff),
                                     vertex = (-vtx,-vtx,vtx,vtx), texcoord = (0.0,0.0,1.0,1.0),
-                                    multiples = True, alpha = True, color = flameColor)
+                                    multiples = True, alpha = alphaEnabled, color = flameColor)
 
+          flameColor = tuple([flameColor[ifc] + .38 for ifc in range(3)]) #to make sure the final color looks correct on any color set
+          flameColorMod = 0.1 * (flameLimit - event.flameCount)
+          flamecol = tuple([ifc*flameColorMod for ifc in flameColor])
           scaleChange = (3.0,2.5,2.0,1.7)
           yOffset = (.35, .405, .355, .355)
           scaleMod = .6 * ms * ff
@@ -931,21 +1052,18 @@ class Instrument(object):
               yzscaleMod = (event.flameCount + 1)/ scaleChange[step]
 
             if self.hitflames1Drawing: 
-              self.engine.draw3Dtex(self.hitflames1Drawing, coord = (x - .005, y + yOffset[step], 0), rot = (90, 1, 0, 0),
+              self.engine.draw3Dtex(self.hitflames1Drawing, coord = (x - .005, y + yOffset[step], z), rot = self.hitFlameRotation,
                                     scale = (.25 + step*.05 + scaleMod, yzscaleMod + scaleMod, yzscaleMod + scaleMod),
                                     vertex = (-vtx,-vtx,vtx,vtx), texcoord = (0.0,0.0,1.0,1.0),
-                                    multiples = True, alpha = True, color = flameColor)
+                                    multiples = True, alpha = alphaEnabled, color = flamecol)
 
             #draw lightning in GH themes on SP gain
             if step == 0 and event.finalStar and self.spEnabled and self.hitlightning:
               self.engine.draw3Dtex(self.hitlightning, coord = (xlightning, ff / 6, 3.3), rot = (90, 1, 0, 0),
-                                    scale = (.15 + .5 * ms * ff, event.flameCount / 3.0 + .6 * ms * ff, 2), vertex = (.4,-2,-.4,2),
+                                    scale = (.15 + .5 * ms * ff, event.flameCount / 3.0 + .6 * ms * ff, 2), vertex = (.4,-2,.4,2),
                                     texcoord = (0.0,0.0,1.0,1.0), multiples = True, alpha = True, color = (1,1,1))
 
         event.flameCount += 1
-
-    if self.hitflamesAnim and self.HCount2 > self.HFrameLimit2:
-      self.HCount2 = 0
 
   #group rendering of 2D notes into method
   def render3DNote(self, texture, model, color, isTappable):
@@ -1435,7 +1553,7 @@ class Instrument(object):
       self.isStarPhrase = Fals
 
   #group rendering of 3D keys/frets into method
-  def render3DKey(self, texture, model, x, y, color, fretNum):
+  def render3DKey(self, texture, model, x, y, color, fretNum, f):
     glPushMatrix()
     glDepthMask(1)
     glEnable(GL_LIGHTING)
@@ -1466,16 +1584,16 @@ class Instrument(object):
       glTranslatef(x, y + color[3] * 6, 0)
         
     if texture:
-      glColor4f(1,1,1,color[3])
+      glColor4f(1,1,1,color[3]+1.0)
       glEnable(GL_TEXTURE_2D)
       texture.bind()
       glMatrixMode(GL_TEXTURE)
       glScalef(1, -1, 1)
       glMatrixMode(GL_MODELVIEW)
       glScalef(self.boardScaleX, self.boardScaleY, 1)
-      if not self.hit[keyNumb] and (f or pressed):
+      if not self.hit[fretNum] and f:
         model.render("Mesh_001")
-      elif self.hit[keyNumb]:
+      elif self.hit[fretNum]:
         model.render("Mesh_002")
       else:
         model.render("Mesh")
@@ -1491,17 +1609,17 @@ class Instrument(object):
       #Key_002 - Bottom of fret (key2_color)
       #Glow_001 - Only rendered when a note is hit along with the glow.svg
 
-      if(model.find("Glow_001")):
-        model.render("Glow_001")
-      if(model.find("Key_001")):
-        glColor3f(self.keyColor[0], self.keyColor[1], self.keyColor[2])
-        model.render("Key_001")
-      if(model.find("Key_002")):
-        glColor3f(self.key2Color[0], self.key2Color[1], self.key2Color[2])
-        model.render("Key_002")
-      else:
+      if (model.find("Glow_001")):
         model.render("Mesh")
-
+        if (model.find("Key_001")):
+          glColor3f(self.keyColor[0], self.keyColor[1], self.keyColor[2])
+          model.render("Key_001")
+        if (model.find("Key_002")):
+          glColor3f(self.key2Color[0], self.key2Color[1], self.key2Color[2])
+          model.render("Key_002")
+      else:
+        model.render()
+        
     glDisable(GL_LIGHTING)
     glDisable(GL_LIGHT0)
     glDepthMask(0)
@@ -1511,12 +1629,15 @@ class Instrument(object):
     pass
     
   def renderHitGlow(self):
-
     for n in range(self.strings2):
       c = self.glowColor[n]
       f = self.fretActivity[n]
       w = self.boardWidth / self.strings
       x = (self.strings / 2 - n) * w
+      if self.fretPress:
+       y = f / 6
+      else:
+        y = 0
       size = .22
 
       if f and self.disableFretSFX != True:
@@ -1528,9 +1649,13 @@ class Instrument(object):
        
         while s < 1:
           ms = s * (math.sin(self.time) * .25 + 1)
-          glColor3f(c[0], c[1], c[2])
+          glColor3f(c[0] * (1 - ms), c[1] * (1 - ms), c[2] * (1 - ms))
          
           glPushMatrix()
+          if self.battleStatus[4]:
+            glTranslatef(x, y + self.battleWhammyNow * .15, 0)
+          else:
+           glTranslatef(x, y, 0)
           glScalef(.1 + .02 * ms * f, .1 + .02 * ms * f, .1 + .02 * ms * f)
           glRotatef( 90, 0, 1, 0)
           glRotatef(-90, 1, 0, 0)
@@ -1599,8 +1724,7 @@ class Instrument(object):
     if kill and big == True:
       kEffect = ( math.sin( pos / 50 ) + 1 ) /2
       size = ((0.02 + (kEffect * 0.182) * 2), s)
-
-      c = [self.killColor[0],self.killColor[1],self.killColor[2]]
+      c = [self.killColor[fret][0],self.killColor[fret][1],self.killColor[fret][2]]
       if c != [0,0,0]:
         for i in range(0,3):
           c[i]=c[i]*kEffect+color[i]*(1-kEffect)
@@ -1661,24 +1785,27 @@ class Instrument(object):
 
         glEnable(GL_TEXTURE_2D)
 
-        tail_tex  = np.array([[0.0, (project((offset * self.tailSpeed) * self.beatsPerUnit)*3)],
-                            [1.0, (project((offset * self.tailSpeed) * self.beatsPerUnit)*3)],
-                            [0.0, (project(((offset * self.tailSpeed) + s) * self.beatsPerUnit)*3)],
-                            [1.0, (project(((offset * self.tailSpeed) + s) * self.beatsPerUnit)*3)]], dtype=np.float32)
+        if length >= self.boardLength:
+          movement1 = (project((offset * self.tailSpeed) * self.beatsPerUnit)*3) - (project(offset * self.beatsPerUnit)*3)
+          movement2 = (project(((offset * self.tailSpeed) + s) * self.beatsPerUnit)*3) - (project(offset * self.beatsPerUnit)*3)
+        else:
+          movement1 = (project((offset * self.tailSpeed) * self.beatsPerUnit)*3)
+          movement2 = (project(((offset * self.tailSpeed) + s) * self.beatsPerUnit)*3)
 
-        tail_col  = np.array([[tailcol[0],tailcol[1],tailcol[2], 1],
-                            [tailcol[0],tailcol[1],tailcol[2], 1],
-                            [tailcol[0],tailcol[1],tailcol[2], 1],
-                            [tailcol[0],tailcol[1],tailcol[2], 1]], dtype=np.float32)
+        self.tail_tex[0][1] = self.tail_tex[1][1] = movement1
+        self.tail_tex[2][1] = self.tail_tex[3][1] = movement2
 
-        tail_vtx = np.array([[-size[0], 0, size[1]],
-                            [size[0], 0, size[1]],
-                            [-size[0], 0, 0 ],
-                            [size[0], 0, 0]], dtype=np.float32)
+        self.tail_col[0][0] = self.tail_col[1][0] = self.tail_col[2][0] = self.tail_col[3][0] = tailcol[0]
+        self.tail_col[0][1] = self.tail_col[1][1] = self.tail_col[2][1] = self.tail_col[3][1] = tailcol[1]
+        self.tail_col[0][2] = self.tail_col[1][2] = self.tail_col[2][2] = self.tail_col[3][2] = tailcol[2]
+
+        self.tail_vtx[0][0] = self.tail_vtx[2][0] = -size[0]
+        self.tail_vtx[1][0] = self.tail_vtx[3][0] = size[0]
+        self.tail_vtx[0][2] = self.tail_vtx[1][2] = size[1]
 
         tex1.texture.bind()
 
-        cmgl.drawArrays(GL_TRIANGLE_STRIP, vertices=tail_vtx, colors=tail_col, texcoords=tail_tex)
+        cmgl.drawArrays(GL_TRIANGLE_STRIP, vertices=self.tail_vtx, colors=self.tail_col, texcoords=self.tail_tex)
           
         glDisable(GL_TEXTURE_2D)
 

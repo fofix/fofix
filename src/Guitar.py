@@ -108,7 +108,6 @@ class Guitar(Instrument):
     glEnable(GL_DEPTH_TEST)
 
     for n in range(self.strings2):
-      pressed = None #to make sure guitar doesnt crash
       keyNumb = n
       f = self.fretWeight[keyNumb]
       c = list(self.fretColors[keyNumb])
@@ -130,7 +129,7 @@ class Guitar(Instrument):
         else:
           texY = (0.0, 1.0 / self.fretImgColNumber)#fret normal guitar/bass/drums
 
-          if controls.getState(self.keys[n]) or controls.getState(self.keys[n+5]) or (self.isDrum and pressed):#fret press
+          if controls.getState(self.keys[n]) or controls.getState(self.keys[n+5]):#fret press
             texY = (1.0 / self.fretImgColNumber, 2.0 / self.fretImgColNumber)
 
           elif self.hit[n] or (self.battleStatus[3] and self.battleBreakString == n):#frets on note hit
@@ -149,7 +148,7 @@ class Guitar(Instrument):
           texture = None
           
         c = [.1 + .8 * c[0] + f, .1 + .8 * c[1] + f, .1 + .8 * c[2] + f, v]
-        self.render3DKey(texture,self.keyMesh, x, y, c, n)
+        self.render3DKey(texture,self.keyMesh, x, y, c, n, f)
             
     glDisable(GL_DEPTH_TEST)
 
@@ -304,8 +303,7 @@ class Guitar(Instrument):
         self.renderFreestyleLanes(visibility, song, pos, None) #MFH - render the lanes on top of the notes.
         self.renderFrets(visibility, song, controls)
 
-        if self.hitFlamesPresent:   #MFH - only if present!
-          self.renderFreestyleFlames(visibility, controls)    #MFH - freestyle hit flames
+        self.renderFreestyleFlames(visibility, controls)    #MFH - freestyle hit flames
 
       else:
         self.renderTails(visibility, song, pos, killswitch)
@@ -325,7 +323,8 @@ class Guitar(Instrument):
 
         self.renderHitGlow()
         self.renderHitTrails(controls)
-        self.renderFlames(song, pos, controls)    #MFH - only when freestyle inactive!
+        self.renderAnimatedFlames(song, pos)
+        self.renderFlames(song, pos)    #MFH - only when freestyle inactive!
         
       if self.leftyMode:
         if not self.battleStatus[6]:

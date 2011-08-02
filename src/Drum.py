@@ -115,10 +115,6 @@ class Drum(Instrument):
     #myfingershurt:
     self.hopoStyle = 0    
 
-    if self.theme < 2:    #make board same size as guitar board if GH based theme so it rockmeters dont interfere
-      self.boardWidth     = 3.0
-      self.boardLength    = 9.0
-
     self.drumFretButtons = None
 
     #blazingamer
@@ -216,8 +212,8 @@ class Drum(Instrument):
     else:
       defaultOpenKey = False
 
-      if self.engine.fileExists(get("open.dae")): #look in the frets folder for files
-        engine.resource.load(self,  "keyMeshOpen",  lambda: Mesh(engine.resource.fileName(get("open.dae"))))
+      if self.engine.fileExists(get("key_open.dae")): #look in the frets folder for files
+        engine.resource.load(self,  "keyMeshOpen",  lambda: Mesh(engine.resource.fileName(get("key_open.dae"))))
       else: #default to files in data folder
         engine.resource.load(self,  "keyMeshOpen",  lambda: Mesh(engine.resource.fileName("key_open.dae")))
         defaultOpenKey = True
@@ -434,7 +430,6 @@ class Drum(Instrument):
         texture = None
         model = self.keyMesh
         if self.keytex:
-          model = self.keyMesh
           if n == 0:
             texture = self.keytexb.texture
           elif n == 1:
@@ -450,7 +445,7 @@ class Drum(Instrument):
           model = self.keyMeshOpen
               
         c = [.1 + .8 * c[0] + f, .1 + .8 * c[1] + f, .1 + .8 * c[2] + f, v]
-        self.render3DKey(texture, model, x, y, c, n)
+        self.render3DKey(texture, model, x, y, c, n, f)
           
     glDisable(GL_DEPTH_TEST)      
 
@@ -667,8 +662,7 @@ class Drum(Instrument):
         self.renderFreestyleLanes(visibility, song, pos, controls) #MFH - render the lanes on top of the notes.
         self.renderFrets(visibility, song, controls)
 
-        if self.hitFlamesPresent: #MFH - only when present!
-          self.renderFreestyleFlames(visibility, controls)    #MFH - freestyle hit flames
+        self.renderFreestyleFlames(visibility, controls)    #MFH - freestyle hit flames
 
       else:
 
@@ -683,7 +677,8 @@ class Drum(Instrument):
           self.renderNotes(visibility, song, pos)
           self.renderFrets(visibility, song, controls)
 
-        self.renderFlames(song, pos, controls)    #MFH - only when freestyle inactive!
+        self.renderAnimatedFlames(song, pos)
+        self.renderFlames(song, pos)    #MFH - only when freestyle inactive!
         
 
   def playDrumSounds(self, controls, playBassDrumOnly = False):   #MFH - handles playing of drum sounds.  
