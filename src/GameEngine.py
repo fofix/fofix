@@ -171,7 +171,7 @@ Config.define("setlist", "songfilepath",       bool, True,     text = _("Show Fi
 Config.define("setlist", "keep_play_count", int, 1, text = _("Remember Play Count"), options = {0: _("No"), 1: _("Yes")}, tipText = _("Keeps track of how many times you've played each song."))
 Config.define("setlist",   "sort_direction",      int, 0,    text = _("Sort Direction"), options = {0: _("Ascending"), 1: _("Descending")}, tipText = _("Choose whether to sort in ascending (A-Z) or descending (Z-A) order."))
 Config.define("setlist",   "sort_order",          int,   0,      text = _("Sort Setlist By"), options = sortOptionsByKey({0: _("Title"), 1: _("Artist"), 2: _("Times played"), 3: _("Album"), 4: _("Genre"), 5: _("Year"), 6: _("Band Difficulty"), 7: _("Difficulty"), 8:_("Song Collection")}), tipText = _("Choose how to sort the setlist by default."))
-Config.define("performance",   "disable_libcount",    bool,  True,  text = _("Show Setlist Size"),    options = {False: _("Yes"), True: _("No")}, tipText = _("Show the number of songs inside of each setlist."))
+Config.define("setlist",   "disable_libcount",    bool,  True,  text = _("Show Setlist Size"),    options = {False: _("Yes"), True: _("No")}, tipText = _("Show the number of songs inside of each setlist."))
 Config.define("setlist", "songlist_difficulty", int, 0, text = _("Difficulty (Setlist Score)"), options = difficulties, tipText = _("Sets the default difficulty displayed in the setlist score."))
 Config.define("setlist", "songlist_instrument", int, 0, text = _("Instrument (Setlist Score)"), options = parts, tipText = _("Sets the default part displayed in the setlist score."))  #MFH
 
@@ -194,7 +194,7 @@ Config.define("game",   "sp_notes_while_active",  int,  2,  text = _("SP Refill 
 Config.define("game",   "whammy_saves_starpower",          bool, False,  text = _("Effects Save SP"), options = {False: _("No"), True: _("Yes")}, tipText = _("If enabled, whammying while in SP will slow down its decrease. And your score will be handicapped by 5%."))
 Config.define("game", "bass_groove_enable",       int, 1,     text = _("Bass Groove"), options = {0: _("Off"), 1: _("By Theme"), 2: _("By MIDI"), 3: _("On")}, tipText = _("Enable or disable bass groove (additional score multiplier for bass)")) #MFH
 Config.define("game",   "note_hit_window",          int, 2,    text = _("Note Hit Window"), options = sortOptionsByKey({0: _("Tightest"), 1: _("Tight"), 2: _("Standard"), 3: _("Wide"), 4: _("Widest")}), tipText = _("Sets how accurate you need to be while playing."))#racer blazingamer
-Config.define("handicap",   "early_hit_window",          int, 0,    text = _("Early Hit Window"), options = sortOptionsByKey({0: _("Auto"), 1: _("None (RB2)"), 2: _("Half (GH2)"), 3: _("Full (FoF)")}), tipText = _("Sets how much time before the note is part of the hit window. 'Auto' uses the MIDI to determine."))  #MFH
+Config.define("game",   "early_hit_window",          int, 0,    text = _("Early Hit Window"), options = sortOptionsByKey({0: _("Auto"), 1: _("None (RB2)"), 2: _("Half (GH2)"), 3: _("Full (FoF)")}), tipText = _("Sets how much time before the note is part of the hit window. 'Auto' uses the MIDI to determine."))  #MFH
 Config.define("game",   "gh2_sloppy",          int,   0,      text = _("GH2 Sloppy Mode"), options = {0: _("Off"), 1: _("On")}, tipText = _("Sloppy mode allows you to hold higher frets while tapping lower frets during HO/PO sections. This will lower your score by 25%."))
 Config.define("game", "hopo_frequency",            int,   2,   text = _("HO/PO Frequency"),    options = sortOptionsByKey({0: _("Least"), 1: _("Less"), 2: _("Normal"), 3: _("More"), 4: _("Even More"), 5: _("Most")}), tipText = _("Sets the window used to determine HO/PO notes. Increasing the frequency will reduce your score, and lower settings will give you a tiny bonus."))
 Config.define("game", "fail_mode",       bool, True,     text = _("No Fail"),             options = {True: _("Off"), False: _("On")}, tipText = _("Sets whether or not you can fail out of a song."))
@@ -207,15 +207,15 @@ Config.define("rules", "face_off_black", bool, False, text = _("Fade to Black"),
 Config.define("rules", "face_off_fail", bool, True, text = _("Failing"), options = {True: _("Enabled"), False: _("Disabled")}, tipText = _("Sets whether you can fail in Face-Off Mode"))
 
 #Battle Items (Q)
-Config.define("game", "battle_Whammy",      int,   1,   text = _("Whammy"),    options = {0: _("Off"), 1: _("On")}, tipText = _("Makes opponent miss notes until the whammy bar is pushed a few times")) 
-Config.define("game", "battle_Diff_Up",      int,   1,   text = _("Difficulty Up"),    options = {0: _("Off"), 1: _("On")}, tipText = _("Ups opponent's difficulty for a while (if not playing on Expert)")) 
-Config.define("game", "battle_String_Break",      int,   1,   text = _("String Break"),    options = {0: _("Off"), 1: _("On")}, tipText = _("Breaks a string, causing your opponent to miss notes on that fret until they push the fret button several times.")) 
-Config.define("game", "battle_Double",      int,   1,   text = _("Double Notes"),    options = {0: _("Off"), 1: _("On")}, tipText = _("Makes single notes into chords, and chords into even bigger ones.")) 
-Config.define("game", "battle_Death_Drain",      int,   2,   text = _("Death Drain"),    options = {0: _("Off"), 1: _("On"), 2: _("Sudden Death Only")}, tipText = _("Drains your opponents life until they die. 'Sudden Death Only' keeps this from appearing until you reach sudden death mode.")) 
-Config.define("game", "battle_Amp_Overload",      int,   1,   text = _("Amp Overload"),    options = {0: _("Off"), 1: _("On")}, tipText = _("Makes opponent's amp flip out, making notes disappear and reappear randomly.")) 
-Config.define("game", "battle_Switch_Controls",      int,   1,   text = _("Switch Controls"),    options = {0: _("Off"), 1: _("On")}, tipText = _("Switches opponent to (or from) lefty mode for a bit!")) 
-Config.define("game", "battle_Steal",      int,   1,   text = _("Steal Object"),    options = {0: _("Off"), 1: _("On")}, tipText = _("Steals an object your opponent has.")) 
-Config.define("game", "battle_Tune",      int,   1,   text = _("Guitar Tune"),    options = {0: _("Off"), 1: _("On")}, tipText = _("Makes opponent miss all notes until they play a scale.")) 
+Config.define("rules", "battle_Whammy",      int,   1,   text = _("Whammy"),    options = {0: _("Off"), 1: _("On")}, tipText = _("Makes opponent miss notes until the whammy bar is pushed a few times")) 
+Config.define("rules", "battle_Diff_Up",      int,   1,   text = _("Difficulty Up"),    options = {0: _("Off"), 1: _("On")}, tipText = _("Ups opponent's difficulty for a while (if not playing on Expert)")) 
+Config.define("rules", "battle_String_Break",      int,   1,   text = _("String Break"),    options = {0: _("Off"), 1: _("On")}, tipText = _("Breaks a string, causing your opponent to miss notes on that fret until they push the fret button several times.")) 
+Config.define("rules", "battle_Double",      int,   1,   text = _("Double Notes"),    options = {0: _("Off"), 1: _("On")}, tipText = _("Makes single notes into chords, and chords into even bigger ones.")) 
+Config.define("rules", "battle_Death_Drain",      int,   2,   text = _("Death Drain"),    options = {0: _("Off"), 1: _("On"), 2: _("Sudden Death Only")}, tipText = _("Drains your opponents life until they die. 'Sudden Death Only' keeps this from appearing until you reach sudden death mode.")) 
+Config.define("rules", "battle_Amp_Overload",      int,   1,   text = _("Amp Overload"),    options = {0: _("Off"), 1: _("On")}, tipText = _("Makes opponent's amp flip out, making notes disappear and reappear randomly.")) 
+Config.define("rules", "battle_Switch_Controls",      int,   1,   text = _("Switch Controls"),    options = {0: _("Off"), 1: _("On")}, tipText = _("Switches opponent to (or from) lefty mode for a bit!")) 
+Config.define("rules", "battle_Steal",      int,   1,   text = _("Steal Object"),    options = {0: _("Off"), 1: _("On")}, tipText = _("Steals an object your opponent has.")) 
+Config.define("rules", "battle_Tune",      int,   1,   text = _("Guitar Tune"),    options = {0: _("Off"), 1: _("On")}, tipText = _("Makes opponent miss all notes until they play a scale.")) 
 
 #Co-Op Rules
 Config.define("rules", "coop_rockmeter", int, 2, text = _("Co-Op Rockmeter"), options = {0: _("Solo"), 1: _("Band"), 2: _("Both")}, tipText = _("Sets who controls the rockmeter. Solo means every member has their own, Band means you're in it together. In both, you are responsible for both."))
@@ -342,7 +342,6 @@ Config.define("debug",   "show_bpm",          int, 0,    text = _("Show BPM"), o
 Config.define("debug",   "use_new_vbpm_beta",          int, 0,    text = _("New BPM Logic"), options = {0: _("Off"), 1: _("On")}, tipText = _("If enabled, the game will attempt to use the new BPM logic. This is not a finished feature. Use at your own risk."))
 Config.define("debug", "use_new_song_database", bool, False, text=_("New Song Database Code"), options={False: _("Off"), True: _("On")}, tipText=_("Activates the new, incomplete song database code."))  #stump
 Config.define("debug",   "show_raw_vocal_data", int, 0,  text = _("Show Raw Vocal Data"), options = {0: _("Off"), 1: _("On")}, tipText = _("If enabled, various information about the microphone input will be show in text on screen. Probably only needed for vocal debugging."))
-Config.define("game",   "disable_vbpm",        bool,  False,  text = _("Disable Variable BPM"),  options = {False: _("No"), True: _("Yes")}, tipText = _("This will disable the use of the Variable BPM logic."))
 
 #MFH - log settings
 Config.define("log",   "log_ini_reads",          int, 0,    text = _("Log INI Reads"), options = {0: _("No"), 1: _("Yes")}, tipText = _("Logs any read to an INI file. This is unnecessary information in bug reports; please leave it disabled unless you are certain it is relevant."))

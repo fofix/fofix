@@ -794,10 +794,10 @@ class SongChoosingScene(Scene):
         return
       if self.song:
           self.song.fadeout(1000)
-      if self.library != Song.DEFAULT_LIBRARY and not self.tut:
+      if not self.tut:
         self.initialItem  = self.library
         self.library      = os.path.dirname(self.library)
-        if self.library == os.path.join("..", self.engine.config.get("setlist", "base_library")):
+        if self.library == os.path.dirname(self.engine.config.get("setlist", "base_library")):
           self.quit()
           return
         self.selectedItem = None

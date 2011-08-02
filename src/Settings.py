@@ -693,15 +693,15 @@ class SettingsMenu(Menu.Menu):
     self.jurgenSettingsMenu = Menu.Menu(self.engine, jurgenSettings, pos = (self.opt_text_x, self.opt_text_y), textColor = self.opt_text_color, selectedColor = self.opt_selected_color)
            
     self.battleObjectSettings = [
-      ConfigChoice(engine, engine.config, "game", "battle_Whammy", autoApply = True),
-      ConfigChoice(engine, engine.config, "game", "battle_Diff_Up", autoApply = True),
-      ConfigChoice(engine, engine.config, "game", "battle_String_Break", autoApply = True),
-      ConfigChoice(engine, engine.config, "game", "battle_Double", autoApply = True),
-      ConfigChoice(engine, engine.config, "game", "battle_Death_Drain", autoApply = True),
-      ConfigChoice(engine, engine.config, "game", "battle_Amp_Overload", autoApply = True),
-      ConfigChoice(engine, engine.config, "game", "battle_Switch_Controls", autoApply = True),
-      ConfigChoice(engine, engine.config, "game", "battle_Steal", autoApply = True),
-      ConfigChoice(engine, engine.config, "game", "battle_Tune", autoApply = True),
+      ConfigChoice(engine, engine.config, "rules", "battle_Whammy", autoApply = True),
+      ConfigChoice(engine, engine.config, "rules", "battle_Diff_Up", autoApply = True),
+      ConfigChoice(engine, engine.config, "rules", "battle_String_Break", autoApply = True),
+      ConfigChoice(engine, engine.config, "rules", "battle_Double", autoApply = True),
+      ConfigChoice(engine, engine.config, "rules", "battle_Death_Drain", autoApply = True),
+      ConfigChoice(engine, engine.config, "rules", "battle_Amp_Overload", autoApply = True),
+      ConfigChoice(engine, engine.config, "rules", "battle_Switch_Controls", autoApply = True),
+      ConfigChoice(engine, engine.config, "rules", "battle_Steal", autoApply = True),
+      ConfigChoice(engine, engine.config, "rules", "battle_Tune", autoApply = True),
     ]
     
     self.battleObjectSettingsMenu = Menu.Menu(self.engine, self.battleObjectSettings, pos = (self.opt_text_x, self.opt_text_y), textColor = self.opt_text_color, selectedColor = self.opt_selected_color)
@@ -969,7 +969,7 @@ class SettingsMenu(Menu.Menu):
       ConfigChoice(engine, engine.config, "audio", "disable_preview", autoApply = True),  #myfingershurt
       ConfigChoice(engine, engine.config, "setlist", "songlist_instrument", autoApply = True), #MFH
       ConfigChoice(engine, engine.config, "setlist", "songlist_difficulty", autoApply = True), #evilynux
-      ConfigChoice(engine, engine.config, "performance", "disable_libcount", autoApply = True, isQuickset = 1), 
+      ConfigChoice(engine, engine.config, "setlist", "disable_libcount", autoApply = True, isQuickset = 1), 
       ConfigChoice(engine, engine.config, "performance", "cache_song_metadata", autoApply = True, isQuickset = 1), #stump
       ConfigChoice(engine, engine.config, "setlist",  "nil_show_next_score", autoApply = True), #MFH
     ]
@@ -993,7 +993,7 @@ class SettingsMenu(Menu.Menu):
       ConfigChoice(engine, engine.config, "game", "hopo_frequency", autoApply = True),
       ConfigChoice(engine, engine.config, "game", "fail_mode", autoApply = True),
       ConfigChoice(engine, engine.config, "audio",  "speed_factor", autoApply = True),     #MFH
-      ConfigChoice(engine, engine.config, "handicap",  "early_hit_window", autoApply = True),     #MFH
+      ConfigChoice(engine, engine.config, "game",  "early_hit_window", autoApply = True),     #MFH
       (_("Mod settings"), self.modSettingsMenu, _("Enable or disable any mods you have installed.")),
     ]
     self.cheatMenu = Menu.Menu(engine, self.cheats, pos = (self.opt_text_x, self.opt_text_y), textColor = self.opt_text_color, selectedColor = self.opt_selected_color)
@@ -1116,8 +1116,8 @@ class SettingsMenu(Menu.Menu):
     Log.debug("settings.baseLibrarySelect function call...")
     newPath = Dialogs.chooseFile(self.engine, masks = ["*/*"], prompt = _("Choose a new songs directory."), dirSelect = True)
     if newPath != None:
-      Config.set("setlist", "base_library", os.path.dirname(newPath))
-      Config.set("setlist", "selected_library", os.path.basename(newPath))
+      Config.set("setlist", "base_library", newPath)
+      Config.set("setlist", "selected_library", "")
       Config.set("setlist", "selected_song", "")
       self.engine.resource.refreshBaseLib()   #myfingershurt - to let user continue with new songpath without restart
     
@@ -1283,7 +1283,7 @@ class BasicSettingsMenu(Menu.Menu):
       ConfigChoice(self.engine, self.engine.config, "game", "hopo_frequency", autoApply = True),
       ConfigChoice(self.engine, self.engine.config, "game", "fail_mode", autoApply = True),
       ConfigChoice(self.engine, self.engine.config, "audio",  "speed_factor", autoApply = True),     #MFH
-      ConfigChoice(self.engine, self.engine.config, "handicap",  "early_hit_window", autoApply = True),     #MFH
+      ConfigChoice(self.engine, self.engine.config, "game",  "early_hit_window", autoApply = True),     #MFH
       (_("Mod settings"), self.modSettingsMenu, _("Enable or disable any mods you have installed.")),]
     choices.extend(choicesb)
     if init:
@@ -1341,8 +1341,8 @@ class BasicSettingsMenu(Menu.Menu):
     Log.debug("settings.baseLibrarySelect function call...")
     newPath = Dialogs.chooseFile(self.engine, masks = ["*/*"], prompt = _("Choose a new songs directory."), dirSelect = True)
     if newPath != None:
-      Config.set("setlist", "base_library", os.path.dirname(newPath))
-      Config.set("setlist", "selected_library", os.path.basename(newPath))
+      Config.set("setlist", "base_library", newPath)
+      Config.set("setlist", "selected_library", "")
       Config.set("setlist", "selected_song", "")
       self.engine.resource.refreshBaseLib()   #myfingershurt - to let user continue with new songpath without restart
 
@@ -1412,7 +1412,7 @@ def quickset(config):
     config.set("menu", "use_graphical_submenu", 0)
     config.set("audio", "enable_crowd_tracks", 0)
     config.set("performance", "static_strings", True)
-    config.set("performance", "disable_libcount", True)
+    config.set("setlist", "disable_libcount", True)
     config.set("performance", "killfx", 2)
     config.set("performance", "star_score_updates", 0)
     config.set("performance", "cache_song_metadata", False)
@@ -1436,7 +1436,7 @@ def quickset(config):
     config.set("menu", "use_graphical_submenu", 0)
     config.set("audio", "enable_crowd_tracks", 1)
     config.set("performance", "static_strings", True)
-    config.set("performance", "disable_libcount", True)
+    config.set("setlist", "disable_libcount", True)
     config.set("performance", "killfx", 0)
     config.set("performance", "star_score_updates", 0)
     config.set("performance", "cache_song_metadata", True)
@@ -1459,7 +1459,7 @@ def quickset(config):
     config.set("menu", "use_graphical_submenu", 1)
     config.set("audio", "enable_crowd_tracks", 1)
     config.set("performance", "static_strings", True)
-    config.set("performance", "disable_libcount", True)
+    config.set("setlist", "disable_libcount", True)
     config.set("performance", "killfx", 0)
     config.set("performance", "star_score_updates", 1)
     config.set("performance", "cache_song_metadata", True)
@@ -1483,7 +1483,7 @@ def quickset(config):
     config.set("menu", "use_graphical_submenu", 1)
     config.set("audio", "enable_crowd_tracks", 1)
     config.set("performance", "static_strings", False)
-    config.set("performance", "disable_libcount", False)
+    config.set("setlist", "disable_libcount", False)
     config.set("performance", "killfx", 0)
     config.set("performance", "star_score_updates", 1)
     config.set("performance", "cache_song_metadata", True)

@@ -518,6 +518,8 @@ class FileChooser(BackgroundLayer, KeyListener):
       driveLetters=win32api.GetLogicalDriveStrings().split('\x00')[:-1]
       self.driveLetters = []
       #Here we should filter some drives out. Anything inaccessible, or with no space.
+      #I have been playing around with other scenarios for figuring out whether or not a drive
+      #is suitable, but this seemed the simplest. (akedrou)
       for drive in driveLetters:
         try:
           size = win32file.GetDiskFreeSpaceEx(drive)
