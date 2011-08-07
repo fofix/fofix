@@ -2106,6 +2106,7 @@ class GuitarScene(Scene):
       self.song.readyToGo = False
     self.countdownSeconds = 3   #MFH - This needs to be reset for song restarts, too!
     self.countdown = float(self.countdownSeconds) * self.songBPS
+    self.countdownOK = False
     self.scaleText = [0.0 for i in self.playerList]
     self.displayText = [None for i in self.playerList]
     self.displayTextScale = [0.0 for i in self.playerList]
