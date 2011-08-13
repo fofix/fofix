@@ -75,7 +75,7 @@ class World:
     self.whammySavesSP = self.engine.config.get("game","whammy_saves_starpower")
     self.bassGroove = self.engine.config.get("game","bass_groove_enable")
     self.noteHitWindow = self.engine.config.get("game","note_hit_window")
-    self.earlyHitWindow = self.engine.config.get("handicap","early_hit_window")
+    self.earlyHitWindow = self.engine.config.get("game","early_hit_window")
     self.sloppyMode = self.engine.config.get("game","gh2_sloppy")
     self.hopoFrequency = self.engine.config.get("game","hopo_frequency")
   

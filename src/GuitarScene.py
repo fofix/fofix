@@ -109,7 +109,7 @@ class GuitarScene(Scene):
       # self.gameMode2p = 6
       # self.gamePlayers = 2
 
-    if self.gameMode1p == 1:
+    if self.gameMode == PRACTICE:
       self.practiceMode = True
     
     #MFH - check for party mode (akedrou TODO - fix/remove party mode!)
