@@ -175,6 +175,10 @@ class Theme(Task):
     self.noteColors  = [get("fret%d_color" % i, "color", default_color[i]) for i in range(6)]
     self.spNoteColor =  get("fretS_color",      "color", "#4CB2E5")
 
+    #Specifies how the power color is used in-game for both Active power and gaining power
+    self.powerGainColorToggle    = get("power_color_gain_toggle",      bool, True)
+    self.powerActiveColorToggle  = get("power_color_active_toggle",    bool, False)
+
     #Color of the tails when whammied, default is set to the colors of the frets
     self.killNoteColor  = get("fretK_color",       str,    "frets")
     if not self.killNoteColor == "frets":

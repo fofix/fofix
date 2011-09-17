@@ -99,13 +99,15 @@ class Instrument(object):
 
     self.tempoBpm = 120   #MFH - default is NEEDED here...
 
-    self.beatsPerBoard  = 5.0
-    self.boardWidth = self.engine.theme.neckWidth
-    self.boardLength = self.engine.theme.neckLength
-    self.beatsPerUnit   = self.beatsPerBoard / self.boardLength
-    self.fretColors     = self.engine.theme.noteColors
-    self.spColor        = self.engine.theme.spNoteColor
-    self.useFretColors  = self.engine.theme.use_fret_colors
+    self.beatsPerBoard            = 5.0
+    self.boardWidth               = self.engine.theme.neckWidth
+    self.boardLength              = self.engine.theme.neckLength
+    self.beatsPerUnit             = self.beatsPerBoard / self.boardLength
+    self.fretColors               = self.engine.theme.noteColors
+    self.spColor                  = self.engine.theme.spNoteColor
+    self.useFretColors            = self.engine.theme.use_fret_colors
+    self.powerActiveColorToggle   = self.engine.theme.powerActiveColorToggle
+    self.powerGainColorToggle     = self.engine.theme.powerGainColorToggle
 
     if not self.engine.theme.killNoteColor == "frets":
       kC = self.engine.theme.killNoteColor
@@ -865,7 +867,10 @@ class Instrument(object):
             flameColorMod = (1.19, 1.97, 10.59)
             flamecol = tuple([color[ifc]*flameColorMod[ifc] for ifc in range(3)])
 
-            if self.starPowerActive or self.spNote == True:
+            if self.starPowerActive and self.powerActiveColorToggle:
+              flamecol = self.spColor
+
+            elif self.spNote and self.powerGainColorToggle:
               flamecol = self.spColor
 
             self.engine.draw3Dtex(self.hitglowDrawing, coord = (x, y + .15, z), rot = self.hitGlowsRotation,
@@ -881,8 +886,12 @@ class Instrument(object):
             flameColorMod = (1.19, 1.78, 12.22)
             flamecol = tuple([color[ifc]*flameColorMod[ifc] for ifc in range(3)])
 
-            if self.starPowerActive or self.spNote == True:
+            if self.starPowerActive and self.powerActiveColorToggle:
               flamecol = self.spColor
+
+            elif self.spNote and self.powerGainColorToggle:
+              flamecol = self.spColor
+
             self.engine.draw3Dtex(self.hitglow2Drawing, coord = (x, y, z), rot = self.hitGlowsRotation,
                                   scale = (.40 + .6 * ms * ff, 1.5 + .6 * ms * ff, 1 + .6 * ms * ff),
                                   vertex = (-vtx,-vtx,vtx,vtx), texcoord = (0.0,0.0,1.0,1.0), 
@@ -993,8 +1002,10 @@ class Instrument(object):
             x  = (self.strings / 2 - event.number) * w
             flameColor = self.flameColors[event.number]
 
-          if self.starPowerActive:
-            flameColor = self.spColor
+          if self.starPowerActive and self.powerActiveColorToggle:
+            flamecol = self.spColor
+          elif event.star and self.powerGainColorToggle:
+            flamecol = self.spColor
 
           ms = math.sin(self.time) * .25 + 1
 
@@ -1262,6 +1273,8 @@ class Instrument(object):
         else:
           continue #can't break. Tempo.
 
+      self.spNote = False
+
       if self.isDrum:
         x  = (self.strings / 2 - .5 - (event.number - 1)) * w
         isOpen = False
@@ -1318,8 +1331,6 @@ class Instrument(object):
         elif self.spRefillMode == 2 and song.midiStyle != 1: #mode 2 = refill based on MIDI type
           self.spEnabled = False
 
-      self.spNote = False
-
       if event.star:
         self.starNotesInView = True
       if event.finalStar:
@@ -1328,8 +1339,8 @@ class Instrument(object):
 
       if event.star and self.spEnabled:
         self.spNote = True
+
       if event.finalStar and self.spEnabled:
-        self.spNote = True
         if event.played or event.hopod:
           if event.flameCount < 1 and not self.starPowerGained:
             if self.starPower < 50 and self.isDrum:   #not enough starpower to activate yet, kill existing drumfills
@@ -1704,8 +1715,11 @@ class Instrument(object):
     if not self.simpleTails: #Seperate Tail images dont color the images
       tailcol = (1,1,1,1)
 
-    elif spNote == True: #Power colored
-      tailcol = (self.spColor)
+    elif self.starPowerActive and self.powerActiveColorToggle:
+      tailcol = self.spColor
+
+    elif spNote and self.powerGainColorToggle:
+      tailcol = self.spColor
 
     elif big == False and tailOnly == True: #grey because the note was missed
       tailcol = (.6, .6, .6, color[3])
@@ -1740,7 +1754,11 @@ class Instrument(object):
                 tex1 = self.kill1
                 tex2 = self.kill2
               else:
-                if self.starPowerActive and not color == (0,0,0,1):
+                if self.starPowerActive and self.powerActiveColorToggle and not color == (0,0,0,1):
+                  tex1 = self.btail6
+                  tex2 = self.btaile6
+
+                elif spNote and self.powerGainColorToggle and not color == (0,0,0,1):
                   tex1 = self.btail6
                   tex2 = self.btaile6
                 else:
@@ -1752,7 +1770,10 @@ class Instrument(object):
                 tex1 = self.tail0
                 tex2 = self.taile0
               else:
-                if self.starPowerActive and not color == (0,0,0,1):
+                if self.starPowerActive and self.powerActiveColorToggle and not color == (0,0,0,1):
+                  tex1 = self.tail6
+                  tex2 = self.taile6
+                elif spNote and self.powerGainColorToggle and not color == (0,0,0,1):
                   tex1 = self.tail6
                   tex2 = self.taile6
                 else:
@@ -2024,14 +2045,12 @@ class Instrument(object):
         length     = 0
       tailOnly   = False
 
-      spNote = False
-
       #myfingershurt: user setting for starpower refill / replenish notes
 
-      if event.star and self.spEnabled:
-        spNote = True
-      if event.finalStar and self.spEnabled:
-        spNote = True
+      if self.spEnabled and (event.star or event.finalStar):
+        spNote = event.star
+      else:
+        spNote = False
 
       if event.tappable < 2:
         isTappable = False
@@ -2139,19 +2158,13 @@ class Instrument(object):
             f2 = min((s - t) / (6 * step), 1.0)
             a1 = waveForm(t) * f1
             a2 = waveForm(t - step) * f2
-            if self.starPowerActive and self.theme != 2:#8bit
-              glColor4f(self.spColor[0],self.spColor[1],self.spColor[2],1)  #(.3,.7,.9,1)
-            else:
-              glColor4f(c[0], c[1], c[2], .5)
+            glColor4f(c[0], c[1], c[2], .5)
             glVertex3f(x - a1, 0, z)
             glVertex3f(x - a2, 0, z - zStep)
             glColor4f(1, 1, 1, .75)
             glVertex3f(x, 0, z)
             glVertex3f(x, 0, z - zStep)
-            if self.starPowerActive and self.theme != 2:#8bit
-              glColor4f(self.spColor[0],self.spColor[1],self.spColor[2],1)  #(.3,.7,.9,1)
-            else:
-              glColor4f(c[0], c[1], c[2], .5)
+            glColor4f(c[0], c[1], c[2], .5)
             glVertex3f(x + a1, 0, z)
             glVertex3f(x + a2, 0, z - zStep)
             glVertex3f(x + a2, 0, z - zStep)
