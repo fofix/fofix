@@ -157,6 +157,15 @@ class Neck:
                                [-w / 2, 0, l],
                                [w / 2, 0, l]], dtype=np.float32)
 
+    self.sidebars_scroll_vtx = np.array([[-w / 2, 0, 0],
+                                         [w / 2, 0, 0],
+                                         [-w/ 2, 0, 0],
+                                         [w / 2, 0, 0],
+                                         [-w/ 2, 0, 0],
+                                         [w / 2, 0, 0],
+                                         [-w/ 2, 0, 0],
+                                         [w / 2, 0, 0]], dtype=np.float32)
+
     self.bpm_tex  = np.array([[0.0, 1.0],
                            [0.0, 0.0],
                            [1.0, 1.0],
@@ -195,20 +204,21 @@ class Neck:
                                 [1.0, 0]], dtype=np.float32)
 
     # evilynux - Just in case the type has became double, convert to float32
-    self.board_col = self.board_col.astype(np.float32)
-    self.board_vtx = self.board_vtx.astype(np.float32)
-    self.sidebars_vtx = self.sidebars_vtx.astype(np.float32)
-    self.bpm_tex = self.bpm_tex.astype(np.float32)
-    self.bpm_col = self.bpm_col.astype(np.float32)
-    self.soloLightVtx1 = self.soloLightVtx1.astype(np.float32)
-    self.soloLightVtx2 = self.soloLightVtx2.astype(np.float32)
-    self.shader_neck_vtx = self.shader_neck_vtx.astype(np.float32)
-    self.track_vtx = self.track_vtx.astype(np.float32)
-    self.board_col_flash = self.board_col_flash.astype(np.float32)
-    self.bpm_vtx = self.bpm_vtx.astype(np.float32)
-    self.board_tex_static = self.board_tex_static.astype(np.float32)
-    self.board_tex = self.board_tex.astype(np.float32)
-    self.board_scroll_vtx = self.board_scroll_vtx.astype(np.float32)
+    self.board_col             = self.board_col.astype(np.float32)
+    self.board_vtx             = self.board_vtx.astype(np.float32)
+    self.sidebars_vtx          = self.sidebars_vtx.astype(np.float32)
+    self.sidebars_scroll_vtx   = self.sidebars_scroll_vtx.astype(np.float32)
+    self.bpm_tex               = self.bpm_tex.astype(np.float32)
+    self.bpm_col               = self.bpm_col.astype(np.float32)
+    self.soloLightVtx1         = self.soloLightVtx1.astype(np.float32)
+    self.soloLightVtx2         = self.soloLightVtx2.astype(np.float32)
+    self.shader_neck_vtx       = self.shader_neck_vtx.astype(np.float32)
+    self.track_vtx             = self.track_vtx.astype(np.float32)
+    self.board_col_flash       = self.board_col_flash.astype(np.float32)
+    self.bpm_vtx               = self.bpm_vtx.astype(np.float32)
+    self.board_tex_static      = self.board_tex_static.astype(np.float32)
+    self.board_tex             = self.board_tex.astype(np.float32)
+    self.board_scroll_vtx      = self.board_scroll_vtx.astype(np.float32)
 	
     self.neckType = playerObj.neckType
     if self.neckType == 0:
@@ -313,17 +323,19 @@ class Neck:
       else:
         engine.loadImgDrawing(self, name, os.path.join(themepath, file))
  
-    loadImage("sideBars", "side_bars.png")
-    loadImage("oSideBars", "overdrive_side_bars.png")
-    loadImage("failSideBars", "fail_side_bars.png")
-    loadImage("oCenterLines", "overdrive_center_lines.png")
-    loadImage("centerLines", "center_lines.png")
-    loadImage("oNeck", "overdriveneck.png")
-    loadImage("oFlash", "overdrive_string_flash.png")
-    loadImage("bpm_halfbeat", "bpm_halfbeat.png")
-    loadImage("bpm_beat",     "bpm_beat.png")
-    loadImage("bpm_measure",  "bpm_measure.png")
-    loadImage("failNeck", "failneck.png")
+    loadImage("sideBars",       "side_bars.png")
+    loadImage("oSideBars",      "overdrive_side_bars.png")
+    loadImage("oSoloSideBars",  "overdrive_solo_side_bars.png")
+    loadImage("failSideBars",   "fail_side_bars.png")
+    loadImage("soloSideBars",   "solo_side_bars.png")
+    loadImage("oCenterLines",   "overdrive_center_lines.png")
+    loadImage("centerLines",    "center_lines.png")
+    loadImage("oNeck",          "overdriveneck.png")
+    loadImage("oFlash",         "overdrive_string_flash.png")
+    loadImage("bpm_halfbeat",   "bpm_halfbeat.png")
+    loadImage("bpm_beat",       "bpm_beat.png")
+    loadImage("bpm_measure",    "bpm_measure.png")
+    loadImage("failNeck",       "failneck.png")
 
     if not self.failNeck:
       engine.loadImgDrawing(self, "failNeck", os.path.join("failneck.png"))
@@ -356,14 +368,14 @@ class Neck:
       if self.fourxNeckMode == 2:  #overlay neck
         engine.loadImgDrawing(self, "fourMultiNeck", os.path.join(themepath, "fourmultineckovr.png"))
 
-    self.isFailing = False
-    self.canGuitarSolo = self.instrument.canGuitarSolo
-    self.guitarSolo = False
-    self.scoreMultiplier = 1
-    self.overdriveFlashCounts = self.indexFps/4   #how many cycles to display the oFlash: self.indexFps/2 = 1/2 second
-    self.overdriveFlashCount = self.overdriveFlashCounts
-    self.ocount = 0
-    self.paused = False
+    self.isFailing             = False
+    self.canGuitarSolo         = self.instrument.canGuitarSolo
+    self.guitarSolo            = False
+    self.scoreMultiplier       = 1
+    self.overdriveFlashCounts  = self.indexFps/4   #how many cycles to display the oFlash: self.indexFps/2 = 1/2 second
+    self.overdriveFlashCount   = self.overdriveFlashCounts
+    self.ocount                = 0
+    self.paused                = False
 
   def project(self, beat):
     return 0.125 * beat / self.beatsPerUnit    # glorandwarf: was 0.12
@@ -375,7 +387,7 @@ class Neck:
       return
 
     l = self.boardLength
-    z  = ((time - pos) / self.currentPeriod) / self.beatsPerUnit
+    z = ((time - pos) / self.currentPeriod) / self.beatsPerUnit
 
     glEnable(GL_TEXTURE_2D)
 
@@ -391,6 +403,29 @@ class Neck:
 
     glDisable(GL_TEXTURE_2D)
 
+  def renderIncomingSideBars(self, song, pos, time, sideBarImg):
+    if not song:
+      return
+    if not song.readyToGo:
+      return
+
+    l = self.boardLength
+    z = ((time - pos) / self.currentPeriod) / self.beatsPerUnit
+
+    glEnable(GL_TEXTURE_2D)
+
+    self.sidebars_scroll_vtx[0][2] = self.sidebars_scroll_vtx[1][2] = z
+    self.sidebars_scroll_vtx[2][2] = self.sidebars_scroll_vtx[3][2] = z + 1
+    self.sidebars_scroll_vtx[4][2] = self.sidebars_scroll_vtx[5][2] = z + 2 + l * .7
+    self.sidebars_scroll_vtx[6][2] = self.sidebars_scroll_vtx[7][2] = z + 2 + l
+
+    if sideBarImg:
+      sideBarImg.texture.bind()
+ 
+    cmgl.drawArrays(GL_TRIANGLE_STRIP, vertices=self.sidebars_scroll_vtx, colors=self.board_col, texcoords=self.board_tex_static)
+
+    glDisable(GL_TEXTURE_2D)
+
   def renderIncomingNecks(self, visibility, song, pos):
     if not song:
       return
@@ -399,7 +434,10 @@ class Neck:
 
     boardWindowMin = pos - self.currentPeriod * 2
     boardWindowMax = pos + self.currentPeriod * self.beatsPerBoard
-    track = song.midiEventTrack[self.player]
+    track          = song.midiEventTrack[self.player]
+    sideBarImg     = None
+    neckImg        = None
+ 
 
     if self.incomingNeckMode > 0:   #if enabled
       if self.useMidiSoloMarkers:
@@ -407,26 +445,41 @@ class Neck:
           if isinstance(event, Song.MarkerNote) and event.number == Song.starPowerMarkingNote and self.soloNeck: 
             if event.endMarker:   #solo end
               if self.incomingNeckMode == 2 and self.guitarSolo:    #render both start and end incoming necks and only until the end of the guitar solo
-                if self.instrument.starPowerActive and self.oNeck and self.ovrneckoverlay == False:
-                  neckImg = self.oNeck
-                  alpha   = self.neckAlpha[4]
-                elif self.scoreMultiplier > 4 and self.bassGrooveNeck != None and self.bassGrooveNeckMode == 1:
-                  neckImg = self.bassGrooveNeck
-                  alpha   = self.neckAlpha[3]
-                elif self.fourMultiNeck and self.scoreMultiplier == 4 and self.fourxNeckMode == 1:
-                  neckImg = self.fourMultiNeck
-                  alpha   = self.neckAlpha[6]
-                else:
-                  neckImg = self.neckDrawing
-                  alpha   = self.neckAlpha[1]
-                self.renderIncomingNeck(visibility*alpha, song, pos, time, neckImg)
+                if self.soloNeck:
+                  if self.instrument.starPowerActive and self.oNeck and self.ovrneckoverlay == False:
+                    neckImg = self.oNeck
+                    alpha   = self.neckAlpha[4]
+                  elif self.scoreMultiplier > 4 and self.bassGrooveNeck != None and self.bassGrooveNeckMode == 1:
+                    neckImg = self.bassGrooveNeck
+                    alpha   = self.neckAlpha[3]
+                  elif self.fourMultiNeck and self.scoreMultiplier == 4 and self.fourxNeckMode == 1:
+                    neckImg = self.fourMultiNeck
+                    alpha   = self.neckAlpha[6]
+                  elif self.neckDrawing:
+                    neckImg = self.neckDrawing
+                    alpha   = self.neckAlpha[1]
+                  if neckImg:
+                    self.renderIncomingNeck(visibility*alpha, song, pos, time, neckImg)
+
+                if self.soloSideBars:
+                  sideBarImg = self.sideBars
+
+                if sideBarImg:
+                  self.renderIncomingSideBars(song, pos, time, sideBarImg)
 
             else:    #solo start
               if not self.guitarSolo:   #only until guitar solo starts!
-                neckImg = self.soloNeck
-                alpha   = self.neckAlpha[2]
-                self.renderIncomingNeck(visibility*alpha, song, pos, time, neckImg)
-                if self.spcount2 != 0 and self.spcount < 1.2 and self.oNeck:
+                if self.soloNeck:
+                  neckImg     = self.soloNeck
+                if self.soloSideBars:
+                  sideBarImg  = self.soloSideBars
+                alpha       = self.neckAlpha[2]
+                if neckImg:
+                  self.renderIncomingNeck(visibility*alpha, song, pos, time, neckImg)
+                if sideBarImg:
+                  self.renderIncomingSideBars(song, pos, time, sideBarImg)
+
+                if self.spcount2 != 0 and self.spcount < 1.2 and self.oNeck and self.soloNeck:
                   alpha = self.neckAlpha[4]
                   self.renderIncomingNeck(visibility*alpha, song, pos, time, neckImg)
 
@@ -434,20 +487,37 @@ class Neck:
         for time, event in song.eventTracks[Song.TK_GUITAR_SOLOS].getEvents(boardWindowMin, boardWindowMax):
           if self.canGuitarSolo and self.soloNeck:
             if event.text.find("ON") >= 0:
+
               if not self.guitarSolo:   #only until guitar solo starts!
-                neckImg = self.soloNeck
-                self.renderIncomingNeck(visibility, song, pos, time, neckImg)
+                if self.soloNeck:
+                  neckImg = self.soloNeck
+                  self.renderIncomingNeck(visibility, song, pos, time, neckImg)
+
+                if self.soloSideBars:
+                  sideBarImg  = self.soloSideBars
+
+                if sideBarImg:
+                  self.renderIncomingSideBars(song, pos, time, sideBarImg)
+
             elif self.incomingNeckMode == 2:    #render both start and end incoming necks
               if self.guitarSolo:   #only until the end of the guitar solo!
-                if self.instrument.starPowerActive and self.oNeck:
-                  neckImg = self.oNeck
-                elif self.scoreMultiplier > 4 and self.bassGrooveNeck != None and self.bassGrooveNeckMode == 1:
-                  neckImg = self.bassGrooveNeck
-                elif self.fourMultiNeck and self.scoreMultiplier == 4 and self.fourxNeckMode == 1:
-                  neckImg = self.fourMultiNeck
-                else:
-                  neckImg = self.neckDrawing
-                self.renderIncomingNeck(visibility, song, pos, time, neckImg)
+                if self.soloNeck:
+                  if self.instrument.starPowerActive and self.oNeck:
+                    neckImg = self.oNeck
+                  elif self.scoreMultiplier > 4 and self.bassGrooveNeck != None and self.bassGrooveNeckMode == 1:
+                    neckImg = self.bassGrooveNeck
+                  elif self.fourMultiNeck and self.scoreMultiplier == 4 and self.fourxNeckMode == 1:
+                    neckImg = self.fourMultiNeck
+                  elif self.neckDrawing:
+                    neckImg = self.neckDrawing
+                  if neckImg:
+                    self.renderIncomingNeck(visibility, song, pos, time, neckImg)
+
+                if self.soloSideBars:
+                  sideBarImg  = self.soloSideBars
+
+                if sideBarImg:
+                  self.renderIncomingSideBars(song, pos, time, sideBarImg)
 
 
   def renderNeckMethod(self, visibility, offset, neck, alpha = False): #blazingamer: New neck rendering method
@@ -533,19 +603,19 @@ class Neck:
       self.renderNeckMethod(v*self.neckAlpha[4], offset, neck, alpha)
 
     if shaders.enabled:
-      shaders.globals["basspos"] = shaders.var["fret"][self.player][0]
-      shaders.globals["notepos"] = shaders.var["fret"][self.player][1:]
-      shaders.globals["bpm"] = self.instrument.currentBpm
-      shaders.globals["songpos"] = pos
-      shaders.globals["spEnabled"] = self.instrument.starPowerActive
-      shaders.globals["isFailing"] = self.isFailing
-      shaders.globals["isMultChanged"] = (shaders.var["scoreMult"][self.player] != self.scoreMultiplier)
+      shaders.globals["basspos"]        = shaders.var["fret"][self.player][0]
+      shaders.globals["notepos"]        = shaders.var["fret"][self.player][1:]
+      shaders.globals["bpm"]            = self.instrument.currentBpm
+      shaders.globals["songpos"]        = pos
+      shaders.globals["spEnabled"]      = self.instrument.starPowerActive
+      shaders.globals["isFailing"]      = self.isFailing
+      shaders.globals["isMultChanged"]  = (shaders.var["scoreMult"][self.player] != self.scoreMultiplier)
       if shaders.globals["isMultChanged"]:
-        shaders.var["multChangePos"][self.player] = pos
-      shaders.globals["scoreMult"] = self.scoreMultiplier
-      shaders.var["scoreMult"][self.player] = self.scoreMultiplier
-      shaders.globals["isDrum"] = self.isDrum
-      shaders.globals["soloActive"] = self.guitarSolo
+        shaders.var["multChangePos"][self.player]  = pos
+      shaders.globals["scoreMult"]                 = self.scoreMultiplier
+      shaders.var["scoreMult"][self.player]        = self.scoreMultiplier
+      shaders.globals["isDrum"]                    = self.isDrum
+      shaders.globals["soloActive"]                = self.guitarSolo
       
       posx = shaders.time()
       neckcol = (0,0,0)
@@ -557,7 +627,7 @@ class Neck:
         
         
       for i in range(5):
-        blend = max(shaders.var["fret"][self.player][i] - posx + 1.5,0.01)
+        blend   = max(shaders.var["fret"][self.player][i] - posx + 1.5,0.01)
         neckcol = mixColors(neckcol, notecolors[i], blend)
 
       shaders.var["color"][self.player]=neckcol
@@ -612,7 +682,9 @@ class Neck:
     color = (1,1,1)
 
     v = visibility
-    w = self.boardWidth + 0.15 
+    w = self.boardWidth + 0.15
+
+    sbb = False
 
     if self.failcount == v:
       board_col = self.board_col_flash
@@ -620,14 +692,21 @@ class Neck:
       board_col = self.board_col
 
     glEnable(GL_TEXTURE_2D)
-    if self.instrument.starPowerActive and self.oSideBars:
+
+    if self.instrument.starPowerActive and self.oSideBars and not (self.guitarSolo or self.soloSideBars):
       self.oSideBars.texture.bind()
-    else:
+    elif self.instrument.starPowerActive and self.oSoloSideBars and self.oSidebars and self.guitarSolo:
+      self.oSoloSideBars.texture.bind()
+    elif self.guitarSolo and self.soloSideBars:
+      self.soloSideBars.texture.bind()
+    elif self.sideBars:
       self.sideBars.texture.bind()
+
+
+
     if self.isFailing and self.failSideBars and v == self.failcount:
       self.failSideBars.texture.bind()
-    else:
-      self.sideBars.texture.bind()
+
     cmgl.drawArrays(GL_TRIANGLE_STRIP, vertices=self.sidebars_vtx, colors=board_col, texcoords=self.board_tex)
     glDisable(GL_TEXTURE_2D)
      
@@ -758,8 +837,7 @@ class Neck:
       self.vis = visibility
       if self.doNecksRender == True:
         self.renderNeck(visibility, song, pos)
-      if self.soloNeck:
-        self.renderIncomingNecks(visibility, song, pos) #MFH
+      self.renderIncomingNecks(visibility, song, pos) #MFH
       if self.centerLines or self.oCenterLines or self.oFlash:
         self.drawTrack(self.ocount, song, pos)
       if not self.bpmLinesDisabled:
