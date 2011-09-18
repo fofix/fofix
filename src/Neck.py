@@ -442,10 +442,10 @@ class Neck:
     if self.incomingNeckMode > 0:   #if enabled
       if self.useMidiSoloMarkers:
         for time, event in track.getEvents(boardWindowMin, boardWindowMax):
-          if isinstance(event, Song.MarkerNote) and event.number == Song.starPowerMarkingNote and self.soloNeck: 
+          if isinstance(event, Song.MarkerNote) and event.number == Song.starPowerMarkingNote: 
             if event.endMarker:   #solo end
               if self.incomingNeckMode == 2 and self.guitarSolo:    #render both start and end incoming necks and only until the end of the guitar solo
-                if self.soloNeck:
+                if self.soloNeck or self.soloSideBars:
                   if self.instrument.starPowerActive and self.oNeck and self.ovrneckoverlay == False:
                     neckImg = self.oNeck
                     alpha   = self.neckAlpha[4]
@@ -461,22 +461,20 @@ class Neck:
                   if neckImg:
                     self.renderIncomingNeck(visibility*alpha, song, pos, time, neckImg)
 
+
                 if self.soloSideBars:
                   sideBarImg = self.sideBars
-
-                if sideBarImg:
                   self.renderIncomingSideBars(song, pos, time, sideBarImg)
 
             else:    #solo start
               if not self.guitarSolo:   #only until guitar solo starts!
                 if self.soloNeck:
                   neckImg     = self.soloNeck
+                  alpha       = self.neckAlpha[2]
+                  self.renderIncomingNeck(visibility*alpha, song, pos, time, neckImg)
+
                 if self.soloSideBars:
                   sideBarImg  = self.soloSideBars
-                alpha       = self.neckAlpha[2]
-                if neckImg:
-                  self.renderIncomingNeck(visibility*alpha, song, pos, time, neckImg)
-                if sideBarImg:
                   self.renderIncomingSideBars(song, pos, time, sideBarImg)
 
                 if self.spcount2 != 0 and self.spcount < 1.2 and self.oNeck and self.soloNeck:
@@ -485,7 +483,7 @@ class Neck:
 
       elif self.markSolos == 1:   #fall back on text-based guitar solo marking track
         for time, event in song.eventTracks[Song.TK_GUITAR_SOLOS].getEvents(boardWindowMin, boardWindowMax):
-          if self.canGuitarSolo and self.soloNeck:
+          if self.canGuitarSolo:
             if event.text.find("ON") >= 0:
 
               if not self.guitarSolo:   #only until guitar solo starts!
@@ -495,13 +493,11 @@ class Neck:
 
                 if self.soloSideBars:
                   sideBarImg  = self.soloSideBars
-
-                if sideBarImg:
                   self.renderIncomingSideBars(song, pos, time, sideBarImg)
 
             elif self.incomingNeckMode == 2:    #render both start and end incoming necks
               if self.guitarSolo:   #only until the end of the guitar solo!
-                if self.soloNeck:
+                if self.soloNeck or self.soloSideBars:
                   if self.instrument.starPowerActive and self.oNeck:
                     neckImg = self.oNeck
                   elif self.scoreMultiplier > 4 and self.bassGrooveNeck != None and self.bassGrooveNeckMode == 1:
@@ -515,8 +511,6 @@ class Neck:
 
                 if self.soloSideBars:
                   sideBarImg  = self.soloSideBars
-
-                if sideBarImg:
                   self.renderIncomingSideBars(song, pos, time, sideBarImg)
 
 
@@ -683,8 +677,6 @@ class Neck:
 
     v = visibility
     w = self.boardWidth + 0.15
-
-    sbb = False
 
     if self.failcount == v:
       board_col = self.board_col_flash
