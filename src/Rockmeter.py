@@ -41,9 +41,15 @@ from OpenGL.GL import *
 import math
 from math import *
 
+import Version
+
 from Theme import halign, valign
 from constants import *
+ 
+import imp
 
+import Log
+     
 #these are the variables for setting the alignment of text and images
 #when setting them up in the rockmeter.ini you do not have
 #to put it in all caps, the code will take care of that
@@ -150,6 +156,7 @@ class Layer(ConfigGetMixin):
       self.a = self.getexpr("a", "1.0")
       self.color = [1.0,1.0,1.0,1.0]
         
+    self.shared      = False            #determines if the element is shared between players in multiplayer modes
     self.condition   = True				#when should the image be shown (by default it will always be shown)
     
     self.alignment   = halign(self.get("alignment", str, "center"))
@@ -160,7 +167,8 @@ class Layer(ConfigGetMixin):
                                         #makes sure to properly scale/position the images in pixels instead of percent
 
     self.effects     = []               #various effects associated with the layer
-                        
+                     
+    
   # all variables that should be updated during the rendering process
   # should be in here just for sake of readablity and organization
   def updateLayer(self, playerNum):
@@ -885,14 +893,24 @@ class Rockmeter(ConfigGetMixin):
     self.config.read(configFileName)
 
     self.themename = self.engine.data.themeLabel
-    
+  
+    try:
+      themepath = os.path.join(Version.dataPath(), "themes", self.themename)
+      fp, pathname, description = imp.find_module("CustomRMLayers",[themepath])
+      self.customRMLayers = imp.load_module("CustomRMLayers", fp, pathname, description)
+    except ImportError:
+      self.customRMLayers = None
+      Log.notice("Custom Rockmeter layers are not available")
+  
     # Build the layers
     for i in range(Rockmeter._layerLimit):
       types = [
                "Image",
                "Text",
-               "Circle"
+               "Circle",
+               "Custom"
               ]
+              
       for t in types:
         self.section = "layer%d:%s" % (i, t)
         if not self.config.has_section(self.section):
@@ -902,6 +920,8 @@ class Rockmeter(ConfigGetMixin):
             self.createFont(self.section, i)
           elif t == types[2]:
             self.createCircle(self.section, i)
+          elif t == types[3]:
+            self.createCustom(self.section, i)
           else:
             self.createImage(self.section, i)
           break
@@ -955,6 +975,14 @@ class Rockmeter(ConfigGetMixin):
           break
             
       
+  def createCustom(self, section, number):
+      
+    if self.customRMLayers:
+      classname = self.get("classname")
+    
+      layer = eval("self.customRMLayers."+classname+"(self, section)")
+      self.addLayer(layer, number, layer.shared)
+    
   def createFont(self, section, number):
 
     font  = self.get("font", str, "font")
