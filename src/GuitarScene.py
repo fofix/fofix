@@ -44,7 +44,7 @@ import Audio
 import Stage
 import Settings
 import Song
-from Scorekeeper import ScoreCard
+from Scorekeeper import ScoreCard, RockmeterScoring
 from Shader import shaders
 
 import random
@@ -448,33 +448,21 @@ class GuitarScene(Scene):
         instrument.starPowerDecreaseDivisor /= self.numOfPlayers
 
 
-    self.rockMax = 30000.0
-    self.rockMedThreshold = self.rockMax/3.0    #MFH
-    self.rockHiThreshold = self.rockMax/3.0*2   #MFH
-    self.rock = [self.rockMax/2 for i in self.playerList]
-    self.arrowRotation    = [.5 for i in self.playerList]
+    self.rockScoring = [RockmeterScoring(player) for player in self.instruments]
+    
     self.starNotesMissed = [False for i in self.playerList]  #MFH
     self.notesMissed = [False for i in self.playerList]
     self.lessMissed = [False for i in self.playerList]
     self.notesHit = [False for i in self.playerList]
     self.lessHit = False
-    self.minBase = 400
-    self.pluBase = 15
-    self.minGain = 2
-    self.pluGain = 7
     self.battleMax = 300 #QQstarS:new2  the max adding when battle
-    self.minusRock = [self.minBase for i in self.playerList]
-    self.plusRock = [self.pluBase for i in self.playerList]
     self.coOpMulti = 1
     self.coOpFailDone = [False for i in self.playerList]
     if self.coOpRB: #akedrou
-      self.coOpPlayerMeter = len(self.rock)
-      self.rock.append(self.rockMax/2)
-      self.minusRock.append(0.0)
-      self.plusRock.append(0.0)
+      self.coOpPlayerMeter = len(self.rockScoring)
       self.timesFailed  = [0 for i in self.playerList]
     if self.coOp or self.coOpGH:
-      self.coOpPlayerMeter = len(self.rock)-1 #make sure it's the last one
+      self.coOpPlayerMeter = len(self.rockScoring)-1 #make sure it's the last one
 
 
     #Dialogs.changeLoadingSplashScreenText(self.engine, splash, phrase + " \n " + _("Loading Stage..."))
@@ -1740,7 +1728,6 @@ class GuitarScene(Scene):
     self.failScreen = None
     self.failMsg = None
     self.menu = None
-    self.mult = None
     self.pauseScreen = None
     self.rockTop = None
     self.rockMsg = None
@@ -2167,9 +2154,8 @@ class GuitarScene(Scene):
       if not self.battleSuddenDeath:
         self.rock = [self.rockMax/2 for i in self.playerList]
     else:
-      self.rock = [self.rockMax/2 for i in self.playerList]
-    self.minusRock = [0.0 for i in self.playerList]
-    self.plusRock = [0.0 for i in self.playerList]
+      for rock in self.rockScoring:
+        rock.start()
     self.coOpMulti = 1
     self.deadPlayerList = []
     self.numDeadPlayers  = 0
@@ -2819,7 +2805,7 @@ class GuitarScene(Scene):
       return
 
     #MFH - only actually pick if the player has not failed already!
-    if self.rock[i] > 0 and guitar.battleStatus[4] == False:
+    if not self.rockScoring[i].failed and guitar.battleStatus[4] == False:
 
       # Volshebnyi - new BRE and drum fills scoring
       if guitar.freestyleActive or (guitar.isDrum and guitar.drumFillsActive):
@@ -3115,10 +3101,10 @@ class GuitarScene(Scene):
                     self.controls.toggle(k, False)
   
 
+  #decreases the rockmeter for the player when a note is missed
   def rockmeterDecrease(self, playerNum, vScore = 0):
     i = playerNum
 
-    rockMinusAmount = 0 #akedrou - simplify the various incarnations of minusRock.
     if self.instruments[i].isDrum: 
       self.drumStart = True
       if not self.drumScoringEnabled:   #MFH - ignore when drum scoring is disabled
@@ -3131,174 +3117,28 @@ class GuitarScene(Scene):
     if not self.failingEnabled or self.practiceMode:
       return
 
-    if self.instruments[i].isVocal:
-      rockMinusAmount = 500 * (3 - vScore)
-      self.rock[i] -= rockMinusAmount
-      if (not self.coOpRB) and (self.rock[i]/self.rockMax <= 0.667) and ((self.rock[i]+rockMinusAmount)/self.rockMax > 0.667): #akedrou
-        self.playersInGreen -= 1
-      return
-      
-    if self.battle and self.numOfPlayers > 1: #battle mode
-      if self.notesMissed[i]:
-        self.minusRock[i] += self.minGain/self.multi[i]
-        if self.plusRock[i] > self.pluBase:
-          self.plusRock[i] -= self.pluGain*2.0/self.multi[i]
-        if self.plusRock[i] <= self.pluBase:
-          self.plusRock[i] = self.pluBase/self.multi[i]
-      if self.lessMissed[i]: #QQstarS:Set [i] to [i]
-        self.minusRock[i] += self.minGain/5.0/self.multi[i]
-        if self.plusRock[i] > self.pluBase:
-          self.plusRock[i] -= self.pluGain/2.5/self.multi[i]
-    
-    elif (self.coOp or self.coOpGH) and self.numOfPlayers > 1: #co-op mode
-      if self.notesMissed[i]:
-        self.minusRock[self.coOpPlayerMeter] += self.minGain/self.multi[i]
-        rockMinusAmount = self.minusRock[self.coOpPlayerMeter]/self.multi[i]
-        self.rock[self.coOpPlayerMeter] -= rockMinusAmount
-        if self.plusRock[self.coOpPlayerMeter] > self.pluBase:
-          self.plusRock[self.coOpPlayerMeter] -= self.pluGain*2.0/self.multi[i]
-        if self.plusRock[self.coOpPlayerMeter] <= self.pluBase:
-          self.plusRock[self.coOpPlayerMeter] = self.pluBase/self.multi[i]
-      if self.lessMissed[i]:
-        self.minusRock[self.coOpPlayerMeter] += self.minGain/5.0/self.multi[i]
-        rockMinusAmount = self.minusRock[0]/5.0/self.multi[i]
-        self.rock[self.coOpPlayerMeter] -= rockMinusAmount
-        if self.plusRock[self.coOpPlayerMeter] > self.pluBase:
-          self.plusRock[self.coOpPlayerMeter] -= self.pluGain/2.5/self.multi[i]
-      if (self.rock[self.coOpPlayerMeter]/self.rockMax <= 0.667) and ((self.rock[self.coOpPlayerMeter]+rockMinusAmount)/self.rockMax > 0.667): #akedrou
-        self.playersInGreen -= 1
-        
-    elif self.coOpRB and self.numOfPlayers > 1: #RB co-op mode
-      if self.notesMissed[i]:
-        self.minusRock[i] += self.minGain/self.coOpMulti
-        if self.numDeadPlayers > 0:
-          self.minusRock[self.coOpPlayerMeter] += self.minGain/self.coOpMulti
-          rockMinusAmount = self.minusRock[self.coOpPlayerMeter]/self.coOpMulti
-          self.rock[self.coOpPlayerMeter] -= rockMinusAmount/self.numOfPlayers
-        self.rock[i] -= self.minusRock[i]/self.coOpMulti
-        if self.plusRock[i] > self.pluBase:
-          self.plusRock[i] -= self.pluGain*2.0/self.coOpMulti
-        if self.plusRock[i] <= self.pluBase:
-          self.plusRock[i] = self.pluBase/self.coOpMulti
-      if self.lessMissed[i]:
-        self.minusRock[i] += self.minGain/5.0/self.coOpMulti
-        if self.numDeadPlayers > 0:
-          self.minusRock[self.coOpPlayerMeter] += self.minGain/5.0/self.coOpMulti
-          rockMinusAmount = self.minusRock[i]/5.0/self.coOpMulti
-          self.rock[self.coOpPlayerMeter] -= rockMinusAmount/(self.numOfPlayers - self.numDeadPlayers)
-        self.rock[i] -= self.minusRock[i]/5.0/self.coOpMulti
-        if self.plusRock[i] > self.pluBase:
-          self.plusRock[i] -= self.pluGain/2.5/self.coOpMulti
+    self.rockScoring[i].decreaseRock(self.notesMissed[i], self.lessMissed[i], vScore)
 
-    else:   #normal mode
-      if self.notesMissed[i]:
-        self.minusRock[i] += self.minGain/self.multi[i]
-        rockMinusAmount = self.minusRock[i]/self.multi[i]
-        self.rock[i] -= rockMinusAmount
-        if self.plusRock[i] > self.pluBase:
-          self.plusRock[i] -= self.pluGain*2.0/self.multi[i]
-        if self.plusRock[i] <= self.pluBase:
-          self.plusRock[i] = self.pluBase/self.multi[i]
-      if self.lessMissed[i]:
-        self.minusRock[i] += self.minGain/5.0/self.multi[i]
-        rockMinusAmount = self.minusRock[i]/5.0/self.multi[i]
-        self.rock[i] -= rockMinusAmount
-        if self.plusRock[i] > self.pluBase:
-          self.plusRock[i] -= self.pluGain/2.5/self.multi[i]
-      if (self.rock[i]/self.rockMax <= 0.667) and ((self.rock[i]+rockMinusAmount)/self.rockMax > 0.667): #akedrou
-        self.playersInGreen -= 1
-
-    if self.minusRock[i] <= self.minBase:
-      self.minusRock[i] = self.minBase
-    if self.plusRock[i] <= self.pluBase:
-      self.plusRock[i] = self.pluBase
-
-
-
+  #increases the rockmeter for a player when a note is hit
   def rockmeterIncrease(self, playerNum, vScore = 0):
     i = playerNum
+    
     if self.instruments[i].isVocal:
-      rockPlusAmt = 500 + (500 * (vScore-2))
-      self.rock[i] += rockPlusAmt
-      if self.rock[i] >= self.rockMax:
-        self.rock[i] = self.rockMax
-      if not self.coOpRB:
-        if (self.rock[i]/self.rockMax > 0.667) and ((self.rock[i]-rockPlusAmt)/self.rockMax <= 0.667):
-          self.playersInGreen += 1
-          if self.engine.data.cheerSoundFound > 0: #haven't decided whether or not to cut crowdSound with crowdsEnabled = 0, but would have to do it at solos too...
-            self.engine.data.crowdSound.play()
       return
+    
     if self.instruments[i].isDrum: 
       self.drumStart = True
+    
     if not self.failingEnabled or self.practiceMode:
       return
-    if not self.notesHit[i]: return
-    if self.battle and self.numOfPlayers > 1: #battle mode
-      if self.notesHit[i]:
-        if self.rock[i] < self.rockMax:
-          self.plusRock[i] += self.pluGain*self.multi[i]
-          if self.plusRock[i] > self.battleMax:
-            self.plusRock[i] = self.battleMax
-          self.rock[i] += self.plusRock[i]*self.multi[i]
-          self.rock[self.battleTarget[i]] -= self.plusRock[i]*self.multi[i]
-        if self.rock[self.battleTarget[i]] < 0:
-          self.rock[self.battleTarget[i]] = 0
-        if self.rock[i] >= self.rockMax:
-          self.rock[i] = self.rockMax
-        if self.minusRock[i] > self.minBase:
-          self.minusRock[i] -= self.minGain/2.0*self.multi[i]
-    
-    #MFH TODO maintain separate rock status for each player
-    elif (self.coOp or self.coOpGH) and self.numOfPlayers > 1: 
-      if self.rock[self.coOpPlayerMeter] < self.rockMax:
-        self.plusRock[self.coOpPlayerMeter] += self.pluGain*self.multi[i]
-        self.rock[self.coOpPlayerMeter] += self.plusRock[self.coOpPlayerMeter]*self.multi[i]
-      if self.rock[self.coOpPlayerMeter] >= self.rockMax:
-        self.rock[self.coOpPlayerMeter] = self.rockMax
-      if self.minusRock[self.coOpPlayerMeter] > self.minBase:
-        self.minusRock[self.coOpPlayerMeter] -= self.minGain/2.0*self.multi[i]
-      if (self.rock[self.coOpPlayerMeter]/self.rockMax > 0.667) and ((self.rock[self.coOpPlayerMeter]-(self.plusRock[self.coOpPlayerMeter]*self.multi[i]))/self.rockMax <= 0.667):
-          self.playersInGreen += 1
-          if self.engine.data.cheerSoundFound > 0: #haven't decided whether or not to cut crowdSound with crowdsEnabled = 0, but would have to do it at solos too...
-            self.engine.data.crowdSound.play()
-          
-    elif self.coOpRB and self.numOfPlayers > 1: 
-      if self.rock[i] < self.rockMax:
-        self.plusRock[i] += self.pluGain*self.coOpMulti
-        self.rock[i] += (self.plusRock[i]*self.coOpMulti)
-      if self.rock[i] >= self.rockMax:
-        self.rock[i] = self.rockMax
-      if self.minusRock[i] > self.minBase:
-        self.minusRock[i] -= self.minGain/2.0*self.coOpMulti
-
-    
-    else:   #normal mode
-  
-      if self.rock[i] < self.rockMax:
-        self.plusRock[i] += self.pluGain*self.multi[i]
-        self.rock[i] += self.plusRock[i]*self.multi[i]
-      if self.rock[i] >= self.rockMax:
-        self.rock[i] = self.rockMax
-      if self.minusRock[i] > self.minBase:
-        self.minusRock[i] -= self.minGain/2.0*self.multi[i]
-      if (self.rock[i]/self.rockMax > 0.667) and ((self.rock[i]-(self.plusRock[i]*self.multi[i]))/self.rockMax <= 0.667):
-        self.playersInGreen += 1
-        if self.engine.data.cheerSoundFound > 0: #haven't decided whether or not to cut crowdSound with crowdsEnabled = 0, but would have to do it at solos too...
-          self.engine.data.crowdSound.play()
-          
-    if self.minusRock[i] <= self.minBase:
-      self.minusRock[i] = self.minBase
-    if self.plusRock[i] <= self.pluBase:
-      self.plusRock[i] = self.pluBase
-
+      
+    if not self.notesHit[i]: 
+      return
+      
+    self.rockScoring[i].increaseRock(vScore)
 
   def rockmeterDrain(self, playerNum):
-    if self.battleGH:
-      self.rock[playerNum] -= 70.0
-    else:
-      self.rock[playerNum] -= 15.0
-    self.minusRock[playerNum] += self.minGain/10/self.coOpMulti
-
+    self.rockScoring[playerNum].drain()
 
   def run(self, ticks): #QQstarS: Fix this funcion
     if self.song and self.song.readyToGo and not self.pause and not self.failed:
@@ -3314,7 +3154,7 @@ class GuitarScene(Scene):
       if self.vbpmLogicType == 1:
         self.handleTempo(self.song, pos)  #MFH - new global tempo / BPM handling logic
       
-      if self.bossBattle and self.rock[1] < 0:
+      if self.bossBattle and self.rockScoring[1].failed:
         if self.careerMode and not self.song.info.completed:
           if self.song.info.count:
             count = int(self.song.info.count)
@@ -3328,36 +3168,14 @@ class GuitarScene(Scene):
           
       #MFH - new failing detection logic
       if self.failingEnabled:
-        if self.numOfPlayers > 1 and self.coOpType:
-          if self.rock[self.coOpPlayerMeter] <= 0:
-            self.failed = True
-          else:
-            if self.coOpRB:
-              for i, player in enumerate(self.playerList):
-                if self.rock[i] <= 0 and not self.coOpFailDone[i]:
-                  self.instruments[i].coOpFailed = True
-                  self.instruments[i].starPower  = 0.0
-                  self.engine.data.coOpFailSound.play()
-                  self.deadPlayerList.append(i)
-                  self.numDeadPlayers += 1
-                  self.timesFailed[i] += 1
-                  self.crowdsCheering = False
-                  self.song.setInstrumentVolume(0.0, self.players[i].part)
-                  if self.whammyEffect == 1:    #pitchbend
-                    self.song.resetInstrumentPitch(self.players[i].part)
-                  self.coOpFailDone[i] = True
-        elif self.numOfPlayers > 1 and self.battleGH:
-          for i, player in enumerate(self.playerList):
-            if self.rock[i] <= 0:
-              self.failed = True
-        else:
-          somebodyStillAlive = False
-          for i, player in enumerate(self.playerList):
-            if self.rock[i] > 0:
-              somebodyStillAlive = True
-          if not somebodyStillAlive:    #only if everybody has failed
-            self.failed = True
-      
+        fail = 0
+        for i, player in enumerate(self.playerList):
+          self.rockScoring[i].run()
+          if self.rockScoring[i].failed:
+            fail += 1;
+        if fail >= self.numOfPlayers:
+          self.failed = True
+          
       if pos > self.lastDrumNoteTime:   #MFH - disable drum scoring so that the drummer can get down with his bad self at the end of the song without penalty.
         self.drumScoringEnabled = False # ...is that what drummers do?
 
@@ -3984,11 +3802,8 @@ class GuitarScene(Scene):
         else:
           self.neckrender[i].isFailing = False
       else:
-        guitar.rockLevel = self.rock[i] / self.rockMax
-        if self.rock[i]< self.rockMax/3.0 and self.failingEnabled:
-          self.neckrender[i].isFailing = True
-        else:
-          self.neckrender[i].isFailing = False
+        guitar.rockLevel = self.rockScoring[i].percentage
+        self.neckrender[i].isFailing = self.rockScoring[i].failing
          
     self.engine.view.setViewport(1,0)
     
@@ -4758,7 +4573,7 @@ class GuitarScene(Scene):
             i = self.deadPlayerList.pop(0) #keeps order intact (with >2 players)
             if self.instruments[i].coOpFailed and self.timesFailed[i]<3:
               self.instruments[i].coOpRescue(self.getSongPosition())
-              self.rock[i] = self.rockMax * 0.667
+              self.rockScoring[i].coOpRescue()
               guitar.starPower -= 50
               self.engine.data.rescueSound.play()
               self.coOpFailDone[i] = False

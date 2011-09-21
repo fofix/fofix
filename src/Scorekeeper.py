@@ -313,6 +313,106 @@ class ScoreCard(object):
       except ValueError:
         return len(SCORE_MULTIPLIER)
 
-class Rockmeter:
-  pass # future breaking out of rockmeter can likely go here. Scorekeeper seems fitting.
 
+#some constants for the rock scoring
+_rockMax = 30000.0
+_rockMin = 0
+_rockHi = _rockMax/3.0*2.0
+_rockLo = _rockMax/3.0
+_multHi = 4
+_multBassHi = 6
+_minBase = 400
+_pluBase = 15
+_minGain = 2
+_pluGain = 7
+
+#handles the scoring of the rockmeter
+class RockmeterScoring(object):
+  def __init__(self, player, coOp = None, battle = None):
+    self.rock = _rockMax/2.0        #amount of rock the player has
+    self.mult = 1
+    self.percentage = .5
+    self.failing = False            #is the player failing
+    self.inGreen = False            #is the player in the top percentile
+    self.player = player            #player/instrument this rockmeter belongs to
+    self.coOp = coOp                #co-op type
+    self.battle = battle            #battle
+    self.minusRock = _minBase       #amount of rock to subtract when decreasing
+    self.plusRock = _pluBase        #amount of rock to add when increasing
+    
+  #starts the process
+  def start(self):
+    self.rock = _rockMax/2.0
+    self.failing = False
+    self.inGreen = False
+    self.mult = 1
+    self.percentage = .5
+    self.minusRock = _minBase
+    self.plusRock = _pluBase
+      
+  #increases the player's rock
+  def increaseRock(self, vScore = 0):
+    
+    if self.player.isVocal:
+      rockPlusAmt = 500 + (500 * (vScore-2))
+      self.rock += rockPlusAmt
+      return
+      
+    if self.player.isDrum: 
+      self.drumStart = True
+  
+    self.plusRock += _pluGain*self.mult
+    self.rock += self.plusRock*self.mult
+          
+    self.minusRock = _minBase
+    
+  #decreases the rock of the player
+  #if they have a lot of missed notes it should take off more
+  def decreaseRock(self, more = False, less = False, vScore = 0):
+    rockMinusAmount = 0
+
+    if self.player.isVocal:
+      rockMinusAmount = 500 * (3 - vScore)
+      self.rock -= rockMinusAmount
+      return
+      
+    if more:
+      self.minusRock += _minGain/self.mult
+      rockMinusAmount = self.minusRock/self.mult
+      self.rock -= rockMinusAmount
+    if less:
+      self.minusRock += _minGain/5.0/self.mult
+      rockMinusAmount = self.minusRock/5.0/self.mult
+      self.rock -= rockMinusAmount
+
+    self.plusRock = _pluBase 
+      
+  def drain(self):
+    if self.battle == "GH":
+      self.rock -= 70.0
+    else:
+      self.rock -= 15.0
+    self.minusRock += _minGain/10.0/self.mult
+      
+  #saves the player after failing in CoOp mode
+  def coOpRescue(self):
+    self.rock = _rockHi
+    
+  def run(self):
+    #locks the rockmeter so you can't go above/below the boundary values
+    self.rock = min(max(self.rock, _rockMin), _rockMax)
+    
+    self.inGreen = self.rock > _rockHi
+    self.failing = self.rock < _rockLo
+    self.failed = self.rock <= _rockMin
+    self.percentage = self.rock/_rockMax
+    
+    multMax = _multHi
+    if self.player.isBassGuitar:
+      multMax = _multBassHi
+    self.mult = min(int(0.0 / 10.0) + 1, multMax)
+    
+    #starpower mult boost
+    if self.player.starPowerActive:
+      self.mult *= 2
+    
