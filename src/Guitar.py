@@ -895,18 +895,7 @@ class Guitar(Instrument):
         self.starPowerActive = False
         self.engine.data.starDeActivateSound.play()
 
-    
-    # update frets
-    if self.editorMode:
-      if (controls.getState(self.actions[0]) or controls.getState(self.actions[1])):
-        for i in range(self.strings):
-          if controls.getState(self.keys[i]) or controls.getState(self.keys[i+5]):
-            activeFrets.append(i)
-        activeFrets = activeFrets or [self.selectedString]
-      else:
-        activeFrets = []
-    else:
-      activeFrets = [note.number for time, note in self.playedNotes]
+    activeFrets = [note.number for time, note in self.playedNotes]
     
     for n in range(self.strings):
       if controls.getState(self.keys[n]) or controls.getState(self.keys[n+5]) or (self.editorMode and self.selectedString == n):
@@ -923,6 +912,8 @@ class Guitar(Instrument):
         self.hit[n] = True
       else:
         self.hit[n] = False
+
+    print self.hit
 
     
     if self.vbpmLogicType == 0:   #MFH - VBPM (old)
