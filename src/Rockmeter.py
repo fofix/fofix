@@ -162,9 +162,11 @@ class Layer(ConfigGetMixin):
     self.shared      = False            #determines if the element is shared between players in multiplayer modes
     self.condition   = True				#when should the image be shown (by default it will always be shown)
     
-    self.alignment   = halign(self.get("alignment", str, "center"))
+    self.alignExpr   = self.get("alignment", str, "center")
+    self.alignment   = CENTER
                                         #alignment of the image (horizontal)
-    self.valignment  = valign(self.get("valignment", str, "middle"))
+    self.valignExpr  = self.get("valignment", str, "middle")
+    self.valignment  = MIDDLE
                                         #alignment of the image (vertical)
     self.inPixels    = self.get("inPixels", str, "").split("|")
                                         #makes sure to properly scale/position the images in pixels instead of percent
@@ -181,6 +183,9 @@ class Layer(ConfigGetMixin):
     
     self.color       = [float(eval(self.r)), float(eval(self.g)),
                         float(eval(self.b)), float(eval(self.a))]
+    
+    self.alignment   = halign(self.alignExpr)
+    self.valignment  = valign(self.valignExpr)
     
     #makes sure color has an alpha value to consider
     if len(self.color) == 3:
