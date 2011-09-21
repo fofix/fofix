@@ -434,11 +434,17 @@ class Effect(ConfigGetMixin):
     return f((x - min) / (max - min))
     
   def triggerPick(self):
-    return self.scene.notesHit[playerNum]
-
+    if not self.stage.lastPickPos:
+      return 0.0
+    t = position - self.stage.lastPickPos
+    return (1.0 - self._smoothstep(0, 500.0, t))
+ 
   def triggerMiss(self):
-    return self.scene.notesMissed[playerNum] or self.scene.lessMissed[playerNum]
-
+    if not self.stage.lastMissPos:
+      return 0.0
+    t = position - self.stage.lastMissPos
+    return (1.0 - self._smoothstep(0, 500.0, t))
+ 
   def update(self):
     pass
 
