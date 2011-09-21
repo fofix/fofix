@@ -37,6 +37,7 @@ import locale
 
 from PIL import Image, ImageDraw
 from OpenGL.GL import *
+import cmgl
 
 import math
 from math import *
@@ -61,7 +62,9 @@ import Log
 #instance of the layer.  This also makes it easier to work with the
 #variables in the rockmeter.ini for you no longer have to use self
 #to refer to theme, instead it has a more friendly and logical setup.
-player = None
+player = None           #instrument object that represents the player
+playerNum = 0           #the player number
+playerName = ""         #the player's name
 part = "Guitar"         #the player's part/instrument
 
 score = 0               #player's score
@@ -426,16 +429,10 @@ class Effect(ConfigGetMixin):
     return f((x - min) / (max - min))
     
   def triggerPick(self):
-    if not self.stage.lastPickPos:
-      return 0.0
-    t = position - self.stage.lastPickPos
-    return (1.0 - self._smoothstep(0, 500.0, t))
+    return self.scene.notesHit[playerNum]
 
   def triggerMiss(self):
-    if not self.stage.lastMissPos:
-      return 0.0
-    t = position - self.stage.lastMissPos
-    return (1.0 - self._smoothstep(0, 500.0, t))
+    return self.scene.notesMissed[playerNum] or self.scene.lessMissed[playerNum]
 
   def update(self):
     pass
@@ -661,7 +658,7 @@ class Scale(IncrementEffect):
     self.current = self.start[:]
       
   def update(self):
-    if not self.fixedScale:
+    if not self.fixedScale and not isinstance(self.layer, Group):
       self.fixScale()
       self.fixedScale = True
       
@@ -869,7 +866,7 @@ class Group(Layer):
       else:
         layer.position = [layer.position[i] + self.position[i] for i in range(2)]
       layer.scale = [layer.scale[i]*self.scale[i] for i in range(2)]
-      layer.angle *= self.angle
+      layer.angle += self.angle
       layer.color = [layer.color[i]*self.color[i] for i in range(4)]
       layer.render(visibility, playerNum)
       
@@ -886,7 +883,10 @@ class Rockmeter(ConfigGetMixin):
     self.layers = {}          #collection of all the layers in the rockmeter
     self.layersForRender = {} #collection of layers that are rendered separate from any group
     self.layerGroups = {}     #collection of layer groups
-    self.sharedlayers = []    #these layers are for coOp use only
+    self.sharedLayerGroups = {}
+    self.sharedLayers = {}    #these layers are for coOp use only
+    self.sharedLayersForRender = {}
+    self.sharedGroups = {}
 
     self.coOp = coOp
     self.config = LinedConfigParser()
@@ -934,6 +934,7 @@ class Rockmeter(ConfigGetMixin):
         self.createGroup(self.section, i)
         
     print self.layerGroups
+    print self.sharedLayerGroups
     print self.layersForRender
     self.reset()
     
@@ -946,7 +947,8 @@ class Rockmeter(ConfigGetMixin):
   #adds a layer to the rockmeter's list
   def addLayer(self, layer, number, shared = False):
     if shared:
-      self.sharedlayers.append(layer)
+      self.sharedLayers[number] = layer
+      self.sharedLayersForRender[number] = layer
     else:
       if layer:
         self.layers[number] = layer
@@ -981,8 +983,12 @@ class Rockmeter(ConfigGetMixin):
       classname = self.get("classname")
     
       layer = eval("self.customRMLayers."+classname+"(self, section)")
-      self.addLayer(layer, number, layer.shared)
-    
+      
+      if isinstance(layer, Group):
+        self.addGroup(layer, number, layer.shared)
+      else:
+        self.addLayer(layer, number, layer.shared)
+        
   def createFont(self, section, number):
 
     font  = self.get("font", str, "font")
@@ -1033,13 +1039,22 @@ class Rockmeter(ConfigGetMixin):
     group = Group(self, section)
     self.loadLayerFX(group, section)
     
+    self.addGroup(group, number, group.shared)
+    
+  def addGroup(self, group, number, shared):
     #remove the layers in the group from the layers to be rendered
     # independent of groups
-    for layer in group.layers.keys():
-      if layer in self.layersForRender.keys():
-        self.layersForRender.pop(layer)
-    self.layerGroups[number] = group
-    
+    if shared:
+      for layer in group.layers.keys():
+        if layer in self.layersForRender.keys():
+          self.layersForRender.pop(layer)
+        self.sharedLayerGroups[number] = group
+    else:
+      for layer in group.layers.keys():
+        if layer in self.layersForRender.keys():
+          self.layersForRender.pop(layer)
+        self.layerGroups[number] = group
+      
   #because time is not player specific it's best to update it only once per cycle
   def updateTime(self):
     global songLength, minutesSongLength, secondsSongLength
@@ -1063,10 +1078,12 @@ class Rockmeter(ConfigGetMixin):
 
   #this updates all the usual global variables that are handled by the rockmeter
   #these are all player specific
-  def updateVars(self, playerNum):
-    global score, rock, streak, streakMax, power, stars, partialStars, multiplier, bassgroove, boost, player, part
+  def updateVars(self, p):
+    global score, rock, streak, streakMax, power, stars, partialStars, multiplier, bassgroove, boost, player, part, playerNum
     scene = self.scene
+    playerNum = p
     player = scene.instruments[playerNum]
+    playerName = self.scene.playerList[p].name
     part = player.__class__.__name__
 
     #this is here for when I finally get coOp worked in
@@ -1079,7 +1096,7 @@ class Rockmeter(ConfigGetMixin):
       score = scene.scoring[playerNum].score
       stars = scene.scoring[playerNum].stars
       partialStars = scene.scoring[playerNum].starRatio
-      rock  = scene.rock[playerNum] / scene.rockMax
+      rock  = scene.rockScoring[playerNum].percentage
 
     streak = scene.scoring[playerNum].streak
     power  = player.starPower/100.0
@@ -1090,17 +1107,10 @@ class Rockmeter(ConfigGetMixin):
     else:
       streakMax = 30
 
-    if streak >= streakMax:
-      multiplier = int(streakMax*.1) + 1
-    else:
-      multiplier = int(streak*.1) + 1
+    multiplier = scene.rockScoring[playerNum].mult
 
     boost = player.starPowerActive
     
-    #doubles the multiplier number when starpower is activated
-    if boost:
-      multiplier *= 2
-      
     if player.isBassGuitar and streak >= 40:
         bassgroove = True
     else:
@@ -1108,7 +1118,7 @@ class Rockmeter(ConfigGetMixin):
         
     #force bassgroove to false if it's not enabled
     if not scene.bassGrooveEnabled:
-        bassgroove = False
+      bassgroove = False
   
   def triggerPick(self, pos, notes):
     if notes:
@@ -1140,5 +1150,8 @@ class Rockmeter(ConfigGetMixin):
 
 
       self.engine.view.setViewportHalf(1,0)
-      for layer in self.sharedlayers:
+      for layer in self.sharedLayersForRender.values():
         layer.render(visibility, 0)
+      for group in self.sharedLayerGroups.values():
+        group.render(visibility, 0)
+      
