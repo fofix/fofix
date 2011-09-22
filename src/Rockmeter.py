@@ -74,6 +74,7 @@ power = 0               #star power fill amount
 stars = 0               #how many stars earned
 partialStars = 0        #percentage of the current star earned
 rock = 0                #rock meter fill amount
+coop_rock = 0           #coop rock meter fill amount
 multiplier = 0          #player's multiplier
 bassgroove = False      #if a player is a bass guitar and their streak is over 30, they enter bass groove, track this
 boost = False           #keeps track if a player is boosting their multiplier (star power/overdrive activated)
@@ -1093,7 +1094,7 @@ class Rockmeter(ConfigGetMixin):
   #this updates all the usual global variables that are handled by the rockmeter
   #these are all player specific
   def updateVars(self, p):
-    global score, rock, streak, streakMax, power, stars, partialStars, multiplier, bassgroove, boost, player, part, playerNum
+    global score, rock, coop_rock, streak, streakMax, power, stars, partialStars, multiplier, bassgroove, boost, player, part, playerNum
     scene = self.scene
     playerNum = p
     player = scene.instruments[playerNum]
@@ -1105,12 +1106,12 @@ class Rockmeter(ConfigGetMixin):
       score = scene.coOpScoreCard.score
       stars = scene.coOpScoreCard.stars
       partialStars = scene.coOpScoreCard.starRatio
-      rock  = scene.rock[scene.coOpPlayerMeter] / scene.rockMax
+      coop_rock  = scene.rock[scene.coOpPlayerMeter] / scene.rockMax
     else:
       score = scene.scoring[playerNum].score
       stars = scene.scoring[playerNum].stars
       partialStars = scene.scoring[playerNum].starRatio
-      rock  = scene.rock[playerNum] / scene.rockMax
+    rock  = scene.rock[playerNum] / scene.rockMax
 
     streak = scene.scoring[playerNum].streak
     power  = player.starPower/100.0
