@@ -394,9 +394,9 @@ class Stage(object):
     else:
       rm = os.path.join("themes", self.themename, "rockmeter.ini")
     
-    try:
+    if os.path.exists(os.path.join("..", "data", rm)):
         rockmeter = self.engine.resource.fileName(rm)
-    except IOError:
+    else:
         rockmeter = self.engine.resource.fileName(os.path.join("themes", self.themename, "rockmeter.ini"))
         
     self.rockmeter = Rockmeter.Rockmeter(self.scene, rockmeter, self.scene.coOpType)
