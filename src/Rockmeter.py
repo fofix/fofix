@@ -1107,7 +1107,7 @@ class Rockmeter(ConfigGetMixin):
       score = scene.scoring[playerNum].score
       stars = scene.scoring[playerNum].stars
       partialStars = scene.scoring[playerNum].starRatio
-      rock  = scene.rockScoring[playerNum].percentage
+      rock  = scene.rock[playerNum]
 
     streak = scene.scoring[playerNum].streak
     power  = player.starPower/100.0
@@ -1118,9 +1118,16 @@ class Rockmeter(ConfigGetMixin):
     else:
       streakMax = 30
 
-    multiplier = scene.rockScoring[playerNum].mult
-
+    if streak >= streakMax:
+      multiplier = int(streakMax*.1) + 1
+    else:
+      multiplier = int(streak*.1) + 1
+ 
     boost = player.starPowerActive
+     
+    #doubles the multiplier number when starpower is activated
+    if boost:
+      multiplier *= 2
     
     if player.isBassGuitar and streak >= 40:
         bassgroove = True
