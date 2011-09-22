@@ -1048,6 +1048,9 @@ class Rockmeter(ConfigGetMixin):
 
   def createGroup(self, section, number):
     group = Group(self, section)
+    
+    group.shared = self.get("shared", bool, False)
+    
     self.loadLayerFX(group, section)
     
     self.addGroup(group, number, group.shared)
@@ -1107,7 +1110,7 @@ class Rockmeter(ConfigGetMixin):
       score = scene.scoring[playerNum].score
       stars = scene.scoring[playerNum].stars
       partialStars = scene.scoring[playerNum].starRatio
-      rock  = scene.rock[playerNum]
+      rock  = scene.rock[playerNum] / scene.rockMax
 
     streak = scene.scoring[playerNum].streak
     power  = player.starPower/100.0
