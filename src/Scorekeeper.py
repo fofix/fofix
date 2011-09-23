@@ -142,7 +142,6 @@ class ScoreCard(object):
     self.lastNoteTime  = 0.0
     self.freestyleWasJustActive = False
 
-
   #resets all the values 
   def reset(self):
     self.avMult = 0.0
@@ -330,7 +329,7 @@ _pluGain = 7
 
 #handles the scoring of the rockmeter
 class RockmeterScoring(object):
-  def __init__(self, player, coOp = None, battle = None):
+  def __init__(self, instrument, coOp = None, battle = None):
     self.rock = _rockMax/2.0        #amount of rock the player has
     self.mult = 1
     self.percentage = .5
@@ -341,6 +340,7 @@ class RockmeterScoring(object):
     self.battle = battle            #battle
     self.minusRock = _minBase       #amount of rock to subtract when decreasing
     self.plusRock = _pluBase        #amount of rock to add when increasing
+    self.instrument = instrument
     
   #starts the process
   def start(self):
@@ -355,13 +355,14 @@ class RockmeterScoring(object):
   #increases the player's rock
   def increaseRock(self, vScore = 0):
     
-    if self.player.isVocal:
-      rockPlusAmt = 500 + (500 * (vScore-2))
-      self.rock += rockPlusAmt
-      return
+    if not self.coOp:
+      if self.player.isVocal:
+        rockPlusAmt = 500 + (500 * (vScore-2))
+        self.rock += rockPlusAmt
+        return
       
-    if self.player.isDrum: 
-      self.drumStart = True
+      if self.instrument.isDrum: 
+        self.drumStart = True
   
     self.plusRock += _pluGain*self.mult
     self.rock += self.plusRock*self.mult
@@ -373,10 +374,11 @@ class RockmeterScoring(object):
   def decreaseRock(self, more = False, less = False, vScore = 0):
     rockMinusAmount = 0
 
-    if self.player.isVocal:
-      rockMinusAmount = 500 * (3 - vScore)
-      self.rock -= rockMinusAmount
-      return
+    if not self.coOp:
+      if self.player.isVocal:
+        rockMinusAmount = 500 * (3 - vScore)
+        self.rock -= rockMinusAmount
+        return
       
     if more:
       self.minusRock += _minGain/self.mult
@@ -409,12 +411,14 @@ class RockmeterScoring(object):
     self.failed = self.rock <= _rockMin
     self.percentage = self.rock/_rockMax
     
-    multMax = _multHi
-    if self.player.isBassGuitar:
-      multMax = _multBassHi
-    self.mult = min(int(0.0 / 10.0) + 1, multMax)
+    if not self.coOp:
+      multMax = _multHi
+      if self.player.isBassGuitar:
+        multMax = _multBassHi
+    else:
+      multMax = _multHi
     
     #starpower mult boost
-    if self.player.starPowerActive:
+    if self.instrument.starPowerActive:
       self.mult *= 2
     

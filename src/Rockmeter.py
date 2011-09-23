@@ -1097,9 +1097,9 @@ class Rockmeter(ConfigGetMixin):
     global score, rock, coop_rock, streak, streakMax, power, stars, partialStars, multiplier, bassgroove, boost, player, part, playerNum
     scene = self.scene
     playerNum = p
-    player = scene.instruments[playerNum]
+    player = self.scene.playerList[p]
     playerName = self.scene.playerList[p].name
-    part = player.__class__.__name__
+    part = player.instrument.__class__.__name__
 
     #this is here for when I finally get coOp worked in
     if self.coOp:
@@ -1108,32 +1108,28 @@ class Rockmeter(ConfigGetMixin):
       partialStars = scene.coOpScoreCard.starRatio
       coop_rock  = scene.rock[scene.coOpPlayerMeter] / scene.rockMax
     else:
-      score = scene.scoring[playerNum].score
-      stars = scene.scoring[playerNum].stars
-      partialStars = scene.scoring[playerNum].starRatio
-    rock  = scene.rock[playerNum] / scene.rockMax
+      score = player.scoreCard.score
+      stars = player.scoreCard.stars
+      partialStars = player.scoreCard.starRatio
+    rock  = player.rockCard.percentage
 
-    streak = scene.scoring[playerNum].streak
-    power  = player.starPower/100.0
+    streak = player.scoreCard.streak
+    power  = player.instrument.starPower/100.0
 
     #allows for bassgroove
-    if player.isBassGuitar:
+    if player.instrument.isBassGuitar:
       streakMax = 50    
     else:
       streakMax = 30
 
-    if streak >= streakMax:
-      multiplier = int(streakMax*.1) + 1
-    else:
-      multiplier = int(streak*.1) + 1
- 
-    boost = player.starPowerActive
+    multiplier = player.scoreCard.getScoreMultiplier()
+    boost = player.instrument.starPowerActive
      
     #doubles the multiplier number when starpower is activated
     if boost:
       multiplier *= 2
     
-    if player.isBassGuitar and streak >= 40:
+    if player.instrument.isBassGuitar and streak >= 40:
         bassgroove = True
     else:
         bassgroove = False
