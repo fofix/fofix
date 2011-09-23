@@ -44,104 +44,106 @@ SCALABLE_NAMES = [_("Song Slowdown"), _("Early Hit Window Adjustment")]
 SCORE_MULTIPLIER = [0, 10, 20, 30]
 BASS_GROOVE_SCORE_MULTIPLIER = [0, 10, 20, 30, 40, 50]
 
+#like Guitar Hero
+GH_STAR_VALUES = [0.0, 0.2, 0.4, 1.2, 2.0, 2.8]  
+    
+#like Rockband
+RB_STAR_VALUES = [0.0, 0.21, 0.46, 0.77, 1.85, 3.08, 4.52] 
+RB_BASS_STAR_VALUES = [0.0, 0.21, 0.5, 0.9, 2.77, 4.62, 6.78]
+RB_DRUM_STAR_VALUES = [0.0, 0.21, 0.46, 0.77, 1.85, 3.08, 4.29] 
+RB_VOC_STAR_VALUES = [0.0, 0.21, 0.46, 0.77, 1.85, 3.08, 4.18]
+          
+#RB+GH mix
+MIX_STAR_VALUES = [0.0, 0.25, 0.5, 1.0, 2.0, 3.0, 5.3]  
+MIX_BASS_STAR_VALUES = [0.0, 0.25, 0.5, 1.0, 2.0, 3.0, 4.8] 
+MIX_DRUM_STAR_VALUES = [0.0, 0.25, 0.5, 1.0, 2.0, 3.0, 4.65] 
+MIX_COOP_STAR_VALUES = [0.0, 0.25, 0.5, 1.0, 2.0, 3.0, 4.8] 
+
+#accuracy-based
+FOF_STAR_VALUES = [0, 10, 30, 50, 75, 95, 100]
+
 class ScoreCard(object):
   def __init__(self, instrument, coOpType = False):
-    self.coOpType = coOpType
+    self.coOpType = coOpType            #does the score card belong to a CoOp system
+    self.instrument = instrument        # 0 = Guitar, 2 = Bass, 4 = Drum
+    self.bassGrooveEnabled = False      #is the player in bass groove
+    
     logClassInits = Config.get("game", "log_class_inits")
     if logClassInits == 1:
       Log.debug("ScoreCard class init...")
-    self.starScoring = Config.get("game", "star_scoring")
-    self.updateOnScore = Config.get("game", "star_score_updates")
-    self.avMult = 0.0
-    self.hitAccuracy = 0.0
-    self.score  = 0
+      
+                                        
+    self.avMult = 0.0                   #vocal multiplier percentage 
+    self.hitAccuracy = 0.0              #accuracy rating/delay
+    self.score  = 0                     #player's score
+    
+    #lowest amount the player can earn per not hit
     if instrument == [5]:
       self.baseScore = 0
     else:
       self.baseScore = 50
-    self.notesHit = 0
-    self.percNotesHit = 0
-    self.notesMissed = 0
-    self.instrument = instrument # 0 = Guitar, 2 = Bass, 4 = Drum
-    self.bassGrooveEnabled = False
-    self.hiStreak = 0
-    self._streak  = 0
-    self.cheats = []
+      
+    self.notesHit = 0                   #number of notes hit
+    self.percNotesHit = 0               #percentage of total notes hit
+    self.notesMissed = 0                #number of notes missed
+    self.hiStreak = 0                   #highest streak done by the player
+    self.streak  = 0                    #current streak
+    
+    self.totalStreakNotes = 0
+    self.totalNotes = 0
+    self.totalPercNotes = 0
+    
+    #cheating/handicap system
+    self.cheatsApply = False
+    self.cheats = []                    
     self.scalable = []
     self.earlyHitWindowSizeHandicap = 1.0
     self.handicap = 0
     self.longHandicap  = ""
     self.handicapValue = 100.0
-    self.totalStreakNotes = 0
-    self.totalNotes = 0
-    self.totalPercNotes = 0
-    self.cheatsApply = False
-    self.stars = 0
-    self.partialStars = 0
-    self.starRatio = 0.0
-    self.star = [0 for i in range(7)]
+    
+    #star scoring
+    self.starScoring = Config.get("game", "star_scoring")
+                                        #star scoring type
+    self.updateOnScore = True           #star's update during play
+    self.stars = 0                      #current number of stars
+    self.partialStars = 0               #current percentage of the next star
+    self.starRatio = 0.0                #percentage of how close the player is to the next star
+    self.star = [0 for i in range(7)]   #keep track of values required to know when the player has hit the next star value
     if self.starScoring == 1: #GH-style (mult thresholds, hit threshold for 5/6 stars)
-      self.star[5] = 2.8
-      self.star[4] = 2.0
-      self.star[3] = 1.2
-      self.star[2] = 0.4
-      self.star[1] = 0.2 #akedrou - GH may start with 1 star, but why do we need to?
-      self.star[0] = 0.0
+      self.star = GH_STAR_VALUES
     elif self.starScoring > 1: #RB-style (mult thresholds, optional 100% gold star)
       if self.starScoring == 4:
         if self.instrument[0] == Song.BASS_PART and not self.coOpType:
-          self.star[6] = 6.78
-          self.star[5] = 4.62
-          self.star[4] = 2.77
-          self.star[3] = 0.90
-          self.star[2] = 0.50
-          self.star[1] = 0.21
-          self.star[0] = 0.0
+          self.star = RB_BASS_STAR_VALUES
         else:
           if self.instrument[0] == Song.DRUM_PART and not self.coOpType:
-            self.star[6] = 4.29
+            self.star = RB_DRUM_STAR_VALUES
           elif self.instrument[0] == Song.VOCAL_PART and not self.coOpType:
-            self.star[6] = 4.18
+            self.star = RB_VOC_STAR_VALUES
           else:
-            self.star[6] = 4.52
-          self.star[5] = 3.08
-          self.star[4] = 1.85
-          self.star[3] = 0.77
-          self.star[2] = 0.46
-          self.star[1] = 0.21
-          self.star[0] = 0.0
+            self.star = RB_STAR_VALUES
       else:
-        self.star[5] = 3.0
-        self.star[4] = 2.0
-        self.star[3] = 1.0
-        self.star[2] = 0.5
-        self.star[1] = 0.25
-        self.star[0] = 0.0
         if self.coOpType:
-          self.star[6] = 4.8
+          self.star = MIX_COOP_STAR_VALUES
         elif self.instrument[0] == Song.BASS_PART: # bass
-          self.star[6] = 4.8
+          self.star = MIX_BASS_STAR_VALUES
         elif self.instrument[0] == Song.DRUM_PART: # drum
-          self.star[6] = 4.65
+          self.star = MIX_DRUM_STAR_VALUES
         else:
-          self.star[6] = 5.3
+          self.star = MIX_STAR_VALUES
     else: #hit accuracy thresholds
-      self.star[6] = 100
-      self.star[5] = 95
-      self.star[4] = 75
-      self.star[3] = 50
-      self.star[2] = 30
-      self.star[1] = 10
-      self.star[0] = 0
+      self.star = FOF_STAR_VALUES
     
-    self.endingScore = 0    #MFH
-    self.endingStreakBroken = False   #MFH
-    self.endingAwarded = False    #MFH
-    self.lastNoteEvent = None    #MFH
+    self.endingScore = 0
+    self.endingStreakBroken = False
+    self.endingAwarded = False          
+    self.lastNoteEvent = None
     self.lastNoteTime  = 0.0
-    self.freestyleWasJustActive = False  #MFH
+    self.freestyleWasJustActive = False
 
-  
+
+  #resets all the values 
   def reset(self):
     self.avMult = 0.0
     self.hitAccuracy = 0.0
@@ -158,10 +160,10 @@ class ScoreCard(object):
     self.stars = 0
     self.partialStars = 0
     self.starRatio = 0.0
-    self.endingScore = 0    #MFH
-    self.endingStreakBroken = False   #MFH
-    self.endingAwarded = False    #MFH
-    self.freestyleWasJustActive = False  #MFH
+    self.endingScore = 0
+    self.endingStreakBroken = False
+    self.endingAwarded = False
+    self.freestyleWasJustActive = False
 
   def getStarScores(self, tempExtraScore = 0):
     if self.updateOnScore == 1 and self.instrument[0] != Song.VOCAL_PART:
