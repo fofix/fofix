@@ -288,7 +288,3 @@ if test ! -f "$PREFIX"/build-stamps/msinttypes; then
 fi
 
 echo "All dependencies done."
-
-echo -n "Creating .def files... "
-python makedefs.py deps/lib deps/bin "$CROSS_DLLTOOL -I"
-echo "done"
