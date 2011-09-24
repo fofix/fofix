@@ -133,19 +133,17 @@ download () {
 
 # We use win-iconv instead of full-fledged GNU libiconv because it still does
 # everything the other deps need and is far smaller.
-WINICONV="win-iconv-0.0.2"
+WINICONV="win-iconv-0.0.4"
 if test ! -f "$PREFIX"/build-stamps/win-iconv; then
   download http://win-iconv.googlecode.com/files/$WINICONV.tar.bz2
   tar jxvf $WINICONV.tar.bz2
   cd $WINICONV
-  make clean
-  make -n iconv.dll | sed -e 's/^/$CROSS_TOOL_PREFIX-/' | sh -ex
-  $CROSS_GCC -mdll -o iconv.dll -Wl,--out-implib,libiconv.a iconv.def win_iconv.o
+  make CC="$CROSS_GCC" iconv.dll
   cp -v iconv.dll "$PREFIX"/bin
   cp -v iconv.h "$PREFIX"/include
   echo '' >>"$PREFIX"/include/iconv.h  # squelch warnings about no newline at the end
   sed -i -e 's://.*$::' "$PREFIX"/include/iconv.h  # squelch warnings about C++ comments
-  cp -v libiconv.a "$PREFIX"/lib
+  cp -v libiconv.dll.a "$PREFIX"/lib
   cd ..
   touch "$PREFIX"/build-stamps/win-iconv
   $RM_RF $WINICONV
