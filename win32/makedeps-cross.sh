@@ -61,6 +61,7 @@ assert_binary_on_path bzip2
 assert_binary_on_path gzip
 assert_binary_on_path libtoolize
 assert_binary_on_path make
+assert_binary_on_path patch
 assert_binary_on_path pkg-config
 assert_binary_on_path python
 assert_binary_on_path svn
@@ -218,11 +219,12 @@ if test ! -f "$PREFIX"/build-stamps/glib; then
 fi
 
 # pkg-config
-PKGCONFIG="pkg-config-0.25"
+PKGCONFIG="pkg-config-0.27"
 if test ! -f "$PREFIX"/build-stamps/pkg-config; then
   download http://pkgconfig.freedesktop.org/releases/$PKGCONFIG.tar.gz
   tar zxvf $PKGCONFIG.tar.gz
   cd $PKGCONFIG
+  patch -Np1 -i ../pkg-config-win32-prefix-escaping.patch
   ./configure $COMMON_AUTOCONF_FLAGS
   make
   make install

@@ -31,3 +31,4 @@ data/themes/*
 win32/*
 !win32/*.sh
 !win32/*.py
+!win32/*.patch

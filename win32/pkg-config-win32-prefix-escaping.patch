@@ -1,0 +1,40 @@
+Submitted upstream at https://bugs.freedesktop.org/show_bug.cgi?id=51883
+
+From 78083cdf52ec72504c78fe8d5c3ec646054c92b8 Mon Sep 17 00:00:00 2001
+From: John Stumpo <stump@jstump.com>
+Date: Wed, 20 Apr 2011 16:18:14 -0400
+Subject: [PATCH] Escape spaces in autodetected ${prefix} values on Windows.
+
+Without this, if the new ${prefix} path contains spaces, they are not
+properly quoted in pkg-config's output. Besides the problems this causes
+with things using the output, this also causes nonsensical results when
+pkg-config splits such options to combine equal options.
+---
+ parse.c |   11 +++++++++++
+ 1 file changed, 11 insertions(+)
+
+diff --git a/parse.c b/parse.c
+index 6e2a389..d45d472 100644
+--- a/parse.c
++++ b/parse.c
+@@ -1051,6 +1051,17 @@ parse_line (Package *pkg, const char *untrimmed, const char *path,
+ 		    *q = '/';
+ 		  q++;
+ 		}
++
++	      /* Now escape the special characters so that there's
++	       * no danger of arguments that include the prefix getting
++	       * split.
++	       */
++	      {
++		gchar *oldprefix = prefix;
++		prefix = strdup_escape_shell(prefix);
++		g_free(oldprefix);
++	      }
++
+ 	      varname = g_strdup (tag);
+ 	      debug_spew (" Variable declaration, '%s' overridden with '%s'\n",
+ 			  tag, prefix);
+-- 
+1.7.10.4
+
