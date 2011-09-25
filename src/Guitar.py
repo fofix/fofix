@@ -912,9 +912,6 @@ class Guitar(Instrument):
         self.hit[n] = True
       else:
         self.hit[n] = False
-
-    print self.hit
-
     
     if self.vbpmLogicType == 0:   #MFH - VBPM (old)
       if self.currentBpm != self.targetBpm:
