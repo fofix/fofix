@@ -322,8 +322,10 @@ _rockHi = _rockMax/3.0*2.0
 _rockLo = _rockMax/3.0
 _multHi = 4
 _multBassHi = 6
-_minBase = 400
+_minBase = 400.0
+_minMax = 900.0
 _pluBase = 15
+_pluMax = 750.0
 _minGain = 2
 _pluGain = 7
 
@@ -335,7 +337,6 @@ class RockmeterScoring(object):
     self.percentage = .5
     self.failing = False            #is the player failing
     self.inGreen = False            #is the player in the top percentile
-    self.player = player            #player/instrument this rockmeter belongs to
     self.coOp = coOp                #co-op type
     self.battle = battle            #battle
     self.minusRock = _minBase       #amount of rock to subtract when decreasing
@@ -356,7 +357,7 @@ class RockmeterScoring(object):
   def increaseRock(self, vScore = 0):
     
     if not self.coOp:
-      if self.player.isVocal:
+      if self.instrument.isVocal:
         rockPlusAmt = 500 + (500 * (vScore-2))
         self.rock += rockPlusAmt
         return
@@ -364,8 +365,8 @@ class RockmeterScoring(object):
       if self.instrument.isDrum: 
         self.drumStart = True
   
-    self.plusRock += _pluGain*self.mult
-    self.rock += self.plusRock*self.mult
+    self.plusRock = min(self.plusRock + _pluGain*self.mult, _pluMax)
+    self.rock += self.plusRock
           
     self.minusRock = _minBase
     
@@ -375,7 +376,7 @@ class RockmeterScoring(object):
     rockMinusAmount = 0
 
     if not self.coOp:
-      if self.player.isVocal:
+      if self.instrument.isVocal:
         rockMinusAmount = 500 * (3 - vScore)
         self.rock -= rockMinusAmount
         return
@@ -413,7 +414,7 @@ class RockmeterScoring(object):
     
     if not self.coOp:
       multMax = _multHi
-      if self.player.isBassGuitar:
+      if self.instrument.isBassGuitar:
         multMax = _multBassHi
     else:
       multMax = _multHi
