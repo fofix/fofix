@@ -885,10 +885,10 @@ class Group(Layer):
       layer.render(visibility, playerNum)
       
     
-class Rockmeter(ConfigGetMixin):
-  
-  _layerLimit = 99    #limit to how many layers can be loaded
-  _groupLimit = 50    #limit to how many groups can be loaded
+_layerLimit = 99    #limit to how many layers can be loaded
+_groupLimit = 50    #limit to how many groups can be loaded
+
+class Rockmeter(ConfigGetMixin):  
   
   def __init__(self, guitarScene, configFileName, coOp = False):
 
@@ -917,7 +917,7 @@ class Rockmeter(ConfigGetMixin):
       Log.notice("Custom Rockmeter layers are not available")
   
     # Build the layers
-    for i in range(Rockmeter._layerLimit):
+    for i in range(_layerLimit):
       types = [
                "Image",
                "Text",
@@ -940,7 +940,7 @@ class Rockmeter(ConfigGetMixin):
             self.createImage(self.section, i)
           break
     
-    for i in range(Rockmeter._groupLimit):
+    for i in range(_groupLimit):
       self.section = "Group%d" % i
       if not self.config.has_section(self.section): 
         continue
