@@ -393,13 +393,6 @@ class RockmeterScoring(object):
       self.rock -= rockMinusAmount
 
     self.plusRock = _pluBase 
-      
-  def drain(self):
-    if self.battle == "GH":
-      self.rock -= 70.0
-    else:
-      self.rock -= 15.0
-    self.minusRock += _minGain/10.0/self.mult
 
   #revives the player after failing in coOp mode
   def coOpRescue(self):
@@ -475,6 +468,10 @@ class CoOpRockmeterScoring(RockmeterScoring):
 
     self.plusRock = _pluBase 
     
+  def drain(self):
+    self.minusRock += _minGain/10.0/self.mult
+    self.rock -= self.minusRock
+          
   def run(self):
     self.rock = min(max(self.rock, _rockMin), _rockMax)
     self.percentage = self.rock/_rockMax
@@ -486,17 +483,18 @@ class CoOpRockmeterScoring(RockmeterScoring):
     self.failing = self.rock <= _rockLo
 
     if self.numDead > 0:
-        self.drain()
+      self.drain()
     else:
-        self.rock = 0
-        for player in self.players:
-            self.rock += player.rockCard.rock
-        self.rock /= len(self.players)
-        
+      self.rock = 0
+      for player in self.players:
+        self.rock += player.rockCard.rock
+      self.rock /= len(self.players)
+      self.rock *= 3.0/2.0
+      
     for player in self.players:
-        if player.instrument.starPowerActive:
-            self.mult *= 2
-        if player.rockCard.failed:
-            if not player in self.deadList:
-                self.deadList.append(player)
+      if player.instrument.starPowerActive:
+        self.mult *= 2
+      if player.rockCard.failed:
+        if not player in self.deadList:
+          self.deadList.append(player)
     

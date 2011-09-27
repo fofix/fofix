@@ -747,8 +747,6 @@ class GuitarScene(Scene):
     self.guitarSoloBroken = [False for i in self.playerList]
 
 
-    self.deadPlayerList = [] #akedrou - keep the order failed.
-    self.numDeadPlayers = 0
     coOpInstruments = []
     for player in self.playerList:   
       if player.instrument.isDrum:
@@ -2149,8 +2147,6 @@ class GuitarScene(Scene):
       for player in self.playerList:
         player.rockCard.start()
     self.coOpMulti = 1
-    self.deadPlayerList = []
-    self.numDeadPlayers  = 0
     self.coOpFailDone = [False for i in self.playerList]
     self.rockFailUp = True
     self.rockFailViz  = 0.0
@@ -3167,8 +3163,12 @@ class GuitarScene(Scene):
           player.rockCard.run()
           if player.rockCard.failed:
             fail += 1;
-        if fail >= self.numOfPlayers:
-          self.failed = True
+        if self.coOpRB:
+          self.coOpPlayerMeter.run()
+          self.failed = self.coOpPlayerMeter.failed
+        else:
+          if fail >= self.numOfPlayers:
+            self.failed = True
           
       if pos > self.lastDrumNoteTime:   #MFH - disable drum scoring so that the drummer can get down with his bad self at the end of the song without penalty.
         self.drumScoringEnabled = False # ...is that what drummers do?
@@ -3557,7 +3557,7 @@ class GuitarScene(Scene):
           self.haveUnison = [False for i in self.playerList]
           self.inUnison = [False for i in self.playerList]
       #akedrou Song/Crowd logic
-      if self.numDeadPlayers == 0:
+      if self.coOpPlayerMeter.numDead == 0:
         if self.crowdsEnabled == 3 and self.crowdsCheering == False and not self.countdown: #prevents cheer-cut-cheer
           self.crowdsCheering = True
         elif self.crowdsEnabled == 0 and self.crowdsCheering == True: #setting change
@@ -4546,7 +4546,6 @@ class GuitarScene(Scene):
               guitar.starPower -= 50
               self.engine.data.rescueSound.play()
               self.coOpFailDone[i] = False
-              self.numDeadPlayers -= 1
               if not guitar.isVocal:
                 self.hopFretboard(num, 0.07)  #stump
                 guitar.neck.overdriveFlashCount = 0  #MFH - this triggers the oFlash strings & timer
