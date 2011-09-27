@@ -207,7 +207,7 @@ class Drum(Instrument):
     if self.twoDkeys == True: #death_au
       if engine.loadImgDrawing(self, "fretButtons", os.path.join("themes",themename, "frets", "drum", "fretbuttons.png")):
         self.drumFretButtons = True
-      elif engine.loadImgDrawing(self, "fretButtons", get("fretbuttons.png")):
+      elif engine.loadImgDrawing(self, "fretButtons", os.path.join("themes",themename, "frets", "fretbuttons.png")):
         self.drumFretButtons = None
 
     else:
@@ -394,33 +394,28 @@ class Drum(Instrument):
           texY = (0.0,1.0/3.0)
           if pressed:
             texY = (1.0/3.0,2.0/3.0)
-          if self.hit[n]:
+          if self.hit[n]: #Currently broken
             texY = (2.0/3.0,1.0)
 
-        elif self.battleStatus[3] and self.battleFrets != None and self.battleBreakString == n:
-          texSize = (n/5.0+.042,n/5.0+0.158)
-          size = (.30, .40)
-          fretPos = 8 - round((self.battleBreakNow/self.battleBreakLimit) * 8)
-          texY = (fretPos/8.0,(fretPos + 1.0)/8)
-
         else:
-          if n == 4: 
-            if pressed:  #drums bass fret press
-              texY = (3.0 / self.fretImgColNumber, 4.0 / self.fretImgColNumber)
-            else:        #fret normal bass drum
-              texY = (1.0 / self.fretImgColNumber, 2.0 / self.fretImgColNumber)
-          else: #fret normal
-            texY = (0.0, 1.0 / self.fretImgColNumber)
+          if controls.getState(self.keys[n]) or controls.getState(self.keys[n+5]) or pressed: #pressed
+            if n == 4: #bass drum
+               texY = (3.0 / self.fretImgColNumber, 4.0 / self.fretImgColNumber)
+            else:
+              texY = (2.0 / self.fretImgColNumber, 3.0 / self.fretImgColNumber)
 
-          if controls.getState(self.keys[n]) or controls.getState(self.keys[n+5]) or pressed:#fret press
-            texY = (2.0 / self.fretImgColNumber, 3.0 / self.fretImgColNumber)
-            
-          elif n == 4 and self.hit[0]:#drum bass hit fret
-            texY = (5.0 / self.fretImgColNumber, 1.0)
+          elif self.hit[n]: #being hit - Currently broken
+            if n == 4: #bass drum
+               texY = (5.0 / self.fretImgColNumber, 1.0)
+            else:
+              texY = (4.0 / self.fretImgColNumber, 5.0 / self.fretImgColNumber)
 
-          elif self.hit[n] or (self.battleStatus[3] and self.battleBreakString == n):#frets on note hit
-            texY = (4.0 / self.fretImgColNumber, 5.0 / self.fretImgColNumber)
-            
+          else: #nothing being pressed or hit
+            if n == 4: #bass drum
+               texY = (1.0 / self.fretImgColNumber, 2.0 / self.fretImgColNumber)
+            else:
+              texY = (0.0, 1.0 / self.fretImgColNumber)
+
         self.engine.draw3Dtex(self.fretButtons, vertex = (size[0],size[1],-size[0],-size[1]), texcoord = (texSize[0], texY[0], texSize[1], texY[1]),
                                 coord = (x,v,0), multiples = True,color = fretColor, depth = True)
   
