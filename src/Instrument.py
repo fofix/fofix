@@ -915,7 +915,7 @@ class Instrument(object):
       if (event.played or event.hopod):
         if not self.disableFlameSFX:
           if self.isDrum:
-            if event.number == 4: #make the bass drum not render a flame
+            if event.number == 0: #make the bass drum not render a flame
               continue
 
             x  = (self.strings / 2 +.5 - event.number) * w
@@ -988,13 +988,10 @@ class Instrument(object):
         if not self.disableFlameSFX:
 
           if self.isDrum:
-            if event.number == 4: #make the bass drum not render a flame
+            if event.number == 0:
               continue
 
-            if event.number == 0: #correct for colors on the drums
-              flameColor = self.flameColors[4]
-            else:
-              flameColor = self.flameColors[event.number]
+            flameColor = self.flameColors[event.number]
 
             x  = (self.strings / 2 +.5 - event.number) * w
 
