@@ -44,7 +44,7 @@ import Audio
 import Stage
 import Settings
 import Song
-from Scorekeeper import ScoreCard, RockmeterScoring
+from Scorekeeper import ScoreCard, RockmeterScoring, CoOpRockmeterScoring
 from Shader import shaders
 
 import random
@@ -450,7 +450,7 @@ class GuitarScene(Scene):
 
 
     for i, player in enumerate(self.playerList):
-        player.rockCard = RockmeterScoring(self.instruments[i])
+        player.rockCard = RockmeterScoring(player)
     
     self.starNotesMissed = [False for i in self.playerList]  #MFH
     self.notesMissed = [False for i in self.playerList]
@@ -461,11 +461,10 @@ class GuitarScene(Scene):
     self.coOpMulti = 1
     self.coOpFailDone = [False for i in self.playerList]
     if self.coOpRB: #akedrou
-      self.coOpPlayerMeter = len(self.rockScoring)
-      self.rockScoring.append(RockmeterScoring(None, coOp = "RB"))
+      self.coOpPlayerMeter = CoOpRockmeterScoring(self.playerList, coOp = "RB")
       self.timesFailed  = [0 for i in self.playerList]
     if self.coOp or self.coOpGH:
-      self.coOpPlayerMeter = len(self.rockScoring)-1 #make sure it's the last one
+      self.coOpPlayerMeter = CoOpRockmeterScoring(self.playerList)
 
 
     #Dialogs.changeLoadingSplashScreenText(self.engine, splash, phrase + " \n " + _("Loading Stage..."))
@@ -2156,11 +2155,6 @@ class GuitarScene(Scene):
     self.rockFailUp = True
     self.rockFailViz  = 0.0
     self.failViz = [0.0 for i in self.playerList]
-    if self.coOpRB:
-      self.rock.append(self.rockMax/2)
-      self.minusRock.append(0.0)
-      self.plusRock.append(0.0)
-      self.timesFailed = [0 for i in self.playerList]
     if self.battleGH:
       self.battleJustUsed = [0 for i in self.playerList]
     for instrument in self.instruments:
@@ -3113,7 +3107,9 @@ class GuitarScene(Scene):
       return
 
     rock.decreaseRock(self.notesMissed[i], self.lessMissed[i], vScore)
-
+    if self.coOpRB:
+        self.coOpPlayerMeter.decreaseRock(vScore)
+        
   #increases the rockmeter for a player when a note is hit
   def rockmeterIncrease(self, playerNum, vScore = 0):
     i = playerNum
@@ -3132,6 +3128,8 @@ class GuitarScene(Scene):
       return
       
     rock.increaseRock(vScore)
+    if self.coOpRB:
+        self.coOpPlayerMeter.increaseRock(vScore)
 
   def rockmeterDrain(self, playerNum):
     self.playerList[playerNum].rockCard.drain()
@@ -3499,16 +3497,9 @@ class GuitarScene(Scene):
               self.unisonActive = True
               self.firstUnison = True
               self.unisonNum = len(self.unisonPlayers[self.unisonIndex])
-        if self.starPowersActive > 0:
-          self.coOpMulti = 2 * self.starPowersActive
-        else:
-          self.coOpMulti = 1
         #MFH - rewritten rockmeter / starpower miss logic, and Faaa's drum sounds:
         #the old logic was ridiculously complicated  
         # For each existing player
-      if self.coOpRB:
-        oldCoOpRock = self.rock[self.coOpPlayerMeter]
-        coOpRock = 0.0
       for i in range(self.numOfPlayers):
         if (self.coOpRB and not guitar.coOpFailed) or not self.coOpRB:
           if self.notesMissed[i] or self.lessMissed[i]:   #(detects missed note or overstrum)
@@ -3523,14 +3514,9 @@ class GuitarScene(Scene):
               self.rockmeterDecrease(i)
           if self.notesHit[i]:
             self.rockmeterIncrease(i)
-          if self.coOpRB:
-            coOpRock += self.rock[i]
         else:
           if not self.instruments[i].coOpRestart:
             self.rockmeterDrain(self.coOpPlayerMeter)
-          else:
-            oldCoOpRock = 0.0
-            coOpRock += self.rock[i]
         self.notesMissed[i] = False 
         self.starNotesMissed[i] = False
         self.notesHit[i] = False 
@@ -3546,15 +3532,6 @@ class GuitarScene(Scene):
           if self.rock[i] <= 0:
             self.newScalingText(i, self.tsYouFailedBattle )
             guitar.actions = [0,0,0]
-      if self.coOpRB: #RB co-op meter is just an average until someone dies.
-        if self.numDeadPlayers == 0:
-          self.rock[self.coOpPlayerMeter] = coOpRock/self.numOfPlayers
-          if (self.rock[self.coOpPlayerMeter]/self.rockMax > 0.667) and (oldCoOpRock/self.rockMax <= 0.667):
-            self.playersInGreen = 1
-            if self.engine.data.cheerSoundFound > 0: #haven't decided whether or not to cut crowdSound with crowdsEnabled = 0, but would have to do it at solos too...
-              self.engine.data.crowdSound.play()
-        if (self.rock[self.coOpPlayerMeter]/self.rockMax <= 0.667) and (oldCoOpRock/self.rockMax > 0.667):
-          self.playersInGreen = 0
 
       if self.unisonActive: #akedrou unison bonuses
         if self.firstUnison:
@@ -3790,13 +3767,11 @@ class GuitarScene(Scene):
         else:
           self.neckrender[i].isFailing = False
       elif self.coOpRB:
-        guitar.rockLevel = self.rock[i] / self.rockMax
-        if self.rock[i]< self.rockMax/3.0 and self.failingEnabled:
-          self.neckrender[i].isFailing = True
-        elif self.numDeadPlayers > 0 and self.rock[self.coOpPlayerMeter]< self.rockMax/6.0 and self.failingEnabled:
-          self.neckrender[i].isFailing = True
-        else:
-          self.neckrender[i].isFailing = False
+        guitar.rockLevel = self.playerList[i].rockCard.percentage
+        
+        self.neckrender[i].isFailing = False
+        if self.failingEnabled:
+            self.neckrender[i].isFailing = self.playerList[i].rockCard.failing or self.coOpPlayerMeter.failing
       else:
         guitar.rockLevel = self.playerList[i].rockCard.percentage
         self.neckrender[i].isFailing = self.playerList[i].rockCard.failing
@@ -4562,11 +4537,12 @@ class GuitarScene(Scene):
       guitar = self.instruments[num]
       if guitar.starPower >= 50: #QQstarS:Set [0] to [i]
         if self.coOpRB:
-          while len(self.deadPlayerList) > 0:
-            i = self.deadPlayerList.pop(0) #keeps order intact (with >2 players)
-            if self.instruments[i].coOpFailed and self.timesFailed[i]<3:
-              self.instruments[i].coOpRescue(self.getSongPosition())
-              self.rockScoring[i].coOpRescue()
+          #revives the dead players
+          while len(self.coOpPlayerMeter.failedList) > 0:
+            player = self.coOpPlayerMeter.failedList.pop(0)
+            if player.instrument.coOpFailed and player.rockCard.timesFailed < 3:
+              player.instrument.coOpRescue(self.getSongPosition())
+              player.rockCard.coOpRescue()
               guitar.starPower -= 50
               self.engine.data.rescueSound.play()
               self.coOpFailDone[i] = False

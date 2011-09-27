@@ -836,8 +836,10 @@ class Group(Layer):
     super(Group, self).__init__(stage, section)
     self.layers      = {}   #the layers the group controls
     for num in self.get("layers", str, "").split(","):
-      self.layers[int(num)] = self.stage.layers[int(num)]
-                                        
+      try:
+        self.layers[int(num)] = self.stage.layers[int(num)]
+      except KeyError:
+        continue
          
   def updateLayer(self, playerNum):
     w, h, = self.engine.view.geometry[2:4]
@@ -945,9 +947,6 @@ class Rockmeter(ConfigGetMixin):
       else:
         self.createGroup(self.section, i)
         
-    print self.layerGroups
-    print self.sharedLayerGroups
-    print self.layersForRender
     self.reset()
     
   def reset(self):
@@ -1098,7 +1097,7 @@ class Rockmeter(ConfigGetMixin):
     scene = self.scene
     playerNum = p
     player = self.scene.playerList[p]
-    playerName = self.scene.playerList[p].name
+    playerName = player.name
     part = player.instrument.__class__.__name__
 
     #this is here for when I finally get coOp worked in
@@ -1106,7 +1105,7 @@ class Rockmeter(ConfigGetMixin):
       score = scene.coOpScoreCard.score
       stars = scene.coOpScoreCard.stars
       partialStars = scene.coOpScoreCard.starRatio
-      coop_rock  = scene.rock[scene.coOpPlayerMeter] / scene.rockMax
+      coop_rock  = scene.coOpPlayerMeter.percentage
     else:
       score = player.scoreCard.score
       stars = player.scoreCard.stars
@@ -1169,6 +1168,9 @@ class Rockmeter(ConfigGetMixin):
 
       self.engine.view.setViewportHalf(1,0)
       for layer in self.sharedLayersForRender.values():
+        layer.updateLayer(0)
+        for effect in layer.effects:
+          effect.update()
         layer.render(visibility, 0)
       for group in self.sharedLayerGroups.values():
         group.render(visibility, 0)
