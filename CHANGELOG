@@ -1,0 +1,63 @@
+FoFiX 4.0 Alpha 2 ChangeLog
+
+
+Theme changes:
+
+	-Added support for a neck which shows when the multiplier reaches 4x
+	-Added 3 different Intro Neck animations which are theme selectable
+	-POV's can now be selected with a theme setting
+	-Added support for fail sidebars
+	-Made almost all images Optional (check Uberlight to see which ones aren't)
+	-Removed editor.png from themes as its no longer of any use
+	-The "stages" folder is now called "backgrounds"
+	-All notes can be animated
+	-Added support for solo sidebars
+	-The main menu can now default to plain text rendering if no main_text.png is detected
+	-Themeable fps display location
+	-Pause menu text style now theme selectable
+	-Added theme settings for control over how the color of tails and flames behave with sp/od
+	-Major changes to MLv4
+	-- New Rockmeters
+	-- Additional replacement minimal rockmeter can be enabled through the mods section
+	-- New 3D notes
+	-- New Main Menu design
+	-ML RB single player rockmeter is complete and cleaned up a bit
+	-GH3 rockmeter has been recreated with the rockmeter.ini in ML: GH3.  Go ahead and convert your GH3 themes
+	-Implemented a separate hitflamesanimation image for when sp/od is active
+	-HitFlames are now completely themeable location, rotation, whether or not black is auto removed from the images
+	-Moved tons of images to their own folders
+	-Uberlight is stripped to the absolute minimum allowed by the engine, making it really light indeed
+	
+
+In-Game Changes:
+
+	-Cleaned up and did some major simplification on the hitflames, any supported hitflame image can now be rendered at the same time
+	-Tails repeat instead of stretching
+	-Hitlightning is fixed
+	-Made the solo neck scroll in to the very end of the neck instead of stopping at the frets
+	-Fix long existent bug when all of the hitflames images are gone Starpower fills completely with one sp phrase
+
+Rockmeter Changes:
+
+	-New Layer
+	-- Circle layer, very handy for star fillup
+	-New Effects
+	-- Scale
+	-- Fade
+	-- Animate
+	-New layer grouping system
+	-Added support for completely custom rockmeter layers with customRMLayers.py
+	-Fixed some rockmeter sliding effect issues
+	-When using the rockmeter.ini and it errors out it will now report line numbers
+	-Improved the speed of the rockmeter code
+	-Multiplayer rockmeters now load correctly
+
+Other Changes:
+
+	-Changed Default frame limit to 60 FPS
+	-Updated more code to use CMGL and Arrays
+	-Code between the guitar and drums is shared more
+	-Fixed menu text, optionsPanel, and BRE/Solo frame Scaling issues
+	-Implement song specific loading screen images
+	-Fix a rotation bug in image rendering
+
