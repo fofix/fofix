@@ -153,10 +153,10 @@ class Drum(Instrument):
         engine.loadImgDrawing(self, "noteOpenAnimated", get("animated_open.png"))        
 
       size = (self.boardWidth/1.9, (self.boardWidth/self.strings)/3.0)
-      self.openVtx = np.array([[-size[0],  .27, size[1]],
-                               [size[0],  .27, size[1]],
-                               [-size[0], -.27, -size[1]],
-                               [size[0], -.27, -size[1]]], 
+      self.openVtx = np.array([[-size[0],  0.0, size[1]],
+                               [size[0],  0.0, size[1]],
+                               [-size[0], 0.0, -size[1]],
+                               [size[0], 0.0, -size[1]]], 
                                dtype=np.float32)
 
       self.noteTexCoord = [[np.array([[i/float(self.strings), s/6.0],
@@ -274,7 +274,7 @@ class Drum(Instrument):
           texCoord = self.noteTexCoord[y][fret]
           
       self.engine.draw3Dtex(noteImage, vertex = vtx, texcoord = texCoord,
-                            scale = (1,1,0), rot = (30,1,0,0), multiples = False, color = color)
+                            scale = (1,1,1), rot = (self.camAngle,1,0,0), multiples = False, color = color)
 
     else: #3d Notes
       shaders.setVar("Material",color,"notes")

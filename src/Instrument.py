@@ -179,6 +179,7 @@ class Instrument(object):
     self.lastBpmChange  = -1.0
     self.baseBeat       = 0.0
 
+    self.camAngle = 0.0 #set from guitarScene
 
     self.indexFps       = self.engine.config.get("video", "fps")
 
@@ -466,10 +467,10 @@ class Instrument(object):
         engine.loadImgDrawing(self, "noteButtons", get("notes.png"))
         
       size = (self.boardWidth/self.strings/2, self.boardWidth/self.strings/2)
-      self.noteVtx = np.array([[-size[0],  .27, size[1]],
-                               [size[0],  .27, size[1]],
-                               [-size[0], -.27, -size[1]],
-                               [size[0], -.27, -size[1]]], 
+      self.noteVtx = np.array([[-size[0],  0.0, size[1]],
+                               [size[0],  0.0, size[1]],
+                               [-size[0], 0.0, -size[1]],
+                               [size[0], 0.0, -size[1]]], 
                                dtype=np.float32)
 
       self.noteTexCoord = [[np.array([[i/float(self.strings), s/6.0],
@@ -1146,7 +1147,7 @@ class Instrument(object):
         y += 4
       if isTappable:
         y += 1
-        
+
       if self.noteSpin:
         texCoord = self.animatedNoteTexCoord[self.noteSpinFrameIndex][fret]
         if isTappable:
@@ -1171,7 +1172,7 @@ class Instrument(object):
         texCoord = self.noteTexCoord[y][fret]
           
       self.engine.draw3Dtex(noteImage, vertex = self.noteVtx, texcoord = texCoord,
-                            scale = (1,1,0), rot = (30,1,0,0), multiples = False, color = color)
+                            scale = (1,1,1), rot = (self.camAngle ,1,0,0), multiples = False, color = color)
 
     else: #3d Notes
       shaders.setVar("Material",color,"notes")

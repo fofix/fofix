@@ -55,6 +55,8 @@ import locale
 
 from OpenGL.GL import *
 
+from math import degrees, atan
+
 class GuitarScene(Scene):
   def __init__(self, engine, libraryName, songName):
     Scene.__init__(self, engine)
@@ -3396,6 +3398,8 @@ class GuitarScene(Scene):
         self.stage.run(pos, instrument.currentPeriod)
         playerNum = i
         guitar = instrument
+
+        instrument.camAngle = -degrees(atan(abs(self.camera.origin[2] - self.camera.target[2]) / abs(self.camera.origin[1] - self.camera.target[1])))
 
         if guitar.battleObjects[0] != 0:
           self.battleItemsHolding[i] = 1
