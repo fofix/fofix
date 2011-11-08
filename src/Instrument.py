@@ -1076,6 +1076,7 @@ class Instrument(object):
 
   #group rendering of 2D notes into method
   def render3DNote(self, texture, model, color, isTappable):
+    glRotatef(self.camAngle + 90, 1, 0, 0)
     if texture: 
       glColor3f(1,1,1)
       glEnable(GL_TEXTURE_2D)
