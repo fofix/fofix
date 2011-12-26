@@ -4539,8 +4539,8 @@ class GuitarScene(Scene):
       if guitar.starPower >= 50: #QQstarS:Set [0] to [i]
         if self.coOpRB:
           #revives the dead players
-          while len(self.coOpPlayerMeter.failedList) > 0:
-            player = self.coOpPlayerMeter.failedList.pop(0)
+          while len(self.coOpPlayerMeter.deadList) > 0:
+            player = self.coOpPlayerMeter.deadList.pop(0)
             if player.instrument.coOpFailed and player.rockCard.timesFailed < 3:
               player.instrument.coOpRescue(self.getSongPosition())
               player.rockCard.coOpRescue()
