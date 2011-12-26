@@ -33,6 +33,7 @@ from Language import _
 import Song
 import Log
 import Config
+from datetime import datetime
 
 HANDICAPS = [.75, 1.0, .8, .9, .75, .8, 1.05, 1.1, 1.03, 1.02, 1.01, .95, .9, .85, .7, .95, 0.0, .5, .7, .7]
 HANDICAP_NAMES = [_("Auto Kick Bass"), _("Medium Assist Mode"), _("Easy Assist Mode"), _("Jurgen Played!"), \
@@ -396,6 +397,9 @@ class RockmeterScoring(object):
     if self.instrument.starPowerActive:
       self.mult *= 2
     
+    
+_drainRate = 500000    #amount of microseconds that need to pass before it drains rock again
+
 #Different rockmeter for keeping track of coOp modes
 class CoOpRockmeterScoring(RockmeterScoring):
   def __init__(self, players, coOp = None):
@@ -411,6 +415,8 @@ class CoOpRockmeterScoring(RockmeterScoring):
     self.minusRock = _minBase       #amount of rock to subtract when decreasing
     self.plusRock = _pluBase        #amount of rock to add when increasing
     self.players = players
+    self.drainTime = 0              #time in microseconds recorded to know when to 
+                                    # drain from the rockmeter again
     
   #starts the process
   def start(self):
@@ -461,8 +467,11 @@ class CoOpRockmeterScoring(RockmeterScoring):
     self.failing = self.rock <= _rockLo
 
     if self.numDead > 0:
-      self.drain()
-    else:
+      dt = datetime.now().microsecond % _drainRate
+      if dt < self.drainTime:
+        self.drain()
+      self.drainTime = dt
+    elif not self.coOp == "RB":
       self.rock = 0
       for player in self.players:
         self.rock += player.rockCard.rock
