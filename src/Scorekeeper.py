@@ -110,30 +110,30 @@ class ScoreCard(object):
     self.partialStars = 0               #current percentage of the next star
     self.starRatio = 0.0                #percentage of how close the player is to the next star
     self.star = [0 for i in range(7)]   #keep track of values required to know when the player has hit the next star value
+    
+    #figure out which star setting to use
+    s = ""
     if self.starScoring == 1: #GH-style (mult thresholds, hit threshold for 5/6 stars)
-      self.star = GH_STAR_VALUES
+      s += "GH"
     elif self.starScoring > 1: #RB-style (mult thresholds, optional 100% gold star)
       if self.starScoring == 4:
-        if self.instrument[0] == Song.BASS_PART and not self.coOpType:
-          self.star = RB_BASS_STAR_VALUES
-        else:
-          if self.instrument[0] == Song.DRUM_PART and not self.coOpType:
-            self.star = RB_DRUM_STAR_VALUES
-          elif self.instrument[0] == Song.VOCAL_PART and not self.coOpType:
-            self.star = RB_VOC_STAR_VALUES
-          else:
-            self.star = RB_STAR_VALUES
+        s += "RB"
       else:
-        if self.coOpType:
-          self.star = MIX_COOP_STAR_VALUES
-        elif self.instrument[0] == Song.BASS_PART: # bass
-          self.star = MIX_BASS_STAR_VALUES
-        elif self.instrument[0] == Song.DRUM_PART: # drum
-          self.star = MIX_DRUM_STAR_VALUES
-        else:
-          self.star = MIX_STAR_VALUES
+        s += "MIX"
+        
+      if self.coOpType:
+        s += "_COOP"
+      elif self.instrument[0] == Song.DRUM_PART:
+        s += "_DRUM"
+      elif self.instrument[0] == Song.VOCAL_PART:
+        s += "_VOC"
+      elif self.instrument[0] == Song.BASS_PART:
+        s += "_BASS"
     else: #hit accuracy thresholds
-      self.star = FOF_STAR_VALUES
+      s += "FOF"
+    s += "_STAR_VALUES"
+    
+    self.star = globals()[s]
     
     self.endingScore = 0
     self.endingStreakBroken = False
