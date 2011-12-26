@@ -82,7 +82,7 @@ class GuitarScene(Scene):
     self.ready = False
     Log.debug("GuitarScene init...")
 
-    self.coOpPlayerMeter = 0
+    self.coOpPlayerMeter = None
 
     #myfingershurt: new loading place for "loading" screen for song preparation:
     #blazingamer new loading phrases
@@ -3557,25 +3557,26 @@ class GuitarScene(Scene):
           self.haveUnison = [False for i in self.playerList]
           self.inUnison = [False for i in self.playerList]
       #akedrou Song/Crowd logic
-      if self.coOpPlayerMeter.numDead == 0:
-        if self.crowdsEnabled == 3 and self.crowdsCheering == False and not self.countdown: #prevents cheer-cut-cheer
-          self.crowdsCheering = True
-        elif self.crowdsEnabled == 0 and self.crowdsCheering == True: #setting change
-          self.crowdsCheering = False
-        elif self.crowdsEnabled == 1:
-          if self.starPowersActive > 0:
-            if self.crowdsCheering == False:
-              self.crowdsCheering = True
-          else:
-            if self.crowdsCheering == True:
-              self.crowdsCheering = False
-        elif self.crowdsEnabled == 2:
-          if self.starPowersActive > 0 or self.playersInGreen > 0:
-            if self.crowdsCheering == False:
-              self.crowdsCheering = True
-          else:
-            if self.crowdsCheering == True:
-              self.crowdsCheering = False
+      if self.coOpPlayerMeter is not None:
+        if self.coOpPlayerMeter.numDead == 0:
+          if self.crowdsEnabled == 3 and self.crowdsCheering == False and not self.countdown: #prevents cheer-cut-cheer
+            self.crowdsCheering = True
+          elif self.crowdsEnabled == 0 and self.crowdsCheering == True: #setting change
+            self.crowdsCheering = False
+          elif self.crowdsEnabled == 1:
+            if self.starPowersActive > 0:
+              if self.crowdsCheering == False:
+                self.crowdsCheering = True
+            else:
+              if self.crowdsCheering == True:
+                self.crowdsCheering = False
+          elif self.crowdsEnabled == 2:
+            if self.starPowersActive > 0 or self.playersInGreen > 0:
+              if self.crowdsCheering == False:
+                self.crowdsCheering = True
+            else:
+              if self.crowdsCheering == True:
+                self.crowdsCheering = False
         
       #Crowd fade-in/out
       if self.crowdsCheering == True and self.crowdFaderVolume < self.crowdVolume:
@@ -3761,11 +3762,11 @@ class GuitarScene(Scene):
         guitar.render(self.visibility, self.song, self.getSongPosition(), self.controls, self.killswitchEngaged[i])  #QQstarS: new
         glPopMatrix()
       if self.coOp or self.coOpGH:
-        guitar.rockLevel = self.rock[self.coOpPlayerMeter] / self.rockMax
-        if self.rock[self.coOpPlayerMeter]< self.rockMax/3.0 and self.failingEnabled:
-          self.neckrender[i].isFailing = True
-        else:
-          self.neckrender[i].isFailing = False
+        guitar.rockLevel = self.coOpPlayerMeter.rockCard.percentage
+      
+        self.neckrender[i].isFailing = False
+        if self.failingEnabled:
+            self.neckrender[i].isFailing = self.playerList[i].rockCard.failing or self.coOpPlayerMeter.failing
       elif self.coOpRB:
         guitar.rockLevel = self.playerList[i].rockCard.percentage
         
