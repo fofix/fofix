@@ -263,11 +263,12 @@ class Instrument(object):
       self.freestyleEnabled = True
 
     #blazingamer
-    self.nstype = self.engine.config.get("game", "nstype")
-    self.twoDnote = self.engine.theme.twoDnote
-    self.twoDkeys = self.engine.theme.twoDkeys 
-    self.threeDspin = self.engine.theme.threeDspin 
-    self.noterotate = self.engine.config.get("coffee", "noterotate")
+    self.nstype = self.engine.config.get("game", "nstype")                  #neck style
+    self.twoDnote = self.engine.theme.twoDnote                              #note style (2D or 3D)
+    self.twoDkeys = self.engine.theme.twoDkeys                              #key style
+    self.threeDspin = self.engine.theme.threeDspin                          #3d notes spin when they are star power notes
+    self.noterotate = self.engine.config.get("coffee", "noterotate")        #adjust notes for if they were designed for FoF 1.1 or 1.2
+    self.billboardNote = self.engine.theme.billboardNote                    #3D notes follow the angle of the camera
 
     #MFH- fixing neck speed
     if self.nstype < 3:   #not constant mode: 
@@ -1076,7 +1077,8 @@ class Instrument(object):
 
   #group rendering of 2D notes into method
   def render3DNote(self, texture, model, color, isTappable):
-    glRotatef(self.camAngle + 90, 1, 0, 0)
+    if (self.billboardNote):
+      glRotatef(self.camAngle + 90, 1, 0, 0)
     if texture: 
       glColor3f(1,1,1)
       glEnable(GL_TEXTURE_2D)

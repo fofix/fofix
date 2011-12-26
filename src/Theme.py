@@ -632,8 +632,10 @@ class Theme(Task):
     self.twoDnote = get("twoDnote", bool, True)
     self.twoDkeys = get("twoDkeys", bool, True)
     
+    #3D notes spin when they are star power notes
     self.threeDspin  = get("threeDspin", bool, False)
     
+    #configure rotation and positioning along the neck for the 3d objects scrolling down
     self.noterot     = [get("noterot"+str(i+1),     float, 0) for i in range(5)]
     self.keyrot      = [get("keyrot"+str(i+1),      float, 0) for i in range(5)]
     self.drumnoterot = [get("drumnoterot"+str(i+1), float, 0) for i in range(5)]
@@ -642,6 +644,9 @@ class Theme(Task):
     self.keypos      = [get("keypos"+str(i+1),      float, 0) for i in range(5)]
     self.drumnotepos = [get("drumnotepos"+str(i+1), float, 0) for i in range(5)]
     self.drumkeypos  = [get("drumkeypos"+str(i+1),  float, 0) for i in range(5)]
+    
+    #3D setting for making the notes always face the camera
+    self.billboardNote = get("billboardNote", bool, True)
     
     self.shaderSolocolor = get("shaderSoloColor", "color", "#0000FF")
     
