@@ -311,7 +311,6 @@ class MainMenu(BackgroundLayer):
     self.newLocalGame()   #just call start function with default settings  = 1p quickplay
 
   def newLocalGame(self, players=1, mode1p=0, mode2p=0, maxplayers = None, allowGuitar = True, allowDrum = True, allowMic = False): #mode1p=0(quickplay),1(practice),2(career) / mode2p=0(faceoff),1(profaceoff)
-    self.engine.data.acceptSound.play()
     self.engine.startWorld(players, maxplayers, mode1p, mode2p, allowGuitar, allowDrum, allowMic)
     self.launchLayer(lambda: Lobby(self.engine))
   
