@@ -36,10 +36,7 @@ codecs.register(lambda encoding: encodings.utf_8.getregentry())
 assert codecs.lookup("iso-8859-1")
 assert codecs.lookup("utf-8")
 
-#stump: pygst eats --help, so process the command line before that.
-# Also do this before we import any heavyweight stuff so --help goes through
-# as efficiently as possible and we can disable pyOpenGL error checking
-# if we are not asked for it.
+# So we can enable pyOpenGL error checking if asked to.
 import getopt
 import sys
 import os
@@ -49,6 +46,30 @@ import Version
 # from source on Windows so we pick them up when those bits are imported.
 if os.name == 'nt' and not hasattr(sys, 'frozen'):
   os.environ['PATH'] = os.path.abspath(os.path.join('..', 'win32', 'deps', 'bin')) + os.pathsep + os.environ['PATH']
+
+#stump: disable pyOpenGL error checking if we are not asked for it.
+# This must be before *anything* that may import pyOpenGL!
+assert 'OpenGL' not in sys.modules
+if '--opengl-error-checking' not in sys.argv:
+  import OpenGL
+  if OpenGL.__version__ >= '3':
+    OpenGL.ERROR_CHECKING = False
+    OpenGL.ARRAY_SIZE_CHECKING = False
+    OpenGL.ERROR_ON_COPY = True
+    OpenGL.FORWARD_COMPATIBLE_ONLY = True
+    OpenGL.SIZE_1_ARRAY_UNPACK = False
+    OpenGL.STORE_POINTERS = False
+
+import Log
+import Config
+from GameEngine import GameEngine
+from MainMenu import MainMenu
+from Language import _
+import Resource
+import pygame
+import traceback
+from VideoPlayer import VideoLayer, VideoPlayerError
+
 
 def _usage(errmsg=None):
   usage = """Usage: %(prog)s [options]
@@ -89,40 +110,12 @@ One-shot mode options (ignored unless in one-shot mode):
     print usage
   sys.exit(1)
 
-# Check --help early so pygst won't eat it.
-if '--help' in sys.argv or '-h' in sys.argv:
-  _usage()
-
-#stump: disable pyOpenGL error checking if we are not asked for it.
-# This must be before *anything* that may import pyOpenGL!
-assert 'OpenGL' not in sys.modules
-if '--opengl-error-checking' not in sys.argv:
-  import OpenGL
-  if OpenGL.__version__ >= '3':
-    OpenGL.ERROR_CHECKING = False
-    OpenGL.ARRAY_SIZE_CHECKING = False
-    OpenGL.ERROR_ON_COPY = True
-    OpenGL.FORWARD_COMPATIBLE_ONLY = True
-    OpenGL.SIZE_1_ARRAY_UNPACK = False
-    OpenGL.STORE_POINTERS = False
-
-import Log
-import Config
-from GameEngine import GameEngine
-from MainMenu import MainMenu
-from Language import _
-import Resource
-import pygame
-import traceback
-from VideoPlayer import VideoLayer, VideoPlayerError
 
 def main():
   try:
     opts, args = getopt.getopt(sys.argv[1:], "hvc:f:r:t:s:p:l:d:m:n:", ["help", "verbose", "config=", "fullscreen=", "resolution=", "theme=", "song=", "part=", "diff=", "mode=", "nbrplayers=", "opengl-error-checking"])
   except getopt.GetoptError, e:
     _usage(str(e))  # str(e): error message from getopt, e.g. "option --some-invalid-option not recognized"
-  if ('-h', '') in opts or ('--help', '') in opts:
-    _usage()
 
   playing = None
   configFile = None
@@ -133,7 +126,10 @@ def main():
   part = None
   mode = 0
   nbrplayers = 1
+
   for opt, arg in opts:
+    if opt in ["--help", "-h"]:
+        _usage()
     if opt in ["--verbose", "-v"]:
       Log.quiet = False
     if opt in ["--config", "-c"]:
