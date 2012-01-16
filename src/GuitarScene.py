@@ -408,23 +408,6 @@ class GuitarScene(Scene):
     
     
     self.multi = [1 for i in self.playerList]
-    self.x1 = [0 for i in self.playerList]
-    self.y1 = [0 for i in self.playerList]
-    self.x2 = [0 for i in self.playerList]
-    self.y2 = [0 for i in self.playerList]
-    self.x3 = [0 for i in self.playerList]
-    self.y3 = [0 for i in self.playerList]
-    if self.coOpType:
-      self.x1.append(0)
-      self.y1.append(0)
-      self.x2.append(0)
-      self.y2.append(0)
-      self.x3.append(0)
-      self.y3.append(0)
-    
-
-    #MFH - precalculation variable definition
-
 
     #Get theme
     themename = self.engine.data.themeLabel
