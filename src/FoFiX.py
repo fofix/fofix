@@ -4,7 +4,7 @@
 # Frets on Fire X (FoFiX)                                           #
 # Copyright (C) 2006 Sami Kyöstilä                                  #
 #               2008 evilynux <evilynux@gmail.com>                  #
-#               2009 FoFiX Team                                     #
+#               2012 FoFiX Team                                     #
 #               2009 akedrou                                        #
 #                                                                   #
 # This program is free software; you can redistribute it and/or     #
@@ -202,13 +202,6 @@ def main():
       engine.cmdMode = nbrplayers, mode, 0
     else:
       engine.cmdMode = nbrplayers, 0, mode
-
-  encoding = Config.get("game", "encoding")
-  if encoding is not None:
-    #stump: XXX: Everything I have seen indicates that this is a
-    # horrible, horrible hack.  Is there another way?  Do we even need this?
-    reload(sys)
-    sys.setdefaultencoding(encoding)
 
   # Play the intro video if it is present, we have the capability, and
   # we are not in one-shot mode.
