@@ -505,8 +505,6 @@ class GameEngine(object):
     self.audio             = Audio()
     self.frames            = 0
     self.fpsEstimate       = 0
-    self.lastTime          = 0
-    self.elapsedTime       = 0
     self.priority          = self.config.get("engine", "highpriority")
     self.show_fps          = self.config.get("video", "show_fps")
     self.advSettings       = self.config.get("game", "adv_settings")
@@ -582,8 +580,6 @@ class GameEngine(object):
     self.resizeScreen(w, h)
 
     self.resource  = Resource(Version.dataPath())
-    self.server    = None
-    self.sessions  = []
     self.mainloop  = self.loading
     self.menuMusic = False
     
@@ -1095,10 +1091,7 @@ class GameEngine(object):
     # Estimate every 2*config.fps when highpriority is False,
     # if you are on target, that should be every 2 seconds.
     if( not self.priority and self.frames == (self.fps << 1) ) or ( self.priority and self.frames == 120 ):
-      currentTime = pygame.time.get_ticks()
-      self.elapsedTime = currentTime-self.lastTime
-      self.lastTime = currentTime
-      self.fpsEstimate = self.frames*(1000.0/self.elapsedTime)
+      self.fpsEstimate = self.clock.get_fps()
       # evilynux - Printing on the console with a frozen binary may cause a crash.
       if self.show_fps and not Version.isWindowsExe():
         print("%.2f fps" % self.fpsEstimate)
