@@ -125,8 +125,7 @@ class World:
     if self.scene:
       self.engine.view.popLayer(self.scene)
       self.engine.removeTask(self.scene)
-    scene = SceneFactory.create(engine = self.engine, name = name, **args)
-    self.scene = scene
+    self.scene = SceneFactory.create(engine = self.engine, name = name, **args)
     self.engine.addTask(self.scene)
     self.engine.view.pushLayer(self.scene)
 
