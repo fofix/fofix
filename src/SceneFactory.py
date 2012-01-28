@@ -22,6 +22,10 @@
 # MA  02110-1301, USA.                                              #
 #####################################################################
 
+import glob
+
+scenes = [n.replace(".py", "") for n in glob.glob("*Scene.py")]
+
 def create(engine, name, **args):
   m = __import__(name)
   return getattr(m, name)(engine = engine, **args)
