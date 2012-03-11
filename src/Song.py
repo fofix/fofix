@@ -2730,8 +2730,8 @@ class MidiReader(midi.MidiOutStream):
       return False
 
     for i, j in enumerate(self.song.parts):
-        if self.partnumber == j:
-            track = i
+      if self.partnumber == j:
+        track = i
 
     self.song.track[track].allWords[time] = text
   
