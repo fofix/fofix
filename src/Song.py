@@ -2725,8 +2725,14 @@ class MidiReader(midi.MidiOutStream):
     
     if not self.useVocalTrack:
       return True
-    
-    track = [i for i,j in enumerate(self.song.parts) if self.partnumber == j][0]
+
+    if self.partnumber == None:
+      return False
+
+    for i, j in enumerate(self.song.parts):
+        if self.partnumber == j:
+            track = i
+
     self.song.track[track].allWords[time] = text
   
   def addVocalStar(self, time):
