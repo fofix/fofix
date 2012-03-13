@@ -1706,7 +1706,7 @@ class GuitarScene(Scene):
       self.camera.target    = (self.camera.target[0], self.camera.target[1], self.camera.target[2]+self.boardZ-1)
       self.camera.origin    = (self.camera.origin[0], self.camera.origin[1], self.camera.origin[2]+self.boardZ-1)
     elif self.neckintroAnimationType == 3: #Off game starts with the pov as is
-	  self.camera.origin    = self.camera.origin
+      self.camera.origin    = self.camera.origin
     elif self.neckintroAnimationType == 4: #By Theme
       if self.neckintroThemeType == "fofix":
         self.camera.origin = (self.camera.origin[0], self.camera.origin[1]*self.boardY, self.camera.origin[2])

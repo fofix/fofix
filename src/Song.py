@@ -2831,11 +2831,11 @@ class MidiReader(midi.MidiOutStream):
         self.partnumber = part
         if self.logSections == 1:
           tempText2 = text.replace(" ", "_")
-        break	#should only have one instance of an instrument
-        break   #end the searching
+        break    #should only have one instance of an instrument
+        break    #end the searching
     
     if text in parts[VOCAL_PART].trackName and parts[VOCAL_PART] not in self.song.parts:
-	  self.useVocalTrack = False
+      self.useVocalTrack = False
                  
     if self.logSections == 1:
       Log.debug(tempText + tempText2)
@@ -3315,7 +3315,7 @@ class MidiPartsDiffReader(midi.MidiOutStream):
             self.currentPart = self.nextPart.id
             self.notesFound  = [0, 0, 0, 0]
             if part.id == DRUM_PART or part.id == PRO_DRUM_PART:
-		      self._drumFound  = True  
+              self._drumFound  = True  
           if self.logSections == 1:
             tempText2 = part.trackName[0].replace(" ", "_")
             Log.debug(tempText + tempText2)

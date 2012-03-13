@@ -59,11 +59,11 @@ class Neck:
     self.neckAlpha.append( self.neckAlpha[0] * self.engine.config.get("game", "overlay_neck_alpha") ) # overlay neck
     self.neckAlpha.append( self.neckAlpha[0] * self.engine.config.get("game", "fail_neck_alpha") ) # fail neck
     self.neckAlpha.append( self.neckAlpha[0] * self.engine.config.get("game", "4x_neck_alpha") ) # 4x multi neck
-	
+
     self.boardWidth     = self.engine.theme.neckWidth
     self.boardLength    = self.engine.theme.neckLength
     self.shaderSolocolor    = self.engine.theme.shaderSolocolor
-	
+
     self.boardFadeAmount = self.engine.theme.boardFade
 
     self.doNecksRender = self.engine.theme.doNecksRender
@@ -219,7 +219,7 @@ class Neck:
     self.board_tex_static      = self.board_tex_static.astype(np.float32)
     self.board_tex             = self.board_tex.astype(np.float32)
     self.board_scroll_vtx      = self.board_scroll_vtx.astype(np.float32)
-	
+
     self.neckType = playerObj.neckType
     if self.neckType == 0:
       self.neck = engine.mainMenu.chosenNeck
@@ -804,7 +804,7 @@ class Neck:
     if not (self.bpm_halfbeat and self.bpm_beat and self.bpm_measure):
       self.bpmLinesDisabled = True
     else:
-	  self.bpmLinesDisabled = False
+      self.bpmLinesDisabled = False
 
     if not (self.instrument.coOpFailed and not self.instrument.coOpRestart):
 
