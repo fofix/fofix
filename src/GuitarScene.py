@@ -3107,10 +3107,6 @@ class GuitarScene(Scene):
       if not self.drumScoringEnabled:   #MFH - ignore when drum scoring is disabled
         return
 
-    if self.starNotesMissed[i] or self.instruments[i].isStarPhrase:
-      self.instruments[i].isStarPhrase = True
-      self.instruments[i].spEnabled = False
-
     if not self.failingEnabled or self.practiceMode:
       return
 
