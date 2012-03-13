@@ -348,7 +348,7 @@ class Lobby(Layer, KeyListener):
         self.done = False
         self.creator.loadPlayer(i)
         self.engine.view.pushLayer(self.creator)
-      elif self.selected > 1:
+      elif self.selected[i] > 1:
         self.playerList[i] = (i, self.options[self.selected[i]])
         self.blockedPlayers.append(i)
         self.blockedItems.append(self.selected[i])
