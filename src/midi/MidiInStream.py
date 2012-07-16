@@ -49,4 +49,3 @@ class MidiInStream:
         of looping going on
 
         """
-

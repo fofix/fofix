@@ -40,31 +40,31 @@ rootMenu = [
 ]
 
 class MenuTest(unittest.TestCase):
-  def testMenuNavigation(self):
-    m = Menu(self.e, rootMenu)
-    self.e.view.pushLayer(m)
+    def testMenuNavigation(self):
+        m = Menu(self.e, rootMenu)
+        self.e.view.pushLayer(m)
 
-  def setUp(self):
-    config = Config.load(Version.PROGRAM_UNIXSTYLE_NAME + ".ini", setAsDefault = True)
-    self.e = GameEngine(config)
-    
-  def tearDown(self):
-    self.e.quit()
+    def setUp(self):
+        config = Config.load(Version.PROGRAM_UNIXSTYLE_NAME + ".ini", setAsDefault = True)
+        self.e = GameEngine(config)
+
+    def tearDown(self):
+        self.e.quit()
 
 class MenuTestInteractive(unittest.TestCase):
-  def testMenuNavigation(self):
-    m = Menu(self.e, rootMenu)
-    self.e.view.pushLayer(m)
+    def testMenuNavigation(self):
+        m = Menu(self.e, rootMenu)
+        self.e.view.pushLayer(m)
 
-    while self.e.view.layers:
-      self.e.run()
+        while self.e.view.layers:
+            self.e.run()
 
-  def setUp(self):
-    config = Config.load(Version.PROGRAM_UNIXSTYLE_NAME + ".ini", setAsDefault = True)
-    self.e = GameEngine(config)
-    
-  def tearDown(self):
-    self.e.quit()
+    def setUp(self):
+        config = Config.load(Version.PROGRAM_UNIXSTYLE_NAME + ".ini", setAsDefault = True)
+        self.e = GameEngine(config)
+
+    def tearDown(self):
+        self.e.quit()
 
 if __name__ == "__main__":
-  unittest.main()
+    unittest.main()

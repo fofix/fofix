@@ -20,7 +20,7 @@ def getNibbles(byte):
     Returns hi and lo bits in a byte as a tuple
     >>> getNibbles(142)
     (8, 14)
-    
+
     Asserts byte value in byte range
     >>> getNibbles(256)
     Traceback (most recent call last):
@@ -38,7 +38,7 @@ def setNibbles(hiNibble, loNibble):
     Asserts hiNibble and loNibble in range(16)
     >>> setNibbles(8, 14)
     142
-    
+
     >>> setNibbles(8, 16)
     Traceback (most recent call last):
         ...
@@ -154,10 +154,10 @@ if __name__ == '__main__':
 #    print to7bits(65536, 3)
 
     # simple test cases
-    
+
 #    print 'getHiLoHex', getNibbles(16)
 #    print 'setHiLoHex', setNibbles(1,0)
-#    
+#
 #    print 'readBew', readBew('aсту')
 #    print 'writeBew', writeBew(1642193635, 4)
 #
@@ -165,15 +165,15 @@ if __name__ == '__main__':
 #
     print 'readVar', readVar('А@')
     print 'writeVar', writeVar(8192)
-    
+
     print 'readVar', readVar('стуa')
     print 'writeVar', writeVar(205058401)
-#    
+#
 #    vartest = '\x82\xF7\x80\x00'
 #    print 'toBytes', toBytes(vartest)
 #    print 'fromBytes', fromBytes([48, 49, 50,])
-    
-    
+
+
 #    instr = '\xFF\xFF\xFF\x00'
 #    print 'readVar', readVar(instr)
 #    inst2 = 268435455
@@ -205,15 +205,3 @@ if __name__ == '__main__':
     print '%08X -' % s11, 'C0 80 80 00', writeVar(s11)
     s12 = 0x0FFFFFFF
     print '%08X -' % s12, 'FF FF FF 7F', writeVar(s12)
-              
-              
-              
-             
-             
-             
-           
-           
-           
-          
-          
-          

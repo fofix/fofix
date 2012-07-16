@@ -26,8 +26,8 @@ __version__ = '$Id$'
 import os
 import sys
 if os.name != 'nt':
-  sys.stderr.write('This script only works on Windows.\n')
-  sys.exit(1)
+    sys.stderr.write('This script only works on Windows.\n')
+    sys.exit(1)
 
 import ListToNSIS
 import _winreg
@@ -37,8 +37,8 @@ import hashlib
 
 us = r'..\FoFiX.exe'
 if not os.path.isfile(us):
-  sys.stderr.write("There's no FoFiX.exe - did you compile yet?\n")
-  sys.exit(1)
+    sys.stderr.write("There's no FoFiX.exe - did you compile yet?\n")
+    sys.exit(1)
 vdict = win32api.GetFileVersionInfo(us, '\\')
 # Unfortunately we need to do some bit-twiddling to retrieve the main version number.
 FOFIX_VERSION = '%d.%d.%d.%d' % (vdict['FileVersionMS'] >> 16, vdict['FileVersionMS'] & 0xffff, vdict['FileVersionLS'] >> 16, vdict['FileVersionLS'] & 0xffff)
@@ -53,12 +53,12 @@ os.chdir('..')
 
 # Find NSIS.
 try:
-  key = _winreg.OpenKey(_winreg.HKEY_LOCAL_MACHINE, r'Software\NSIS')
-  nsisPath = _winreg.QueryValueEx(key, '')[0]
-  _winreg.CloseKey(key)
+    key = _winreg.OpenKey(_winreg.HKEY_LOCAL_MACHINE, r'Software\NSIS')
+    nsisPath = _winreg.QueryValueEx(key, '')[0]
+    _winreg.CloseKey(key)
 except WindowsError:
-  sys.stderr.write("Looks like you don't have NSIS - get it at http://nsis.sourceforge.net/\n")
-  sys.exit(1)
+    sys.stderr.write("Looks like you don't have NSIS - get it at http://nsis.sourceforge.net/\n")
+    sys.exit(1)
 makensis = os.path.join(nsisPath, 'makensis.exe')
 
 # Generate the full installer script.
@@ -185,7 +185,7 @@ RmDir "$INSTDIR"
 ''' % MLDist.getUninstallScript(), 'Installs the core of FoFiX (required).')
 builder.filterSection('MegaLight GH3', r'data\themes\MegaLight GH3', 'Installs the MegaLight GH3 theme.', secStart='SectionGroup /e "Themes"\r\nSection')
 builder.filterSection('MegaLight', r'data\themes\MegaLight', 'Installs the MegaLight theme.')
-builder.filterSection('UberLight', r'data\themes\UberLight', 'Installs the UberLight theme.', secEnd='SectionEnd\r\nSectionGroupEnd') 
+builder.filterSection('UberLight', r'data\themes\UberLight', 'Installs the UberLight theme.', secEnd='SectionEnd\r\nSectionGroupEnd')
 
 builder.filterSection('Cassettes Only', r'data\mods\Cassettes', 'Replace CDs in the songlist with the original FoF cassettes.', secStart='SectionGroup /e "Mods"\r\nSection')
 builder.filterSection('Guitar Cases Only', r'data\mods\Guitar Cases', 'Replace CD Cases in the songlist by the Guitar Cases created by FoZZ.')
@@ -211,23 +211,23 @@ Image.open(os.path.join('pkg', 'installer_gfx', 'un_welcome.png')).convert('RGB'
 # Generate and compile the NSIS script.
 open('Setup.nsi', 'w').write(builder.getScript())
 if os.path.isfile('fofix.ini'):
-  os.rename('fofix.ini', 'fofix.bak')
+    os.rename('fofix.ini', 'fofix.bak')
 shutil.copy(os.path.join('pkg', 'fofix.fresh.ini'), 'fofix.ini')
 try:
-  if os.spawnl(os.P_WAIT, makensis, 'makensis.exe', 'Setup.nsi') != 0:
-    raise RuntimeError, 'Installer generation failed.'
+    if os.spawnl(os.P_WAIT, makensis, 'makensis.exe', 'Setup.nsi') != 0:
+        raise RuntimeError, 'Installer generation failed.'
 
 finally:
-  if os.getcwd() == oldcwd:
-    os.chdir('..')
-  os.unlink('fofix.ini')
-  if os.path.isfile('fofix.bak'):
-    os.rename('fofix.bak', 'fofix.ini')
-  if os.path.isfile('Setup.nsi'):
-    os.unlink('Setup.nsi')
-  os.chdir(oldcwd)
-  if os.path.isfile('uninst.exe'):
-    os.unlink('uninst.exe')
+    if os.getcwd() == oldcwd:
+        os.chdir('..')
+    os.unlink('fofix.ini')
+    if os.path.isfile('fofix.bak'):
+        os.rename('fofix.bak', 'fofix.ini')
+    if os.path.isfile('Setup.nsi'):
+        os.unlink('Setup.nsi')
+    os.chdir(oldcwd)
+    if os.path.isfile('uninst.exe'):
+        os.unlink('uninst.exe')
 
 os.unlink(os.path.join('installer_gfx', 'header.bmp'))
 os.unlink(os.path.join('installer_gfx', 'welcome.bmp'))

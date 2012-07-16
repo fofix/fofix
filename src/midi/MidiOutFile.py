@@ -18,22 +18,22 @@ class MidiOutFile(MidiOutStream):
 
         self.raw_out = RawOutstreamFile(raw_out)
         MidiOutStream.__init__(self)
-        
-    
+
+
     def write(self):
         self.raw_out.write()
 
 
     def event_slice(self, slc):
         """
-        Writes the slice of an event to the current track. Correctly 
+        Writes the slice of an event to the current track. Correctly
         inserting a varlen timestamp too.
         """
         trk = self._current_track_buffer
         trk.writeVarLen(self.rel_time())
         trk.writeSlice(slc)
-        
-    
+
+
     #####################
     ## Midi events
 
@@ -168,18 +168,18 @@ class MidiOutFile(MidiOutStream):
         """
         self.event_slice(chr(TUNING_REQUEST))
 
-            
+
     #########################
     # header does not really belong here. But anyhoo!!!
-    
+
     def header(self, format=0, nTracks=1, division=96):
 
         """
         format: type of midi file in [0,1,2]
         nTracks: number of tracks. 1 track for type 0 file
         division: timing division ie. 96 ppq.
-        
-        """        
+
+        """
         raw = self.raw_out
         raw.writeSlice('MThd')
         bew = raw.writeBew
@@ -238,7 +238,7 @@ class MidiOutFile(MidiOutStream):
         # then write
         raw.writeSlice(track_data)
         raw.writeSlice(eot_slice)
-        
+
 
 
     def sequence_number(self, value):
@@ -339,15 +339,15 @@ class MidiOutFile(MidiOutStream):
         """
         hour,
         minute,
-        second: 3 bytes specifying the hour (0-23), minutes (0-59) and 
-                seconds (0-59), respectively. The hour should be 
-                encoded with the SMPTE format, just as it is in MIDI 
+        second: 3 bytes specifying the hour (0-23), minutes (0-59) and
+                seconds (0-59), respectively. The hour should be
+                encoded with the SMPTE format, just as it is in MIDI
                 Time Code.
-        frame: A byte specifying the number of frames per second (one 
+        frame: A byte specifying the number of frames per second (one
                of : 24, 25, 29, 30).
-        framePart: A byte specifying the number of fractional frames, 
-                   in 100ths of a frame (even in SMPTE-based tracks 
-                   using a different frame subdivision, defined in the 
+        framePart: A byte specifying the number of fractional frames,
+                   in 100ths of a frame (even in SMPTE-based tracks
+                   using a different frame subdivision, defined in the
                    MThd chunk).
         """
         self.meta_slice(SMTP_OFFSET, fromBytes([hour, minute, second, frame, framePart]))
@@ -359,11 +359,11 @@ class MidiOutFile(MidiOutStream):
         """
         nn: Numerator of the signature as notated on sheet music
         dd: Denominator of the signature as notated on sheet music
-            The denominator is a negative power of 2: 2 = quarter 
+            The denominator is a negative power of 2: 2 = quarter
             note, 3 = eighth, etc.
         cc: The number of MIDI clocks in a metronome click
-        bb: The number of notated 32nd notes in a MIDI quarter note 
-            (24 MIDI clocks)        
+        bb: The number of notated 32nd notes in a MIDI quarter note
+            (24 MIDI clocks)
         """
         self.meta_slice(TIME_SIGNATURE, fromBytes([nn, dd, cc, bb]))
 
@@ -373,8 +373,8 @@ class MidiOutFile(MidiOutStream):
     def key_signature(self, sf, mi):
 
         """
-        sf: is a byte specifying the number of flats (-ve) or sharps 
-            (+ve) that identifies the key signature (-7 = 7 flats, -1 
+        sf: is a byte specifying the number of flats (-ve) or sharps
+            (+ve) that identifies the key signature (-7 = 7 flats, -1
             = 1 flat, 0 = key of C, 1 = 1 sharp, etc).
         mi: is a byte specifying a major (0) or minor (1) key.
         """
@@ -427,7 +427,7 @@ if __name__ == '__main__':
 
 
     midi.header(0, 1, 480)
-    
+
     midi.start_of_track()
     midi.sequence_name('Type 0')
     midi.tempo(750000)
@@ -438,10 +438,10 @@ if __name__ == '__main__':
         midi.update_time(96)
         midi.note_off(ch, i, 0x40)
         midi.update_time(0)
-    
+
     midi.update_time(0)
     midi.end_of_track()
-    
+
     midi.eof() # currently optional, should it do the write instead of write??
 
 

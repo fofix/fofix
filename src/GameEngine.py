@@ -64,27 +64,27 @@ from constants import *
 import cmgl
 
 class ConfigOption:
-  def __init__(self, id, text):
-    self.id   = id
-    self.text = text
-  
-  def __str__(self):
-    return self.text
-  
-  def __repr__(self):
-    return self.text
-  
-  def __cmp__(self, other):
-    try:
-      return cmp(self.id, other.id)
-    except:
-      return -1
+    def __init__(self, id, text):
+        self.id   = id
+        self.text = text
+
+    def __str__(self):
+        return self.text
+
+    def __repr__(self):
+        return self.text
+
+    def __cmp__(self, other):
+        try:
+            return cmp(self.id, other.id)
+        except:
+            return -1
 
 def sortOptionsByKey(dict):
-  a = {}
-  for k in dict.keys():
-    a[k] = ConfigOption(k, dict[k])
-  return a
+    a = {}
+    for k in dict.keys():
+        a[k] = ConfigOption(k, dict[k])
+    return a
 
 # evilynux - Grab name and version from Version class.
 version = "%s v%s" % ( Version.PROGRAM_NAME, Version.version() )
@@ -171,8 +171,8 @@ Config.define("performance", "max_players", int, 2, text = _("Max Players"), opt
 #myfingershurt:
 Config.define("game",  "stage_rotate_delay",        int,   800,   text = _("Slideshow Delay"), options = dict([(n, n) for n in range(0, 10, 1)] + [(n, n) for n in range(10, 50, 10)] + [(n, n) for n in range(50, 2001, 50)]), tipText = _("Sets how long, in milliseconds, to wait between each frame in a stage slideshow."))
 Config.define("game",  "stage_animate_delay",        int,   3,   text = _("Animation Delay"), options = dict([(n, n) for n in range(0, 10, 1)] + [(n, n) for n in range(10, 50, 10)] + [(n, n) for n in range(50, 2001, 50)]), tipText = _("Sets how long, in milliseconds, to wait between each frame in a stage animation."))
-Config.define("game",   "rotate_stages",           int,  0,  text = _("Stage Slideshow"),  options = {0: _("Off"), 1: _("Random"), 2: _("In Order"), 3: _("BackNForth")}, tipText = _("Sets the method used to rotate frames in a stage slideshow.")) 
-Config.define("game",   "stage_animate",           int,  0,  text = _("Stage Animation"),  options = {0: _("Off"), 1: _("Random"), 2: _("In Order"), 3: _("BackNForth")}, tipText = _("Sets the method used to rotate frames in a stage animation.")) 
+Config.define("game",   "rotate_stages",           int,  0,  text = _("Stage Slideshow"),  options = {0: _("Off"), 1: _("Random"), 2: _("In Order"), 3: _("BackNForth")}, tipText = _("Sets the method used to rotate frames in a stage slideshow."))
+Config.define("game",   "stage_animate",           int,  0,  text = _("Stage Animation"),  options = {0: _("Off"), 1: _("Random"), 2: _("In Order"), 3: _("BackNForth")}, tipText = _("Sets the method used to rotate frames in a stage animation."))
 Config.define("game",   "stage_mode",           int,  0,  text = _("Stage Selection"),  options = {0: _("Random"), 1: _("Default"), 2: _("Blank"), 3: _("Video")}, tipText = _("Set the background for your stage. Default will use the default background, and Blank puts you in a dark room. Probably a lot like the one you're in now."))
 Config.define("game",   "song_stage",           int,  1,  text = _("Song Stage"),  options = {0: _("Off"), 1: _("On") }, tipText = _("Fretters can include a stage to be used with their songs. If this is enabled, you can see it.")) #MFH
 Config.define("game",   "lyric_mode",           int,   2,   text = _("Script Lyric Display"), options = sortOptionsByKey({0: _("Off"), 1: _("By Song"), 2: _("Always"), 3: _("Dual Lyric Prevention")}), tipText = _("Sets whether lyrics from a script.txt file are displayed. 'By Song' lets the fretter decide. 'Always' always displays script lyrics, if available, and 'Dual Lyric Prevention' will disable script lyrics if there are MIDI lyrics. (This is affected by the 'Performance' quickset)"))#racer
@@ -180,7 +180,7 @@ Config.define("game",   "frets_under_notes",          bool, True,  text = _("Fre
 Config.define("game",   "drum_navigation",          bool, True,  text = _("Drum Navigation"), options = {False: _("Off"), True: _("On")}, tipText = _("If enabled, drum keys will be allowed to navigate menus. If not, only guitar keys and keyboard master keys will."))
 
 Config.define("game", "decimal_places",      int, 1,  text = _("Stat Decimal Places"), options = dict([(n, n) for n in range(0, 3)]), tipText = _("Determines how many decimal places will be noted in displaying stats."))
- 
+
 Config.define("game",   "ignore_open_strums",          bool, True,  text = _("Ignore Open Strums"), options = {False: _("No"), True: _("Yes")}, tipText = _("If enabled, strumming without holding any frets down won't be counted."))
 Config.define("performance",   "static_strings",          bool, True,  text = _("Static Strings"), options = {False: _("No"), True: _("Yes")}, tipText = _("If enabled, the 'strings' on your fretboard will not scroll."))
 Config.define("game",   "whammy_saves_starpower",          bool, False,  text = _("Effects Save SP"), options = {False: _("No"), True: _("Yes")}, tipText = _("If enabled, whammying while in SP will slow down its decrease. And your score will be handicapped by 5%."))
@@ -195,7 +195,7 @@ Config.define("game", "script_lyric_pos",      int,   0,   text = _("Script Lyri
 Config.define("game",   "star_claps",          bool, False,  text = _("Starpower Claps"), options = {False: _("Off"), True: _("On")}, tipText = _("Enables a clapping sound effect to be used on the beats in Starpower."))
 Config.define("audio", "disable_preview",      bool, True,  text = _("Song Previews"), options = {False: _("Automatic"), True: _("Yellow Fret (#3)")}, tipText = _("If set to 'Automatic', songs will automatically start previewing when you select them. Otherwise you must press the third fret."))
 Config.define("game", "rb_sp_neck_glow",      bool, False,  text = _("RB SP Neck Glow"), options = {False: _("Off"), True: _("On")}, tipText = _("Sets a neck glow effect during SP in RB-type themes."))
-Config.define("game",   "sp_notes_while_active",  int,  2,  text = _("SP Refill Mode"),  options = sortOptionsByKey({0: _("None"), 1: _("By Theme"), 2: _("By MIDI Type"), 3: _("Always")}), tipText = _("Sets whether you can earn more starpower while using it. In 'By MIDI Type', only MIDIs that mark RB-style sections will use this. (This is set by the 'Gameplay' quickset)")) 
+Config.define("game",   "sp_notes_while_active",  int,  2,  text = _("SP Refill Mode"),  options = sortOptionsByKey({0: _("None"), 1: _("By Theme"), 2: _("By MIDI Type"), 3: _("Always")}), tipText = _("Sets whether you can earn more starpower while using it. In 'By MIDI Type', only MIDIs that mark RB-style sections will use this. (This is set by the 'Gameplay' quickset)"))
 
 #MFH wuz here.  Yeah.
 Config.define("game", "kill_debug",      bool, False,  text = _("Effects Debug"), options = {False: _("Off"), True: _("On")}, tipText = _("If enabled, will show on-screen the raw data of your killswitch/whammy."))
@@ -273,15 +273,15 @@ Config.define("game", "beat_claps",          bool, False,  text = _("Practice Be
 Config.define("game", "HSMovement",      int,   1,   text = _("Change Score Display"),    options = {0: _("Auto"), 1: _("Blue Fret (#4)")}, tipText = _("Sets whether to change the setlist high score difficulty automatically or with the fourth fret.")) #racer
 
 #Q
-Config.define("game", "battle_Whammy",      int,   1,   text = _("Whammy"),    options = {0: _("Off"), 1: _("On")}, tipText = _("Makes opponent miss notes until the whammy bar is pushed a few times")) 
-Config.define("game", "battle_Diff_Up",      int,   1,   text = _("Difficulty Up"),    options = {0: _("Off"), 1: _("On")}, tipText = _("Ups opponent's difficulty for a while (if not playing on Expert)")) 
-Config.define("game", "battle_String_Break",      int,   1,   text = _("String Break"),    options = {0: _("Off"), 1: _("On")}, tipText = _("Breaks a string, causing your opponent to miss notes on that fret until they push the fret button several times.")) 
-Config.define("game", "battle_Double",      int,   1,   text = _("Double Notes"),    options = {0: _("Off"), 1: _("On")}, tipText = _("Makes single notes into chords, and chords into even bigger ones.")) 
-Config.define("game", "battle_Death_Drain",      int,   2,   text = _("Death Drain"),    options = {0: _("Off"), 1: _("On"), 2: _("Sudden Death Only")}, tipText = _("Drains your opponents life until they die. 'Sudden Death Only' keeps this from appearing until you reach sudden death mode.")) 
-Config.define("game", "battle_Amp_Overload",      int,   1,   text = _("Amp Overload"),    options = {0: _("Off"), 1: _("On")}, tipText = _("Makes opponent's amp flip out, making notes disappear and reappear randomly.")) 
-Config.define("game", "battle_Switch_Controls",      int,   1,   text = _("Switch Controls"),    options = {0: _("Off"), 1: _("On")}, tipText = _("Switches opponent to (or from) lefty mode for a bit!")) 
-Config.define("game", "battle_Steal",      int,   1,   text = _("Steal Object"),    options = {0: _("Off"), 1: _("On")}, tipText = _("Steals an object your opponent has.")) 
-Config.define("game", "battle_Tune",      int,   1,   text = _("Guitar Tune"),    options = {0: _("Off"), 1: _("On")}, tipText = _("Makes opponent miss all notes until they play a scale.")) 
+Config.define("game", "battle_Whammy",      int,   1,   text = _("Whammy"),    options = {0: _("Off"), 1: _("On")}, tipText = _("Makes opponent miss notes until the whammy bar is pushed a few times"))
+Config.define("game", "battle_Diff_Up",      int,   1,   text = _("Difficulty Up"),    options = {0: _("Off"), 1: _("On")}, tipText = _("Ups opponent's difficulty for a while (if not playing on Expert)"))
+Config.define("game", "battle_String_Break",      int,   1,   text = _("String Break"),    options = {0: _("Off"), 1: _("On")}, tipText = _("Breaks a string, causing your opponent to miss notes on that fret until they push the fret button several times."))
+Config.define("game", "battle_Double",      int,   1,   text = _("Double Notes"),    options = {0: _("Off"), 1: _("On")}, tipText = _("Makes single notes into chords, and chords into even bigger ones."))
+Config.define("game", "battle_Death_Drain",      int,   2,   text = _("Death Drain"),    options = {0: _("Off"), 1: _("On"), 2: _("Sudden Death Only")}, tipText = _("Drains your opponents life until they die. 'Sudden Death Only' keeps this from appearing until you reach sudden death mode."))
+Config.define("game", "battle_Amp_Overload",      int,   1,   text = _("Amp Overload"),    options = {0: _("Off"), 1: _("On")}, tipText = _("Makes opponent's amp flip out, making notes disappear and reappear randomly."))
+Config.define("game", "battle_Switch_Controls",      int,   1,   text = _("Switch Controls"),    options = {0: _("Off"), 1: _("On")}, tipText = _("Switches opponent to (or from) lefty mode for a bit!"))
+Config.define("game", "battle_Steal",      int,   1,   text = _("Steal Object"),    options = {0: _("Off"), 1: _("On")}, tipText = _("Steals an object your opponent has."))
+Config.define("game", "battle_Tune",      int,   1,   text = _("Guitar Tune"),    options = {0: _("Off"), 1: _("On")}, tipText = _("Makes opponent miss all notes until they play a scale."))
 
 #blazingamer
 Config.define("game", "congrats",       bool, True,     text = _("Score SFX"),             options = {True: _("On"), False: _("Off")}, tipText = _("Sets whether or not to have Jurgen taunt (or, I suppose, congratulate) you at the end of a song."))#blazingamer
@@ -356,23 +356,23 @@ themes = []
 defaultTheme = None           #myfingershurt
 allthemes = os.listdir(themepath)
 for name in allthemes:
-  if os.path.exists(os.path.join(themepath,name,"notes","notes.png")):
-    themes.append(name)
-    if name == "MegaLight V4":
-      defaultTheme = name
+    if os.path.exists(os.path.join(themepath,name,"notes","notes.png")):
+        themes.append(name)
+        if name == "MegaLight V4":
+            defaultTheme = name
 
 i = len(themes)
 if i == 0:
-  if os.name == 'posix':
-    Log.error("No valid theme found!\n"+\
-              "Make sure theme files are properly cased "+\
-              "e.g. notes.png works, Notes.png doesn't\n")
-  else:
-    Log.error("No valid theme found!")
-  sys.exit(1);
-  
+    if os.name == 'posix':
+        Log.error("No valid theme found!\n"+\
+                  "Make sure theme files are properly cased "+\
+                  "e.g. notes.png works, Notes.png doesn't\n")
+    else:
+        Log.error("No valid theme found!")
+    sys.exit(1);
+
 if defaultTheme is None:
-  defaultTheme = themes[0]    #myfingershurt
+    defaultTheme = themes[0]    #myfingershurt
 
 #myfingershurt: default theme must be an existing one!
 Config.define("coffee", "themename",           str,   defaultTheme,      text = _("Theme"),                options = dict([(str(themes[n]),themes[n]) for n in range(0, i)]), tipText = _("Sets the overall graphical feel of the game. You can find and download many more at fretsonfire.net"))
@@ -391,725 +391,725 @@ Config.define("game", "songlist_instrument", int, 0, text = _("Instrument (Setli
 
 
 class FullScreenSwitcher(KeyListener):
-  """
-  A keyboard listener that looks for special built-in key combinations,
-  such as the fullscreen toggle (Alt-Enter).
-  """
-  def __init__(self, engine):
-    self.engine = engine
-    self.altStatus = False
-  
-  def keyPressed(self, key, unicode):
-    if key == pygame.K_LALT:
-      self.altStatus = True
-    elif key == pygame.K_RETURN and self.altStatus:
-      if not self.engine.toggleFullscreen():
-        Log.error("Unable to toggle fullscreen mode.")
-      return True
-    elif key == pygame.K_d and self.altStatus:
-      self.engine.setDebugModeEnabled(not self.engine.isDebugModeEnabled())
-      return True
-    elif key == pygame.K_g and self.altStatus and self.engine.isDebugModeEnabled():
-      self.engine.debugLayer.gcDump()
-      return True
+    """
+    A keyboard listener that looks for special built-in key combinations,
+    such as the fullscreen toggle (Alt-Enter).
+    """
+    def __init__(self, engine):
+        self.engine = engine
+        self.altStatus = False
 
-  def keyReleased(self, key):
-    if key == pygame.K_LALT:
-      self.altStatus = False
-      
+    def keyPressed(self, key, unicode):
+        if key == pygame.K_LALT:
+            self.altStatus = True
+        elif key == pygame.K_RETURN and self.altStatus:
+            if not self.engine.toggleFullscreen():
+                Log.error("Unable to toggle fullscreen mode.")
+            return True
+        elif key == pygame.K_d and self.altStatus:
+            self.engine.setDebugModeEnabled(not self.engine.isDebugModeEnabled())
+            return True
+        elif key == pygame.K_g and self.altStatus and self.engine.isDebugModeEnabled():
+            self.engine.debugLayer.gcDump()
+            return True
+
+    def keyReleased(self, key):
+        if key == pygame.K_LALT:
+            self.altStatus = False
+
 class SystemEventHandler(SystemEventListener):
-  """
-  A system event listener that takes care of restarting the game when needed
-  and reacting to screen resize events.
-  """
-  def __init__(self, engine):
-    self.engine = engine
+    """
+    A system event listener that takes care of restarting the game when needed
+    and reacting to screen resize events.
+    """
+    def __init__(self, engine):
+        self.engine = engine
 
-  def screenResized(self, size):
-    self.engine.resizeScreen(size[0], size[1])
-    
-  def restartRequested(self):
-    self.engine.restart()
-    
-  def quit(self):
-    self.engine.quit()
+    def screenResized(self, size):
+        self.engine.resizeScreen(size[0], size[1])
+
+    def restartRequested(self):
+        self.engine.restart()
+
+    def quit(self):
+        self.engine.quit()
 
 class GameEngine(object):
-  """The main game engine."""
-  def __init__(self, config = None):
+    """The main game engine."""
+    def __init__(self, config = None):
 
-    Log.debug("GameEngine class init (GameEngine.py)...")
-    self.mainMenu = None    #placeholder for main menu object - to prevent reinstantiation
-    
-    self.createdGuitarScene = False   #MFH - so we only create ONE guitarscene...!
-    self.currentScene = None
-    
-    self.versionString = version  #stump: other version stuff moved to allow full version string to be retrieved without instantiating GameEngine
-    self.uploadVersion = "%s-4.0" % Version.PROGRAM_NAME #akedrou - the version passed to the upload site.
+        Log.debug("GameEngine class init (GameEngine.py)...")
+        self.mainMenu = None    #placeholder for main menu object - to prevent reinstantiation
 
-    self.dataPath = Version.dataPath()
-    Log.debug(self.versionString + " starting up...")
-    Log.debug("Python version: " + sys.version.split(' ')[0])
-    Log.debug("Pygame version: " + str(pygame.version.ver) )
-    Log.debug("PyOpenGL version: " + OpenGL.__version__)
-    Log.debug("Numpy version: " + np.__version__)
-    Log.debug("PIL version: " + Image.VERSION)
-    Log.debug("sys.argv: " + repr(sys.argv))
-    Log.debug("os.name: " + os.name)
-    Log.debug("sys.platform: " + sys.platform)
-    if os.name == 'nt':
-      import win32api
-      Log.debug("win32api.GetVersionEx(1): " + repr(win32api.GetVersionEx(1)))
-    elif os.name == 'posix':
-      Log.debug("os.uname(): " + repr(os.uname()))
+        self.createdGuitarScene = False   #MFH - so we only create ONE guitarscene...!
+        self.currentScene = None
 
-    """
-    Constructor.
-    @param config:  L{Config} instance for settings
-    """
+        self.versionString = version  #stump: other version stuff moved to allow full version string to be retrieved without instantiating GameEngine
+        self.uploadVersion = "%s-4.0" % Version.PROGRAM_NAME #akedrou - the version passed to the upload site.
 
-    self.tutorialFolder = "tutorials"
+        self.dataPath = Version.dataPath()
+        Log.debug(self.versionString + " starting up...")
+        Log.debug("Python version: " + sys.version.split(' ')[0])
+        Log.debug("Pygame version: " + str(pygame.version.ver) )
+        Log.debug("PyOpenGL version: " + OpenGL.__version__)
+        Log.debug("Numpy version: " + np.__version__)
+        Log.debug("PIL version: " + Image.VERSION)
+        Log.debug("sys.argv: " + repr(sys.argv))
+        Log.debug("os.name: " + os.name)
+        Log.debug("sys.platform: " + sys.platform)
+        if os.name == 'nt':
+            import win32api
+            Log.debug("win32api.GetVersionEx(1): " + repr(win32api.GetVersionEx(1)))
+        elif os.name == 'posix':
+            Log.debug("os.uname(): " + repr(os.uname()))
 
-    if not config:
-      config = Config.load()
+        """
+        Constructor.
+        @param config:  L{Config} instance for settings
+        """
 
-    self.config  = config
+        self.tutorialFolder = "tutorials"
 
-    fps          = self.config.get("video", "fps")
+        if not config:
+            config = Config.load()
 
-    self.tasks = []
-    self.frameTasks = []
-    self.fps = fps
-    self.currentTask = None
-    self.paused = []
-    self.running = True
-    self.clock = pygame.time.Clock()
+        self.config  = config
 
-    self.title             = self.versionString
-    self.restartRequested  = False
+        fps          = self.config.get("video", "fps")
 
-    # evilynux - Check if theme icon exists first, then fallback on FoFiX icon.
-    themename = self.config.get("coffee", "themename")
-    themeicon = os.path.join(Version.dataPath(), "themes", themename, "icon.png")
-    fofixicon = os.path.join(Version.dataPath(), "fofix_icon.png")
-    icon = None
-    if os.path.exists(themeicon):
-      icon = themeicon
-    elif os.path.exists(fofixicon):
-      icon = fofixicon
+        self.tasks = []
+        self.frameTasks = []
+        self.fps = fps
+        self.currentTask = None
+        self.paused = []
+        self.running = True
+        self.clock = pygame.time.Clock()
 
-    self.video             = Video(self.title, icon)
-    if self.config.get("video", "disable_screensaver"):
-      self.video.disableScreensaver()
+        self.title             = self.versionString
+        self.restartRequested  = False
 
-    self.audio             = Audio()
-    self.frames            = 0
-    self.fpsEstimate       = 0
-    self.priority          = self.config.get("engine", "highpriority")
-    self.show_fps          = self.config.get("video", "show_fps")
-    self.advSettings       = self.config.get("game", "adv_settings")
-    self.restartRequired   = False
-    self.quicksetRestart   = False
-    self.quicksetPerf      = self.config.get("quickset", "performance")
-    self.scrollRate        = self.config.get("game", "scroll_rate")
-    self.scrollDelay       = self.config.get("game", "scroll_delay")
-    
-    Log.debug("Initializing audio.")
-    frequency    = self.config.get("audio", "frequency")
-    bits         = self.config.get("audio", "bits")
-    stereo       = self.config.get("audio", "stereo")
-    bufferSize   = self.config.get("audio", "buffersize")
-    
-    self.frequency = frequency    #MFH - store this for later reference!
-    self.bits = bits
-    self.stereo = stereo
-    self.bufferSize = bufferSize
-    
-    self.cmdPlay           = 0
-    self.cmdMode           = None
-    self.cmdDiff           = None
-    self.cmdPart           = None
-    
-    self.gameStarted       = False
-    self.world             = None
+        # evilynux - Check if theme icon exists first, then fallback on FoFiX icon.
+        themename = self.config.get("coffee", "themename")
+        themeicon = os.path.join(Version.dataPath(), "themes", themename, "icon.png")
+        fofixicon = os.path.join(Version.dataPath(), "fofix_icon.png")
+        icon = None
+        if os.path.exists(themeicon):
+            icon = themeicon
+        elif os.path.exists(fofixicon):
+            icon = fofixicon
 
-    #MFH - TODO - Audio speed divisor needs to be changed to audio speed factor, so can support 0.75x (3/4 speed)
-    self.audioSpeedFactor = 0
-    self.setSpeedFactor(1)   #MFH - handles initialization at full speed    
-    
-    Log.debug("Initializing video.")
-    #myfingershurt: ensuring windowed mode starts up in center of the screen instead of cascading positions:
-    os.environ['SDL_VIDEO_WINDOW_POS'] = 'center'
+        self.video             = Video(self.title, icon)
+        if self.config.get("video", "disable_screensaver"):
+            self.video.disableScreensaver()
 
-    width, height = [int(s) for s in self.config.get("video", "resolution").split("x")]
-    fullscreen    = self.config.get("video", "fullscreen")
-    multisamples  = self.config.get("video", "multisamples")
-    self.video.setMode((width, height), fullscreen = fullscreen, multisamples = multisamples)
-    Log.debug("OpenGL version: " + glGetString(GL_VERSION))
-    Log.debug("OpenGL vendor: " + glGetString(GL_VENDOR))
-    Log.debug("OpenGL renderer: " + glGetString(GL_RENDERER))
-    Log.debug("OpenGL extensions: " + ' '.join(sorted(glGetString(GL_EXTENSIONS).split())))
-    
-    if self.video.default:
-      self.config.set("video", "fullscreen", False)
-      self.config.set("video", "resolution", "800x600")
-    
-    if self.config.get("video", "shader_use"):
-      shaders.set(os.path.join(Version.dataPath(), "shaders"))
+        self.audio             = Audio()
+        self.frames            = 0
+        self.fpsEstimate       = 0
+        self.priority          = self.config.get("engine", "highpriority")
+        self.show_fps          = self.config.get("video", "show_fps")
+        self.advSettings       = self.config.get("game", "adv_settings")
+        self.restartRequired   = False
+        self.quicksetRestart   = False
+        self.quicksetPerf      = self.config.get("quickset", "performance")
+        self.scrollRate        = self.config.get("game", "scroll_rate")
+        self.scrollDelay       = self.config.get("game", "scroll_delay")
 
-    # Enable the high priority timer if configured
-    if self.priority:
-      Log.debug("Enabling high priority timer.")
-      self.fps = 0 # High priority
+        Log.debug("Initializing audio.")
+        frequency    = self.config.get("audio", "frequency")
+        bits         = self.config.get("audio", "bits")
+        stereo       = self.config.get("audio", "stereo")
+        bufferSize   = self.config.get("audio", "buffersize")
 
-    # evilynux - This was generating an error on the first pass (at least under
-    #            GNU/Linux) as the Viewport was not set yet.
-    try:
-      viewport = glGetIntegerv(GL_VIEWPORT)
-    except:
-      viewport = [0, 0, width, height]
-    h = viewport[3] - viewport[1]
-    w = viewport[2] - viewport[0]
-    geometry = (0, 0, w, h)
-    self.svg = SvgContext(geometry)
-    glViewport(int(viewport[0]), int(viewport[1]), int(viewport[2]), int(viewport[3]))
+        self.frequency = frequency    #MFH - store this for later reference!
+        self.bits = bits
+        self.stereo = stereo
+        self.bufferSize = bufferSize
 
-    self.startupMessages   = self.video.error
-    self.input     = Input()
-    self.view      = View(self, geometry)
-    self.resizeScreen(w, h)
+        self.cmdPlay           = 0
+        self.cmdMode           = None
+        self.cmdDiff           = None
+        self.cmdPart           = None
 
-    self.resource  = Resource(Version.dataPath())
-    self.mainloop  = self.loading
-    self.menuMusic = False
-    
-    self.setlistMsg = None
+        self.gameStarted       = False
+        self.world             = None
 
-    
-    # Load game modifications
-    Mod.init(self)
-    self.addTask(self.input, synchronized = False)
-    
-    self.addTask(self.view, synchronized = False)
-    
-    self.addTask(self.resource, synchronized = False)
+        #MFH - TODO - Audio speed divisor needs to be changed to audio speed factor, so can support 0.75x (3/4 speed)
+        self.audioSpeedFactor = 0
+        self.setSpeedFactor(1)   #MFH - handles initialization at full speed
 
-    self.data = Data(self.resource, self.svg)
+        Log.debug("Initializing video.")
+        #myfingershurt: ensuring windowed mode starts up in center of the screen instead of cascading positions:
+        os.environ['SDL_VIDEO_WINDOW_POS'] = 'center'
 
-    ##MFH: Animated stage folder selection option
-    #<themename>\Stages still contains the backgrounds for when stage rotation is off, and practice.png
-    #subfolders under Stages\ will each be treated as a separate animated stage set
-    
-    self.stageFolders = []
-    currentTheme = themename
-    
-    stagespath = os.path.join(Version.dataPath(), "themes", currentTheme, "backgrounds")
-    themepath  = os.path.join(Version.dataPath(), "themes", currentTheme)
-    if os.path.exists(stagespath):
-      self.stageFolders = []
-      allFolders = os.listdir(stagespath)   #this also includes all the stage files - so check to see if there is at least one .png file inside each folder to be sure it's an animated stage folder
-      for name in allFolders:
-        aniStageFolderListing = []
-        thisIsAnAnimatedStageFolder = False
+        width, height = [int(s) for s in self.config.get("video", "resolution").split("x")]
+        fullscreen    = self.config.get("video", "fullscreen")
+        multisamples  = self.config.get("video", "multisamples")
+        self.video.setMode((width, height), fullscreen = fullscreen, multisamples = multisamples)
+        Log.debug("OpenGL version: " + glGetString(GL_VERSION))
+        Log.debug("OpenGL vendor: " + glGetString(GL_VENDOR))
+        Log.debug("OpenGL renderer: " + glGetString(GL_RENDERER))
+        Log.debug("OpenGL extensions: " + ' '.join(sorted(glGetString(GL_EXTENSIONS).split())))
+
+        if self.video.default:
+            self.config.set("video", "fullscreen", False)
+            self.config.set("video", "resolution", "800x600")
+
+        if self.config.get("video", "shader_use"):
+            shaders.set(os.path.join(Version.dataPath(), "shaders"))
+
+        # Enable the high priority timer if configured
+        if self.priority:
+            Log.debug("Enabling high priority timer.")
+            self.fps = 0 # High priority
+
+        # evilynux - This was generating an error on the first pass (at least under
+        #            GNU/Linux) as the Viewport was not set yet.
         try:
-          aniStageFolderListing = os.listdir(os.path.join(stagespath,name))
-        except Exception:
-          thisIsAnAnimatedStageFolder = False
-        for aniFile in aniStageFolderListing:
-          if os.path.splitext(aniFile)[1] == ".png" or os.path.splitext(aniFile)[1] ==  ".jpg" or os.path.splitext(aniFile)[1] == ".jpeg":  #we've found at least one .png file here, chances are this is a valid animated stage folder
-            thisIsAnAnimatedStageFolder = True
-        if thisIsAnAnimatedStageFolder:
-          self.stageFolders.append(name)
+            viewport = glGetIntegerv(GL_VIEWPORT)
+        except:
+            viewport = [0, 0, width, height]
+        h = viewport[3] - viewport[1]
+        w = viewport[2] - viewport[0]
+        geometry = (0, 0, w, h)
+        self.svg = SvgContext(geometry)
+        glViewport(int(viewport[0]), int(viewport[1]), int(viewport[2]), int(viewport[3]))
+
+        self.startupMessages   = self.video.error
+        self.input     = Input()
+        self.view      = View(self, geometry)
+        self.resizeScreen(w, h)
+
+        self.resource  = Resource(Version.dataPath())
+        self.mainloop  = self.loading
+        self.menuMusic = False
+
+        self.setlistMsg = None
 
 
-      i = len(self.stageFolders)
-      if i > 0: #only set default to first animated subfolder if one exists - otherwise use Normal!
-        defaultAniStage = str(self.stageFolders[0])
-      else:
-        defaultAniStage = "Normal"
-      Log.debug("Default animated stage for " + currentTheme + " theme = " + defaultAniStage)
-      aniStageOptions = dict([(str(self.stageFolders[n]),self.stageFolders[n]) for n in range(0, i)])
-      aniStageOptions.update({"Normal":_("Slideshow")})
-      if i > 1:   #only add Random setting if more than one animated stage exists
-        aniStageOptions.update({"Random":_("Random")})
-      Config.define("game", "animated_stage_folder", str, defaultAniStage, text = _("Animated Stage"), options = aniStageOptions )
-      
-      #MFH: here, need to track and check a new ini entry for last theme - so when theme changes we can re-default animated stage to first found
-      lastTheme = self.config.get("game","last_theme")
-      if lastTheme == "" or lastTheme != currentTheme:   #MFH - no last theme, and theme just changed:
-        self.config.set("game","animated_stage_folder",defaultAniStage)   #force defaultAniStage
-      self.config.set("game","last_theme",currentTheme)
-      
-      selectedAnimatedStage = self.config.get("game", "animated_stage_folder")
-      if selectedAnimatedStage != "Normal" and selectedAnimatedStage != "Random":
-        if not os.path.exists(os.path.join(stagespath,selectedAnimatedStage)):
-          Log.warn("Selected animated stage folder " + selectedAnimatedStage + " does not exist, forcing Normal.")
-          self.config.set("game","animated_stage_folder","Normal") #MFH: force "Standard" currently selected animated stage folder is invalid
-    else:
-      Config.define("game", "animated_stage_folder", str, "None", text = _("Animated Stage"), options = ["None",_("None")])
-      Log.warn("No stages\ folder found, forcing None setting for Animated Stage.")
-      self.config.set("game","animated_stage_folder", "None") #MFH: force "None" when Stages folder can't be found
+        # Load game modifications
+        Mod.init(self)
+        self.addTask(self.input, synchronized = False)
 
-    
-    
-    try:
-      fp, pathname, description = imp.find_module("CustomTheme",[themepath])
-      theme = imp.load_module("CustomTheme", fp, pathname, description)
-      self.theme = theme.CustomTheme(themepath, themename)
-    except ImportError:
-      self.theme = Theme(themepath, themename)
-    
-    self.addTask(self.theme)
+        self.addTask(self.view, synchronized = False)
 
-    
-    self.input.addKeyListener(FullScreenSwitcher(self), priority = True)
-    self.input.addSystemEventListener(SystemEventHandler(self))
+        self.addTask(self.resource, synchronized = False)
 
-    self.debugLayer         = None
-    self.startupLayer       = None
-    self.loadingScreenShown = False
-    self.graphicMenuShown   = False
-    
-    Log.debug("Ready.")
-    
+        self.data = Data(self.resource, self.svg)
 
-  def setSpeedFactor(self, factor):
-    '''
-    allows for slowing down streaming audio tracks
-    @param factor:
-    '''
-    if self.audioSpeedFactor != factor:   #MFH - don't re-init to the same divisor.
-      try:
-        self.audio.close()    #MFH - ensure no audio is playing during the switch!
-        self.audio.pre_open(frequency = int(self.frequency*factor), bits = self.bits, stereo = self.stereo, bufferSize = self.bufferSize)
-        self.audio.open(frequency = int(self.frequency*factor), bits = self.bits, stereo = self.stereo, bufferSize = self.bufferSize)
-        self.audioSpeedFactor = factor
-        pygame.init()
-        Log.debug("Initializing pygame.mixer & audio system at " + str(self.frequency*factor) + " Hz." )
-      except Exception:
-        Log.error("Failed to initialize or re-initialize pygame.mixer & audio system - crash imminent!")
-  
-  # evilynux - This stops the crowd cheers if they're still playing (issue 317).
-  def quit(self):
-    # evilynux - self.audio.close() crashes when we attempt to restart
-    if not self.restartRequested:
-      self.audio.close()
-    Player.savePlayers()
-    for t in list(self.tasks + self.frameTasks):
-      self.removeTask(t)
-    self.running = False
+        ##MFH: Animated stage folder selection option
+        #<themename>\Stages still contains the backgrounds for when stage rotation is off, and practice.png
+        #subfolders under Stages\ will each be treated as a separate animated stage set
 
-  def setStartupLayer(self, startupLayer):
-    """
-    Set the L{Layer} that will be shown when the all
-    the resources have been loaded. See L{Data}
+        self.stageFolders = []
+        currentTheme = themename
 
-    @param startupLayer:    Startup L{Layer}
-    """
-    self.startupLayer = startupLayer
+        stagespath = os.path.join(Version.dataPath(), "themes", currentTheme, "backgrounds")
+        themepath  = os.path.join(Version.dataPath(), "themes", currentTheme)
+        if os.path.exists(stagespath):
+            self.stageFolders = []
+            allFolders = os.listdir(stagespath)   #this also includes all the stage files - so check to see if there is at least one .png file inside each folder to be sure it's an animated stage folder
+            for name in allFolders:
+                aniStageFolderListing = []
+                thisIsAnAnimatedStageFolder = False
+                try:
+                    aniStageFolderListing = os.listdir(os.path.join(stagespath,name))
+                except Exception:
+                    thisIsAnAnimatedStageFolder = False
+                for aniFile in aniStageFolderListing:
+                    if os.path.splitext(aniFile)[1] == ".png" or os.path.splitext(aniFile)[1] ==  ".jpg" or os.path.splitext(aniFile)[1] == ".jpeg":  #we've found at least one .png file here, chances are this is a valid animated stage folder
+                        thisIsAnAnimatedStageFolder = True
+                if thisIsAnAnimatedStageFolder:
+                    self.stageFolders.append(name)
 
-  def isDebugModeEnabled(self):
-    return bool(self.debugLayer)
-    
-  def setDebugModeEnabled(self, enabled):
-    """
-    Show or hide the debug layer.
 
-    @type enabled: bool
-    """
-    if enabled:
-      self.debugLayer = DebugLayer(self)
-    else:
-      self.debugLayer = None
-    
-  def toggleFullscreen(self):
-    """
-    Toggle between fullscreen and windowed mode.
+            i = len(self.stageFolders)
+            if i > 0: #only set default to first animated subfolder if one exists - otherwise use Normal!
+                defaultAniStage = str(self.stageFolders[0])
+            else:
+                defaultAniStage = "Normal"
+            Log.debug("Default animated stage for " + currentTheme + " theme = " + defaultAniStage)
+            aniStageOptions = dict([(str(self.stageFolders[n]),self.stageFolders[n]) for n in range(0, i)])
+            aniStageOptions.update({"Normal":_("Slideshow")})
+            if i > 1:   #only add Random setting if more than one animated stage exists
+                aniStageOptions.update({"Random":_("Random")})
+            Config.define("game", "animated_stage_folder", str, defaultAniStage, text = _("Animated Stage"), options = aniStageOptions )
 
-    @return: True on success
-    """
-    if not self.video.toggleFullscreen():
-      # on windows, the fullscreen toggle kills our textures, se we must restart the whole game
-      self.input.broadcastSystemEvent("restartRequested")
-      self.config.set("video", "fullscreen", not self.video.fullscreen)
-      return True
-    self.config.set("video", "fullscreen", self.video.fullscreen)
-    return True
-    
-  def restart(self):
-    """Restart the game."""
-    if not self.restartRequested:
-      self.restartRequested = True
-      self.input.broadcastSystemEvent("restartRequested")
-    else:
-      self.quit()
+            #MFH: here, need to track and check a new ini entry for last theme - so when theme changes we can re-default animated stage to first found
+            lastTheme = self.config.get("game","last_theme")
+            if lastTheme == "" or lastTheme != currentTheme:   #MFH - no last theme, and theme just changed:
+                self.config.set("game","animated_stage_folder",defaultAniStage)   #force defaultAniStage
+            self.config.set("game","last_theme",currentTheme)
 
-  def resizeScreen(self, width, height):
-    """
-    Resize the game screen.
-
-    @param width:   New width in pixels
-    @param height:  New height in pixels
-    """
-    self.view.setGeometry((0, 0, width, height))
-    self.svg.setGeometry((0, 0, width, height))
-  
-  def startWorld(self, players, maxplayers = None, gameMode = 0, multiMode = 0, allowGuitar = True, allowDrum = True, allowMic = False, tutorial = False):
-    self.world = World(self, players, maxplayers, gameMode, multiMode, allowGuitar, allowDrum, allowMic, tutorial)
-  
-  def finishGame(self):
-    if not self.world:
-      Log.notice("GameEngine.finishGame called before World created.")
-      return
-    self.world.finishGame()
-    self.world = None
-    self.gameStarted = False
-    self.view.pushLayer(self.mainMenu)
-
-  def loadImgDrawing(self, target, name, fileName, textureSize = None):
-    """
-    Load an SVG drawing synchronously.
-    
-    @param target:      An object that will own the drawing
-    @param name:        The name of the attribute the drawing will be assigned to
-    @param fileName:    The name of the file in the data directory
-    @param textureSize: Either None or (x, y), in which case the file will
-                        be rendered to an x by y texture
-    @return:            L{ImgDrawing} instance
-    """
-    return self.data.loadImgDrawing(target, name, fileName, textureSize)
-
-  #volshebnyi
-  def drawStarScore(self, screenwidth, screenheight, xpos, ypos, stars, scale = None, horiz_spacing = 1.2, space = 1.0, hqStar = False, align = LEFT):
-    minScale = 0.02
-    w = screenwidth
-    h = screenheight
-    if not scale:
-      scale = minScale
-    elif scale < minScale:
-      scale = minScale
-    if self.data.fcStars and stars == 7:
-      star = self.data.starFC
-    else:
-      star = self.data.starPerfect
-    wide = scale * horiz_spacing
-    if align == CENTER: #center - akedrou (simplifying the alignment...)
-      xpos  -= (2 * wide)
-    elif align == RIGHT: #right
-      xpos  -= (4 * wide)
-    if stars > 5:
-      for j in range(5):
-
-        if self.data.maskStars:
-          if self.data.theme == 2:
-            self.drawImage(star, scale = (scale,-scale), coord = (w*(xpos+wide*j)*space**4,h*ypos), color = (1, 1, 0, 1), stretched=11)
-          else:
-            self.drawImage(star, scale = (scale,-scale), coord = (w*(xpos+wide*j)*space**4,h*ypos), color = (0, 1, 0, 1), stretched=11)
+            selectedAnimatedStage = self.config.get("game", "animated_stage_folder")
+            if selectedAnimatedStage != "Normal" and selectedAnimatedStage != "Random":
+                if not os.path.exists(os.path.join(stagespath,selectedAnimatedStage)):
+                    Log.warn("Selected animated stage folder " + selectedAnimatedStage + " does not exist, forcing Normal.")
+                    self.config.set("game","animated_stage_folder","Normal") #MFH: force "Standard" currently selected animated stage folder is invalid
         else:
-          self.drawImage(star, scale = (scale,-scale), coord = (w*(xpos+wide*j)*space**4,h*ypos), stretched=11)
-    else:
-      for j in range(5):
-        if j < stars:
-          if hqStar:
-            star = self.data.star4
-          else:
-            star = self.data.star2
+            Config.define("game", "animated_stage_folder", str, "None", text = _("Animated Stage"), options = ["None",_("None")])
+            Log.warn("No stages\ folder found, forcing None setting for Animated Stage.")
+            self.config.set("game","animated_stage_folder", "None") #MFH: force "None" when Stages folder can't be found
+
+
+
+        try:
+            fp, pathname, description = imp.find_module("CustomTheme",[themepath])
+            theme = imp.load_module("CustomTheme", fp, pathname, description)
+            self.theme = theme.CustomTheme(themepath, themename)
+        except ImportError:
+            self.theme = Theme(themepath, themename)
+
+        self.addTask(self.theme)
+
+
+        self.input.addKeyListener(FullScreenSwitcher(self), priority = True)
+        self.input.addSystemEventListener(SystemEventHandler(self))
+
+        self.debugLayer         = None
+        self.startupLayer       = None
+        self.loadingScreenShown = False
+        self.graphicMenuShown   = False
+
+        Log.debug("Ready.")
+
+
+    def setSpeedFactor(self, factor):
+        '''
+        allows for slowing down streaming audio tracks
+        @param factor:
+        '''
+        if self.audioSpeedFactor != factor:   #MFH - don't re-init to the same divisor.
+            try:
+                self.audio.close()    #MFH - ensure no audio is playing during the switch!
+                self.audio.pre_open(frequency = int(self.frequency*factor), bits = self.bits, stereo = self.stereo, bufferSize = self.bufferSize)
+                self.audio.open(frequency = int(self.frequency*factor), bits = self.bits, stereo = self.stereo, bufferSize = self.bufferSize)
+                self.audioSpeedFactor = factor
+                pygame.init()
+                Log.debug("Initializing pygame.mixer & audio system at " + str(self.frequency*factor) + " Hz." )
+            except Exception:
+                Log.error("Failed to initialize or re-initialize pygame.mixer & audio system - crash imminent!")
+
+    # evilynux - This stops the crowd cheers if they're still playing (issue 317).
+    def quit(self):
+        # evilynux - self.audio.close() crashes when we attempt to restart
+        if not self.restartRequested:
+            self.audio.close()
+        Player.savePlayers()
+        for t in list(self.tasks + self.frameTasks):
+            self.removeTask(t)
+        self.running = False
+
+    def setStartupLayer(self, startupLayer):
+        """
+        Set the L{Layer} that will be shown when the all
+        the resources have been loaded. See L{Data}
+
+        @param startupLayer:    Startup L{Layer}
+        """
+        self.startupLayer = startupLayer
+
+    def isDebugModeEnabled(self):
+        return bool(self.debugLayer)
+
+    def setDebugModeEnabled(self, enabled):
+        """
+        Show or hide the debug layer.
+
+        @type enabled: bool
+        """
+        if enabled:
+            self.debugLayer = DebugLayer(self)
         else:
-          if hqStar:
-            star = self.data.star3
-          else:
-            star = self.data.star1
-        self.drawImage(star, scale = (scale,-scale), coord = (w*(xpos+wide*j)*space**4,h*ypos), stretched=11)
+            self.debugLayer = None
 
-  def drawImage(self, image, scale = (1.0, -1.0), coord = (0, 0), rot = 0, \
-                color = (1,1,1,1), rect = (0,1,0,1), stretched = 0, fit = 0, \
-                alignment = CENTER, valignment = 1):
-    """
-    Draws the image/surface to screen
+    def toggleFullscreen(self):
+        """
+        Toggle between fullscreen and windowed mode.
 
-    @param image:        The openGL surface
-    @param scale:        Scale factor (between 0.0 and 1.0, second value must be negative due to texture flipping)
-    @param coord:        Where the image will be translated to on the screen
-    @param rot:          How many degrees it will be rotated
-    @param color:        The color of the image
-                             (values are between 0.0 and 1.0)
-                             (can have 3 values or 4, if 3 are given the alpha is automatically set to 1.0)
-    @param rect:         The surface rectangle, this is used for cropping the texture
-    @param stretched:    Stretches the image in one of 5 ways according to following passed values
-                             1) fits it to the width of the viewport
-                             2) fits it to the height of the viewport
-                            11) fits it to the width of the viewport and scales the height while keeping the aspect ratio
-                            12) fits it to the heigh of the viewport and scales the width while keeping the aspect ratio
-                             0) stretches it so it fits the whole viewport
-                         Any other values will have the image maintain its size passed by scale
-    @param fit:          Adjusts the texture so the coordinate for the y-axis placement can be
-                         on the top side (1), bottom side (2), or center point (any other value) of the image
-    @param alignment:    Adjusts the texture so the coordinate for x-axis placement can either be
-                         on the left side (0), center point (1), or right(2) side of the image 
-    @param valignment:   Adjusts the texture so the coordinate for y-axis placement can either be
-                         on the bottom side (0), center point (1), or top(2) side of the image
-    """
-    
-    if not isinstance(image, ImgDrawing):
-      return
-    
-    width, height = scale
-    x, y = coord
-    if stretched == 1: # fit to width
-      width  = width  / image.pixelSize[0] * self.view.geometry[2]
-    elif stretched == 2: # fit to height
-      height = height / image.pixelSize[1] * self.view.geometry[3]
-    elif stretched == 11: # fit to width and keep ratio
-      width  = width  / image.pixelSize[0] * self.view.geometry[2]
-      height = height / image.pixelSize[0] * self.view.geometry[2]
-    elif stretched == 12: # fit to height and keep ratio
-      width  = width  / image.pixelSize[1] * self.view.geometry[3]
-      height = height / image.pixelSize[1] * self.view.geometry[3]
-    elif not stretched == 0: # fit to screen
-      width  = width  / image.pixelSize[0] * self.view.geometry[2]
-      height = height / image.pixelSize[1] * self.view.geometry[3]
+        @return: True on success
+        """
+        if not self.video.toggleFullscreen():
+            # on windows, the fullscreen toggle kills our textures, se we must restart the whole game
+            self.input.broadcastSystemEvent("restartRequested")
+            self.config.set("video", "fullscreen", not self.video.fullscreen)
+            return True
+        self.config.set("video", "fullscreen", self.video.fullscreen)
+        return True
 
-    if fit == 1: #y is on top (not center)
-      y = y - ((image.pixelSize[1] * abs(scale[1]))*.5*(self.view.geometry[3]/480.0))
-    elif fit == 2: #y is on bottom
-      y = y + ((image.pixelSize[1] * abs(scale[1]))*.5*(self.view.geometry[3]/480.0))
+    def restart(self):
+        """Restart the game."""
+        if not self.restartRequested:
+            self.restartRequested = True
+            self.input.broadcastSystemEvent("restartRequested")
+        else:
+            self.quit()
 
-    image.setRect(rect)  
-    image.setScale(width, height)
-    image.setPosition(x, y)
-    image.setAlignment(alignment)
-    image.setVAlignment(valignment)
-    image.setAngle(rot)
-    image.setColor(color)
-    image.draw()
+    def resizeScreen(self, width, height):
+        """
+        Resize the game screen.
 
-  #blazingamer
-  def draw3Dtex(self, image, vertex, texcoord, coord = None, scale = None, rot = None, color = (1,1,1), multiples = False, alpha = False, depth = False, vertscale = 0):
-    '''
-    Simplifies tex rendering
-    
-    @param image: self.xxx - tells the system which image/resource should be mapped to the plane
-    @param vertex: (Left, Top, Right, Bottom) - sets the points that define where the plane will be drawn
-    @param texcoord: (Left, Top, Right, Bottom) - sets where the texture should be drawn on the plane
-    @param coord: (x,y,z) - where on the screen the plane will be rendered within the 3d field
-    @param scale: (x,y,z) - scales an glplane how far in each direction
+        @param width:   New width in pixels
+        @param height:  New height in pixels
+        """
+        self.view.setGeometry((0, 0, width, height))
+        self.svg.setGeometry((0, 0, width, height))
 
-    @param rot: (degrees, x-axis, y-axis, z-axis)
-    a digit in the axis is how many times you want to rotate degrees around that axis
-    
-    @param color: (r,g,b) - sets the color of the image when rendered 
-    0 = No Color, 1 = Full color
+    def startWorld(self, players, maxplayers = None, gameMode = 0, multiMode = 0, allowGuitar = True, allowDrum = True, allowMic = False, tutorial = False):
+        self.world = World(self, players, maxplayers, gameMode, multiMode, allowGuitar, allowDrum, allowMic, tutorial)
 
-    @param multiples: True/False
-    defines whether or not there should be multiples of the plane drawn at the same time
-    only really used with the rendering of the notes, keys, and flames
+    def finishGame(self):
+        if not self.world:
+            Log.notice("GameEngine.finishGame called before World created.")
+            return
+        self.world.finishGame()
+        self.world = None
+        self.gameStarted = False
+        self.view.pushLayer(self.mainMenu)
 
-    @param alpha: True/False - defines whether or not the image should have black turned into transparent
-    only really used with hitglows and flames
-    
-    @param depth: True/False - sets the depth by which the object is rendered
-    only really used by keys and notes
-    
-    @param vertscale: # - changes the yscale when setting vertex points
-    only really used by notes
-    '''
+    def loadImgDrawing(self, target, name, fileName, textureSize = None):
+        """
+        Load an SVG drawing synchronously.
+
+        @param target:      An object that will own the drawing
+        @param name:        The name of the attribute the drawing will be assigned to
+        @param fileName:    The name of the file in the data directory
+        @param textureSize: Either None or (x, y), in which case the file will
+                            be rendered to an x by y texture
+        @return:            L{ImgDrawing} instance
+        """
+        return self.data.loadImgDrawing(target, name, fileName, textureSize)
+
+    #volshebnyi
+    def drawStarScore(self, screenwidth, screenheight, xpos, ypos, stars, scale = None, horiz_spacing = 1.2, space = 1.0, hqStar = False, align = LEFT):
+        minScale = 0.02
+        w = screenwidth
+        h = screenheight
+        if not scale:
+            scale = minScale
+        elif scale < minScale:
+            scale = minScale
+        if self.data.fcStars and stars == 7:
+            star = self.data.starFC
+        else:
+            star = self.data.starPerfect
+        wide = scale * horiz_spacing
+        if align == CENTER: #center - akedrou (simplifying the alignment...)
+            xpos  -= (2 * wide)
+        elif align == RIGHT: #right
+            xpos  -= (4 * wide)
+        if stars > 5:
+            for j in range(5):
+
+                if self.data.maskStars:
+                    if self.data.theme == 2:
+                        self.drawImage(star, scale = (scale,-scale), coord = (w*(xpos+wide*j)*space**4,h*ypos), color = (1, 1, 0, 1), stretched=11)
+                    else:
+                        self.drawImage(star, scale = (scale,-scale), coord = (w*(xpos+wide*j)*space**4,h*ypos), color = (0, 1, 0, 1), stretched=11)
+                else:
+                    self.drawImage(star, scale = (scale,-scale), coord = (w*(xpos+wide*j)*space**4,h*ypos), stretched=11)
+        else:
+            for j in range(5):
+                if j < stars:
+                    if hqStar:
+                        star = self.data.star4
+                    else:
+                        star = self.data.star2
+                else:
+                    if hqStar:
+                        star = self.data.star3
+                    else:
+                        star = self.data.star1
+                self.drawImage(star, scale = (scale,-scale), coord = (w*(xpos+wide*j)*space**4,h*ypos), stretched=11)
+
+    def drawImage(self, image, scale = (1.0, -1.0), coord = (0, 0), rot = 0, \
+                  color = (1,1,1,1), rect = (0,1,0,1), stretched = 0, fit = 0, \
+                  alignment = CENTER, valignment = 1):
+        """
+        Draws the image/surface to screen
+
+        @param image:        The openGL surface
+        @param scale:        Scale factor (between 0.0 and 1.0, second value must be negative due to texture flipping)
+        @param coord:        Where the image will be translated to on the screen
+        @param rot:          How many degrees it will be rotated
+        @param color:        The color of the image
+                                 (values are between 0.0 and 1.0)
+                                 (can have 3 values or 4, if 3 are given the alpha is automatically set to 1.0)
+        @param rect:         The surface rectangle, this is used for cropping the texture
+        @param stretched:    Stretches the image in one of 5 ways according to following passed values
+                                 1) fits it to the width of the viewport
+                                 2) fits it to the height of the viewport
+                                11) fits it to the width of the viewport and scales the height while keeping the aspect ratio
+                                12) fits it to the heigh of the viewport and scales the width while keeping the aspect ratio
+                                 0) stretches it so it fits the whole viewport
+                             Any other values will have the image maintain its size passed by scale
+        @param fit:          Adjusts the texture so the coordinate for the y-axis placement can be
+                             on the top side (1), bottom side (2), or center point (any other value) of the image
+        @param alignment:    Adjusts the texture so the coordinate for x-axis placement can either be
+                             on the left side (0), center point (1), or right(2) side of the image
+        @param valignment:   Adjusts the texture so the coordinate for y-axis placement can either be
+                             on the bottom side (0), center point (1), or top(2) side of the image
+        """
+
+        if not isinstance(image, ImgDrawing):
+            return
+
+        width, height = scale
+        x, y = coord
+        if stretched == 1: # fit to width
+            width  = width  / image.pixelSize[0] * self.view.geometry[2]
+        elif stretched == 2: # fit to height
+            height = height / image.pixelSize[1] * self.view.geometry[3]
+        elif stretched == 11: # fit to width and keep ratio
+            width  = width  / image.pixelSize[0] * self.view.geometry[2]
+            height = height / image.pixelSize[0] * self.view.geometry[2]
+        elif stretched == 12: # fit to height and keep ratio
+            width  = width  / image.pixelSize[1] * self.view.geometry[3]
+            height = height / image.pixelSize[1] * self.view.geometry[3]
+        elif not stretched == 0: # fit to screen
+            width  = width  / image.pixelSize[0] * self.view.geometry[2]
+            height = height / image.pixelSize[1] * self.view.geometry[3]
+
+        if fit == 1: #y is on top (not center)
+            y = y - ((image.pixelSize[1] * abs(scale[1]))*.5*(self.view.geometry[3]/480.0))
+        elif fit == 2: #y is on bottom
+            y = y + ((image.pixelSize[1] * abs(scale[1]))*.5*(self.view.geometry[3]/480.0))
+
+        image.setRect(rect)
+        image.setScale(width, height)
+        image.setPosition(x, y)
+        image.setAlignment(alignment)
+        image.setVAlignment(valignment)
+        image.setAngle(rot)
+        image.setColor(color)
+        image.draw()
+
+    #blazingamer
+    def draw3Dtex(self, image, vertex, texcoord, coord = None, scale = None, rot = None, color = (1,1,1), multiples = False, alpha = False, depth = False, vertscale = 0):
+        '''
+        Simplifies tex rendering
+
+        @param image: self.xxx - tells the system which image/resource should be mapped to the plane
+        @param vertex: (Left, Top, Right, Bottom) - sets the points that define where the plane will be drawn
+        @param texcoord: (Left, Top, Right, Bottom) - sets where the texture should be drawn on the plane
+        @param coord: (x,y,z) - where on the screen the plane will be rendered within the 3d field
+        @param scale: (x,y,z) - scales an glplane how far in each direction
+
+        @param rot: (degrees, x-axis, y-axis, z-axis)
+        a digit in the axis is how many times you want to rotate degrees around that axis
+
+        @param color: (r,g,b) - sets the color of the image when rendered
+        0 = No Color, 1 = Full color
+
+        @param multiples: True/False
+        defines whether or not there should be multiples of the plane drawn at the same time
+        only really used with the rendering of the notes, keys, and flames
+
+        @param alpha: True/False - defines whether or not the image should have black turned into transparent
+        only really used with hitglows and flames
+
+        @param depth: True/False - sets the depth by which the object is rendered
+        only really used by keys and notes
+
+        @param vertscale: # - changes the yscale when setting vertex points
+        only really used by notes
+        '''
 
 
-    if not isinstance(image, ImgDrawing):
-      return
-        
-    if alpha == True:
-      glBlendFunc(GL_SRC_ALPHA, GL_ONE)
+        if not isinstance(image, ImgDrawing):
+            return
 
-    if len(color) == 4:
-      col_array  = np.array([[color[0],color[1],color[2], color[3]],
-                         [color[0],color[1],color[2], color[3]],
-                         [color[0],color[1],color[2], color[3]],
-                         [color[0],color[1],color[2], color[3]]], dtype=np.float32)
-    else:
-      col_array  = np.array([[color[0],color[1],color[2], 1],
-                         [color[0],color[1],color[2], 1],
-                         [color[0],color[1],color[2], 1],
-                         [color[0],color[1],color[2], 1]], dtype=np.float32)
-    
-    glEnable(GL_TEXTURE_2D)  
-    image.texture.bind()
-    
-    if multiples == True:
-      glPushMatrix()
-      
-    if coord != None:
-      glTranslate(coord[0], coord[1], coord[2])
-    if rot != None:
-      glRotate(rot[0], rot[1], rot[2], rot[3])
-    if scale != None:
-      glScalef(scale[0], scale[1], scale[2])
+        if alpha == True:
+            glBlendFunc(GL_SRC_ALPHA, GL_ONE)
 
-    if depth == True:
-      glDepthMask(1)
+        if len(color) == 4:
+            col_array  = np.array([[color[0],color[1],color[2], color[3]],
+                               [color[0],color[1],color[2], color[3]],
+                               [color[0],color[1],color[2], color[3]],
+                               [color[0],color[1],color[2], color[3]]], dtype=np.float32)
+        else:
+            col_array  = np.array([[color[0],color[1],color[2], 1],
+                               [color[0],color[1],color[2], 1],
+                               [color[0],color[1],color[2], 1],
+                               [color[0],color[1],color[2], 1]], dtype=np.float32)
 
-    if not isinstance(vertex, np.ndarray):
-      vertex = np.array(
-        [[ vertex[0],  vertscale, vertex[1]],
-         [ vertex[2],  vertscale, vertex[1]],
-         [ vertex[0], -vertscale, vertex[3]],
-         [ vertex[2], -vertscale, vertex[3]]], dtype=np.float32)
-    
-    if not isinstance(texcoord, np.ndarray):
-      texcoord = np.array(
-        [[texcoord[0], texcoord[1]],
-         [texcoord[2], texcoord[1]],
-         [texcoord[0], texcoord[3]],
-         [texcoord[2], texcoord[3]]], dtype=np.float32)
-    
-    cmgl.drawArrays(GL_TRIANGLE_STRIP, vertices=vertex, colors=col_array, texcoords=texcoord)
-    
-    if depth == True:
-      glDepthMask(0)
-      
-    if multiples == True:
-      glPopMatrix()
+        glEnable(GL_TEXTURE_2D)
+        image.texture.bind()
 
-    glDisable(GL_TEXTURE_2D)
-    
-    if alpha == True:
-      glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)                   
-  #glorandwarf: renamed to retrieve the path of the file
-  def fileExists(self, fileName):
-    return self.data.fileExists(fileName)
-  
-  def getPath(self, fileName):
-    return self.data.getPath(fileName)
+        if multiples == True:
+            glPushMatrix()
 
-  def loading(self):
-    """Loading state loop."""
-    done = self.doRun()
-    self.clearScreen()
-    
-    if self.data.essentialResourcesLoaded():
-      if not self.loadingScreenShown:
-        self.loadingScreenShown = True
-        Dialogs.showLoadingScreen(self, self.data.resourcesLoaded)
-        if self.startupLayer:
-          self.view.pushLayer(self.startupLayer)
-        self.mainloop = self.main
-      self.view.render()
-    self.video.flip()
-    return done
+        if coord != None:
+            glTranslate(coord[0], coord[1], coord[2])
+        if rot != None:
+            glRotate(rot[0], rot[1], rot[2], rot[3])
+        if scale != None:
+            glScalef(scale[0], scale[1], scale[2])
 
-  def clearScreen(self):
-    self.svg.clear(*self.theme.backgroundColor)
+        if depth == True:
+            glDepthMask(1)
 
-  def addTask(self, task, synchronized = True):
-    """
-    Add a task to the engine.
+        if not isinstance(vertex, np.ndarray):
+            vertex = np.array(
+              [[ vertex[0],  vertscale, vertex[1]],
+               [ vertex[2],  vertscale, vertex[1]],
+               [ vertex[0], -vertscale, vertex[3]],
+               [ vertex[2], -vertscale, vertex[3]]], dtype=np.float32)
 
-    @param task:          L{Task} to add
-    @type  synchronized:  bool
-    @param synchronized:  If True, the task will be run with small
-                          timesteps tied to the engine clock.
-                          Otherwise the task will be run once per frame.
-    """
-    if synchronized:
-      queue = self.tasks
-    else:
-      queue = self.frameTasks
+        if not isinstance(texcoord, np.ndarray):
+            texcoord = np.array(
+              [[texcoord[0], texcoord[1]],
+               [texcoord[2], texcoord[1]],
+               [texcoord[0], texcoord[3]],
+               [texcoord[2], texcoord[3]]], dtype=np.float32)
 
-    if not task in queue:
-      queue.append(task)
-      task.started()
+        cmgl.drawArrays(GL_TRIANGLE_STRIP, vertices=vertex, colors=col_array, texcoords=texcoord)
 
-  def removeTask(self, task):
-    """
-    Remove a task from the engine.
+        if depth == True:
+            glDepthMask(0)
 
-    @param task:    L{Task} to remove
-    """
-    queues = self._getTaskQueues(task)
-    for q in queues:
-      q.remove(task)
-    if queues:
-      task.stopped()
+        if multiples == True:
+            glPopMatrix()
 
-  def _getTaskQueues(self, task):
-    queues = []
-    for queue in [self.tasks, self.frameTasks]:
-      if task in queue:
-        queues.append(queue)
-    return queues
+        glDisable(GL_TEXTURE_2D)
 
-  def pauseTask(self, task):
-    """
-    Pause a task.
+        if alpha == True:
+            glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
+    #glorandwarf: renamed to retrieve the path of the file
+    def fileExists(self, fileName):
+        return self.data.fileExists(fileName)
 
-    @param task:  L{Task} to pause
-    """
-    self.paused.append(task)
+    def getPath(self, fileName):
+        return self.data.getPath(fileName)
 
-  def resumeTask(self, task):
-    """
-    Resume a paused task.
+    def loading(self):
+        """Loading state loop."""
+        done = self.doRun()
+        self.clearScreen()
 
-    @param task:  L{Task} to resume
-    """
-    self.paused.remove(task)
+        if self.data.essentialResourcesLoaded():
+            if not self.loadingScreenShown:
+                self.loadingScreenShown = True
+                Dialogs.showLoadingScreen(self, self.data.resourcesLoaded)
+                if self.startupLayer:
+                    self.view.pushLayer(self.startupLayer)
+                self.mainloop = self.main
+            self.view.render()
+        self.video.flip()
+        return done
 
-  def enableGarbageCollection(self, enabled):
-    """
-    Enable or disable garbage collection whenever a random garbage
-    collection run would be undesirable. Disabling the garbage collector
-    has the unfortunate side-effect that your memory usage will skyrocket.
-    """
-    if enabled:
-      gc.enable()
-    else:
-      gc.disable()
+    def clearScreen(self):
+        self.svg.clear(*self.theme.backgroundColor)
 
-  def collectGarbage(self):
-    """
-    Run a garbage collection run.
-    """
-    gc.collect()
+    def addTask(self, task, synchronized = True):
+        """
+        Add a task to the engine.
 
-  def _runTask(self, task, ticks = 0):
-    if not task in self.paused:
-      self.currentTask = task
-      task.run(ticks)
-      self.currentTask = None
+        @param task:          L{Task} to add
+        @type  synchronized:  bool
+        @param synchronized:  If True, the task will be run with small
+                              timesteps tied to the engine clock.
+                              Otherwise the task will be run once per frame.
+        """
+        if synchronized:
+            queue = self.tasks
+        else:
+            queue = self.frameTasks
 
-  def main(self):
-    """Main state loop."""
-    done = self.doRun()
-    self.clearScreen()
-    self.view.render()
-    if self.debugLayer:
-      self.debugLayer.render(1.0, True)
-    self.video.flip()
-    # evilynux - Estimate the rendered frames per second.
-    self.frames = self.frames+1
-    # Estimate every 120 frames when highpriority is True.
-    # Estimate every 2*config.fps when highpriority is False,
-    # if you are on target, that should be every 2 seconds.
-    if( not self.priority and self.frames == (self.fps << 1) ) or ( self.priority and self.frames == 120 ):
-      self.fpsEstimate = self.clock.get_fps()
-      # evilynux - Printing on the console with a frozen binary may cause a crash.
-      if self.show_fps and not Version.isWindowsExe():
-        print("%.2f fps" % self.fpsEstimate)
-      self.frames = 0
-    return done
+        if not task in queue:
+            queue.append(task)
+            task.started()
 
-  def doRun(self):
-    """Run one cycle of the task scheduler engine."""
-    if not self.frameTasks and not self.tasks:
-      return False
+    def removeTask(self, task):
+        """
+        Remove a task from the engine.
 
-    for task in self.frameTasks:
-      self._runTask(task)
-    tick = self.clock.get_time()
-    for task in self.tasks:
-      self._runTask(task, tick)
-    self.clock.tick(self.fps)
-    return True
+        @param task:    L{Task} to remove
+        """
+        queues = self._getTaskQueues(task)
+        for q in queues:
+            q.remove(task)
+        if queues:
+            task.stopped()
 
-  def run(self):
-    return self.mainloop()
+    def _getTaskQueues(self, task):
+        queues = []
+        for queue in [self.tasks, self.frameTasks]:
+            if task in queue:
+                queues.append(queue)
+        return queues
+
+    def pauseTask(self, task):
+        """
+        Pause a task.
+
+        @param task:  L{Task} to pause
+        """
+        self.paused.append(task)
+
+    def resumeTask(self, task):
+        """
+        Resume a paused task.
+
+        @param task:  L{Task} to resume
+        """
+        self.paused.remove(task)
+
+    def enableGarbageCollection(self, enabled):
+        """
+        Enable or disable garbage collection whenever a random garbage
+        collection run would be undesirable. Disabling the garbage collector
+        has the unfortunate side-effect that your memory usage will skyrocket.
+        """
+        if enabled:
+            gc.enable()
+        else:
+            gc.disable()
+
+    def collectGarbage(self):
+        """
+        Run a garbage collection run.
+        """
+        gc.collect()
+
+    def _runTask(self, task, ticks = 0):
+        if not task in self.paused:
+            self.currentTask = task
+            task.run(ticks)
+            self.currentTask = None
+
+    def main(self):
+        """Main state loop."""
+        done = self.doRun()
+        self.clearScreen()
+        self.view.render()
+        if self.debugLayer:
+            self.debugLayer.render(1.0, True)
+        self.video.flip()
+        # evilynux - Estimate the rendered frames per second.
+        self.frames = self.frames+1
+        # Estimate every 120 frames when highpriority is True.
+        # Estimate every 2*config.fps when highpriority is False,
+        # if you are on target, that should be every 2 seconds.
+        if( not self.priority and self.frames == (self.fps << 1) ) or ( self.priority and self.frames == 120 ):
+            self.fpsEstimate = self.clock.get_fps()
+            # evilynux - Printing on the console with a frozen binary may cause a crash.
+            if self.show_fps and not Version.isWindowsExe():
+                print("%.2f fps" % self.fpsEstimate)
+            self.frames = 0
+        return done
+
+    def doRun(self):
+        """Run one cycle of the task scheduler engine."""
+        if not self.frameTasks and not self.tasks:
+            return False
+
+        for task in self.frameTasks:
+            self._runTask(task)
+        tick = self.clock.get_time()
+        for task in self.tasks:
+            self._runTask(task, tick)
+        self.clock.tick(self.fps)
+        return True
+
+    def run(self):
+        return self.mainloop()

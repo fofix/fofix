@@ -32,100 +32,100 @@ import fnmatch
 import hashlib
 
 class NsisScriptGenerator(object):
-  def __init__(self, baseFolder='.'):
-    self.nodeList = []
-    self.baseFolder = baseFolder
-  def readList(self, listname):
-    l = open(listname, 'r')
-    for line in l:
-      line = line.partition('//')[0].strip()  # remove comments
-      if not len(line):
-        continue
-      if line[0] == '"' and line[-1] == '"':
-        line = line[1:-1]
-      oldpwd = os.getcwd()
-      os.chdir(self.baseFolder)
-      if os.path.dirname(line) == '' or os.path.isdir(os.path.dirname(line)):
-        for f in win32api.FindFiles(line):
-          path = os.path.join(os.path.dirname(line), f[8])
-          if os.path.isfile(path) and path.find('.svn') == -1:  # omit .svn folders
-            self.nodeList.append(path)
-      os.chdir(oldpwd)
-    l.close()
-  def readExcludeList(self, listname):
-    patterns = []
-    l = open(listname, 'r')
-    for line in l:
-      line = line.partition('//')[0].strip()  # remove comments
-      if not len(line):
-        continue
-      if line[0] == '"' and line[-1] == '"':
-        line = line[1:-1]
-      patterns.append(line)
-    l.close()
-    for p in patterns:
-      self.nodeList = [n for n in self.nodeList if not fnmatch.fnmatch(n.lower(), p.lower())]
-  def getInstallScript(self):
-    prevFolder = None
-    script = ''
-    for f in self.nodeList:
-      if os.path.dirname(f) != prevFolder:
-        script += 'SetOutPath "$INSTDIR\\%s"\r\n' % os.path.dirname(f).replace('..\\', '')
-        prevFolder = os.path.dirname(f)
-      script += 'File "%s"\r\n' % f
-    script += 'SetOutPath "$INSTDIR"\r\n'
-    return script
-  def getUninstallScript(self):
-    prevFolder = None
-    script = ''
-    for f in reversed(self.nodeList):
-      if os.path.dirname(f) != prevFolder:
+    def __init__(self, baseFolder='.'):
+        self.nodeList = []
+        self.baseFolder = baseFolder
+    def readList(self, listname):
+        l = open(listname, 'r')
+        for line in l:
+            line = line.partition('//')[0].strip()  # remove comments
+            if not len(line):
+                continue
+            if line[0] == '"' and line[-1] == '"':
+                line = line[1:-1]
+            oldpwd = os.getcwd()
+            os.chdir(self.baseFolder)
+            if os.path.dirname(line) == '' or os.path.isdir(os.path.dirname(line)):
+                for f in win32api.FindFiles(line):
+                    path = os.path.join(os.path.dirname(line), f[8])
+                    if os.path.isfile(path) and path.find('.svn') == -1:  # omit .svn folders
+                        self.nodeList.append(path)
+            os.chdir(oldpwd)
+        l.close()
+    def readExcludeList(self, listname):
+        patterns = []
+        l = open(listname, 'r')
+        for line in l:
+            line = line.partition('//')[0].strip()  # remove comments
+            if not len(line):
+                continue
+            if line[0] == '"' and line[-1] == '"':
+                line = line[1:-1]
+            patterns.append(line)
+        l.close()
+        for p in patterns:
+            self.nodeList = [n for n in self.nodeList if not fnmatch.fnmatch(n.lower(), p.lower())]
+    def getInstallScript(self):
+        prevFolder = None
+        script = ''
+        for f in self.nodeList:
+            if os.path.dirname(f) != prevFolder:
+                script += 'SetOutPath "$INSTDIR\\%s"\r\n' % os.path.dirname(f).replace('..\\', '')
+                prevFolder = os.path.dirname(f)
+            script += 'File "%s"\r\n' % f
+        script += 'SetOutPath "$INSTDIR"\r\n'
+        return script
+    def getUninstallScript(self):
+        prevFolder = None
+        script = ''
+        for f in reversed(self.nodeList):
+            if os.path.dirname(f) != prevFolder:
+                if prevFolder is not None:
+                    p = prevFolder.replace('..\\', '')
+                    while len(p):
+                        script += 'RmDir "$INSTDIR\\%s"\r\n' % p
+                        p = os.path.dirname(p)
+                prevFolder = os.path.dirname(f)
+            script += 'Delete "$INSTDIR\\%s"\r\n' % f.replace('..\\', '')
         if prevFolder is not None:
-          p = prevFolder.replace('..\\', '')
-          while len(p):
-            script += 'RmDir "$INSTDIR\\%s"\r\n' % p
-            p = os.path.dirname(p)
-        prevFolder = os.path.dirname(f)
-      script += 'Delete "$INSTDIR\\%s"\r\n' % f.replace('..\\', '')
-    if prevFolder is not None:
-      script += 'RmDir "$INSTDIR\\%s"\r\n' % prevFolder.replace('..\\', '')
-    return script
+            script += 'RmDir "$INSTDIR\\%s"\r\n' % prevFolder.replace('..\\', '')
+        return script
 
 def separate(path, scriptIn):
-  scriptOut = ([], [])
-  for l in scriptIn.splitlines():
-    if l.lower().find(path.lower()) == -1:
-      scriptOut[0].append(l)
-    else:
-      scriptOut[1].append(l)
-  return ('\r\n'.join(x) for x in scriptOut)
+    scriptOut = ([], [])
+    for l in scriptIn.splitlines():
+        if l.lower().find(path.lower()) == -1:
+            scriptOut[0].append(l)
+        else:
+            scriptOut[1].append(l)
+    return ('\r\n'.join(x) for x in scriptOut)
 
 class NsisScriptBuilder(object):
-  def __init__(self, header):
-    self.header = header
-    self.sectionScripts = []
-  def addSection(self, secName, secInstContent, secUninstContent, secDescription, secStart='Section', secEnd='SectionEnd'):
-    self.sectionScripts.append([secName, secInstContent, secUninstContent, secDescription, secStart, secEnd])
-  def filterSection(self, secName, secFilter, secDescription, secStart='Section', secEnd='SectionEnd', instHeader='', instFooter='', uninstHeader='', uninstFooter=''):
-    self.sectionScripts[0][1], instContent = separate(secFilter, self.sectionScripts[0][1])
-    self.sectionScripts[0][2], uninstContent = separate(secFilter, self.sectionScripts[0][2])
-    self.addSection(secName, instHeader+instContent+instFooter, uninstHeader+uninstContent+uninstFooter, secDescription, secStart, secEnd)
-  def getScript(self):
-    script = self.header
-    for name, instContent, uninstContent, desc, start, end in self.sectionScripts:
-      script += '''
+    def __init__(self, header):
+        self.header = header
+        self.sectionScripts = []
+    def addSection(self, secName, secInstContent, secUninstContent, secDescription, secStart='Section', secEnd='SectionEnd'):
+        self.sectionScripts.append([secName, secInstContent, secUninstContent, secDescription, secStart, secEnd])
+    def filterSection(self, secName, secFilter, secDescription, secStart='Section', secEnd='SectionEnd', instHeader='', instFooter='', uninstHeader='', uninstFooter=''):
+        self.sectionScripts[0][1], instContent = separate(secFilter, self.sectionScripts[0][1])
+        self.sectionScripts[0][2], uninstContent = separate(secFilter, self.sectionScripts[0][2])
+        self.addSection(secName, instHeader+instContent+instFooter, uninstHeader+uninstContent+uninstFooter, secDescription, secStart, secEnd)
+    def getScript(self):
+        script = self.header
+        for name, instContent, uninstContent, desc, start, end in self.sectionScripts:
+            script += '''
 %s "%s" SecID_%s
 %s
 %s
 ''' % (start, name, hashlib.sha1(name).hexdigest(), instContent, end)
-    script += '!insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN\r\n'
-    for name, instContent, uninstContent, desc, start, end in self.sectionScripts:
-      script += '!insertmacro MUI_DESCRIPTION_TEXT ${SecID_%s} "%s"\r\n' % (hashlib.sha1(name).hexdigest(), desc)
-    script += '!insertmacro MUI_FUNCTION_DESCRIPTION_END\r\n'
-    for name, instContent, uninstContent, desc, start, end in reversed(self.sectionScripts):
-      script += '''
+        script += '!insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN\r\n'
+        for name, instContent, uninstContent, desc, start, end in self.sectionScripts:
+            script += '!insertmacro MUI_DESCRIPTION_TEXT ${SecID_%s} "%s"\r\n' % (hashlib.sha1(name).hexdigest(), desc)
+        script += '!insertmacro MUI_FUNCTION_DESCRIPTION_END\r\n'
+        for name, instContent, uninstContent, desc, start, end in reversed(self.sectionScripts):
+            script += '''
 Section "un.%s"
 %s
 SectionEnd
 ''' % (name, uninstContent)
-    return script
+        return script

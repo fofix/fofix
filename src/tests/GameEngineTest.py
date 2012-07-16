@@ -26,43 +26,43 @@ import Config
 import Version
 
 class EngineTest(unittest.TestCase):
-  def testNetworking(self):
-    config = Config.load(Version.PROGRAM_UNIXSTYLE_NAME + ".ini", setAsDefault = True)
-    e1 = GameEngine(config)
-    
-    e1.startServer()
-    session1 = e1.connect("localhost")
-    session2 = e1.connect("localhost")
+    def testNetworking(self):
+        config = Config.load(Version.PROGRAM_UNIXSTYLE_NAME + ".ini", setAsDefault = True)
+        e1 = GameEngine(config)
 
-    while not session1.isConnected() or not session2.isConnected():
-      e1.run()
+        e1.startServer()
+        session1 = e1.connect("localhost")
+        session2 = e1.connect("localhost")
 
-    session1.world.createPlayer("mario")
-    session2.world.createPlayer("luigi")
-    
-    for i in range(10):
-      e1.run()
+        while not session1.isConnected() or not session2.isConnected():
+            e1.run()
 
-    assert len(e1.server.world.players) == 2
-    assert len(session1.world.players) == 2
-    assert len(session2.world.players) == 2
-    
-    session3 = e1.connect("localhost")
-    
-    for i in range(10):
-      e1.run()
+        session1.world.createPlayer("mario")
+        session2.world.createPlayer("luigi")
 
-    assert len(session3.world.players) == 2
+        for i in range(10):
+            e1.run()
 
-    session1.disconnect()
-    
-    for i in range(10):
-      e1.run()
+        assert len(e1.server.world.players) == 2
+        assert len(session1.world.players) == 2
+        assert len(session2.world.players) == 2
 
-    assert len(e1.server.world.players) == 1
-    assert len(session2.world.players) == 1
+        session3 = e1.connect("localhost")
 
-    e1.quit()
+        for i in range(10):
+            e1.run()
+
+        assert len(session3.world.players) == 2
+
+        session1.disconnect()
+
+        for i in range(10):
+            e1.run()
+
+        assert len(e1.server.world.players) == 1
+        assert len(session2.world.players) == 1
+
+        e1.quit()
 
 if __name__ == "__main__":
-  unittest.main()
+    unittest.main()

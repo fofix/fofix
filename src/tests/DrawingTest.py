@@ -21,15 +21,15 @@
 #####################################################################
 from OpenGL.GL import *
 try:
-  import cmgl
-  cmgl_support = True
+    import cmgl
+    cmgl_support = True
 except ImportError:
-  cmgl_support = False
+    cmgl_support = False
 try:
-  from OpenGL.arrays import vbo
-  vbo_support = True
+    from OpenGL.arrays import vbo
+    vbo_support = True
 except:
-  vbo_support = False
+    vbo_support = False
 import numpy as np
 import pygame
 from pygame.locals import *
@@ -52,40 +52,40 @@ def init():
          [ 0,  0, 1]], dtype=np.float32)
 
     nbSteps = 400.0
-    
+
     #np.append changes dtype=f to dtype=d -> don't use it
     spiralVtx = np.zeros((nbSteps, 3), dtype=np.float32)
     spiralCol = np.zeros((nbSteps, 3), dtype=np.float32)
     for i in range(0, int(nbSteps), 2):
-      ratio = i/nbSteps;
-      angle = 21*ratio
-      c = cos(angle)
-      s = sin(angle);
-      r1 = 1.0 - 0.8*ratio;
-      r2 = 0.8 - 0.8*ratio;
-      alt = ratio - 0.5
-      nor = 0.5
-      up = sqrt(1.0-nor*nor)
-      np.put(spiralVtx[i], [0,1,2] ,[r1*c, alt, r1*s])
-      np.put(spiralCol[i], [0,1,2] ,[1.0-ratio, 0.2, ratio])
-      np.put(spiralVtx[i+1], [0,1,2] ,[r2*c, alt+0.05, r2*s])
-      np.put(spiralCol[i+1], [0,1,2] ,[1.0-ratio, 0.2, ratio])
+        ratio = i/nbSteps;
+        angle = 21*ratio
+        c = cos(angle)
+        s = sin(angle);
+        r1 = 1.0 - 0.8*ratio;
+        r2 = 0.8 - 0.8*ratio;
+        alt = ratio - 0.5
+        nor = 0.5
+        up = sqrt(1.0-nor*nor)
+        np.put(spiralVtx[i], [0,1,2] ,[r1*c, alt, r1*s])
+        np.put(spiralCol[i], [0,1,2] ,[1.0-ratio, 0.2, ratio])
+        np.put(spiralVtx[i+1], [0,1,2] ,[r2*c, alt+0.05, r2*s])
+        np.put(spiralCol[i+1], [0,1,2] ,[1.0-ratio, 0.2, ratio])
 
     if vbo_support:
-      #after hstack array isn't contiguous -> make it contiguous
-      triangArray = np.ascontiguousarray(np.hstack((triangVtx, triangCol)))
-      spiralArray = np.ascontiguousarray(np.hstack((spiralVtx, spiralCol)))
-      #print "triangArray cont: ", triangArray.flags['C_CONTIGUOUS']
-      #print "triangArray dtype: ", triangArray.dtype.char
-      triangVbo = vbo.VBO( triangArray, usage='GL_STATIC_DRAW' )
-      spiralVbo = vbo.VBO( spiralArray, usage='GL_STATIC_DRAW' )
+        #after hstack array isn't contiguous -> make it contiguous
+        triangArray = np.ascontiguousarray(np.hstack((triangVtx, triangCol)))
+        spiralArray = np.ascontiguousarray(np.hstack((spiralVtx, spiralCol)))
+        #print "triangArray cont: ", triangArray.flags['C_CONTIGUOUS']
+        #print "triangArray dtype: ", triangArray.dtype.char
+        triangVbo = vbo.VBO( triangArray, usage='GL_STATIC_DRAW' )
+        spiralVbo = vbo.VBO( spiralArray, usage='GL_STATIC_DRAW' )
     else:
-      print "VBO not supported, fallbacking to cmgl."
-      mode = 1
+        print "VBO not supported, fallbacking to cmgl."
+        mode = 1
 
     if mode == 1 and not cmgl_support:
-      print "cmgl not supported, fallbacking to array-based drawing."
-      mode = 2
+        print "cmgl not supported, fallbacking to array-based drawing."
+        mode = 2
 
 def draw():
     global mode, triangVbo, triangVtx, triangCol
@@ -99,18 +99,18 @@ def draw():
 
     # VBO drawing
     if mode == 0 and vbo_support:
-      drawVBO()
+        drawVBO()
 
     elif mode == 1 and cmgl_support:
-      drawCmgl()
+        drawCmgl()
 
     # Array-based drawing
     elif mode == 2:
-      drawArray()
+        drawArray()
 
     # Direct drawing
     else: # mode == 3
-      drawDirect()
+        drawDirect()
 
     glPopMatrix()
 
@@ -118,19 +118,19 @@ def drawDirect():
     # With pyopengl3.x, glVertex3fv() is much slower than glVertex3f().
     glBegin(GL_TRIANGLES)
     for i in range(triangVtx.shape[0]):
-      #glColor(triangCol[i])
-      #glVertex3fv(triangVtx[i])
-      glColor3f(triangCol[i][0],triangCol[i][1],triangCol[i][2])
-      glVertex3f(triangVtx[i][0],triangVtx[i][1],triangVtx[i][2])
+        #glColor(triangCol[i])
+        #glVertex3fv(triangVtx[i])
+        glColor3f(triangCol[i][0],triangCol[i][1],triangCol[i][2])
+        glVertex3f(triangVtx[i][0],triangVtx[i][1],triangVtx[i][2])
     glEnd()
 
     # Draw spiral
     glBegin(GL_TRIANGLE_STRIP);
     for i in range(spiralVtx.shape[0]):
-      #glColor(spiralCol[i])
-      #glVertex3fv(spiralVtx[i])
-      glColor3f(spiralCol[i][0],spiralCol[i][1],spiralCol[i][2])
-      glVertex3f(spiralVtx[i][0],spiralVtx[i][1],spiralVtx[i][2])
+        #glColor(spiralCol[i])
+        #glVertex3fv(spiralVtx[i])
+        glColor3f(spiralCol[i][0],spiralCol[i][1],spiralCol[i][2])
+        glVertex3f(spiralVtx[i][0],spiralVtx[i][1],spiralVtx[i][2])
     glEnd()
 
 def drawCmgl():
@@ -150,7 +150,7 @@ def drawArray():
     glDrawArrays(GL_TRIANGLE_STRIP, 0, spiralVtx.shape[0])
     glDisableClientState(GL_COLOR_ARRAY)
     glDisableClientState(GL_VERTEX_ARRAY)
-    
+
 def drawVBO():
     # Draw triangle
     triangVbo.bind()
@@ -173,14 +173,14 @@ def drawVBO():
     glDisableClientState(GL_COLOR_ARRAY)
     glDisableClientState(GL_VERTEX_ARRAY)
     spiralVbo.unbind()
-    
+
 def main():
     global rot, scale, mode
     scale_dir = -1
     modeName = ["VBO", "cmgl", "Array-based", "Direct-mode"]
     fps = 0
     video_flags = DOUBLEBUF|OPENGL|HWPALETTE|HWSURFACE
-    
+
     pygame.init()
     pygame.display.set_mode((640,480), video_flags)
     init()
@@ -189,47 +189,47 @@ def main():
     ticks = pygame.time.get_ticks()
     clock = pygame.time.Clock()
     while 1:
-      event = pygame.event.poll()
-      if event.type == QUIT or (event.type == KEYDOWN and event.key == K_ESCAPE):
-        break
-      elif event.type == KEYDOWN and event.key == K_RIGHT:
-        mode = (mode + 1) % 4
-        if mode == 0 and not vbo_support:
-          mode = (mode + 1) % 4
-          print "VBO not supported, fallbacking to %s drawing." % modeName[mode]
-        if mode == 1 and not cmgl_support:
-          mode = (mode + 1) % 4
-          print "cmgl not supported, fallbacking to %s drawing." % modeName[mode]
-      elif event.type == KEYDOWN and event.key == K_LEFT:
-        mode = (mode - 1) % 4
-        if mode == 0 and not vbo_support:
-          mode = (mode - 1) % 4
-          print "VBO not supported, fallbacking to %s drawing." % modeName[mode]
-        if mode == 1 and not cmgl_support:
-          mode = (mode - 1) % 4
-          print "cmgl not supported, fallbacking to %s drawing." % modeName[mode]
-        
-      ticksDiff = pygame.time.get_ticks()-ticks
+        event = pygame.event.poll()
+        if event.type == QUIT or (event.type == KEYDOWN and event.key == K_ESCAPE):
+            break
+        elif event.type == KEYDOWN and event.key == K_RIGHT:
+            mode = (mode + 1) % 4
+            if mode == 0 and not vbo_support:
+                mode = (mode + 1) % 4
+                print "VBO not supported, fallbacking to %s drawing." % modeName[mode]
+            if mode == 1 and not cmgl_support:
+                mode = (mode + 1) % 4
+                print "cmgl not supported, fallbacking to %s drawing." % modeName[mode]
+        elif event.type == KEYDOWN and event.key == K_LEFT:
+            mode = (mode - 1) % 4
+            if mode == 0 and not vbo_support:
+                mode = (mode - 1) % 4
+                print "VBO not supported, fallbacking to %s drawing." % modeName[mode]
+            if mode == 1 and not cmgl_support:
+                mode = (mode - 1) % 4
+                print "cmgl not supported, fallbacking to %s drawing." % modeName[mode]
 
-      # draw all objects
-      draw()
-        
-      # update rotation counters
-      rot += 0.2
-      scale += scale_dir*0.0002
-      if scale > 1.0 or scale < 0.5:
-        scale_dir = scale_dir*-1
+        ticksDiff = pygame.time.get_ticks()-ticks
 
-      # make changes visible
-      pygame.display.flip()
+        # draw all objects
+        draw()
 
-      frames = frames+1
-      if( ticksDiff > 2000 ):
-        fps = ((frames*1000)/(ticksDiff))
-        ticks = pygame.time.get_ticks()
-        frames = 0
-        print "mode: %s, %.2f fps" % (modeName[mode], fps)
-      # evilynux - commented the following so we go as fast as we can
-      #clock.tick(60)
+        # update rotation counters
+        rot += 0.2
+        scale += scale_dir*0.0002
+        if scale > 1.0 or scale < 0.5:
+            scale_dir = scale_dir*-1
+
+        # make changes visible
+        pygame.display.flip()
+
+        frames = frames+1
+        if( ticksDiff > 2000 ):
+            fps = ((frames*1000)/(ticksDiff))
+            ticks = pygame.time.get_ticks()
+            frames = 0
+            print "mode: %s, %.2f fps" % (modeName[mode], fps)
+        # evilynux - commented the following so we go as fast as we can
+        #clock.tick(60)
 
 if __name__ == '__main__': main()

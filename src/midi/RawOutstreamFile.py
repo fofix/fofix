@@ -10,11 +10,11 @@ from cStringIO import StringIO
 from DataTypeConverters import writeBew, writeVar, fromBytes
 
 class RawOutstreamFile:
-    
+
     """
-    
+
     Writes a midi file to disk.
-    
+
     """
 
     def __init__(self, outfile=''):
@@ -28,8 +28,8 @@ class RawOutstreamFile:
     def writeSlice(self, str_slice):
         "Writes the next text slice to the raw data"
         self.buffer.write(str_slice)
-        
-        
+
+
     def writeBew(self, value, length=1):
         "Writes a value to the file as big endian word"
         self.writeSlice(writeBew(value, length))
@@ -51,7 +51,7 @@ class RawOutstreamFile:
                 self.outfile.write(self.getvalue())
         else:
             sys.stdout.write(self.getvalue())
-                
+
     def getvalue(self):
         return self.buffer.getvalue()
 

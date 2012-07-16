@@ -32,32 +32,32 @@ import Microphone  #stump
 import VFS
 
 class ConfigOption:
-  def __init__(self, id, text):
-    self.id   = id
-    self.text = text
-  
-  def __str__(self):
-    return self.text
-  
-  def __repr__(self):
-    return self.text
-  
-  def __cmp__(self, other):
-    try:
-      if self.id > other.id:
-        return 1
-      elif self.id == other.id:
-        return 0
-      else:
-        return -1
-    except:
-      return -1
+    def __init__(self, id, text):
+        self.id   = id
+        self.text = text
+
+    def __str__(self):
+        return self.text
+
+    def __repr__(self):
+        return self.text
+
+    def __cmp__(self, other):
+        try:
+            if self.id > other.id:
+                return 1
+            elif self.id == other.id:
+                return 0
+            else:
+                return -1
+        except:
+            return -1
 
 def sortOptionsByKey(dict):
-  a = {}
-  for k in dict.keys():
-    a[k] = ConfigOption(k, dict[k])
-  return a
+    a = {}
+    for k in dict.keys():
+        a[k] = ConfigOption(k, dict[k])
+    return a
 
 import Log
 
@@ -222,12 +222,12 @@ playerpath = '/users/players'
 
 
 def _makeControllerIniName(name):
-  '''Turn a controller name into a virtual path to the appropriate ini.'''
-  return '%s/%s.ini' % (controlpath, name)
+    '''Turn a controller name into a virtual path to the appropriate ini.'''
+    return '%s/%s.ini' % (controlpath, name)
 
 def _makePlayerIniName(name):
-  '''Turn a player name into a virtual path to the appropriate ini.'''
-  return '%s/%s.ini' % (playerpath, name)
+    '''Turn a player name into a virtual path to the appropriate ini.'''
+    return '%s/%s.ini' % (playerpath, name)
 
 control0 = None
 control1 = None
@@ -244,750 +244,750 @@ _SCHEMA_VERSION = 3
 _playerDB = VFS.openSqlite3('%s/%s' % (playerpath, 'FoFiX-players.cache'))
 _updateTables = 0
 try:
-  v = _playerDB.execute("SELECT `value` FROM `config` WHERE `key` = 'version'").fetchone()[0]
-  if int(v) != _SCHEMA_VERSION:
-    _updateTables = 2 #an old version. We don't want to just burn old tables.
+    v = _playerDB.execute("SELECT `value` FROM `config` WHERE `key` = 'version'").fetchone()[0]
+    if int(v) != _SCHEMA_VERSION:
+        _updateTables = 2 #an old version. We don't want to just burn old tables.
 except:
-  _updateTables = 1 #no good table
+    _updateTables = 1 #no good table
 if _updateTables > 0: #needs to handle old versions eventually.
-  for tbl in _playerDB.execute("SELECT `name` FROM `sqlite_master` WHERE `type` = 'table'").fetchall():
-    _playerDB.execute('DROP TABLE `%s`' % tbl)
-  _playerDB.commit()
-  _playerDB.execute('VACUUM')
-  _playerDB.execute('CREATE TABLE `config` (`key` STRING UNIQUE, `value` STRING)')
-  _playerDB.execute('CREATE TABLE `players` (`name` STRING UNIQUE, `lefty` INT, `drumflip` INT, `autokick` INT, `assist` INT, `twochord` INT, `necktype` INT, `neck` STRING, \
-                 `part` INT, `difficulty` INT, `upname` STRING, `control` INT, `changed` INT, `loaded` INT)')
-  _playerDB.execute('CREATE TABLE `stats` (`song` STRING, `hash` STRING, `player` STRING)')
-  _playerDB.execute("INSERT INTO `config` (`key`, `value`) VALUES (?, ?)", ('version', _SCHEMA_VERSION))
-  _playerDB.commit()
+    for tbl in _playerDB.execute("SELECT `name` FROM `sqlite_master` WHERE `type` = 'table'").fetchall():
+        _playerDB.execute('DROP TABLE `%s`' % tbl)
+    _playerDB.commit()
+    _playerDB.execute('VACUUM')
+    _playerDB.execute('CREATE TABLE `config` (`key` STRING UNIQUE, `value` STRING)')
+    _playerDB.execute('CREATE TABLE `players` (`name` STRING UNIQUE, `lefty` INT, `drumflip` INT, `autokick` INT, `assist` INT, `twochord` INT, `necktype` INT, `neck` STRING, \
+                   `part` INT, `difficulty` INT, `upname` STRING, `control` INT, `changed` INT, `loaded` INT)')
+    _playerDB.execute('CREATE TABLE `stats` (`song` STRING, `hash` STRING, `player` STRING)')
+    _playerDB.execute("INSERT INTO `config` (`key`, `value`) VALUES (?, ?)", ('version', _SCHEMA_VERSION))
+    _playerDB.commit()
 
 def resetStats(player = None):
-  if player == None:
-    _playerDB.execute('UPDATE `stats` SET `hit` = 0, `notes` = 0, `sc1` = 0, `sc2` = 0, `sc3` = 0, `sc4` = 0, `sc5` = 0, `ha1` = 0, `ha2` = 0, `ha3` = 0, `ha4` = 0, `ha5` = 0')
-  else:
-    _playerDB.execute('UPDATE `stats` SET `hit` = 0, `notes` = 0, `sc1` = 0, `sc2` = 0, `sc3` = 0, `sc4` = 0, `sc5` = 0, `ha1` = 0, `ha2` = 0, `ha3` = 0, `ha4` = 0, `ha5` = 0 WHERE `name` = ?', [player])
-  _playerDB.commit()
+    if player == None:
+        _playerDB.execute('UPDATE `stats` SET `hit` = 0, `notes` = 0, `sc1` = 0, `sc2` = 0, `sc3` = 0, `sc4` = 0, `sc5` = 0, `ha1` = 0, `ha2` = 0, `ha3` = 0, `ha4` = 0, `ha5` = 0')
+    else:
+        _playerDB.execute('UPDATE `stats` SET `hit` = 0, `notes` = 0, `sc1` = 0, `sc2` = 0, `sc3` = 0, `sc4` = 0, `sc5` = 0, `ha1` = 0, `ha2` = 0, `ha3` = 0, `ha4` = 0, `ha5` = 0 WHERE `name` = ?', [player])
+    _playerDB.commit()
 
 def loadPlayers():
-  global playername, playerpref, playerstat
-  playername = []
-  playerpref = []
-  playerstat = []
-  allplayers = VFS.listdir(playerpath)
-  for name in allplayers:
-    if name == "default.ini":
-      continue
-    if name.lower().endswith(".ini") and len(name) > 4:
-      playername.append(name[0:len(name)-4])
-      pref = _playerDB.execute('SELECT * FROM `players` WHERE `name` = ?', [playername[-1]]).fetchone()
-      try:
-        if len(pref) == 14:
-          playerpref.append((pref[1], pref[2], pref[3], pref[4], pref[5], pref[6], pref[7], pref[8], pref[9], pref[10]))
-      except TypeError:
-        try:
-          c = Config.load(VFS.resolveRead(_makePlayerIniName(name[:-4])), type = 2)
-          lefty  = c.get("player","leftymode")
-          drumf  = c.get("player","drumflip")
-          autok  = c.get("player","auto_kick")
-          assist = c.get("player","assist_mode")
-          twoch  = c.get("player","two_chord_max")
-          neck   = c.get("player","neck")
-          neckt  = c.get("player","necktype")
-          part   = c.get("player","part")
-          diff   = c.get("player","difficulty")
-          upname = c.get("player","name")
-          control= c.get("player","controller")
-          del c
-          _playerDB.execute('INSERT INTO `players` VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, 1)', [playername[-1], lefty, drumf, autok, assist, twoch, neckt, neck, part, diff, upname, control])
-          playerpref.append((lefty, drumf, autok, assist, twoch, neckt, neck, part, diff, upname))
-        except IOError:
-          _playerDB.execute('INSERT INTO `players` VALUES (?, 0, 0, 0, 0, 0, 0, ``, 0, 2, ``, 0, 0, 1)', [playername[-1]])
-          playerpref.append((0, 0, 0, 0, 0, 0, '', 0, 2, '', 0))
-      _playerDB.execute('UPDATE `players` SET `loaded` = 1 WHERE `name` = ?', [playername[-1]])
-      _playerDB.commit()
-  return 1
+    global playername, playerpref, playerstat
+    playername = []
+    playerpref = []
+    playerstat = []
+    allplayers = VFS.listdir(playerpath)
+    for name in allplayers:
+        if name == "default.ini":
+            continue
+        if name.lower().endswith(".ini") and len(name) > 4:
+            playername.append(name[0:len(name)-4])
+            pref = _playerDB.execute('SELECT * FROM `players` WHERE `name` = ?', [playername[-1]]).fetchone()
+            try:
+                if len(pref) == 14:
+                    playerpref.append((pref[1], pref[2], pref[3], pref[4], pref[5], pref[6], pref[7], pref[8], pref[9], pref[10]))
+            except TypeError:
+                try:
+                    c = Config.load(VFS.resolveRead(_makePlayerIniName(name[:-4])), type = 2)
+                    lefty  = c.get("player","leftymode")
+                    drumf  = c.get("player","drumflip")
+                    autok  = c.get("player","auto_kick")
+                    assist = c.get("player","assist_mode")
+                    twoch  = c.get("player","two_chord_max")
+                    neck   = c.get("player","neck")
+                    neckt  = c.get("player","necktype")
+                    part   = c.get("player","part")
+                    diff   = c.get("player","difficulty")
+                    upname = c.get("player","name")
+                    control= c.get("player","controller")
+                    del c
+                    _playerDB.execute('INSERT INTO `players` VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, 1)', [playername[-1], lefty, drumf, autok, assist, twoch, neckt, neck, part, diff, upname, control])
+                    playerpref.append((lefty, drumf, autok, assist, twoch, neckt, neck, part, diff, upname))
+                except IOError:
+                    _playerDB.execute('INSERT INTO `players` VALUES (?, 0, 0, 0, 0, 0, 0, ``, 0, 2, ``, 0, 0, 1)', [playername[-1]])
+                    playerpref.append((0, 0, 0, 0, 0, 0, '', 0, 2, '', 0))
+            _playerDB.execute('UPDATE `players` SET `loaded` = 1 WHERE `name` = ?', [playername[-1]])
+            _playerDB.commit()
+    return 1
 
 def savePlayers():
-  for pref in _playerDB.execute('SELECT * FROM `players` WHERE `changed` = 1').fetchall():
-    try:
-      c = Config.load(VFS.resolveWrite(_makePlayerIniName(str(pref[0]))), type = 2)
-      c.set("player","leftymode",int(pref[1]))
-      c.set("player","drumflip",int(pref[2]))
-      c.set("player","auto_kick",int(pref[3]))
-      c.set("player","assist_mode",int(pref[4]))
-      c.set("player","two_chord_max",int(pref[5]))
-      c.set("player","necktype",int(pref[6]))
-      c.set("player","neck",str(pref[7]))
-      c.set("player","part",int(pref[8]))
-      c.set("player","difficulty",int(pref[9]))
-      c.set("player","name",str(pref[10]))
-      c.set("player","controller",int(pref[11]))
-      del c
-      _playerDB.execute('UPDATE `players` SET `changed` = 0 WHERE `name` = ?', [pref[0]])
-    except:
-      c = VFS.open(_makePlayerIniName(str(pref[0])), "w")
-      c.close()
-      c = Config.load(VFS.resolveWrite(_makePlayerIniName(str(pref[0]))), type = 2)
-      c.set("player","leftymode",int(pref[1]))
-      c.set("player","drumflip",int(pref[2]))
-      c.set("player","auto_kick",int(pref[3]))
-      c.set("player","assist_mode",int(pref[4]))
-      c.set("player","two_chord_max",int(pref[5]))
-      c.set("player","necktype",int(pref[6]))
-      c.set("player","neck",str(pref[7]))
-      c.set("player","part",int(pref[8]))
-      c.set("player","difficulty",int(pref[9]))
-      c.set("player","name",str(pref[10]))
-      c.set("player","controller",int(pref[11]))
-      del c
-      _playerDB.execute('UPDATE `players` SET `changed` = 0 WHERE `name` = ?', [pref[0]])
-  _playerDB.execute('UPDATE `players` SET `loaded` = 0')
-  _playerDB.commit()
+    for pref in _playerDB.execute('SELECT * FROM `players` WHERE `changed` = 1').fetchall():
+        try:
+            c = Config.load(VFS.resolveWrite(_makePlayerIniName(str(pref[0]))), type = 2)
+            c.set("player","leftymode",int(pref[1]))
+            c.set("player","drumflip",int(pref[2]))
+            c.set("player","auto_kick",int(pref[3]))
+            c.set("player","assist_mode",int(pref[4]))
+            c.set("player","two_chord_max",int(pref[5]))
+            c.set("player","necktype",int(pref[6]))
+            c.set("player","neck",str(pref[7]))
+            c.set("player","part",int(pref[8]))
+            c.set("player","difficulty",int(pref[9]))
+            c.set("player","name",str(pref[10]))
+            c.set("player","controller",int(pref[11]))
+            del c
+            _playerDB.execute('UPDATE `players` SET `changed` = 0 WHERE `name` = ?', [pref[0]])
+        except:
+            c = VFS.open(_makePlayerIniName(str(pref[0])), "w")
+            c.close()
+            c = Config.load(VFS.resolveWrite(_makePlayerIniName(str(pref[0]))), type = 2)
+            c.set("player","leftymode",int(pref[1]))
+            c.set("player","drumflip",int(pref[2]))
+            c.set("player","auto_kick",int(pref[3]))
+            c.set("player","assist_mode",int(pref[4]))
+            c.set("player","two_chord_max",int(pref[5]))
+            c.set("player","necktype",int(pref[6]))
+            c.set("player","neck",str(pref[7]))
+            c.set("player","part",int(pref[8]))
+            c.set("player","difficulty",int(pref[9]))
+            c.set("player","name",str(pref[10]))
+            c.set("player","controller",int(pref[11]))
+            del c
+            _playerDB.execute('UPDATE `players` SET `changed` = 0 WHERE `name` = ?', [pref[0]])
+    _playerDB.execute('UPDATE `players` SET `loaded` = 0')
+    _playerDB.commit()
 
 def updatePlayer(player, pref):
-  a = _playerDB.execute('SELECT * FROM `players` WHERE `name` = ?', [player]).fetchone()
-  try:
-    a = a[0]
-  except:
-    a = None
-  if a is not None:
-    _playerDB.execute('UPDATE `players` SET `name` = ?, `lefty` = ?, `drumflip` = ?, `autokick` = ?, `assist` = ?, `twochord` = ?, `necktype` = ?, `neck` = ?, \
-                   `part` = 0, `difficulty` = 2, `upname` = ?, `control` = 0, `changed` = 1, `loaded` = 1 WHERE `name` = ?', pref + [player])
-    if player != pref[0]:
-      VFS.rename(_makePlayerIniName(player), _makePlayerIniName(pref[0]))
-  else:
-    _playerDB.execute('INSERT INTO `players` VALUES (?, ?, ?, ?, ?, ?, ?, ?, 0, 2, ?, 0, 1, 1)', pref)
-  _playerDB.commit()
-  savePlayers()
-  loadPlayers()
+    a = _playerDB.execute('SELECT * FROM `players` WHERE `name` = ?', [player]).fetchone()
+    try:
+        a = a[0]
+    except:
+        a = None
+    if a is not None:
+        _playerDB.execute('UPDATE `players` SET `name` = ?, `lefty` = ?, `drumflip` = ?, `autokick` = ?, `assist` = ?, `twochord` = ?, `necktype` = ?, `neck` = ?, \
+                       `part` = 0, `difficulty` = 2, `upname` = ?, `control` = 0, `changed` = 1, `loaded` = 1 WHERE `name` = ?', pref + [player])
+        if player != pref[0]:
+            VFS.rename(_makePlayerIniName(player), _makePlayerIniName(pref[0]))
+    else:
+        _playerDB.execute('INSERT INTO `players` VALUES (?, ?, ?, ?, ?, ?, ?, ?, 0, 2, ?, 0, 1, 1)', pref)
+    _playerDB.commit()
+    savePlayers()
+    loadPlayers()
 
 def deletePlayer(player):
-  _playerDB.execute('DELETE FROM `players` WHERE `name` = ?', [player])
-  VFS.unlink(_makePlayerIniName(player))
-  if VFS.isfile('%s/%s.png' % (playerpath, player)):
-    VFS.unlink('%s/%s.png' % (playerpath, player))
-  savePlayers()
-  loadPlayers()
+    _playerDB.execute('DELETE FROM `players` WHERE `name` = ?', [player])
+    VFS.unlink(_makePlayerIniName(player))
+    if VFS.isfile('%s/%s.png' % (playerpath, player)):
+        VFS.unlink('%s/%s.png' % (playerpath, player))
+    savePlayers()
+    loadPlayers()
 
 def loadControls():
-  global controllerDict
-  controllers = []
-  allcontrollers = VFS.listdir(controlpath)
-  default = ["defaultd.ini", "defaultg.ini", "defaultm.ini"]
-  for name in allcontrollers:
-    if name.lower().endswith(".ini") and len(name) > 4:
-      if name in default:
-        continue
-      controllers.append(name[0:len(name)-4])
+    global controllerDict
+    controllers = []
+    allcontrollers = VFS.listdir(controlpath)
+    default = ["defaultd.ini", "defaultg.ini", "defaultm.ini"]
+    for name in allcontrollers:
+        if name.lower().endswith(".ini") and len(name) > 4:
+            if name in default:
+                continue
+            controllers.append(name[0:len(name)-4])
 
-  i = len(controllers)
-  controllerDict = dict([(str(controllers[n]),controllers[n]) for n in range(0, i)])
-  controllerDict["defaultg"] = _("Default Guitar")
-  controllerDict["defaultd"] = _("Default Drum")
-  defMic = None
-  if Microphone.supported:
-    controllerDict["defaultm"] = _("Default Microphone")
-    defMic = "defaultm"
-  tsControl    = _("Controller %d")
-  tsControlTip = _("Select the controller for slot %d")
-  i = 1
-  Config.define("game", "control0",           str,   "defaultg", text = tsControl % 1,                options = controllerDict, tipText = tsControlTip % 1)
-  
-  controllerDict[_("None")] = None
-  
-  Config.define("game", "control1",           str,   "defaultd", text = tsControl % 2,                options = controllerDict, tipText = tsControlTip % 2)
-  Config.define("game", "control2",           str,   defMic,     text = tsControl % 3,                options = controllerDict, tipText = tsControlTip % 3)
-  Config.define("game", "control3",           str,   None,       text = tsControl % 4,                options = controllerDict, tipText = tsControlTip % 4)
+    i = len(controllers)
+    controllerDict = dict([(str(controllers[n]),controllers[n]) for n in range(0, i)])
+    controllerDict["defaultg"] = _("Default Guitar")
+    controllerDict["defaultd"] = _("Default Drum")
+    defMic = None
+    if Microphone.supported:
+        controllerDict["defaultm"] = _("Default Microphone")
+        defMic = "defaultm"
+    tsControl    = _("Controller %d")
+    tsControlTip = _("Select the controller for slot %d")
+    i = 1
+    Config.define("game", "control0",           str,   "defaultg", text = tsControl % 1,                options = controllerDict, tipText = tsControlTip % 1)
+
+    controllerDict[_("None")] = None
+
+    Config.define("game", "control1",           str,   "defaultd", text = tsControl % 2,                options = controllerDict, tipText = tsControlTip % 2)
+    Config.define("game", "control2",           str,   defMic,     text = tsControl % 3,                options = controllerDict, tipText = tsControlTip % 3)
+    Config.define("game", "control3",           str,   None,       text = tsControl % 4,                options = controllerDict, tipText = tsControlTip % 4)
 
 
 def deleteControl(control):
-  VFS.unlink(_makeControllerIniName(control))
-  defaultUsed = -1
-  for i in range(4):
-    get = Config.get("game", "control%d" % i)
-    if get == control:
-      if i == 0:
-        Config.set("game", "control%d" % i, "defaultg")
-        defaultUsed = 0
-      else:
-        Config.set("game", "control%d" % i, None)
-    if get == "defaultg" and defaultUsed > -1:
-      Config.set("game", "control%d" % i, None)
-  loadControls()
+    VFS.unlink(_makeControllerIniName(control))
+    defaultUsed = -1
+    for i in range(4):
+        get = Config.get("game", "control%d" % i)
+        if get == control:
+            if i == 0:
+                Config.set("game", "control%d" % i, "defaultg")
+                defaultUsed = 0
+            else:
+                Config.set("game", "control%d" % i, None)
+        if get == "defaultg" and defaultUsed > -1:
+            Config.set("game", "control%d" % i, None)
+    loadControls()
 
 def renameControl(control, newname):
-  VFS.rename(_makeControllerIniName(control), _makeControllerIniName(newname))
-  for i in range(4):
-    if Config.get("game", "control%d" % i) == control:
-      Config.set("game", "control%d" % i, newname)
-  loadControls()
+    VFS.rename(_makeControllerIniName(control), _makeControllerIniName(newname))
+    for i in range(4):
+        if Config.get("game", "control%d" % i) == control:
+            Config.set("game", "control%d" % i, newname)
+    loadControls()
 
 def pluginControls(activeControls):
-  global playerkeys, player0, player1, player2, player3
-  playerkeys = [None] * 4
-  for player, control in enumerate(activeControls):
-    if control == 0:
-      playerkeys[player] = CONTROL1
-    elif control == 1:
-      playerkeys[player] = CONTROL2
-    elif control == 2:
-      playerkeys[player] = CONTROL3
-    elif control == 3:
-      playerkeys[player] = CONTROL4
-  player0 = playerkeys[0]
-  player1 = playerkeys[1]
-  player2 = playerkeys[2]
-  player3 = playerkeys[3]
+    global playerkeys, player0, player1, player2, player3
+    playerkeys = [None] * 4
+    for player, control in enumerate(activeControls):
+        if control == 0:
+            playerkeys[player] = CONTROL1
+        elif control == 1:
+            playerkeys[player] = CONTROL2
+        elif control == 2:
+            playerkeys[player] = CONTROL3
+        elif control == 3:
+            playerkeys[player] = CONTROL4
+    player0 = playerkeys[0]
+    player1 = playerkeys[1]
+    player2 = playerkeys[2]
+    player3 = playerkeys[3]
 
 class Controls:
-  def __init__(self):
+    def __init__(self):
 
-    self.logClassInits = Config.get("game", "log_class_inits")
-    if self.logClassInits == 1:
-      Log.debug("Controls class init (Player.py)...")
-    self.controls = []
-    self.controls.append(Config.get("game", "control0"))
-    self.controls.append(Config.get("game", "control1"))
-    self.controls.append(Config.get("game", "control2"))
-    self.controls.append(Config.get("game", "control3"))
-    self.config = []
-    self.controlList = []
-    self.maxplayers = 0
-    self.guitars    = 0
-    self.drums      = 0
-    self.mics       = 0
-    self.overlap    = []
-    
-    self.p2Nav = Config.get("game", "p2_menu_nav")
-    self.drumNav = Config.get("game", "drum_navigation")
-    
-    self.keyCheckerMode = Config.get("game","key_checker_mode")
-    
-    if VFS.isfile(_makeControllerIniName(self.controls[0])):
-      self.config.append(Config.load(VFS.resolveRead(_makeControllerIniName(self.controls[0])), type = 1))
-      if VFS.isfile(_makeControllerIniName(self.controls[1])) and self.controls[1] != "None":
-        self.config.append(Config.load(VFS.resolveRead(_makeControllerIniName(self.controls[1])), type = 1))
-      else:
-        self.config.append(None)
-        Config.set("game", "control1", None)
-        self.controls[1] = "None"
-      if VFS.isfile(_makeControllerIniName(self.controls[2])) and self.controls[2] != "None":
-        self.config.append(Config.load(VFS.resolveRead(_makeControllerIniName(self.controls[2])), type = 1))
-      else:
-        self.config.append(None)
-        Config.set("game", "control2", None)
-        self.controls[2] = "None"
-      if VFS.isfile(_makeControllerIniName(self.controls[3])) and self.controls[3] != "None":
-        self.config.append(Config.load(VFS.resolveRead(_makeControllerIniName(self.controls[3])), type = 1))
-      else:
-        self.config.append(None)
-        Config.set("game", "control3", None)
-        self.controls[3] = "None"
-    else:
-      confM = None
-      if Microphone.supported:
-        confM = Config.load(VFS.resolveRead(_makeControllerIniName("defaultm")), type = 1)
-      self.config.append(Config.load(VFS.resolveRead(_makeControllerIniName("defaultg")), type = 1))
-      self.config.append(Config.load(VFS.resolveRead(_makeControllerIniName("defaultd")), type = 1))
-      self.config.append(confM)
-      self.config.append(None)
-      Config.set("game", "control0", "defaultg")
-      Config.set("game", "control1", "defaultd")
-      self.controls = ["defaultg", "defaultd"]
-      if confM is not None:
-        Config.set("game", "control2", "defaultm")
-        self.controls.append("defaultm")
-      else:
-        Config.set("game", "control2", None)
-        self.controls.append("None")
-      Config.set("game", "control3", None)
-      self.controls.append("None")
-    
-    self.type       = []
-    self.analogKill = []
-    self.analogSP   = []
-    self.analogSPThresh = []
-    self.analogSPSense  = []
-    self.analogDrum = [] #FIXME: Analog Drum
-    self.analogSlide = []
-    self.analogFX   = [] #FIXME: Analog FX
-    self.twoChord   = []
-    self.micDevice  = []  #stump
-    self.micTapSensitivity = []
-    self.micPassthroughVolume = []
-    
-    self.flags = 0
-    
-    for i in self.config:
-      if i:
-        type = i.get("controller", "type")
-        if type == 5:
-          self.mics += 1
-        elif type > 1:
-          self.guitars += 1
-        else:
-          self.drums += 1
-        self.type.append(type)
-        self.analogKill.append(i.get("controller", "analog_kill"))
-        self.analogSP.append(i.get("controller", "analog_sp"))
-        self.analogSPThresh.append(i.get("controller", "analog_sp_threshold"))
-        self.analogSPSense.append(i.get("controller", "analog_sp_sensitivity"))
-        self.analogDrum.append(i.get("controller", "analog_drum")) #FIXME: Analog Drum
-        self.analogSlide.append(i.get("controller", "analog_slide"))
-        self.analogFX.append(i.get("controller", "analog_fx")) #FIXME: Analog FX
-        self.micDevice.append(i.get("controller", "mic_device"))  #stump
-        self.micTapSensitivity.append(i.get("controller", "mic_tap_sensitivity"))
-        self.micPassthroughVolume.append(i.get("controller", "mic_passthrough_volume"))
-        self.twoChord.append(i.get("controller", "two_chord_max"))
-        self.controlList.append(i.get("controller", "name"))
-      else:
-        self.type.append(None)
-        self.analogKill.append(None)
-        self.analogSP.append(None)
-        self.analogFX.append(None) #FIXME: Analog FX
-        self.twoChord.append(None)
-    
-    def keycode(name, config):
-      if not config:
-        return "None"
-      k = config.get("controller", name)
-      if k == "None":
-        return "None"
-      try:
-        return int(k)
-      except:
-        return getattr(pygame, k)
-    
-    self.controlMapping = {}
-    global menuUp, menuDown, menuNext, menuPrev, menuYes, menuNo
-    global drum1s, drum2s, drum3s, drum4s, drum5s, bassdrums
-    global key1s, key2s, key3s, key4s, key5s, keysolos, action1s, action2s, kills
-    menuUp = []
-    menuDown = []
-    menuNext = []
-    menuPrev = []
-    menuYes = []
-    menuNo = []
-    drum1s = []
-    drum2s = []
-    drum3s = []
-    drum4s = []
-    drum5s = []
-    bassdrums = []
-    key1s = []
-    key2s = []
-    key3s = []
-    key4s = []
-    key5s = []
-    keysolos = []
-    action1s = []
-    action2s = []
-    kills = []
-    
-    for i, config in enumerate(self.config):
-      if self.type[i] in DRUMTYPES: #drum set
-        drum1s.extend([CONTROLS[i][DRUM1], CONTROLS[i][DRUM1A]])
-        drum2s.extend([CONTROLS[i][DRUM2], CONTROLS[i][DRUM2A]])
-        drum3s.extend([CONTROLS[i][DRUM3], CONTROLS[i][DRUM3A]])
-        drum4s.extend([CONTROLS[i][DRUM4], CONTROLS[i][DRUM4A]])
-        drum5s.extend([CONTROLS[i][DRUM5], CONTROLS[i][DRUM5A]])
-        bassdrums.extend([CONTROLS[i][DRUMBASS], CONTROLS[i][DRUMBASSA]])
-        if self.p2Nav == 1 or (self.p2Nav == 0 and i == 0):
-          if self.drumNav:
-            menuUp.extend([CONTROLS[i][DRUM2], CONTROLS[i][DRUM2A]])
-            if self.type[i] == 3:
-              menuDown.extend([CONTROLS[i][DRUM4], CONTROLS[i][DRUM4A]])
+        self.logClassInits = Config.get("game", "log_class_inits")
+        if self.logClassInits == 1:
+            Log.debug("Controls class init (Player.py)...")
+        self.controls = []
+        self.controls.append(Config.get("game", "control0"))
+        self.controls.append(Config.get("game", "control1"))
+        self.controls.append(Config.get("game", "control2"))
+        self.controls.append(Config.get("game", "control3"))
+        self.config = []
+        self.controlList = []
+        self.maxplayers = 0
+        self.guitars    = 0
+        self.drums      = 0
+        self.mics       = 0
+        self.overlap    = []
+
+        self.p2Nav = Config.get("game", "p2_menu_nav")
+        self.drumNav = Config.get("game", "drum_navigation")
+
+        self.keyCheckerMode = Config.get("game","key_checker_mode")
+
+        if VFS.isfile(_makeControllerIniName(self.controls[0])):
+            self.config.append(Config.load(VFS.resolveRead(_makeControllerIniName(self.controls[0])), type = 1))
+            if VFS.isfile(_makeControllerIniName(self.controls[1])) and self.controls[1] != "None":
+                self.config.append(Config.load(VFS.resolveRead(_makeControllerIniName(self.controls[1])), type = 1))
             else:
-              menuDown.extend([CONTROLS[i][DRUM3], CONTROLS[i][DRUM3A]])
-            menuYes.extend([CONTROLS[i][DRUM5], CONTROLS[i][DRUM5A]])
-            menuNo.extend([CONTROLS[i][DRUM1], CONTROLS[i][DRUM1A]])
-          menuYes.append(CONTROLS[i][START])
-          menuNo.append(CONTROLS[i][CANCEL])
-          menuUp.append(CONTROLS[i][UP])
-          menuDown.append(CONTROLS[i][DOWN])
-          menuNext.append(CONTROLS[i][RIGHT])
-          menuPrev.append(CONTROLS[i][LEFT])
-      elif self.type[i] in MICTYPES:  #stump: it's a mic
-        if self.p2Nav == 1 or (self.p2Nav == 0 and i == 0):
-          menuUp.append(CONTROLS[i][UP])
-          menuDown.append(CONTROLS[i][DOWN])
-          menuNext.append(CONTROLS[i][RIGHT])
-          menuPrev.append(CONTROLS[i][LEFT])
-          menuYes.append(CONTROLS[i][START])
-          menuNo.append(CONTROLS[i][CANCEL])
-      elif self.type[i] in GUITARTYPES:
-        if self.type[i] == 0:
-          key1s.extend([CONTROLS[i][KEY1], CONTROLS[i][KEY1A]])
+                self.config.append(None)
+                Config.set("game", "control1", None)
+                self.controls[1] = "None"
+            if VFS.isfile(_makeControllerIniName(self.controls[2])) and self.controls[2] != "None":
+                self.config.append(Config.load(VFS.resolveRead(_makeControllerIniName(self.controls[2])), type = 1))
+            else:
+                self.config.append(None)
+                Config.set("game", "control2", None)
+                self.controls[2] = "None"
+            if VFS.isfile(_makeControllerIniName(self.controls[3])) and self.controls[3] != "None":
+                self.config.append(Config.load(VFS.resolveRead(_makeControllerIniName(self.controls[3])), type = 1))
+            else:
+                self.config.append(None)
+                Config.set("game", "control3", None)
+                self.controls[3] = "None"
         else:
-          key1s.extend([CONTROLS[i][KEY1]])
-        key2s.extend([CONTROLS[i][KEY2], CONTROLS[i][KEY2A]])
-        key3s.extend([CONTROLS[i][KEY3], CONTROLS[i][KEY3A]])
-        key4s.extend([CONTROLS[i][KEY4], CONTROLS[i][KEY4A]])
-        key5s.extend([CONTROLS[i][KEY5], CONTROLS[i][KEY5A]])
-        keysolos.extend([CONTROLS[i][KEY1A], CONTROLS[i][KEY2A], CONTROLS[i][KEY3A], CONTROLS[i][KEY4A], CONTROLS[i][KEY5A]])
-        action1s.extend([CONTROLS[i][ACTION1]])
-        action2s.extend([CONTROLS[i][ACTION2]])
-        kills.extend([CONTROLS[i][KILL]])
-        if self.p2Nav == 1 or (self.p2Nav == 0 and i == 0):
-          menuUp.extend([CONTROLS[i][ACTION1], CONTROLS[i][UP]])
-          menuDown.extend([CONTROLS[i][ACTION2], CONTROLS[i][DOWN]])
-          menuNext.extend([CONTROLS[i][RIGHT], CONTROLS[i][KEY4], CONTROLS[i][KEY4A]])
-          menuPrev.extend([CONTROLS[i][LEFT], CONTROLS[i][KEY3], CONTROLS[i][KEY3A]])
-          menuYes.extend([CONTROLS[i][KEY1], CONTROLS[i][KEY1A], CONTROLS[i][START]])
-          menuNo.extend([CONTROLS[i][KEY2], CONTROLS[i][KEY2A], CONTROLS[i][CANCEL]])
-          
-      if self.type[i] == 3:
-        controlMapping = { #akedrou - drums do not need special declarations!
-          keycode("key_left", config):          CONTROLS[i][LEFT],
-          keycode("key_right", config):         CONTROLS[i][RIGHT],
-          keycode("key_up", config):            CONTROLS[i][UP],
-          keycode("key_down", config):          CONTROLS[i][DOWN],
-          keycode("key_star", config):          CONTROLS[i][STAR],
-          keycode("key_cancel", config):        CONTROLS[i][CANCEL],
-          keycode("key_1a", config):            CONTROLS[i][DRUM5A], #order is important. This minimizes key conflicts.
-          keycode("key_2a", config):            CONTROLS[i][DRUM1A],
-          keycode("key_3a", config):            CONTROLS[i][DRUM2A],
-          keycode("key_4a", config):            CONTROLS[i][DRUM3A],
-          keycode("key_5a", config):            CONTROLS[i][DRUM4A],
-          keycode("key_action2", config):       CONTROLS[i][DRUMBASSA],
-          keycode("key_1", config):             CONTROLS[i][DRUM5],
-          keycode("key_2", config):             CONTROLS[i][DRUM1],
-          keycode("key_3", config):             CONTROLS[i][DRUM2],
-          keycode("key_4", config):             CONTROLS[i][DRUM3],
-          keycode("key_5", config):             CONTROLS[i][DRUM4],
-          keycode("key_action1", config):       CONTROLS[i][DRUMBASS],
-          keycode("key_start", config):         CONTROLS[i][START],
-        }
-      elif self.type[i] == 2:
-        controlMapping = { #akedrou - drums do not need special declarations!
-          keycode("key_left", config):          CONTROLS[i][LEFT],
-          keycode("key_right", config):         CONTROLS[i][RIGHT],
-          keycode("key_up", config):            CONTROLS[i][UP],
-          keycode("key_down", config):          CONTROLS[i][DOWN],
-          keycode("key_star", config):          CONTROLS[i][STAR],
-          keycode("key_cancel", config):        CONTROLS[i][CANCEL],
-          keycode("key_1a", config):            CONTROLS[i][DRUM5A], #order is important. This minimizes key conflicts.
-          keycode("key_2a", config):            CONTROLS[i][DRUM1A],
-          keycode("key_3a", config):            CONTROLS[i][DRUM2A],
-          keycode("key_4a", config):            CONTROLS[i][DRUM3A],
-          keycode("key_action2", config):       CONTROLS[i][DRUMBASSA],
-          keycode("key_1", config):             CONTROLS[i][DRUM5],
-          keycode("key_2", config):             CONTROLS[i][DRUM1],
-          keycode("key_3", config):             CONTROLS[i][DRUM2],
-          keycode("key_4", config):             CONTROLS[i][DRUM3],
-          keycode("key_action1", config):       CONTROLS[i][DRUMBASS],
-          keycode("key_start", config):         CONTROLS[i][START],
-        }
-      elif self.type[i] > -1:
-        controlMapping = { #akedrou - drums do not need special declarations!
-          keycode("key_left", config):          CONTROLS[i][LEFT],
-          keycode("key_right", config):         CONTROLS[i][RIGHT],
-          keycode("key_up", config):            CONTROLS[i][UP],
-          keycode("key_down", config):          CONTROLS[i][DOWN],
-          keycode("key_cancel", config):        CONTROLS[i][CANCEL],
-          keycode("key_star", config):          CONTROLS[i][STAR],
-          keycode("key_kill", config):          CONTROLS[i][KILL],
-          keycode("key_1a", config):            CONTROLS[i][KEY1A], #order is important. This minimizes key conflicts.
-          keycode("key_2a", config):            CONTROLS[i][KEY2A],
-          keycode("key_3a", config):            CONTROLS[i][KEY3A],
-          keycode("key_4a", config):            CONTROLS[i][KEY4A],
-          keycode("key_5a", config):            CONTROLS[i][KEY5A],
-          keycode("key_1", config):             CONTROLS[i][KEY1],
-          keycode("key_2", config):             CONTROLS[i][KEY2],
-          keycode("key_3", config):             CONTROLS[i][KEY3],
-          keycode("key_4", config):             CONTROLS[i][KEY4],
-          keycode("key_5", config):             CONTROLS[i][KEY5],
-          keycode("key_action2", config):       CONTROLS[i][ACTION2],
-          keycode("key_action1", config):       CONTROLS[i][ACTION1],
-          keycode("key_start", config):         CONTROLS[i][START],
-        }
-      else:
-        controlMapping = {}
-      controlMapping = self.checkMapping(controlMapping, i)
-      self.controlMapping.update(controlMapping)
-      
-    self.reverseControlMapping = dict((value, key) for key, value in self.controlMapping.iteritems() )
-    
-    # Multiple key support
-    self.heldKeys = {}
-  def checkMapping(self, newDict, i):
-    def keyName(value):
-      if value in CONTROL1:
-        name = "Controller 1"
-        control = CONTROL1
-        n = 0
-      elif value in CONTROL2:
-        name = "Controller 2"
-        control = CONTROL2
-        n = 1
-      elif value in CONTROL3:
-        name = "Controller 3"
-        control = CONTROL3
-        n = 2
-      else:
-        name = "Controller 4"
-        control = CONTROL4
-        n = 3
-      for j in range(20):
-        if value == control[j]:
-          if self.type[n] == 2:
-            return name + " " + drumkey4names[j]
-          elif self.type[n] == 3:
-            return name + " " + drumkey5names[j]
-          else:
-            return name + " " + guitarkeynames[j]
-      else:
-        Log.notice("Key value not found.")
-        return "Error"
-      
-    if self.keyCheckerMode == 0:
-      return newDict
-    okconflict = lefts + rights + ups + downs + starts + cancels
-    a = []
-    for key, value in newDict.iteritems():
-      if key == "None":
-        continue
-      if key in self.controlMapping.keys():
-        if value in okconflict:
-          if self.getMapping(key) in okconflict:
-            continue
-        a.append(_("%s conflicts with %s") % (keyName(value), keyName(self.getMapping(key))))
-    if len(a) == 0:
-      return newDict
-    self.overlap.extend(a)
-    return newDict
-    
-  def getMapping(self, key):
-    return self.controlMapping.get(key)
-  def getReverseMapping(self, control):
-    return self.reverseControlMapping.get(control)
+            confM = None
+            if Microphone.supported:
+                confM = Config.load(VFS.resolveRead(_makeControllerIniName("defaultm")), type = 1)
+            self.config.append(Config.load(VFS.resolveRead(_makeControllerIniName("defaultg")), type = 1))
+            self.config.append(Config.load(VFS.resolveRead(_makeControllerIniName("defaultd")), type = 1))
+            self.config.append(confM)
+            self.config.append(None)
+            Config.set("game", "control0", "defaultg")
+            Config.set("game", "control1", "defaultd")
+            self.controls = ["defaultg", "defaultd"]
+            if confM is not None:
+                Config.set("game", "control2", "defaultm")
+                self.controls.append("defaultm")
+            else:
+                Config.set("game", "control2", None)
+                self.controls.append("None")
+            Config.set("game", "control3", None)
+            self.controls.append("None")
 
-  def keyPressed(self, key):
-    c = self.getMapping(key)
-    if c:
-      self.toggle(c, True)
-      if c in self.heldKeys and not key in self.heldKeys[c]:
-        self.heldKeys[c].append(key)
-      return c
-    return None
+        self.type       = []
+        self.analogKill = []
+        self.analogSP   = []
+        self.analogSPThresh = []
+        self.analogSPSense  = []
+        self.analogDrum = [] #FIXME: Analog Drum
+        self.analogSlide = []
+        self.analogFX   = [] #FIXME: Analog FX
+        self.twoChord   = []
+        self.micDevice  = []  #stump
+        self.micTapSensitivity = []
+        self.micPassthroughVolume = []
 
-  def keyReleased(self, key):
-    c = self.getMapping(key)
-    if c:
-      if c in self.heldKeys:
-        if key in self.heldKeys[c]:
-          self.heldKeys[c].remove(key)
-          if not self.heldKeys[c]:
+        self.flags = 0
+
+        for i in self.config:
+            if i:
+                type = i.get("controller", "type")
+                if type == 5:
+                    self.mics += 1
+                elif type > 1:
+                    self.guitars += 1
+                else:
+                    self.drums += 1
+                self.type.append(type)
+                self.analogKill.append(i.get("controller", "analog_kill"))
+                self.analogSP.append(i.get("controller", "analog_sp"))
+                self.analogSPThresh.append(i.get("controller", "analog_sp_threshold"))
+                self.analogSPSense.append(i.get("controller", "analog_sp_sensitivity"))
+                self.analogDrum.append(i.get("controller", "analog_drum")) #FIXME: Analog Drum
+                self.analogSlide.append(i.get("controller", "analog_slide"))
+                self.analogFX.append(i.get("controller", "analog_fx")) #FIXME: Analog FX
+                self.micDevice.append(i.get("controller", "mic_device"))  #stump
+                self.micTapSensitivity.append(i.get("controller", "mic_tap_sensitivity"))
+                self.micPassthroughVolume.append(i.get("controller", "mic_passthrough_volume"))
+                self.twoChord.append(i.get("controller", "two_chord_max"))
+                self.controlList.append(i.get("controller", "name"))
+            else:
+                self.type.append(None)
+                self.analogKill.append(None)
+                self.analogSP.append(None)
+                self.analogFX.append(None) #FIXME: Analog FX
+                self.twoChord.append(None)
+
+        def keycode(name, config):
+            if not config:
+                return "None"
+            k = config.get("controller", name)
+            if k == "None":
+                return "None"
+            try:
+                return int(k)
+            except:
+                return getattr(pygame, k)
+
+        self.controlMapping = {}
+        global menuUp, menuDown, menuNext, menuPrev, menuYes, menuNo
+        global drum1s, drum2s, drum3s, drum4s, drum5s, bassdrums
+        global key1s, key2s, key3s, key4s, key5s, keysolos, action1s, action2s, kills
+        menuUp = []
+        menuDown = []
+        menuNext = []
+        menuPrev = []
+        menuYes = []
+        menuNo = []
+        drum1s = []
+        drum2s = []
+        drum3s = []
+        drum4s = []
+        drum5s = []
+        bassdrums = []
+        key1s = []
+        key2s = []
+        key3s = []
+        key4s = []
+        key5s = []
+        keysolos = []
+        action1s = []
+        action2s = []
+        kills = []
+
+        for i, config in enumerate(self.config):
+            if self.type[i] in DRUMTYPES: #drum set
+                drum1s.extend([CONTROLS[i][DRUM1], CONTROLS[i][DRUM1A]])
+                drum2s.extend([CONTROLS[i][DRUM2], CONTROLS[i][DRUM2A]])
+                drum3s.extend([CONTROLS[i][DRUM3], CONTROLS[i][DRUM3A]])
+                drum4s.extend([CONTROLS[i][DRUM4], CONTROLS[i][DRUM4A]])
+                drum5s.extend([CONTROLS[i][DRUM5], CONTROLS[i][DRUM5A]])
+                bassdrums.extend([CONTROLS[i][DRUMBASS], CONTROLS[i][DRUMBASSA]])
+                if self.p2Nav == 1 or (self.p2Nav == 0 and i == 0):
+                    if self.drumNav:
+                        menuUp.extend([CONTROLS[i][DRUM2], CONTROLS[i][DRUM2A]])
+                        if self.type[i] == 3:
+                            menuDown.extend([CONTROLS[i][DRUM4], CONTROLS[i][DRUM4A]])
+                        else:
+                            menuDown.extend([CONTROLS[i][DRUM3], CONTROLS[i][DRUM3A]])
+                        menuYes.extend([CONTROLS[i][DRUM5], CONTROLS[i][DRUM5A]])
+                        menuNo.extend([CONTROLS[i][DRUM1], CONTROLS[i][DRUM1A]])
+                    menuYes.append(CONTROLS[i][START])
+                    menuNo.append(CONTROLS[i][CANCEL])
+                    menuUp.append(CONTROLS[i][UP])
+                    menuDown.append(CONTROLS[i][DOWN])
+                    menuNext.append(CONTROLS[i][RIGHT])
+                    menuPrev.append(CONTROLS[i][LEFT])
+            elif self.type[i] in MICTYPES:  #stump: it's a mic
+                if self.p2Nav == 1 or (self.p2Nav == 0 and i == 0):
+                    menuUp.append(CONTROLS[i][UP])
+                    menuDown.append(CONTROLS[i][DOWN])
+                    menuNext.append(CONTROLS[i][RIGHT])
+                    menuPrev.append(CONTROLS[i][LEFT])
+                    menuYes.append(CONTROLS[i][START])
+                    menuNo.append(CONTROLS[i][CANCEL])
+            elif self.type[i] in GUITARTYPES:
+                if self.type[i] == 0:
+                    key1s.extend([CONTROLS[i][KEY1], CONTROLS[i][KEY1A]])
+                else:
+                    key1s.extend([CONTROLS[i][KEY1]])
+                key2s.extend([CONTROLS[i][KEY2], CONTROLS[i][KEY2A]])
+                key3s.extend([CONTROLS[i][KEY3], CONTROLS[i][KEY3A]])
+                key4s.extend([CONTROLS[i][KEY4], CONTROLS[i][KEY4A]])
+                key5s.extend([CONTROLS[i][KEY5], CONTROLS[i][KEY5A]])
+                keysolos.extend([CONTROLS[i][KEY1A], CONTROLS[i][KEY2A], CONTROLS[i][KEY3A], CONTROLS[i][KEY4A], CONTROLS[i][KEY5A]])
+                action1s.extend([CONTROLS[i][ACTION1]])
+                action2s.extend([CONTROLS[i][ACTION2]])
+                kills.extend([CONTROLS[i][KILL]])
+                if self.p2Nav == 1 or (self.p2Nav == 0 and i == 0):
+                    menuUp.extend([CONTROLS[i][ACTION1], CONTROLS[i][UP]])
+                    menuDown.extend([CONTROLS[i][ACTION2], CONTROLS[i][DOWN]])
+                    menuNext.extend([CONTROLS[i][RIGHT], CONTROLS[i][KEY4], CONTROLS[i][KEY4A]])
+                    menuPrev.extend([CONTROLS[i][LEFT], CONTROLS[i][KEY3], CONTROLS[i][KEY3A]])
+                    menuYes.extend([CONTROLS[i][KEY1], CONTROLS[i][KEY1A], CONTROLS[i][START]])
+                    menuNo.extend([CONTROLS[i][KEY2], CONTROLS[i][KEY2A], CONTROLS[i][CANCEL]])
+
+            if self.type[i] == 3:
+                controlMapping = { #akedrou - drums do not need special declarations!
+                  keycode("key_left", config):          CONTROLS[i][LEFT],
+                  keycode("key_right", config):         CONTROLS[i][RIGHT],
+                  keycode("key_up", config):            CONTROLS[i][UP],
+                  keycode("key_down", config):          CONTROLS[i][DOWN],
+                  keycode("key_star", config):          CONTROLS[i][STAR],
+                  keycode("key_cancel", config):        CONTROLS[i][CANCEL],
+                  keycode("key_1a", config):            CONTROLS[i][DRUM5A], #order is important. This minimizes key conflicts.
+                  keycode("key_2a", config):            CONTROLS[i][DRUM1A],
+                  keycode("key_3a", config):            CONTROLS[i][DRUM2A],
+                  keycode("key_4a", config):            CONTROLS[i][DRUM3A],
+                  keycode("key_5a", config):            CONTROLS[i][DRUM4A],
+                  keycode("key_action2", config):       CONTROLS[i][DRUMBASSA],
+                  keycode("key_1", config):             CONTROLS[i][DRUM5],
+                  keycode("key_2", config):             CONTROLS[i][DRUM1],
+                  keycode("key_3", config):             CONTROLS[i][DRUM2],
+                  keycode("key_4", config):             CONTROLS[i][DRUM3],
+                  keycode("key_5", config):             CONTROLS[i][DRUM4],
+                  keycode("key_action1", config):       CONTROLS[i][DRUMBASS],
+                  keycode("key_start", config):         CONTROLS[i][START],
+                }
+            elif self.type[i] == 2:
+                controlMapping = { #akedrou - drums do not need special declarations!
+                  keycode("key_left", config):          CONTROLS[i][LEFT],
+                  keycode("key_right", config):         CONTROLS[i][RIGHT],
+                  keycode("key_up", config):            CONTROLS[i][UP],
+                  keycode("key_down", config):          CONTROLS[i][DOWN],
+                  keycode("key_star", config):          CONTROLS[i][STAR],
+                  keycode("key_cancel", config):        CONTROLS[i][CANCEL],
+                  keycode("key_1a", config):            CONTROLS[i][DRUM5A], #order is important. This minimizes key conflicts.
+                  keycode("key_2a", config):            CONTROLS[i][DRUM1A],
+                  keycode("key_3a", config):            CONTROLS[i][DRUM2A],
+                  keycode("key_4a", config):            CONTROLS[i][DRUM3A],
+                  keycode("key_action2", config):       CONTROLS[i][DRUMBASSA],
+                  keycode("key_1", config):             CONTROLS[i][DRUM5],
+                  keycode("key_2", config):             CONTROLS[i][DRUM1],
+                  keycode("key_3", config):             CONTROLS[i][DRUM2],
+                  keycode("key_4", config):             CONTROLS[i][DRUM3],
+                  keycode("key_action1", config):       CONTROLS[i][DRUMBASS],
+                  keycode("key_start", config):         CONTROLS[i][START],
+                }
+            elif self.type[i] > -1:
+                controlMapping = { #akedrou - drums do not need special declarations!
+                  keycode("key_left", config):          CONTROLS[i][LEFT],
+                  keycode("key_right", config):         CONTROLS[i][RIGHT],
+                  keycode("key_up", config):            CONTROLS[i][UP],
+                  keycode("key_down", config):          CONTROLS[i][DOWN],
+                  keycode("key_cancel", config):        CONTROLS[i][CANCEL],
+                  keycode("key_star", config):          CONTROLS[i][STAR],
+                  keycode("key_kill", config):          CONTROLS[i][KILL],
+                  keycode("key_1a", config):            CONTROLS[i][KEY1A], #order is important. This minimizes key conflicts.
+                  keycode("key_2a", config):            CONTROLS[i][KEY2A],
+                  keycode("key_3a", config):            CONTROLS[i][KEY3A],
+                  keycode("key_4a", config):            CONTROLS[i][KEY4A],
+                  keycode("key_5a", config):            CONTROLS[i][KEY5A],
+                  keycode("key_1", config):             CONTROLS[i][KEY1],
+                  keycode("key_2", config):             CONTROLS[i][KEY2],
+                  keycode("key_3", config):             CONTROLS[i][KEY3],
+                  keycode("key_4", config):             CONTROLS[i][KEY4],
+                  keycode("key_5", config):             CONTROLS[i][KEY5],
+                  keycode("key_action2", config):       CONTROLS[i][ACTION2],
+                  keycode("key_action1", config):       CONTROLS[i][ACTION1],
+                  keycode("key_start", config):         CONTROLS[i][START],
+                }
+            else:
+                controlMapping = {}
+            controlMapping = self.checkMapping(controlMapping, i)
+            self.controlMapping.update(controlMapping)
+
+        self.reverseControlMapping = dict((value, key) for key, value in self.controlMapping.iteritems() )
+
+        # Multiple key support
+        self.heldKeys = {}
+    def checkMapping(self, newDict, i):
+        def keyName(value):
+            if value in CONTROL1:
+                name = "Controller 1"
+                control = CONTROL1
+                n = 0
+            elif value in CONTROL2:
+                name = "Controller 2"
+                control = CONTROL2
+                n = 1
+            elif value in CONTROL3:
+                name = "Controller 3"
+                control = CONTROL3
+                n = 2
+            else:
+                name = "Controller 4"
+                control = CONTROL4
+                n = 3
+            for j in range(20):
+                if value == control[j]:
+                    if self.type[n] == 2:
+                        return name + " " + drumkey4names[j]
+                    elif self.type[n] == 3:
+                        return name + " " + drumkey5names[j]
+                    else:
+                        return name + " " + guitarkeynames[j]
+            else:
+                Log.notice("Key value not found.")
+                return "Error"
+
+        if self.keyCheckerMode == 0:
+            return newDict
+        okconflict = lefts + rights + ups + downs + starts + cancels
+        a = []
+        for key, value in newDict.iteritems():
+            if key == "None":
+                continue
+            if key in self.controlMapping.keys():
+                if value in okconflict:
+                    if self.getMapping(key) in okconflict:
+                        continue
+                a.append(_("%s conflicts with %s") % (keyName(value), keyName(self.getMapping(key))))
+        if len(a) == 0:
+            return newDict
+        self.overlap.extend(a)
+        return newDict
+
+    def getMapping(self, key):
+        return self.controlMapping.get(key)
+    def getReverseMapping(self, control):
+        return self.reverseControlMapping.get(control)
+
+    def keyPressed(self, key):
+        c = self.getMapping(key)
+        if c:
+            self.toggle(c, True)
+            if c in self.heldKeys and not key in self.heldKeys[c]:
+                self.heldKeys[c].append(key)
+            return c
+        return None
+
+    def keyReleased(self, key):
+        c = self.getMapping(key)
+        if c:
+            if c in self.heldKeys:
+                if key in self.heldKeys[c]:
+                    self.heldKeys[c].remove(key)
+                    if not self.heldKeys[c]:
+                        self.toggle(c, False)
+                        return c
+                return None
             self.toggle(c, False)
             return c
         return None
-      self.toggle(c, False)
-      return c
-    return None
 
-  def toggle(self, control, state):
-    prevState = self.flags
-    if state:
-      self.flags |= control
-      return not prevState & control
-    else:
-      self.flags &= ~control
-      return prevState & control
+    def toggle(self, control, state):
+        prevState = self.flags
+        if state:
+            self.flags |= control
+            return not prevState & control
+        else:
+            self.flags &= ~control
+            return prevState & control
 
-  def getState(self, control):
-    return self.flags & control
+    def getState(self, control):
+        return self.flags & control
 
 # glorandwarf: returns False if there are any key mapping conflicts
 def isKeyMappingOK(config, start):
-  def keycode(name, config):
-    k = config.get("controller", name)
-    if k is None or k == "None":
-      return None
-    try:
-      return int(k)
-    except:
-      return getattr(pygame, k)
+    def keycode(name, config):
+        k = config.get("controller", name)
+        if k is None or k == "None":
+            return None
+        try:
+            return int(k)
+        except:
+            return getattr(pygame, k)
 
-  # list of keys to look for
-  keyNames = ["key_action1","key_action2","key_1","key_2","key_3","key_4","key_5","key_1a","key_2a","key_3a","key_4a","key_5a","key_start","key_star","key_kill","key_cancel"]
-  overlap     = []
-  keyVal = []
-  for i in keyNames:
-    if config.get("controller", i) in keyVal and i != start:
-      overlap.append(config.prototype["controller"][i].text)
-    else:
-      keyVal.append(keycode(i, config))
+    # list of keys to look for
+    keyNames = ["key_action1","key_action2","key_1","key_2","key_3","key_4","key_5","key_1a","key_2a","key_3a","key_4a","key_5a","key_start","key_star","key_kill","key_cancel"]
+    overlap     = []
+    keyVal = []
+    for i in keyNames:
+        if config.get("controller", i) in keyVal and i != start:
+            overlap.append(config.prototype["controller"][i].text)
+        else:
+            keyVal.append(keycode(i, config))
 
-  if len(overlap) > 0:
-    return overlap
+    if len(overlap) > 0:
+        return overlap
 
-    # everything tests OK
-  return 0
+        # everything tests OK
+    return 0
 
 # glorandwarf: sets the key mapping and checks for a conflict #FIXME
 # restores the old mapping if a conflict occurred
 def setNewKeyMapping(engine, config, section, option, key):
-  oldKey = config.get(section, option)
-  config.set(section, option, key)
-  keyCheckerMode = Config.get("game", "key_checker_mode")
-  if key == "None" or key is None:
+    oldKey = config.get(section, option)
+    config.set(section, option, key)
+    keyCheckerMode = Config.get("game", "key_checker_mode")
+    if key == "None" or key is None:
+        return True
+    b = isKeyMappingOK(config, option)
+    if b != 0:
+        if keyCheckerMode > 0:
+            import Dialogs
+            Dialogs.showMessage(engine, _("This key conflicts with the following keys: %s") % str(b))
+        if keyCheckerMode == 2:   #enforce no conflicts!
+            config.set(section, option, oldKey)
+        return False
     return True
-  b = isKeyMappingOK(config, option)
-  if b != 0:
-    if keyCheckerMode > 0:
-      import Dialogs
-      Dialogs.showMessage(engine, _("This key conflicts with the following keys: %s") % str(b))
-    if keyCheckerMode == 2:   #enforce no conflicts!
-      config.set(section, option, oldKey)
-    return False
-  return True
-      
+
 class Player(object):
-  def __init__(self, name, number):
+    def __init__(self, name, number):
 
-    self.logClassInits = Config.get("game", "log_class_inits")
-    if self.logClassInits == 1:
-      Log.debug("Player class init (Player.py)...")
+        self.logClassInits = Config.get("game", "log_class_inits")
+        if self.logClassInits == 1:
+            Log.debug("Player class init (Player.py)...")
 
-    self.name     = name
-    
-    self.reset()
-    self.keyList     = None
-    
-    self.progressKeys = []
-    self.drums        = []
-    self.keys         = []
-    self.soloKeys     = []
-    self.soloShift    = None
-    self.soloSlide    = False
-    self.actions      = []
-    self.yes          = []
-    self.no           = []
-    self.conf         = []
-    self.up           = []
-    self.down         = []
-    self.left         = []
-    self.right        = []
-    self.controller   = -1
-    self.controlType  = -1
-    
-    self.guitarNum    = None
-    self.number       = number
-    
-    self.bassGrooveEnabled = False
-    self.currentTheme = 1
-    
-    self.lefty       = _playerDB.execute('SELECT `lefty` FROM `players` WHERE `name` = ?', [self.name]).fetchone()[0]
-    self.twoChordMax = _playerDB.execute('SELECT `twochord` FROM `players` WHERE `name` = ?', [self.name]).fetchone()[0]
-    self.drumflip    = _playerDB.execute('SELECT `drumflip` FROM `players` WHERE `name` = ?', [self.name]).fetchone()[0]
-    self.assistMode  = _playerDB.execute('SELECT `assist` FROM `players` WHERE `name` = ?', [self.name]).fetchone()[0]
-    self.autoKick    = _playerDB.execute('SELECT `autokick` FROM `players` WHERE `name` = ?', [self.name]).fetchone()[0]
-    self.neck        = _playerDB.execute('SELECT `neck` FROM `players` WHERE `name` = ?', [self.name]).fetchone()[0]
-    self.neckType    = _playerDB.execute('SELECT `necktype` FROM `players` WHERE `name` = ?', [self.name]).fetchone()[0]
-    self.whichPart   = _playerDB.execute('SELECT `part` FROM `players` WHERE `name` = ?', [self.name]).fetchone()[0]
-    self._upname      = _playerDB.execute('SELECT `upname` FROM `players` WHERE `name` = ?', [self.name]).fetchone()[0]
-    self._difficulty  = _playerDB.execute('SELECT `difficulty` FROM `players` WHERE `name` = ?', [self.name]).fetchone()[0]
-    #MFH - need to store selected practice mode and start position here
-    self.practiceMode = False
-    self.practiceSpeed = 1.0
-    self.practiceSection = None
-    self.startPos = 0.0
-    
-    self.hopoFreq = None
-    
-    
-  def reset(self):
-    self.twoChord      = 0
-  
-  def configController(self):
-    if self.keyList:
-      if self.controlType == 1:
-        self.keys      = [self.keyList[KEY1], self.keyList[KEY2], self.keyList[KEY3], self.keyList[KEY4], self.keyList[KEY5], \
-                          self.keyList[KEY1], self.keyList[KEY2], self.keyList[KEY3], self.keyList[KEY4], self.keyList[KEY5]]
-        self.soloKeys  = [self.keyList[KEY1], self.keyList[KEY2], self.keyList[KEY3], self.keyList[KEY4], self.keyList[KEY5]]
-      else:
-        self.keys   = [self.keyList[KEY1], self.keyList[KEY2], self.keyList[KEY3], self.keyList[KEY4], self.keyList[KEY5], \
-                       self.keyList[KEY1A], self.keyList[KEY2A], self.keyList[KEY3A], self.keyList[KEY4A], self.keyList[KEY5A]]
-        self.soloKeys = [self.keyList[KEY1A], self.keyList[KEY2A], self.keyList[KEY3A], self.keyList[KEY4A], self.keyList[KEY5A]]
-      self.soloShift = self.keyList[KEY1A]
-      self.drumSolo = []
-      self.actions  = [self.keyList[ACTION1], self.keyList[ACTION2]]
-      self.drums    = [self.keyList[DRUMBASS], self.keyList[DRUM1], self.keyList[DRUM2], self.keyList[DRUM3], self.keyList[DRUM5], \
-                       self.keyList[DRUMBASSA], self.keyList[DRUM1A], self.keyList[DRUM2A], self.keyList[DRUM3A], self.keyList[DRUM5A]]
-      if self.controlType == 1:
-        self.progressKeys = [self.keyList[KEY1], self.keyList[CANCEL], self.keyList[START], self.keyList[KEY2]]
-      else:
-        self.progressKeys = [self.keyList[KEY1], self.keyList[KEY1A], self.keyList[CANCEL], self.keyList[START], self.keyList[KEY2], \
-                             self.keyList[KEY2A]]
-      if self.controlType == 4:
-        self.soloSlide = True
-      else:
-        self.soloSlide = False
-      if self.controlType in GUITARTYPES:
-        self.yes  = [self.keyList[KEY1]]
-        if self.controlType == 1:
-          self.yes.append(self.keyList[KEY1A])
-        self.no   = [self.keyList[KEY2], self.keyList[KEY2A]]
-        self.up   = [self.keyList[ACTION1]]
-        self.down = [self.keyList[ACTION2]]
-      elif self.controlType == 2:
-        self.yes  = [self.keyList[DRUM5], self.keyList[DRUM5A]]
-        self.no   = [self.keyList[DRUM1], self.keyList[DRUM1A]]
-        self.up   = [self.keyList[DRUM2], self.keyList[DRUM2A]]
-        self.down = [self.keyList[DRUM3], self.keyList[DRUM3A]]
-        self.conf = [self.keyList[DRUMBASS], self.keyList[DRUMBASSA]]
-      self.yes.append(self.keyList[START])
-      self.no.append(self.keyList[CANCEL])
-      self.up.append(self.keyList[UP])
-      self.down.append(self.keyList[DOWN])
-      self.left.append(self.keyList[LEFT])
-      self.right.append(self.keyList[RIGHT])
-      #akedrou - add drum4 to the drums when ready
-      return True
-    else:
-      return False 
-  
-  def getName(self):
-    if self._upname == "" or self._upname is None:
-      return self.name
-    else:
-      return self._upname
-  
-  def setName(self, name):
-    _playerDB.execute('UPDATE `players` SET `upname` = ?, `changed` = 1 WHERE `name` = ?', [name, self.name])
-    _playerDB.commit()
-    self._upname = name
-    
-  def getDifficulty(self):
-    return Song.difficulties.get(self._difficulty)
-    
-  def setDifficulty(self, difficulty):
-    _playerDB.execute('UPDATE `players` SET `difficulty` = ?, `changed` = 1 WHERE `name` = ?', [difficulty.id, self.name])
-    _playerDB.commit()
-    self._difficulty = difficulty.id
-  
-  def getDifficultyInt(self):
-    return self._difficulty
+        self.name     = name
 
-  def getPart(self):
-    #myfingershurt: this should not be reading from the ini file each time it wants to know the part.  Also add "self."
-    if self.whichPart == -1:
-      return "Party Mode"
-    elif self.whichPart == -2:
-      return "No Player 2"
-    else:
-      return Song.parts.get(self.whichPart)
-    
-  def setPart(self, part):
-    if part == "Party Mode":
-      self.whichPart = -1    #myfingershurt: also need to set self.part here to avoid unnecessary ini reads
-    elif part == "No Player 2":
-      self.whichPart = -2    #myfingershurt: also need to set self.part here to avoid unnecessary ini reads
-    else:
-      self.whichPart = part.id    #myfingershurt: also need to set self.part here to avoid unnecessary ini reads
-    _playerDB.execute('UPDATE `players` SET `part` = ?, `changed` = 1 WHERE `name` = ?', [self.whichPart, self.name])
-    _playerDB.commit()
-    
-  difficulty = property(getDifficulty, setDifficulty)
-  part = property(getPart, setPart)
-  upname = property(getName, setName)
+        self.reset()
+        self.keyList     = None
+
+        self.progressKeys = []
+        self.drums        = []
+        self.keys         = []
+        self.soloKeys     = []
+        self.soloShift    = None
+        self.soloSlide    = False
+        self.actions      = []
+        self.yes          = []
+        self.no           = []
+        self.conf         = []
+        self.up           = []
+        self.down         = []
+        self.left         = []
+        self.right        = []
+        self.controller   = -1
+        self.controlType  = -1
+
+        self.guitarNum    = None
+        self.number       = number
+
+        self.bassGrooveEnabled = False
+        self.currentTheme = 1
+
+        self.lefty       = _playerDB.execute('SELECT `lefty` FROM `players` WHERE `name` = ?', [self.name]).fetchone()[0]
+        self.twoChordMax = _playerDB.execute('SELECT `twochord` FROM `players` WHERE `name` = ?', [self.name]).fetchone()[0]
+        self.drumflip    = _playerDB.execute('SELECT `drumflip` FROM `players` WHERE `name` = ?', [self.name]).fetchone()[0]
+        self.assistMode  = _playerDB.execute('SELECT `assist` FROM `players` WHERE `name` = ?', [self.name]).fetchone()[0]
+        self.autoKick    = _playerDB.execute('SELECT `autokick` FROM `players` WHERE `name` = ?', [self.name]).fetchone()[0]
+        self.neck        = _playerDB.execute('SELECT `neck` FROM `players` WHERE `name` = ?', [self.name]).fetchone()[0]
+        self.neckType    = _playerDB.execute('SELECT `necktype` FROM `players` WHERE `name` = ?', [self.name]).fetchone()[0]
+        self.whichPart   = _playerDB.execute('SELECT `part` FROM `players` WHERE `name` = ?', [self.name]).fetchone()[0]
+        self._upname      = _playerDB.execute('SELECT `upname` FROM `players` WHERE `name` = ?', [self.name]).fetchone()[0]
+        self._difficulty  = _playerDB.execute('SELECT `difficulty` FROM `players` WHERE `name` = ?', [self.name]).fetchone()[0]
+        #MFH - need to store selected practice mode and start position here
+        self.practiceMode = False
+        self.practiceSpeed = 1.0
+        self.practiceSection = None
+        self.startPos = 0.0
+
+        self.hopoFreq = None
+
+
+    def reset(self):
+        self.twoChord      = 0
+
+    def configController(self):
+        if self.keyList:
+            if self.controlType == 1:
+                self.keys      = [self.keyList[KEY1], self.keyList[KEY2], self.keyList[KEY3], self.keyList[KEY4], self.keyList[KEY5], \
+                                  self.keyList[KEY1], self.keyList[KEY2], self.keyList[KEY3], self.keyList[KEY4], self.keyList[KEY5]]
+                self.soloKeys  = [self.keyList[KEY1], self.keyList[KEY2], self.keyList[KEY3], self.keyList[KEY4], self.keyList[KEY5]]
+            else:
+                self.keys   = [self.keyList[KEY1], self.keyList[KEY2], self.keyList[KEY3], self.keyList[KEY4], self.keyList[KEY5], \
+                               self.keyList[KEY1A], self.keyList[KEY2A], self.keyList[KEY3A], self.keyList[KEY4A], self.keyList[KEY5A]]
+                self.soloKeys = [self.keyList[KEY1A], self.keyList[KEY2A], self.keyList[KEY3A], self.keyList[KEY4A], self.keyList[KEY5A]]
+            self.soloShift = self.keyList[KEY1A]
+            self.drumSolo = []
+            self.actions  = [self.keyList[ACTION1], self.keyList[ACTION2]]
+            self.drums    = [self.keyList[DRUMBASS], self.keyList[DRUM1], self.keyList[DRUM2], self.keyList[DRUM3], self.keyList[DRUM5], \
+                             self.keyList[DRUMBASSA], self.keyList[DRUM1A], self.keyList[DRUM2A], self.keyList[DRUM3A], self.keyList[DRUM5A]]
+            if self.controlType == 1:
+                self.progressKeys = [self.keyList[KEY1], self.keyList[CANCEL], self.keyList[START], self.keyList[KEY2]]
+            else:
+                self.progressKeys = [self.keyList[KEY1], self.keyList[KEY1A], self.keyList[CANCEL], self.keyList[START], self.keyList[KEY2], \
+                                     self.keyList[KEY2A]]
+            if self.controlType == 4:
+                self.soloSlide = True
+            else:
+                self.soloSlide = False
+            if self.controlType in GUITARTYPES:
+                self.yes  = [self.keyList[KEY1]]
+                if self.controlType == 1:
+                    self.yes.append(self.keyList[KEY1A])
+                self.no   = [self.keyList[KEY2], self.keyList[KEY2A]]
+                self.up   = [self.keyList[ACTION1]]
+                self.down = [self.keyList[ACTION2]]
+            elif self.controlType == 2:
+                self.yes  = [self.keyList[DRUM5], self.keyList[DRUM5A]]
+                self.no   = [self.keyList[DRUM1], self.keyList[DRUM1A]]
+                self.up   = [self.keyList[DRUM2], self.keyList[DRUM2A]]
+                self.down = [self.keyList[DRUM3], self.keyList[DRUM3A]]
+                self.conf = [self.keyList[DRUMBASS], self.keyList[DRUMBASSA]]
+            self.yes.append(self.keyList[START])
+            self.no.append(self.keyList[CANCEL])
+            self.up.append(self.keyList[UP])
+            self.down.append(self.keyList[DOWN])
+            self.left.append(self.keyList[LEFT])
+            self.right.append(self.keyList[RIGHT])
+            #akedrou - add drum4 to the drums when ready
+            return True
+        else:
+            return False
+
+    def getName(self):
+        if self._upname == "" or self._upname is None:
+            return self.name
+        else:
+            return self._upname
+
+    def setName(self, name):
+        _playerDB.execute('UPDATE `players` SET `upname` = ?, `changed` = 1 WHERE `name` = ?', [name, self.name])
+        _playerDB.commit()
+        self._upname = name
+
+    def getDifficulty(self):
+        return Song.difficulties.get(self._difficulty)
+
+    def setDifficulty(self, difficulty):
+        _playerDB.execute('UPDATE `players` SET `difficulty` = ?, `changed` = 1 WHERE `name` = ?', [difficulty.id, self.name])
+        _playerDB.commit()
+        self._difficulty = difficulty.id
+
+    def getDifficultyInt(self):
+        return self._difficulty
+
+    def getPart(self):
+        #myfingershurt: this should not be reading from the ini file each time it wants to know the part.  Also add "self."
+        if self.whichPart == -1:
+            return "Party Mode"
+        elif self.whichPart == -2:
+            return "No Player 2"
+        else:
+            return Song.parts.get(self.whichPart)
+
+    def setPart(self, part):
+        if part == "Party Mode":
+            self.whichPart = -1    #myfingershurt: also need to set self.part here to avoid unnecessary ini reads
+        elif part == "No Player 2":
+            self.whichPart = -2    #myfingershurt: also need to set self.part here to avoid unnecessary ini reads
+        else:
+            self.whichPart = part.id    #myfingershurt: also need to set self.part here to avoid unnecessary ini reads
+        _playerDB.execute('UPDATE `players` SET `part` = ?, `changed` = 1 WHERE `name` = ?', [self.whichPart, self.name])
+        _playerDB.commit()
+
+    difficulty = property(getDifficulty, setDifficulty)
+    part = property(getPart, setPart)
+    upname = property(getName, setName)

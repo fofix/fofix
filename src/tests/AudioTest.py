@@ -24,10 +24,10 @@ import unittest
 from Audio import Audio
 
 class AudioTest(unittest.TestCase):
-  def testOpen(self):
-    a = Audio()
-    assert a.open()
-    a.close()
+    def testOpen(self):
+        a = Audio()
+        assert a.open()
+        a.close()
 
 if __name__ == "__main__":
-  unittest.main()
+    unittest.main()

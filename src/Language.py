@@ -30,32 +30,32 @@ import glob
 Config.define("game", "language", str, "")
 
 def getAvailableLanguages():
-  return [os.path.basename(l).capitalize().replace(".mo", "").replace("_", " ") for l in glob.glob(os.path.join(Version.dataPath(), "translations", "*.mo"))]
+    return [os.path.basename(l).capitalize().replace(".mo", "").replace("_", " ") for l in glob.glob(os.path.join(Version.dataPath(), "translations", "*.mo"))]
 
 def dummyTranslator(string):
-  return string
+    return string
 
 encoding = Config.load(Version.PROGRAM_UNIXSTYLE_NAME + ".ini").get("game", "encoding")
 language = Config.load(Version.PROGRAM_UNIXSTYLE_NAME + ".ini").get("game", "language")
 _ = dummyTranslator
 
 if language:
-  try:
-    trFile = os.path.join(Version.dataPath(), "translations", "%s.mo" % language.lower().replace(" ", "_"))
-    catalog = gettext.GNUTranslations(open(trFile, "rb"))
-    def translate(m):
-      if encoding == "None":
-        return catalog.gettext(m).decode("iso-8859-1")
-      else:
-        return catalog.gettext(m).decode(encoding)
-    _ = translate
-  except Exception, x:
-    Log.warn("Unable to select language '%s': %s" % (language, x))
-    language = None
-    Config.set("game", "language", "")
+    try:
+        trFile = os.path.join(Version.dataPath(), "translations", "%s.mo" % language.lower().replace(" ", "_"))
+        catalog = gettext.GNUTranslations(open(trFile, "rb"))
+        def translate(m):
+            if encoding == "None":
+                return catalog.gettext(m).decode("iso-8859-1")
+            else:
+                return catalog.gettext(m).decode(encoding)
+        _ = translate
+    except Exception, x:
+        Log.warn("Unable to select language '%s': %s" % (language, x))
+        language = None
+        Config.set("game", "language", "")
 
 # Define the config key again now that we have some options for it
 langOptions = {"": "English"}
 for lang in getAvailableLanguages():
-  langOptions[lang] = _(lang)
+    langOptions[lang] = _(lang)
 Config.define("game", "language", str, "", _("Language"), langOptions, tipText = _("Change the game language!"))

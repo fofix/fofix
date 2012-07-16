@@ -28,46 +28,46 @@ import Config
 import Version
 
 class TestLayer(Layer):
-  def __init__(self):
-    self.visibility = 0
-    self.topMost = False
-    
-  def render(self, visibility, topMost):
-    self.visibility = visibility
-    self.topMost = topMost
+    def __init__(self):
+        self.visibility = 0
+        self.topMost = False
 
-  def __repr__(self):
-    return "Layer(%x)" % abs(id(self))
+    def render(self, visibility, topMost):
+        self.visibility = visibility
+        self.topMost = topMost
+
+    def __repr__(self):
+        return "Layer(%x)" % abs(id(self))
 
 class ViewTest(unittest.TestCase):
-  def testTransition(self):
-    l1 = TestLayer()
-    l2 = TestLayer()
-    l3 = TestLayer()
-    v = self.e.view
-    
-    v.pushLayer(l1)
-    v.pushLayer(l2)
-    v.pushLayer(l3)
-    
-    while l3.visibility < 1.0:
-      self.e.run()
-      
-    v.popLayer(l3)
-    v.popLayer(l2)
-    v.popLayer(l1)
-    
-    while l1 in v.layers or l2 in v.layers or l3 in v.layers:
-      self.e.run()
+    def testTransition(self):
+        l1 = TestLayer()
+        l2 = TestLayer()
+        l3 = TestLayer()
+        v = self.e.view
 
-    assert not v.layers
-      
-  def setUp(self):
-    config = Config.load(Version.PROGRAM_UNIXSTYLE_NAME + ".ini", setAsDefault = True)
-    self.e = GameEngine(config)
-    
-  def tearDown(self):
-    self.e.quit()
+        v.pushLayer(l1)
+        v.pushLayer(l2)
+        v.pushLayer(l3)
+
+        while l3.visibility < 1.0:
+            self.e.run()
+
+        v.popLayer(l3)
+        v.popLayer(l2)
+        v.popLayer(l1)
+
+        while l1 in v.layers or l2 in v.layers or l3 in v.layers:
+            self.e.run()
+
+        assert not v.layers
+
+    def setUp(self):
+        config = Config.load(Version.PROGRAM_UNIXSTYLE_NAME + ".ini", setAsDefault = True)
+        self.e = GameEngine(config)
+
+    def tearDown(self):
+        self.e.quit()
 
 if __name__ == "__main__":
-  unittest.main()
+    unittest.main()

@@ -21,14 +21,14 @@
 #####################################################################
 
 class Task(object):
-  def __init__(self):
-    pass
-  
-  def started(self):
-    pass
-  
-  def stopped(self):
-    pass
-  
-  def run(self, ticks):
-    pass
+    def __init__(self):
+        pass
+
+    def started(self):
+        pass
+
+    def stopped(self):
+        pass
+
+    def run(self, ticks):
+        pass

@@ -27,14 +27,14 @@ from Scene import Scene
 from Resource import Resource
 
 class CityScene(Scene):
-  def __init__(self, id = None, manager = None):
-    Scene.__init__(self, id, manager)
-    #self.objects =
-    # Create a bunch of objects and simulate the scene for some time
+    def __init__(self, id = None, manager = None):
+        Scene.__init__(self, id, manager)
+        #self.objects =
+        # Create a bunch of objects and simulate the scene for some time
 
 class SceneTest(unittest.TestCase):
-  def TestScene():
-    pass
+    def TestScene():
+        pass
 
 if __name__ == "__main__":
-  unittest.main()
+    unittest.main()

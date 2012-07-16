@@ -5,11 +5,11 @@
 # It is available under the Python licence.
 
 try:
-  set
+    set
 except:
-  import sets
-  set = sets.Set
-  class frozenset(set): pass
+    import sets
+    set = sets.Set
+    class frozenset(set): pass
 
 """Cerealizer -- A secure Pickle-like module
 
@@ -137,424 +137,424 @@ class NonCerealizableObjectError(StandardError): pass
 def _priority_sorter(a, b): return cmp(a[0], b[0])
 
 class Dumper(object):
-  def dump(self, root_obj, s):
-    self.objs            = []
-    self.objs_id         = set()
-    self.priorities_objs = [] # [(priority1, obj1), (priority2, obj2),...]
-    self.obj2state       = {}
-    self.obj2newargs     = {}
-    self.id2id           = {}
-    
-    self.collect(root_obj)
-    self.priorities_objs.sort(_priority_sorter)
-    self.objs.extend([o for (priority, o) in self.priorities_objs])
-    
-    s.write("cereal1\n%s\n" % len(self.objs))
-    
-    i = 0
-    for obj in self.objs:
-      self.id2id[id(obj)] = i
-      i += 1
-    for obj in self.objs: _HANDLERS_[obj.__class__].dump_obj (obj, self, s)
-    for obj in self.objs: _HANDLERS_[obj.__class__].dump_data(obj, self, s)
-    
-    _HANDLERS_[root_obj.__class__].dump_ref(root_obj, self, s)
-    
-  def undump(self, s):
-    if s.read(8) != "cereal1\n": raise NotCerealizerFileError("Not a cerealizer file!")
-    
-    nb = int(s.readline())
-    self.id2obj = [ None ] * nb  # DO NOT DO  self.id2obj = [comprehension list], since undump_ref may access id2obj during its construction
-    for i in range(nb):
-      classname = s.readline()
-      handler = _HANDLERS.get(classname)
-      if not handler: raise NonCerealizableObjectError("Object of class/type '%s' cannot be de-cerealized! Use cerealizer.register to extend Cerealizer support to other classes." % classname[:-1])
-      self.id2obj[i] = handler.undump_obj(self, s)
-    for obj in self.id2obj: _HANDLERS_[obj.__class__].undump_data(obj, self, s)
-    
-    return self.undump_ref(s)
-  
-  def collect(self, obj):
-    """Dumper.collect(OBJ) -> bool
+    def dump(self, root_obj, s):
+        self.objs            = []
+        self.objs_id         = set()
+        self.priorities_objs = [] # [(priority1, obj1), (priority2, obj2),...]
+        self.obj2state       = {}
+        self.obj2newargs     = {}
+        self.id2id           = {}
 
-Collects OBJ for serialization. Returns false is OBJ is already collected; else returns true."""
-    handler = _HANDLERS_.get(obj.__class__)
-    if not handler: raise NonCerealizableObjectError("Object of class/type '%s' cannot be cerealized! Use cerealizer.register to extend Cerealizer support to other classes." % obj.__class__)
-    handler.collect(obj, self)
-  
-  def dump_ref (self, obj, s):
-    """Dumper.dump_ref(OBJ, S)
+        self.collect(root_obj)
+        self.priorities_objs.sort(_priority_sorter)
+        self.objs.extend([o for (priority, o) in self.priorities_objs])
 
-Writes a reference to OBJ in file S."""
-    _HANDLERS_[obj.__class__].dump_ref(obj, self, s)
-    
-  def undump_ref(self, s):
-    """Dumper.undump_ref(S) -> obj
+        s.write("cereal1\n%s\n" % len(self.objs))
 
-Reads a reference from file S."""
-    c = s.read(1)
-    if   c == "i": return int  (s.readline())
-    elif c == "f": return float(s.readline())
-    elif c == "s": return s.read(int(s.readline()))
-    elif c == "u": return s.read(int(s.readline())).decode("utf8")
-    elif c == "r": return self.id2obj[int(s.readline())]
-    elif c == "n": return None
-    elif c == "b": return bool(int(s.read(1)))
-    elif c == "l": return long(s.readline())
-    elif c == "c": return complex(s.readline())
-    raise ValueError("Unknown ref code '%s'!" % c)
-    
-  def immutable_depth(self, t):
-    depth = 0
-    for i in t:
-      i2 = self.obj2newargs.get(id(i))
-      if not i2 is None: i = i2
-      if isinstance(i, tuple) or isinstance(i, frozenset):
-        x = self.immutable_depth(i)
-        if x > depth: depth = x
-    return depth + 1
-  
+        i = 0
+        for obj in self.objs:
+            self.id2id[id(obj)] = i
+            i += 1
+        for obj in self.objs: _HANDLERS_[obj.__class__].dump_obj (obj, self, s)
+        for obj in self.objs: _HANDLERS_[obj.__class__].dump_data(obj, self, s)
+
+        _HANDLERS_[root_obj.__class__].dump_ref(root_obj, self, s)
+
+    def undump(self, s):
+        if s.read(8) != "cereal1\n": raise NotCerealizerFileError("Not a cerealizer file!")
+
+        nb = int(s.readline())
+        self.id2obj = [ None ] * nb  # DO NOT DO  self.id2obj = [comprehension list], since undump_ref may access id2obj during its construction
+        for i in range(nb):
+            classname = s.readline()
+            handler = _HANDLERS.get(classname)
+            if not handler: raise NonCerealizableObjectError("Object of class/type '%s' cannot be de-cerealized! Use cerealizer.register to extend Cerealizer support to other classes." % classname[:-1])
+            self.id2obj[i] = handler.undump_obj(self, s)
+        for obj in self.id2obj: _HANDLERS_[obj.__class__].undump_data(obj, self, s)
+
+        return self.undump_ref(s)
+
+    def collect(self, obj):
+        """Dumper.collect(OBJ) -> bool
+
+    Collects OBJ for serialization. Returns false is OBJ is already collected; else returns true."""
+        handler = _HANDLERS_.get(obj.__class__)
+        if not handler: raise NonCerealizableObjectError("Object of class/type '%s' cannot be cerealized! Use cerealizer.register to extend Cerealizer support to other classes." % obj.__class__)
+        handler.collect(obj, self)
+
+    def dump_ref (self, obj, s):
+        """Dumper.dump_ref(OBJ, S)
+
+    Writes a reference to OBJ in file S."""
+        _HANDLERS_[obj.__class__].dump_ref(obj, self, s)
+
+    def undump_ref(self, s):
+        """Dumper.undump_ref(S) -> obj
+
+    Reads a reference from file S."""
+        c = s.read(1)
+        if   c == "i": return int  (s.readline())
+        elif c == "f": return float(s.readline())
+        elif c == "s": return s.read(int(s.readline()))
+        elif c == "u": return s.read(int(s.readline())).decode("utf8")
+        elif c == "r": return self.id2obj[int(s.readline())]
+        elif c == "n": return None
+        elif c == "b": return bool(int(s.read(1)))
+        elif c == "l": return long(s.readline())
+        elif c == "c": return complex(s.readline())
+        raise ValueError("Unknown ref code '%s'!" % c)
+
+    def immutable_depth(self, t):
+        depth = 0
+        for i in t:
+            i2 = self.obj2newargs.get(id(i))
+            if not i2 is None: i = i2
+            if isinstance(i, tuple) or isinstance(i, frozenset):
+                x = self.immutable_depth(i)
+                if x > depth: depth = x
+        return depth + 1
+
 class Handler(object):
-  """Handler
+    """Handler
 
-A customized handler for serialization and deserialization.
-You can subclass it to extend cerealization support to new object.
-See also ObjHandler."""
-  
-  def collect(self, obj, dumper):
-    """Handler.collect(obj, dumper) -> bool
+  A customized handler for serialization and deserialization.
+  You can subclass it to extend cerealization support to new object.
+  See also ObjHandler."""
 
-Collects all the objects referenced by OBJ.
-For each objects ROBJ referenced by OBJ, calls collect method of the Handler for ROBJ's class,
-i.e._HANDLERS_[ROBJ.__class__].collect(ROBJ, dumper).
-Returns false if OBJ is already referenced (and thus no collection should occur); else returns true.
-"""
-    i = id(obj)
-    if not i in dumper.objs_id:
-      dumper.objs.append(obj)
-      dumper.objs_id.add(i)
-      return 1
-    
-  def dump_obj (self, obj, dumper, s):
-    """Handler.dump_obj(obj, dumper, s)
+    def collect(self, obj, dumper):
+        """Handler.collect(obj, dumper) -> bool
 
-Dumps OBJ classname in file S."""
-    s.write(self.classname)
-    
-  def dump_data(self, obj, dumper, s):
-    """Handler.dump_data(obj, dumper, s)
+    Collects all the objects referenced by OBJ.
+    For each objects ROBJ referenced by OBJ, calls collect method of the Handler for ROBJ's class,
+    i.e._HANDLERS_[ROBJ.__class__].collect(ROBJ, dumper).
+    Returns false if OBJ is already referenced (and thus no collection should occur); else returns true.
+    """
+        i = id(obj)
+        if not i in dumper.objs_id:
+            dumper.objs.append(obj)
+            dumper.objs_id.add(i)
+            return 1
 
-Dumps OBJ data in file S."""
-    
-  def dump_ref (self, obj, dumper, s):
-    """Handler.dump_ref(obj, dumper, s)
+    def dump_obj (self, obj, dumper, s):
+        """Handler.dump_obj(obj, dumper, s)
 
-Write a reference to OBJ in file S.
-You should not override dump_ref, since they is no corresponding 'undump_ref' that you
-can override."""
-    s.write("r%s\n" % dumper.id2id[id(obj)])
-  
-  def undump_obj(self, dumper, s):
-    """Handler.undump_obj(dumper, s)
+    Dumps OBJ classname in file S."""
+        s.write(self.classname)
 
-Returns a new uninitialized (=no __init__'ed) instance of the class.
-If you override undump_obj, DUMPER and file S can be used to read additional data
-saved by Handler.dump_obj()."""
-    
-  def undump_data(self, obj, dumper, s):
-    """Handler.undump_data(obj, dumper, s)
+    def dump_data(self, obj, dumper, s):
+        """Handler.dump_data(obj, dumper, s)
 
-Reads the data for OBJ, from DUMPER and file S.
-If you override undump_data, you should use DUMPER.undump_ref(S) to
-read a reference or a basic type (=a string, an int,...)."""
-  
-    
+    Dumps OBJ data in file S."""
+
+    def dump_ref (self, obj, dumper, s):
+        """Handler.dump_ref(obj, dumper, s)
+
+    Write a reference to OBJ in file S.
+    You should not override dump_ref, since they is no corresponding 'undump_ref' that you
+    can override."""
+        s.write("r%s\n" % dumper.id2id[id(obj)])
+
+    def undump_obj(self, dumper, s):
+        """Handler.undump_obj(dumper, s)
+
+    Returns a new uninitialized (=no __init__'ed) instance of the class.
+    If you override undump_obj, DUMPER and file S can be used to read additional data
+    saved by Handler.dump_obj()."""
+
+    def undump_data(self, obj, dumper, s):
+        """Handler.undump_data(obj, dumper, s)
+
+    Reads the data for OBJ, from DUMPER and file S.
+    If you override undump_data, you should use DUMPER.undump_ref(S) to
+    read a reference or a basic type (=a string, an int,...)."""
+
+
 class RefHandler(object):
-  def collect  (self, obj, dumper)   : pass
-  def dump_obj (self, obj, dumper, s): pass
-  def dump_data(self, obj, dumper, s): pass
-  
+    def collect  (self, obj, dumper)   : pass
+    def dump_obj (self, obj, dumper, s): pass
+    def dump_data(self, obj, dumper, s): pass
+
 class NoneHandler(RefHandler):
-  def dump_ref (self, obj, dumper, s): s.write("n")
-  
+    def dump_ref (self, obj, dumper, s): s.write("n")
+
 class StrHandler(RefHandler):
-  def dump_ref (self, obj, dumper, s): s.write("s%s\n%s" % (len(obj), obj))
-  
+    def dump_ref (self, obj, dumper, s): s.write("s%s\n%s" % (len(obj), obj))
+
 class UnicodeHandler(RefHandler):
-  def dump_ref (self, obj, dumper, s):
-    obj = obj.encode("utf8")
-    s.write("u%s\n%s" % (len(obj), obj))
-    
+    def dump_ref (self, obj, dumper, s):
+        obj = obj.encode("utf8")
+        s.write("u%s\n%s" % (len(obj), obj))
+
 class BoolHandler(RefHandler):
-  def dump_ref (self, obj, dumper, s): s.write("b%s" % int(obj))
+    def dump_ref (self, obj, dumper, s): s.write("b%s" % int(obj))
 
 class IntHandler(RefHandler):
-  def dump_ref (self, obj, dumper, s): s.write("i%s\n" % obj)
-  
+    def dump_ref (self, obj, dumper, s): s.write("i%s\n" % obj)
+
 class LongHandler(RefHandler):
-  def dump_ref (self, obj, dumper, s): s.write("l%s\n" % obj)
-  
+    def dump_ref (self, obj, dumper, s): s.write("l%s\n" % obj)
+
 class FloatHandler(RefHandler):
-  def dump_ref (self, obj, dumper, s): s.write("f%s\n" % obj)
-  
+    def dump_ref (self, obj, dumper, s): s.write("f%s\n" % obj)
+
 class ComplexHandler(RefHandler):
-  def dump_ref (self, obj, dumper, s):
-    c = str(obj)
-    if c.startswith("("): c = c[1:-1] # complex("(1+2j)") doesn't work
-    s.write("c%s\n" % c)
-    
+    def dump_ref (self, obj, dumper, s):
+        c = str(obj)
+        if c.startswith("("): c = c[1:-1] # complex("(1+2j)") doesn't work
+        s.write("c%s\n" % c)
+
 
 class TupleHandler(Handler):
-  classname = "tuple\n"
-  def collect(self, obj, dumper):
-    if not id(obj) in dumper.objs_id:
-      dumper.priorities_objs.append((dumper.immutable_depth(obj), obj))
-      dumper.objs_id.add(id(obj))
-      
-      for i in obj: dumper.collect(i)
-      return 1
-    
-  def dump_obj(self, obj, dumper, s):
-    s.write("%s%s\n" % (self.classname, len(obj)))
-    for i in obj: _HANDLERS_[i.__class__].dump_ref(i, dumper, s)
-    
-  def undump_obj(self, dumper, s): return tuple([dumper.undump_ref(s) for i in range(int(s.readline()))])
-  
+    classname = "tuple\n"
+    def collect(self, obj, dumper):
+        if not id(obj) in dumper.objs_id:
+            dumper.priorities_objs.append((dumper.immutable_depth(obj), obj))
+            dumper.objs_id.add(id(obj))
+
+            for i in obj: dumper.collect(i)
+            return 1
+
+    def dump_obj(self, obj, dumper, s):
+        s.write("%s%s\n" % (self.classname, len(obj)))
+        for i in obj: _HANDLERS_[i.__class__].dump_ref(i, dumper, s)
+
+    def undump_obj(self, dumper, s): return tuple([dumper.undump_ref(s) for i in range(int(s.readline()))])
+
 class FrozensetHandler(TupleHandler):
-  classname = "frozenset\n"
-  def undump_obj(self, dumper, s): return frozenset([dumper.undump_ref(s) for i in range(int(s.readline()))])
-  
-  
+    classname = "frozenset\n"
+    def undump_obj(self, dumper, s): return frozenset([dumper.undump_ref(s) for i in range(int(s.readline()))])
+
+
 class ListHandler(Handler):
-  classname = "list\n"
-  def collect(self, obj, dumper):
-    if Handler.collect(self, obj, dumper):
-      for i in obj: dumper.collect(i)
-      return 1
-    
-  def dump_data(self, obj, dumper, s):
-    s.write("%s\n" % len(obj))
-    for i in obj: _HANDLERS_[i.__class__].dump_ref(i, dumper, s)
-      
-  def undump_obj(self, dumper, s): return []
-  
-  def undump_data(self, obj, dumper, s):
-    for i in range(int(s.readline())): obj.append(dumper.undump_ref(s))
-    
+    classname = "list\n"
+    def collect(self, obj, dumper):
+        if Handler.collect(self, obj, dumper):
+            for i in obj: dumper.collect(i)
+            return 1
+
+    def dump_data(self, obj, dumper, s):
+        s.write("%s\n" % len(obj))
+        for i in obj: _HANDLERS_[i.__class__].dump_ref(i, dumper, s)
+
+    def undump_obj(self, dumper, s): return []
+
+    def undump_data(self, obj, dumper, s):
+        for i in range(int(s.readline())): obj.append(dumper.undump_ref(s))
+
 class SetHandler(ListHandler):
-  classname = "set\n"
-  def undump_obj(self, dumper, s): return set()
-  def undump_data(self, obj, dumper, s):
-    for i in range(int(s.readline())): obj.add(dumper.undump_ref(s))
-    
+    classname = "set\n"
+    def undump_obj(self, dumper, s): return set()
+    def undump_data(self, obj, dumper, s):
+        for i in range(int(s.readline())): obj.add(dumper.undump_ref(s))
+
 class DictHandler(Handler):
-  classname = "dict\n"
-  def collect(self, obj, dumper):
-    if Handler.collect(self, obj, dumper):
-      for i in obj.iterkeys  (): dumper.collect(i) # Collect is not ordered
-      for i in obj.itervalues(): dumper.collect(i)
-      return 1
-    
-  def dump_data(self, obj, dumper, s):
-    s.write("%s\n" % len(obj))
-    for k, v in obj.iteritems():
-      _HANDLERS_[v.__class__].dump_ref(v, dumper, s) # Value is saved fist
-      _HANDLERS_[k.__class__].dump_ref(k, dumper, s)
-      
-  def undump_obj(self, dumper, s): return {}
-  
-  def undump_data(self, obj, dumper, s):
-    for i in range(int(s.readline())):
-      obj[dumper.undump_ref(s)] = dumper.undump_ref(s) # Value is read fist
-      
+    classname = "dict\n"
+    def collect(self, obj, dumper):
+        if Handler.collect(self, obj, dumper):
+            for i in obj.iterkeys  (): dumper.collect(i) # Collect is not ordered
+            for i in obj.itervalues(): dumper.collect(i)
+            return 1
+
+    def dump_data(self, obj, dumper, s):
+        s.write("%s\n" % len(obj))
+        for k, v in obj.iteritems():
+            _HANDLERS_[v.__class__].dump_ref(v, dumper, s) # Value is saved fist
+            _HANDLERS_[k.__class__].dump_ref(k, dumper, s)
+
+    def undump_obj(self, dumper, s): return {}
+
+    def undump_data(self, obj, dumper, s):
+        for i in range(int(s.readline())):
+            obj[dumper.undump_ref(s)] = dumper.undump_ref(s) # Value is read fist
+
 
 class ObjHandler(Handler):
-  """ObjHandler
+    """ObjHandler
 
-A Cerealizer Handler that can support any new-style class instances, old-style class instances
-as well as C-defined types (although it may not save the C-side data)."""
-  def __init__(self, Class, classname = ""):
-    self.Class          = Class
-    self.Class_new      = getattr(Class, "__new__"     , instance)
-    self.Class_getstate = getattr(Class, "__getstate__", None)  # Check for and store __getstate__ and __setstate__ now
-    self.Class_setstate = getattr(Class, "__setstate__", None)  # so we are are they are not modified in the class or the object
-    if classname: self.classname = "%s\n"    % classname
-    else:         self.classname = "%s.%s\n" % (Class.__module__, Class.__name__)
-    
-  def collect(self, obj, dumper):
-    i = id(obj)
-    if not i in dumper.objs_id:
-      dumper.priorities_objs.append((-1, obj))
-      dumper.objs_id.add(i)
-      
-      if self.Class_getstate: state = self.Class_getstate(obj)
-      else:                   state = obj.__dict__
-      dumper.obj2state[i] = state
-      dumper.collect(state)
-      return 1
-    
-  def dump_data(self, obj, dumper, s):
-    i = dumper.obj2state[id(obj)]
-    _HANDLERS_[i.__class__].dump_ref(i, dumper, s)
-    
-  def undump_obj(self, dumper, s): return self.Class_new(self.Class)
-  
-  def undump_data(self, obj, dumper, s):
-    if self.Class_setstate: self.Class_setstate(obj, dumper.undump_ref(s))
-    else:                   obj.__dict__ =           dumper.undump_ref(s)
-    
+  A Cerealizer Handler that can support any new-style class instances, old-style class instances
+  as well as C-defined types (although it may not save the C-side data)."""
+    def __init__(self, Class, classname = ""):
+        self.Class          = Class
+        self.Class_new      = getattr(Class, "__new__"     , instance)
+        self.Class_getstate = getattr(Class, "__getstate__", None)  # Check for and store __getstate__ and __setstate__ now
+        self.Class_setstate = getattr(Class, "__setstate__", None)  # so we are are they are not modified in the class or the object
+        if classname: self.classname = "%s\n"    % classname
+        else:         self.classname = "%s.%s\n" % (Class.__module__, Class.__name__)
+
+    def collect(self, obj, dumper):
+        i = id(obj)
+        if not i in dumper.objs_id:
+            dumper.priorities_objs.append((-1, obj))
+            dumper.objs_id.add(i)
+
+            if self.Class_getstate: state = self.Class_getstate(obj)
+            else:                   state = obj.__dict__
+            dumper.obj2state[i] = state
+            dumper.collect(state)
+            return 1
+
+    def dump_data(self, obj, dumper, s):
+        i = dumper.obj2state[id(obj)]
+        _HANDLERS_[i.__class__].dump_ref(i, dumper, s)
+
+    def undump_obj(self, dumper, s): return self.Class_new(self.Class)
+
+    def undump_data(self, obj, dumper, s):
+        if self.Class_setstate: self.Class_setstate(obj, dumper.undump_ref(s))
+        else:                   obj.__dict__ =           dumper.undump_ref(s)
+
 class SlotedObjHandler(ObjHandler):
-  """SlotedObjHandler
+    """SlotedObjHandler
 
-A Cerealizer Handler that can support new-style class instances with __slot__."""
-  def __init__(self, Class, classname = ""):
-    ObjHandler.__init__(self, Class, classname)
-    self.Class_slots = Class.__slots__
-    
-  def collect(self, obj, dumper):
-    i = id(obj)
-    if not i in dumper.objs_id:
-      dumper.priorities_objs.append((-1, obj))
-      dumper.objs_id.add(i)
-      
-      if self.Class_getstate: state = self.Class_getstate(obj)
-      else:                   state = dict([(slot, getattr(obj, slot, None)) for slot in self.Class_slots])
-      dumper.obj2state[i] = state
-      dumper.collect(state)
-      return 1
-    
-  def undump_data(self, obj, dumper, s):
-    if self.Class_setstate: self.Class_setstate(obj, dumper.undump_ref(s))
-    else:
-      state = dumper.undump_ref(s)
-      for slot in self.Class_slots: setattr(obj, slot, state[slot])
-      
+  A Cerealizer Handler that can support new-style class instances with __slot__."""
+    def __init__(self, Class, classname = ""):
+        ObjHandler.__init__(self, Class, classname)
+        self.Class_slots = Class.__slots__
+
+    def collect(self, obj, dumper):
+        i = id(obj)
+        if not i in dumper.objs_id:
+            dumper.priorities_objs.append((-1, obj))
+            dumper.objs_id.add(i)
+
+            if self.Class_getstate: state = self.Class_getstate(obj)
+            else:                   state = dict([(slot, getattr(obj, slot, None)) for slot in self.Class_slots])
+            dumper.obj2state[i] = state
+            dumper.collect(state)
+            return 1
+
+    def undump_data(self, obj, dumper, s):
+        if self.Class_setstate: self.Class_setstate(obj, dumper.undump_ref(s))
+        else:
+            state = dumper.undump_ref(s)
+            for slot in self.Class_slots: setattr(obj, slot, state[slot])
+
 class InitArgsObjHandler(ObjHandler):
-  """InitArgsObjHandler
+    """InitArgsObjHandler
 
-A Cerealizer Handler that can support class instances with __getinitargs__."""
-  def __init__(self, Class, classname = ""):
-    ObjHandler.__init__(self, Class, classname)
-    self.Class_getinitargs = Class.__getinitargs__
-    self.Class_init        = Class.__init__
-    
-  def collect(self, obj, dumper):
-    i = id(obj)
-    if not i in dumper.objs_id:
-      dumper.priorities_objs.append((-1, obj))
-      dumper.objs_id.add(i)
-      
-      dumper.obj2state[i] = state = self.Class_getinitargs(obj)
-      dumper.collect(state)
-      return 1
-    
-  def undump_data(self, obj, dumper, s): self.Class_init(obj, *dumper.undump_ref(s))
-      
+  A Cerealizer Handler that can support class instances with __getinitargs__."""
+    def __init__(self, Class, classname = ""):
+        ObjHandler.__init__(self, Class, classname)
+        self.Class_getinitargs = Class.__getinitargs__
+        self.Class_init        = Class.__init__
+
+    def collect(self, obj, dumper):
+        i = id(obj)
+        if not i in dumper.objs_id:
+            dumper.priorities_objs.append((-1, obj))
+            dumper.objs_id.add(i)
+
+            dumper.obj2state[i] = state = self.Class_getinitargs(obj)
+            dumper.collect(state)
+            return 1
+
+    def undump_data(self, obj, dumper, s): self.Class_init(obj, *dumper.undump_ref(s))
+
 class NewArgsObjHandler(ObjHandler):
-  """NewArgsObjHandler
+    """NewArgsObjHandler
 
-A Cerealizer Handler that can support class instances with __getnewargs__."""
-  def __init__(self, Class, classname = ""):
-    ObjHandler.__init__(self, Class, classname)
-    self.Class_getnewargs = Class.__getnewargs__
-    
-  def collect(self, obj, dumper):
-    i = id(obj)
-    if not i in dumper.objs_id:
-      dumper.obj2newargs[i] = newargs = self.Class_getnewargs(obj)
-      dumper.collect(newargs)
-      
-      dumper.priorities_objs.append((dumper.immutable_depth(newargs), obj))
-      dumper.objs_id.add(i)
-      
-      if self.Class_getstate: state = self.Class_getstate(obj)
-      else:                   state = obj.__dict__
-      dumper.obj2state[i] = state
-      dumper.collect(state)
-      return 1
-    
-  def dump_obj (self, obj, dumper, s):
-    s.write(self.classname)
-    newargs = dumper.obj2newargs[id(obj)]
-    _HANDLERS_[newargs.__class__].dump_ref(newargs, dumper, s)
-    
-  def undump_obj(self, dumper, s): return self.Class_new(self.Class, *dumper.undump_ref(s))
-  
-  
+  A Cerealizer Handler that can support class instances with __getnewargs__."""
+    def __init__(self, Class, classname = ""):
+        ObjHandler.__init__(self, Class, classname)
+        self.Class_getnewargs = Class.__getnewargs__
+
+    def collect(self, obj, dumper):
+        i = id(obj)
+        if not i in dumper.objs_id:
+            dumper.obj2newargs[i] = newargs = self.Class_getnewargs(obj)
+            dumper.collect(newargs)
+
+            dumper.priorities_objs.append((dumper.immutable_depth(newargs), obj))
+            dumper.objs_id.add(i)
+
+            if self.Class_getstate: state = self.Class_getstate(obj)
+            else:                   state = obj.__dict__
+            dumper.obj2state[i] = state
+            dumper.collect(state)
+            return 1
+
+    def dump_obj (self, obj, dumper, s):
+        s.write(self.classname)
+        newargs = dumper.obj2newargs[id(obj)]
+        _HANDLERS_[newargs.__class__].dump_ref(newargs, dumper, s)
+
+    def undump_obj(self, dumper, s): return self.Class_new(self.Class, *dumper.undump_ref(s))
+
+
 _configurable = 1
 _HANDLERS  = {}
 _HANDLERS_ = {}
 def register(Class, handler = None, classname = ""):
-  """register(Class, handler = None, classname = "")
+    """register(Class, handler = None, classname = "")
 
-Registers CLASS as a serializable and secure class.
-By calling register, YOU HAVE TO ASSUME THAT THE FOLLOWING METHODS ARE SECURE:
-  - CLASS.__new__
-  - CLASS.__del__
-  - CLASS.__getstate__
-  - CLASS.__setstate__
-  - CLASS.__getinitargs__
-  - CLASS.__init__ (only if CLASS.__getinitargs__ exists)
+  Registers CLASS as a serializable and secure class.
+  By calling register, YOU HAVE TO ASSUME THAT THE FOLLOWING METHODS ARE SECURE:
+    - CLASS.__new__
+    - CLASS.__del__
+    - CLASS.__getstate__
+    - CLASS.__setstate__
+    - CLASS.__getinitargs__
+    - CLASS.__init__ (only if CLASS.__getinitargs__ exists)
 
-HANDLER is the Cerealizer Handler object that handles serialization and deserialization for Class.
-If not given, Cerealizer create an instance of ObjHandler, which is suitable for old-style and
-new_style Python class, and also C-defined types (although if it has some C-side data, you may
-have to write a custom Handler or a __getstate__ and __setstate__ pair).
+  HANDLER is the Cerealizer Handler object that handles serialization and deserialization for Class.
+  If not given, Cerealizer create an instance of ObjHandler, which is suitable for old-style and
+  new_style Python class, and also C-defined types (although if it has some C-side data, you may
+  have to write a custom Handler or a __getstate__ and __setstate__ pair).
 
-CLASSNAME is the classname used in Cerealizer files. It defaults to the full classname (module.class)
-but you may choose something shorter -- as long as there is no risk of name clash."""
-  if not _configurable: raise StandardError("Cannot register new classes after freeze_configuration has been called!")
-  if "\n" in classname: raise ValueError("CLASSNAME cannot have \\n (Cerealizer automatically add a trailing \\n for performance reason)!")
-  if not handler:
-    if   hasattr(Class, "__getnewargs__" ): handler = NewArgsObjHandler (Class, classname)
-    elif hasattr(Class, "__getinitargs__"): handler = InitArgsObjHandler(Class, classname)
-    elif hasattr(Class, "__slots__"      ): handler = SlotedObjHandler  (Class, classname)
-    else:                                   handler = ObjHandler        (Class, classname)
-  if _HANDLERS_.has_key(Class): raise ValueError("Class %s has already been registred!" % Class)
-  if not isinstance(handler, RefHandler):
-    if _HANDLERS .has_key(handler.classname): raise ValueError("A class has already been registred under the name %s!" % handler.classname[:-1])
-    _HANDLERS [handler.classname] = handler
-    if handler.__class__ is ObjHandler:
-      logger.info("Registring class %s as '%s'" % (Class, handler.classname[:-1]))
+  CLASSNAME is the classname used in Cerealizer files. It defaults to the full classname (module.class)
+  but you may choose something shorter -- as long as there is no risk of name clash."""
+    if not _configurable: raise StandardError("Cannot register new classes after freeze_configuration has been called!")
+    if "\n" in classname: raise ValueError("CLASSNAME cannot have \\n (Cerealizer automatically add a trailing \\n for performance reason)!")
+    if not handler:
+        if   hasattr(Class, "__getnewargs__" ): handler = NewArgsObjHandler (Class, classname)
+        elif hasattr(Class, "__getinitargs__"): handler = InitArgsObjHandler(Class, classname)
+        elif hasattr(Class, "__slots__"      ): handler = SlotedObjHandler  (Class, classname)
+        else:                                   handler = ObjHandler        (Class, classname)
+    if _HANDLERS_.has_key(Class): raise ValueError("Class %s has already been registred!" % Class)
+    if not isinstance(handler, RefHandler):
+        if _HANDLERS .has_key(handler.classname): raise ValueError("A class has already been registred under the name %s!" % handler.classname[:-1])
+        _HANDLERS [handler.classname] = handler
+        if handler.__class__ is ObjHandler:
+            logger.info("Registring class %s as '%s'" % (Class, handler.classname[:-1]))
+        else:
+            logger.info("Registring class %s as '%s' (using %s)" % (Class, handler.classname[:-1], handler.__class__.__name__))
     else:
-      logger.info("Registring class %s as '%s' (using %s)" % (Class, handler.classname[:-1], handler.__class__.__name__))
-  else:
-    logger.info("Registring reference '%s'" % Class)
-    
-  _HANDLERS_[Class] = handler
+        logger.info("Registring reference '%s'" % Class)
+
+    _HANDLERS_[Class] = handler
 
 register_class = register # For backward compatibility
 
 def register_alias(Class, alias):
-  """register_alias(Class, alias)
+    """register_alias(Class, alias)
 
-Registers ALIAS as an alias classname for CLASS.
-Usefull for keeping backward compatibility in files: e.g. if you have renamed OldClass to
-NewClass, just do:
+  Registers ALIAS as an alias classname for CLASS.
+  Usefull for keeping backward compatibility in files: e.g. if you have renamed OldClass to
+  NewClass, just do:
 
-    cerealizer.register_alias(NewClass, "OldClass")
+      cerealizer.register_alias(NewClass, "OldClass")
 
-and you'll be able to open old files containing OldClass serialized."""
-  handler = _HANDLERS_.get(Class)
-  if not handler:
-    raise ValueError("Cannot register alias '%s' to Class %s: the class is not yet registred!" % (alias, Class))
-  if _HANDLERS.has_key(alias):
-    raise ValueError("Cannot register alias '%s' to Class %s: another class is already registred under the alias name!" % (alias, Class))
-  logger.info("Registring alias '%s' for %s" % (alias, Class))
-  _HANDLERS[alias + "\n"] = handler
+  and you'll be able to open old files containing OldClass serialized."""
+    handler = _HANDLERS_.get(Class)
+    if not handler:
+        raise ValueError("Cannot register alias '%s' to Class %s: the class is not yet registred!" % (alias, Class))
+    if _HANDLERS.has_key(alias):
+        raise ValueError("Cannot register alias '%s' to Class %s: another class is already registred under the alias name!" % (alias, Class))
+    logger.info("Registring alias '%s' for %s" % (alias, Class))
+    _HANDLERS[alias + "\n"] = handler
 
 
 def freeze_configuration():
-  """freeze_configuration()
+    """freeze_configuration()
 
-Ends Cerealizer configuration. When freeze_configuration() is called, it is no longer possible
-to register classes, using register().
-Calling freeze_configuration() is not mandatory, but it may enforce security, by forbidding
-unexpected calls to register()."""
-  global _configurable
-  _configurable = 0
-  logger.info("Configuration frozen")
-  
+  Ends Cerealizer configuration. When freeze_configuration() is called, it is no longer possible
+  to register classes, using register().
+  Calling freeze_configuration() is not mandatory, but it may enforce security, by forbidding
+  unexpected calls to register()."""
+    global _configurable
+    _configurable = 0
+    logger.info("Configuration frozen")
+
 register(type(None), NoneHandler     ())
 register(str       , StrHandler      ())
 register(unicode   , UnicodeHandler  ())
@@ -571,42 +571,41 @@ register(frozenset , FrozensetHandler())
 
 
 def dump(obj, file, protocol = 0):
-  """dump(obj, file, protocol = 0)
+    """dump(obj, file, protocol = 0)
 
-Serializes object OBJ in FILE.
-PROTOCOL is unused, it exists only for compatibility with Pickle."""
-  Dumper().dump(obj, file)
-  
+  Serializes object OBJ in FILE.
+  PROTOCOL is unused, it exists only for compatibility with Pickle."""
+    Dumper().dump(obj, file)
+
 def load(file):
-  """load(file) -> obj
+    """load(file) -> obj
 
-De-serializes an object from FILE."""
-  return Dumper().undump(file)
+  De-serializes an object from FILE."""
+    return Dumper().undump(file)
 
 def dumps(obj, protocol = 0):
-  """dumps(obj, protocol = 0) -> str
+    """dumps(obj, protocol = 0) -> str
 
-Serializes object OBJ and returns the serialized string.
-PROTOCOL is unused, it exists only for compatibility with Pickle."""
-  s = StringIO()
-  Dumper().dump(obj, s)
-  return s.getvalue()
+  Serializes object OBJ and returns the serialized string.
+  PROTOCOL is unused, it exists only for compatibility with Pickle."""
+    s = StringIO()
+    Dumper().dump(obj, s)
+    return s.getvalue()
 
 def loads(string):
-  """loads(file) -> obj
+    """loads(file) -> obj
 
-De-serializes an object from STRING."""
-  return Dumper().undump(StringIO(string))
+  De-serializes an object from STRING."""
+    return Dumper().undump(StringIO(string))
 
 
 def dump_class_of_module(*modules):
-  """dump_class_of_module(*modules)
+    """dump_class_of_module(*modules)
 
-Utility function; for each classes found in the given module, print the needed call to register."""
-  class D: pass
-  class O(object): pass
-  s = set([c for module in modules for c in module.__dict__.values() if isinstance(c, type(D)) or  isinstance(c, type(O))])
-  l = ['cerealizer.register(%s.%s)' % (c.__module__, c.__name__) for c in s]
-  l.sort()
-  for i in l: print i
-  
+  Utility function; for each classes found in the given module, print the needed call to register."""
+    class D: pass
+    class O(object): pass
+    s = set([c for module in modules for c in module.__dict__.values() if isinstance(c, type(D)) or  isinstance(c, type(O))])
+    l = ['cerealizer.register(%s.%s)' % (c.__module__, c.__name__) for c in s]
+    l.sort()
+    for i in l: print i

@@ -29,99 +29,99 @@ cimport numpy
 include "gl.pxi"
 
 cdef class PushedMatrix(object):
-  '''Context manager for a matrix push.
+    '''Context manager for a matrix push.
 
-  Inside its context, the active matrix is pushed.
-  It is popped upon leaving the context.'''
+    Inside its context, the active matrix is pushed.
+    It is popped upon leaving the context.'''
 
-  def __enter__(self):
-    glPushMatrix()
-  def __exit__(self, etype, evalue, tb):
-    glPopMatrix()
+    def __enter__(self):
+        glPushMatrix()
+    def __exit__(self, etype, evalue, tb):
+        glPopMatrix()
 
 
 cdef class PushedAttrib(object):
-  '''Context manager for an attribute push.
+    '''Context manager for an attribute push.
 
-  Inside its context, the chosen attributes are pushed.
-  They are popped upon leaving the context.'''
+    Inside its context, the chosen attributes are pushed.
+    They are popped upon leaving the context.'''
 
-  cdef GLbitfield gl_mask
+    cdef GLbitfield gl_mask
 
-  def __cinit__(self, GLbitfield mask):
-    self.gl_mask = mask
+    def __cinit__(self, GLbitfield mask):
+        self.gl_mask = mask
 
-  def __enter__(self):
-    glPushAttrib(self.gl_mask)
-  def __exit__(self, etype, evalue, tb):
-    glPopAttrib()
+    def __enter__(self):
+        glPushAttrib(self.gl_mask)
+    def __exit__(self, etype, evalue, tb):
+        glPopAttrib()
 
 
 cdef class MatrixMode(object):
-  '''Context manager for switching the matrix mode.
+    '''Context manager for switching the matrix mode.
 
-  Inside its context, the chosen matrix is active.
-  It is restored to its original value upon leaving the context.'''
+    Inside its context, the chosen matrix is active.
+    It is restored to its original value upon leaving the context.'''
 
-  cdef GLenum oldmode
-  cdef GLenum newmode
+    cdef GLenum oldmode
+    cdef GLenum newmode
 
-  def __cinit__(self, GLenum newmode):
-    self.newmode = newmode
+    def __cinit__(self, GLenum newmode):
+        self.newmode = newmode
 
-  def __enter__(self):
-    glGetIntegerv(GL_MATRIX_MODE, <GLint*>&self.oldmode)
-    glMatrixMode(self.newmode)
-  def __exit__(self, etype, evalue, tb):
-    glMatrixMode(self.oldmode)
+    def __enter__(self):
+        glGetIntegerv(GL_MATRIX_MODE, <GLint*>&self.oldmode)
+        glMatrixMode(self.newmode)
+    def __exit__(self, etype, evalue, tb):
+        glMatrixMode(self.oldmode)
 
 
 cdef class PushedSpecificMatrix(object):
-  '''Context manager for pushing a specific matrix.
+    '''Context manager for pushing a specific matrix.
 
-  Inside its context, that matrix is pushed, but the active matrix is not changed.
-  It is popped upon leaving the context.'''
+    Inside its context, that matrix is pushed, but the active matrix is not changed.
+    It is popped upon leaving the context.'''
 
-  cdef GLenum gl_mode
+    cdef GLenum gl_mode
 
-  def __cinit__(self, GLenum mode):
-    self.gl_mode = mode
+    def __cinit__(self, GLenum mode):
+        self.gl_mode = mode
 
-  def __enter__(self):
-    cdef GLenum oldmode
-    glGetIntegerv(GL_MATRIX_MODE, <GLint*>&oldmode)
-    glMatrixMode(self.gl_mode)
-    glPushMatrix()
-    glMatrixMode(oldmode)
-  def __exit__(self, etype, evalue, tb):
-    cdef GLenum oldmode
-    glGetIntegerv(GL_MATRIX_MODE, <GLint*>&oldmode)
-    glMatrixMode(self.gl_mode)
-    glPopMatrix()
-    glMatrixMode(oldmode)
+    def __enter__(self):
+        cdef GLenum oldmode
+        glGetIntegerv(GL_MATRIX_MODE, <GLint*>&oldmode)
+        glMatrixMode(self.gl_mode)
+        glPushMatrix()
+        glMatrixMode(oldmode)
+    def __exit__(self, etype, evalue, tb):
+        cdef GLenum oldmode
+        glGetIntegerv(GL_MATRIX_MODE, <GLint*>&oldmode)
+        glMatrixMode(self.gl_mode)
+        glPopMatrix()
+        glMatrixMode(oldmode)
 
 
 cdef class List(object):
-  '''Abstraction of a display list.
+    '''Abstraction of a display list.
 
-  The list is automatically created and destroyed with the object.
-  To compile operations into the list, enter the list's context.
-  To call the list, call the object.'''
+    The list is automatically created and destroyed with the object.
+    To compile operations into the list, enter the list's context.
+    To call the list, call the object.'''
 
-  cdef GLuint gl_list
+    cdef GLuint gl_list
 
-  def __cinit__(self):
-    self.gl_list = glGenLists(1)
-  def __dealloc__(self):
-    glDeleteLists(self.gl_list, 1)
+    def __cinit__(self):
+        self.gl_list = glGenLists(1)
+    def __dealloc__(self):
+        glDeleteLists(self.gl_list, 1)
 
-  def __enter__(self):
-    glNewList(self.gl_list, GL_COMPILE)
-  def __exit__(self, etype, evalue, tb):
-    glEndList()
+    def __enter__(self):
+        glNewList(self.gl_list, GL_COMPILE)
+    def __exit__(self, etype, evalue, tb):
+        glEndList()
 
-  def __call__(self):
-    glCallList(self.gl_list)
+    def __call__(self):
+        glCallList(self.gl_list)
 
 
 def drawArrays(GLenum mode,
@@ -129,35 +129,35 @@ def drawArrays(GLenum mode,
                    numpy.ndarray[numpy.float32_t, ndim=2] colors=None,
                    numpy.ndarray[numpy.float32_t, ndim=2] texcoords=None,
                    numpy.ndarray[numpy.float32_t, ndim=2] normals=None):
-  '''Perform a glDrawArrays call with the given set of numpy arrays.'''
+    '''Perform a glDrawArrays call with the given set of numpy arrays.'''
 
-  try:
-    glEnableClientState(GL_VERTEX_ARRAY)
-    glVertexPointer(vertices.shape[1], GL_FLOAT, 0, vertices.data)
-    if colors is not None:
-      if colors.shape[0] != vertices.shape[0]:
-        raise TypeError, 'colors and vertices must be the same length'
-      glEnableClientState(GL_COLOR_ARRAY)
-      glColorPointer(colors.shape[1], GL_FLOAT, 0, colors.data)
-    if texcoords is not None:
-      if texcoords.shape[0] != vertices.shape[0]:
-        raise TypeError, 'texcoords and vertices must be the same length'
-      glEnableClientState(GL_TEXTURE_COORD_ARRAY)
-      glTexCoordPointer(texcoords.shape[1], GL_FLOAT, 0, texcoords.data)
-    if normals is not None:
-      if normals.shape[0] != vertices.shape[0]:
-        raise TypeError, 'normals and vertices must be the same length'
-      if normals.shape[1] != 3:
-        raise TypeError, 'normal vectors must have exactly 3 components'
-      glEnableClientState(GL_NORMAL_ARRAY)
-      glNormalPointer(GL_FLOAT, 0, texcoords.data)
-    glDrawArrays(mode, 0, vertices.shape[0])
-  finally:
-    glNormalPointer(GL_FLOAT, 0, NULL)
-    glTexCoordPointer(4, GL_FLOAT, 0, NULL)
-    glColorPointer(4, GL_FLOAT, 0, NULL)
-    glVertexPointer(4, GL_FLOAT, 0, NULL)
-    glDisableClientState(GL_NORMAL_ARRAY)
-    glDisableClientState(GL_TEXTURE_COORD_ARRAY)
-    glDisableClientState(GL_COLOR_ARRAY)
-    glDisableClientState(GL_VERTEX_ARRAY)
+    try:
+        glEnableClientState(GL_VERTEX_ARRAY)
+        glVertexPointer(vertices.shape[1], GL_FLOAT, 0, vertices.data)
+        if colors is not None:
+            if colors.shape[0] != vertices.shape[0]:
+                raise TypeError, 'colors and vertices must be the same length'
+            glEnableClientState(GL_COLOR_ARRAY)
+            glColorPointer(colors.shape[1], GL_FLOAT, 0, colors.data)
+        if texcoords is not None:
+            if texcoords.shape[0] != vertices.shape[0]:
+                raise TypeError, 'texcoords and vertices must be the same length'
+            glEnableClientState(GL_TEXTURE_COORD_ARRAY)
+            glTexCoordPointer(texcoords.shape[1], GL_FLOAT, 0, texcoords.data)
+        if normals is not None:
+            if normals.shape[0] != vertices.shape[0]:
+                raise TypeError, 'normals and vertices must be the same length'
+            if normals.shape[1] != 3:
+                raise TypeError, 'normal vectors must have exactly 3 components'
+            glEnableClientState(GL_NORMAL_ARRAY)
+            glNormalPointer(GL_FLOAT, 0, texcoords.data)
+        glDrawArrays(mode, 0, vertices.shape[0])
+    finally:
+        glNormalPointer(GL_FLOAT, 0, NULL)
+        glTexCoordPointer(4, GL_FLOAT, 0, NULL)
+        glColorPointer(4, GL_FLOAT, 0, NULL)
+        glVertexPointer(4, GL_FLOAT, 0, NULL)
+        glDisableClientState(GL_NORMAL_ARRAY)
+        glDisableClientState(GL_TEXTURE_COORD_ARRAY)
+        glDisableClientState(GL_COLOR_ARRAY)
+        glDisableClientState(GL_VERTEX_ARRAY)

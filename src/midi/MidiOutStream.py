@@ -20,10 +20,10 @@ class MidiOutStream:
     """
 
     def __init__(self):
-        
-        # the time is rather global, so it needs to be stored 
-        # here. Otherwise there would be no really simple way to 
-        # calculate it. The alternative would be to have each event 
+
+        # the time is rather global, so it needs to be stored
+        # here. Otherwise there would be no really simple way to
+        # calculate it. The alternative would be to have each event
         # handler do it. That sucks even worse!
         self._absolute_time = 0
         self._relative_time = 0
@@ -34,7 +34,7 @@ class MidiOutStream:
 
     def update_time(self, new_time=0, relative=1):
         """
-        Updates the time, if relative is true, new_time is relative, 
+        Updates the time, if relative is true, new_time is relative,
         else it's absolute.
         """
         if relative:
@@ -50,7 +50,7 @@ class MidiOutStream:
         """
         self._relative_time = 0
         self._absolute_time = 0
-        
+
     def rel_time(self):
         "Returns the relative time"
         return self._relative_time
@@ -60,7 +60,7 @@ class MidiOutStream:
         return self._absolute_time
 
     # running status methods
-    
+
     def reset_run_stat(self):
         "Invalidates the running status"
         self._running_status = None
@@ -74,16 +74,16 @@ class MidiOutStream:
         return self._running_status
 
     # track handling event handlers
-    
+
     def set_current_track(self, new_track):
         "Sets the current track number"
         self._current_track = new_track
-    
+
     def get_current_track(self):
         "Returns the current track number"
         return self._current_track
-    
-    
+
+
     #####################
     ## Midi events
 
@@ -196,7 +196,7 @@ class MidiOutStream:
         """
         pass
 
-            
+
     def midi_time_code(self, msg_type, values):
         """
         msg_type: 0-7
@@ -207,7 +207,7 @@ class MidiOutStream:
 
     #########################
     # header does not really belong here. But anyhoo!!!
-    
+
     def header(self, format=0, nTracks=1, division=96):
 
         """
@@ -231,7 +231,7 @@ class MidiOutStream:
 
 
     def meta_event(self, meta_type, data):
-        
+
         """
         Handles any undefined meta events
         """
@@ -352,15 +352,15 @@ class MidiOutStream:
         """
         hour,
         minute,
-        second: 3 bytes specifying the hour (0-23), minutes (0-59) and 
-                seconds (0-59), respectively. The hour should be 
-                encoded with the SMPTE format, just as it is in MIDI 
+        second: 3 bytes specifying the hour (0-23), minutes (0-59) and
+                seconds (0-59), respectively. The hour should be
+                encoded with the SMPTE format, just as it is in MIDI
                 Time Code.
-        frame: A byte specifying the number of frames per second (one 
+        frame: A byte specifying the number of frames per second (one
                of : 24, 25, 29, 30).
-        framePart: A byte specifying the number of fractional frames, 
-                   in 100ths of a frame (even in SMPTE-based tracks 
-                   using a different frame subdivision, defined in the 
+        framePart: A byte specifying the number of fractional frames,
+                   in 100ths of a frame (even in SMPTE-based tracks
+                   using a different frame subdivision, defined in the
                    MThd chunk).
         """
         pass
@@ -372,11 +372,11 @@ class MidiOutStream:
         """
         nn: Numerator of the signature as notated on sheet music
         dd: Denominator of the signature as notated on sheet music
-            The denominator is a negative power of 2: 2 = quarter 
+            The denominator is a negative power of 2: 2 = quarter
             note, 3 = eighth, etc.
         cc: The number of MIDI clocks in a metronome click
-        bb: The number of notated 32nd notes in a MIDI quarter note 
-            (24 MIDI clocks)        
+        bb: The number of notated 32nd notes in a MIDI quarter note
+            (24 MIDI clocks)
         """
         pass
 
@@ -385,8 +385,8 @@ class MidiOutStream:
     def key_signature(self, sf, mi):
 
         """
-        sf: is a byte specifying the number of flats (-ve) or sharps 
-            (+ve) that identifies the key signature (-7 = 7 flats, -1 
+        sf: is a byte specifying the number of flats (-ve) or sharps
+            (+ve) that identifies the key signature (-7 = 7 flats, -1
             = 1 flat, 0 = key of C, 1 = 1 sharp, etc).
         mi: is a byte specifying a major (0) or minor (1) key.
         """
@@ -467,5 +467,3 @@ if __name__ == '__main__':
     midiOut.update_time(0,0)
     midiOut.note_on(0, 63, 127)
     midiOut.note_off(0, 63, 127)
-
-    

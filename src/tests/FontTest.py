@@ -46,7 +46,7 @@ def init():
     pygameFont = pygame.font.Font(None, 24)
     pygameChar = []
     for c in range(256):
-      pygameChar.append(createCharacter(chr(c)))
+        pygameChar.append(createCharacter(chr(c)))
     pygameChar = tuple(pygameChar)
 
 def draw():
@@ -90,54 +90,54 @@ def draw():
     glLoadIdentity()
     s = str('Mode: %d, FPS: %.2f' % (mode, fps))
     if( mode == 0):
-      global gui_screen, font
-      txt = font.render(s, 1, (0,0,0), (200,0,0))
-      gui_screen.surf.blit(txt, (640 - txt.get_size()[0], 0))
-      gui_screen.display()
+        global gui_screen, font
+        txt = font.render(s, 1, (0,0,0), (200,0,0))
+        gui_screen.surf.blit(txt, (640 - txt.get_size()[0], 0))
+        gui_screen.display()
     # FoFiX font rendering
     if( mode == 1):
-      global fofixFont
-      size = fofixFont.getStringSize(s)
-      # Text invisible unless i put a negative Z position, wtf?!
-      glTranslatef(-size[0], .0, -1.0)
-      fofixFont.render(s, (0, 0), (1,0))
+        global fofixFont
+        size = fofixFont.getStringSize(s)
+        # Text invisible unless i put a negative Z position, wtf?!
+        glTranslatef(-size[0], .0, -1.0)
+        fofixFont.render(s, (0, 0), (1,0))
     # Nelson Rush method for font rendering
     if( mode == 2):
-      global pygameFont, pygameChar
-      i = 0
-      lx = 0
-      length = len(s)
-      x = 640 - pygameChar[ord('0')][1]*length
-      y = 480 - pygameChar[ord('0')][2]
-      textView(640,480)
-      glPushMatrix()
-      while i < length:
-        glRasterPos2i(x + lx, y)
-        ch = pygameChar[ ord( s[i] ) ]
-        glDrawPixels(ch[1], ch[2], GL_RGBA, GL_UNSIGNED_BYTE, ch[0])
-        lx += ch[1]
-        i += 1
-      glPopMatrix()
+        global pygameFont, pygameChar
+        i = 0
+        lx = 0
+        length = len(s)
+        x = 640 - pygameChar[ord('0')][1]*length
+        y = 480 - pygameChar[ord('0')][2]
+        textView(640,480)
+        glPushMatrix()
+        while i < length:
+            glRasterPos2i(x + lx, y)
+            ch = pygameChar[ ord( s[i] ) ]
+            glDrawPixels(ch[1], ch[2], GL_RGBA, GL_UNSIGNED_BYTE, ch[0])
+            lx += ch[1]
+            i += 1
+        glPopMatrix()
 
 def textView(w = 640, h = 480):
-  glViewport(0, 0, w, h)
-  glMatrixMode(GL_PROJECTION)
-  glLoadIdentity()
-  glOrtho(0.0, w - 1.0, 0.0, h - 1.0, -1.0, 1.0)
-  glMatrixMode(GL_MODELVIEW)
-  glLoadIdentity()
+    glViewport(0, 0, w, h)
+    glMatrixMode(GL_PROJECTION)
+    glLoadIdentity()
+    glOrtho(0.0, w - 1.0, 0.0, h - 1.0, -1.0, 1.0)
+    glMatrixMode(GL_MODELVIEW)
+    glLoadIdentity()
 
 def createCharacter(s):
-  global pygameFont
-  try:
-    letter_render = pygameFont.render(s, 1, (255,255,255), (0,0,0))
-    letter = pygame.image.tostring(letter_render, 'RGBA', 1)
-    letter_w, letter_h = letter_render.get_size()
-  except:
-    letter = None
-    letter_w = 0
-    letter_h = 0
-  return (letter, letter_w, letter_h)
+    global pygameFont
+    try:
+        letter_render = pygameFont.render(s, 1, (255,255,255), (0,0,0))
+        letter = pygame.image.tostring(letter_render, 'RGBA', 1)
+        letter_w, letter_h = letter_render.get_size()
+    except:
+        letter = None
+        letter_w = 0
+        letter_h = 0
+    return (letter, letter_w, letter_h)
 
 
 def main():
@@ -146,7 +146,7 @@ def main():
     fps = 0
     #video_flags = OPENGL|DOUBLEBUF
     video_flags = DOUBLEBUF|OPENGL|HWPALETTE|HWSURFACE
-    
+
     pygame.init()
     pygame.display.set_mode((640,480), video_flags)
 
@@ -155,7 +155,7 @@ def main():
 
     # create PanelOverlaySurface
     gui_screen = lamina.LaminaScreenSurface(0.985)
-    
+
     pointlist = [(200,200), (400,200), (400,400), (200,400)]
     pygame.draw.polygon(gui_screen.surf, (200,0,0), pointlist, 0)
     pointlist1 = [(250,250), (350,250), (350,350), (250,350)]
@@ -174,17 +174,17 @@ def main():
     while 1:
         event = pygame.event.poll()
         if event.type == QUIT or (event.type == KEYDOWN and event.key == K_ESCAPE):
-          break
+            break
         elif event.type == KEYDOWN and (event.key == K_RIGHT or event.key == K_LEFT):
-          mode = (mode + 1) % 3
-        
+            mode = (mode + 1) % 3
+
         ticksDiff = pygame.time.get_ticks()-ticks
         if ticksDiff > 200 and mode == 0:
-          gui_screen.refresh()
+            gui_screen.refresh()
 
         # draw all objects
         draw()
-        
+
         # update rotation counters
         if triOn:
             rtri += 0.2
@@ -204,4 +204,3 @@ def main():
 
 
 if __name__ == '__main__': main()
-

@@ -45,20 +45,20 @@ import Version
 # Add the directory of DLL dependencies to the PATH if we're running
 # from source on Windows so we pick them up when those bits are imported.
 if os.name == 'nt' and not hasattr(sys, 'frozen'):
-  os.environ['PATH'] = os.path.abspath(os.path.join('..', 'win32', 'deps', 'bin')) + os.pathsep + os.environ['PATH']
+    os.environ['PATH'] = os.path.abspath(os.path.join('..', 'win32', 'deps', 'bin')) + os.pathsep + os.environ['PATH']
 
 #stump: disable pyOpenGL error checking if we are not asked for it.
 # This must be before *anything* that may import pyOpenGL!
 assert 'OpenGL' not in sys.modules
 if '--opengl-error-checking' not in sys.argv:
-  import OpenGL
-  if OpenGL.__version__ >= '3':
-    OpenGL.ERROR_CHECKING = False
-    OpenGL.ARRAY_SIZE_CHECKING = False
-    OpenGL.ERROR_ON_COPY = True
-    OpenGL.FORWARD_COMPATIBLE_ONLY = True
-    OpenGL.SIZE_1_ARRAY_UNPACK = False
-    OpenGL.STORE_POINTERS = False
+    import OpenGL
+    if OpenGL.__version__ >= '3':
+        OpenGL.ERROR_CHECKING = False
+        OpenGL.ARRAY_SIZE_CHECKING = False
+        OpenGL.ERROR_ON_COPY = True
+        OpenGL.FORWARD_COMPATIBLE_ONLY = True
+        OpenGL.SIZE_1_ARRAY_UNPACK = False
+        OpenGL.STORE_POINTERS = False
 
 import Log
 import Config
@@ -72,7 +72,7 @@ from VideoPlayer import VideoLayer, VideoPlayerError
 
 
 def _usage(errmsg=None):
-  usage = """Usage: %(prog)s [options]
+    usage = """Usage: %(prog)s [options]
 
 Options:
   --help,    -h                       Show this help.
@@ -100,210 +100,210 @@ One-shot mode options (ignored unless in one-shot mode):
                                       (Only applies if "part" is set)
   --mode=,   -m [game mode]           0: Quickplay, 1: Practice, 2: Career
 """ % {"prog": sys.argv[0]}
-  if errmsg is not None:
-    usage = '%s: %s\n\n%s' % (sys.argv[0], errmsg, usage)
-  if hasattr(sys, 'frozen') and os.name == 'nt':
-    import win32api
-    import win32con
-    win32api.MessageBox(0, usage, '%s %s' % (Version.PROGRAM_NAME, Version.version()), win32con.MB_OK)
-  else:
-    print usage
-  sys.exit(1)
+    if errmsg is not None:
+        usage = '%s: %s\n\n%s' % (sys.argv[0], errmsg, usage)
+    if hasattr(sys, 'frozen') and os.name == 'nt':
+        import win32api
+        import win32con
+        win32api.MessageBox(0, usage, '%s %s' % (Version.PROGRAM_NAME, Version.version()), win32con.MB_OK)
+    else:
+        print usage
+    sys.exit(1)
 
 
 def main():
-  try:
-    opts, args = getopt.getopt(sys.argv[1:], "hvc:f:r:t:s:p:l:d:m:n:", ["help", "verbose", "config=", "fullscreen=", "resolution=", "theme=", "song=", "part=", "diff=", "mode=", "nbrplayers=", "opengl-error-checking"])
-  except getopt.GetoptError, e:
-    _usage(str(e))  # str(e): error message from getopt, e.g. "option --some-invalid-option not recognized"
-
-  playing = None
-  configFile = None
-  fullscreen = None
-  resolution = None
-  theme = None
-  difficulty = None
-  part = None
-  mode = 0
-  nbrplayers = 1
-
-  for opt, arg in opts:
-    if opt in ["--help", "-h"]:
-        _usage()
-    if opt in ["--verbose", "-v"]:
-      Log.quiet = False
-    if opt in ["--config", "-c"]:
-      configFile = arg
-    if opt in ["--fullscreen", "-f"]:
-      fullscreen = arg
-    if opt in ["--resolution", "-r"]:
-      resolution = arg
-    if opt in ["--theme", "-t"]:
-      theme = arg
-    if opt in ["--song", "-s"]:
-      playing = arg
-    if opt in ["--part", "-p"]:
-      part = arg
-    if opt in ["--diff", "-d", "-l"]:
-      difficulty = arg      
-    #evilynux - Multiplayer and mode selection support
-    if opt in ["--mode", "-m"]:
-      mode = int(arg)
-    if opt in ["--nbrplayers", "-n"]:
-      nbrplayers = int(arg)
-
-  # Load the configuration file.
-  if configFile is not None:
-    if configFile.lower() == "reset":
-      fileName = os.path.join(Resource.getWritableResourcePath(), Version.PROGRAM_UNIXSTYLE_NAME + ".ini")
-      os.remove(fileName)
-      config = Config.load(Version.PROGRAM_UNIXSTYLE_NAME + ".ini", setAsDefault = True)
-    else:
-      config = Config.load(configFile, setAsDefault = True)
-  else:
-    config = Config.load(Version.PROGRAM_UNIXSTYLE_NAME + ".ini", setAsDefault = True)
-
-  #Lysdestic - Allow support for manipulating fullscreen via CLI
-  if fullscreen is not None:
-    Config.set("video", "fullscreen", fullscreen)
-
-  #Lysdestic - Change resolution from CLI
-  if resolution is not None:
-    Config.set("video", "resolution", resolution)
-
-  #Lysdestic - Alter theme from CLI
-  if theme is not None:
-    Config.set("coffee", "themename", theme)
-
-  engine = GameEngine(config)
-  engine.cmdPlay = 0
-
-  # Check for a valid invocation of one-shot mode.
-  if playing is not None:
-    Log.debug('Validating song directory for one-shot mode.')
-    library = Config.get("setlist","base_library")
-    basefolder = os.path.join(Version.dataPath(),library,"songs",playing)
-    if not (os.path.exists(os.path.join(basefolder, "song.ini")) and (os.path.exists(os.path.join(basefolder, "notes.mid")) or os.path.exists(os.path.join(basefolder, "notes-unedited.mid"))) and (os.path.exists(os.path.join(basefolder, "song.ogg")) or os.path.exists(os.path.join(basefolder, "guitar.ogg")))):
-      Log.warn("Song directory provided ('%s') is not a valid song directory. Starting up FoFiX in standard mode." % playing)
-      engine.startupMessages.append(_("Song directory provided ('%s') is not a valid song directory. Starting up FoFiX in standard mode.") % playing)
-      playing = None
-
-  # Set up one-shot mode if the invocation is valid for it.
-  if playing is not None:
-    Log.debug('Entering one-shot mode.')
-    Config.set("setlist", "selected_song", playing)
-    engine.cmdPlay = 1
-    if difficulty is not None:
-      engine.cmdDiff = int(difficulty)
-    if part is not None:
-      engine.cmdPart = int(part)
-    #evilynux - Multiplayer and mode selection support
-    if nbrplayers == 1:
-      engine.cmdMode = nbrplayers, mode, 0
-    else:
-      engine.cmdMode = nbrplayers, 0, mode
-
-  # Play the intro video if it is present, we have the capability, and
-  # we are not in one-shot mode.
-  videoLayer = False
-  if not engine.cmdPlay:
-    themename = Config.get("coffee", "themename")
-    vidSource = os.path.join(Version.dataPath(), 'themes', themename, \
-                             'menu', 'intro.ogv')
-    if os.path.isfile(vidSource):
-      try:
-        vidPlayer = VideoLayer(engine, vidSource, cancellable=True)
-      except (IOError, VideoPlayerError):
-        Log.error("Error loading intro video:")
-      else:
-        vidPlayer.play()
-        engine.view.pushLayer(vidPlayer)
-        videoLayer = True
-        engine.ticksAtStart = pygame.time.get_ticks()
-        while not vidPlayer.finished:
-          engine.run()
-        engine.view.popLayer(vidPlayer)
-        engine.view.pushLayer(MainMenu(engine))
-  if not videoLayer:
-    engine.setStartupLayer(MainMenu(engine))
-
-  #stump: make psyco optional
-  if Config.get("performance", "use_psyco"):
     try:
-      import psyco
-      psyco.profile()
-    except:
-      Log.error("Unable to enable psyco as requested: ")
+        opts, args = getopt.getopt(sys.argv[1:], "hvc:f:r:t:s:p:l:d:m:n:", ["help", "verbose", "config=", "fullscreen=", "resolution=", "theme=", "song=", "part=", "diff=", "mode=", "nbrplayers=", "opengl-error-checking"])
+    except getopt.GetoptError, e:
+        _usage(str(e))  # str(e): error message from getopt, e.g. "option --some-invalid-option not recognized"
 
-  # Run the main game loop.
-  try:
-    engine.ticksAtStart = pygame.time.get_ticks()
-    while engine.run():
-      pass
-  except KeyboardInterrupt:
-    Log.notice("Left mainloop due to KeyboardInterrupt.")
-    # don't reraise
+    playing = None
+    configFile = None
+    fullscreen = None
+    resolution = None
+    theme = None
+    difficulty = None
+    part = None
+    mode = 0
+    nbrplayers = 1
 
-  # Restart the program if the engine is asking that we do so.
-  if engine.restartRequested:
-    Log.notice("Restarting.")
-    engine.audio.close()
-    try:
-      # Extra arguments to insert between the executable we call and our
-      # command line arguments.
-      args = []
-      # Figure out what executable to call.
-      if hasattr(sys, "frozen"):
-        if os.name == "nt":
-          # When py2exe'd, sys.executable is the name of the EXE.
-          exe = os.path.abspath(unicode(sys.executable, sys.getfilesystemencoding()))
-        elif sys.frozen == "macosx_app":
-          # When py2app'd, sys.executable is a Python interpreter copied
-          # into the same dir where we live.
-          exe = os.path.join(os.path.dirname(sys.executable), 'FoFiX')  # FIXME: don't hard-code "FoFiX" here
+    for opt, arg in opts:
+        if opt in ["--help", "-h"]:
+            _usage()
+        if opt in ["--verbose", "-v"]:
+            Log.quiet = False
+        if opt in ["--config", "-c"]:
+            configFile = arg
+        if opt in ["--fullscreen", "-f"]:
+            fullscreen = arg
+        if opt in ["--resolution", "-r"]:
+            resolution = arg
+        if opt in ["--theme", "-t"]:
+            theme = arg
+        if opt in ["--song", "-s"]:
+            playing = arg
+        if opt in ["--part", "-p"]:
+            part = arg
+        if opt in ["--diff", "-d", "-l"]:
+            difficulty = arg
+        #evilynux - Multiplayer and mode selection support
+        if opt in ["--mode", "-m"]:
+            mode = int(arg)
+        if opt in ["--nbrplayers", "-n"]:
+            nbrplayers = int(arg)
+
+    # Load the configuration file.
+    if configFile is not None:
+        if configFile.lower() == "reset":
+            fileName = os.path.join(Resource.getWritableResourcePath(), Version.PROGRAM_UNIXSTYLE_NAME + ".ini")
+            os.remove(fileName)
+            config = Config.load(Version.PROGRAM_UNIXSTYLE_NAME + ".ini", setAsDefault = True)
         else:
-          raise RuntimeError, "Don't know how to restart when sys.frozen is %s" % repr(sys.frozen)
-      else:
-        # When running from source, sys.executable is the Python interpreter
-        # being used to run the program.
-        exe = sys.executable
-        # Pass the optimization level on if python version >= 2.6.0 as
-        # sys.flags has been introduced in 2.6.0.
-        if sys.version_info[:3] >= (2,6,0) and sys.flags.optimize > 0:
-          args.append('-%s' % ('O' * sys.flags.optimize))
-        args.append(sys.argv[0])
-      os.execv(exe, [sys.executable] + args + sys.argv[1:])
-    except:
-      Log.error("Restart failed: ")
-      raise
+            config = Config.load(configFile, setAsDefault = True)
+    else:
+        config = Config.load(Version.PROGRAM_UNIXSTYLE_NAME + ".ini", setAsDefault = True)
 
-  # evilynux - MainMenu class already calls this - useless?
-  engine.quit()
+    #Lysdestic - Allow support for manipulating fullscreen via CLI
+    if fullscreen is not None:
+        Config.set("video", "fullscreen", fullscreen)
+
+    #Lysdestic - Change resolution from CLI
+    if resolution is not None:
+        Config.set("video", "resolution", resolution)
+
+    #Lysdestic - Alter theme from CLI
+    if theme is not None:
+        Config.set("coffee", "themename", theme)
+
+    engine = GameEngine(config)
+    engine.cmdPlay = 0
+
+    # Check for a valid invocation of one-shot mode.
+    if playing is not None:
+        Log.debug('Validating song directory for one-shot mode.')
+        library = Config.get("setlist","base_library")
+        basefolder = os.path.join(Version.dataPath(),library,"songs",playing)
+        if not (os.path.exists(os.path.join(basefolder, "song.ini")) and (os.path.exists(os.path.join(basefolder, "notes.mid")) or os.path.exists(os.path.join(basefolder, "notes-unedited.mid"))) and (os.path.exists(os.path.join(basefolder, "song.ogg")) or os.path.exists(os.path.join(basefolder, "guitar.ogg")))):
+            Log.warn("Song directory provided ('%s') is not a valid song directory. Starting up FoFiX in standard mode." % playing)
+            engine.startupMessages.append(_("Song directory provided ('%s') is not a valid song directory. Starting up FoFiX in standard mode.") % playing)
+            playing = None
+
+    # Set up one-shot mode if the invocation is valid for it.
+    if playing is not None:
+        Log.debug('Entering one-shot mode.')
+        Config.set("setlist", "selected_song", playing)
+        engine.cmdPlay = 1
+        if difficulty is not None:
+            engine.cmdDiff = int(difficulty)
+        if part is not None:
+            engine.cmdPart = int(part)
+        #evilynux - Multiplayer and mode selection support
+        if nbrplayers == 1:
+            engine.cmdMode = nbrplayers, mode, 0
+        else:
+            engine.cmdMode = nbrplayers, 0, mode
+
+    # Play the intro video if it is present, we have the capability, and
+    # we are not in one-shot mode.
+    videoLayer = False
+    if not engine.cmdPlay:
+        themename = Config.get("coffee", "themename")
+        vidSource = os.path.join(Version.dataPath(), 'themes', themename, \
+                                 'menu', 'intro.ogv')
+        if os.path.isfile(vidSource):
+            try:
+                vidPlayer = VideoLayer(engine, vidSource, cancellable=True)
+            except (IOError, VideoPlayerError):
+                Log.error("Error loading intro video:")
+            else:
+                vidPlayer.play()
+                engine.view.pushLayer(vidPlayer)
+                videoLayer = True
+                engine.ticksAtStart = pygame.time.get_ticks()
+                while not vidPlayer.finished:
+                    engine.run()
+                engine.view.popLayer(vidPlayer)
+                engine.view.pushLayer(MainMenu(engine))
+    if not videoLayer:
+        engine.setStartupLayer(MainMenu(engine))
+
+    #stump: make psyco optional
+    if Config.get("performance", "use_psyco"):
+        try:
+            import psyco
+            psyco.profile()
+        except:
+            Log.error("Unable to enable psyco as requested: ")
+
+    # Run the main game loop.
+    try:
+        engine.ticksAtStart = pygame.time.get_ticks()
+        while engine.run():
+            pass
+    except KeyboardInterrupt:
+        Log.notice("Left mainloop due to KeyboardInterrupt.")
+        # don't reraise
+
+    # Restart the program if the engine is asking that we do so.
+    if engine.restartRequested:
+        Log.notice("Restarting.")
+        engine.audio.close()
+        try:
+            # Extra arguments to insert between the executable we call and our
+            # command line arguments.
+            args = []
+            # Figure out what executable to call.
+            if hasattr(sys, "frozen"):
+                if os.name == "nt":
+                    # When py2exe'd, sys.executable is the name of the EXE.
+                    exe = os.path.abspath(unicode(sys.executable, sys.getfilesystemencoding()))
+                elif sys.frozen == "macosx_app":
+                    # When py2app'd, sys.executable is a Python interpreter copied
+                    # into the same dir where we live.
+                    exe = os.path.join(os.path.dirname(sys.executable), 'FoFiX')  # FIXME: don't hard-code "FoFiX" here
+                else:
+                    raise RuntimeError, "Don't know how to restart when sys.frozen is %s" % repr(sys.frozen)
+            else:
+                # When running from source, sys.executable is the Python interpreter
+                # being used to run the program.
+                exe = sys.executable
+                # Pass the optimization level on if python version >= 2.6.0 as
+                # sys.flags has been introduced in 2.6.0.
+                if sys.version_info[:3] >= (2,6,0) and sys.flags.optimize > 0:
+                    args.append('-%s' % ('O' * sys.flags.optimize))
+                args.append(sys.argv[0])
+            os.execv(exe, [sys.executable] + args + sys.argv[1:])
+        except:
+            Log.error("Restart failed: ")
+            raise
+
+    # evilynux - MainMenu class already calls this - useless?
+    engine.quit()
 
 
 if __name__ == '__main__':
-  try:
-    main()
-  except (KeyboardInterrupt, SystemExit):
-    raise
-  except:
-    Log.error("Terminating due to unhandled exception: ")
-    _logname = os.path.abspath(Log.logFile.name)
-    _errmsg = "%s\n\n%s\n%s\n%s\n%s" % (
-      _("Terminating due to unhandled exception:"),
-      traceback.format_exc(),
-      _("If you make a bug report about this error, please include the contents of the following log file:"),
-      _logname,
-      _("The log file already includes the traceback given above."))
+    try:
+        main()
+    except (KeyboardInterrupt, SystemExit):
+        raise
+    except:
+        Log.error("Terminating due to unhandled exception: ")
+        _logname = os.path.abspath(Log.logFile.name)
+        _errmsg = "%s\n\n%s\n%s\n%s\n%s" % (
+          _("Terminating due to unhandled exception:"),
+          traceback.format_exc(),
+          _("If you make a bug report about this error, please include the contents of the following log file:"),
+          _logname,
+          _("The log file already includes the traceback given above."))
 
-    if os.name == 'nt':
-      import win32api
-      import win32con
-      if win32api.MessageBox(0, "%s\n\n%s" % (_errmsg, _("Open the logfile now?")), "%s %s" % (Version.PROGRAM_NAME, Version.version()), win32con.MB_YESNO|win32con.MB_ICONSTOP) == win32con.IDYES:
-        Log.logFile.close()
-        os.startfile(_logname)
-      if hasattr(sys, 'frozen'):
-        sys.exit(1)  # don't reraise if py2exe'd so the "Errors occurred" box won't appear after this and confuse the user as to which logfile we actually want
-    else:
-      print >>sys.stderr, _errmsg
-    raise
+        if os.name == 'nt':
+            import win32api
+            import win32con
+            if win32api.MessageBox(0, "%s\n\n%s" % (_errmsg, _("Open the logfile now?")), "%s %s" % (Version.PROGRAM_NAME, Version.version()), win32con.MB_YESNO|win32con.MB_ICONSTOP) == win32con.IDYES:
+                Log.logFile.close()
+                os.startfile(_logname)
+            if hasattr(sys, 'frozen'):
+                sys.exit(1)  # don't reraise if py2exe'd so the "Errors occurred" box won't appear after this and confuse the user as to which logfile we actually want
+        else:
+            print >>sys.stderr, _errmsg
+        raise

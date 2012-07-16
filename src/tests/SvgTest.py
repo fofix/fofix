@@ -29,62 +29,62 @@ from OpenGL.GL import *
 from OpenGL.GLU import *
 
 class SvgTest(unittest.TestCase):
-  def testRendering(self):
-    self.svg.transform.translate(256, 256)
-    self.svg.transform.rotate(3.141592)
-    self.svg.draw()
-    self.e.video.flip()
+    def testRendering(self):
+        self.svg.transform.translate(256, 256)
+        self.svg.transform.rotate(3.141592)
+        self.svg.draw()
+        self.e.video.flip()
 
-  def testRenderToTexture(self):
-    scale = 4
-    fullwidth, fullheight = 512, 512
-    width, height = int(fullwidth / scale), int(fullheight / scale)
-    t = Texture()
-    self.e.svg.setProjection((0, 0, fullwidth, fullheight))
-    
-    glViewport(0, 0, width, height)
-    glClear(GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
-    self.svg.transform.translate(width * scale / 2, height * scale / 2)
-    self.svg.transform.rotate(3.141592)
-    self.svg.draw()
+    def testRenderToTexture(self):
+        scale = 4
+        fullwidth, fullheight = 512, 512
+        width, height = int(fullwidth / scale), int(fullheight / scale)
+        t = Texture()
+        self.e.svg.setProjection((0, 0, fullwidth, fullheight))
 
-    glViewport(0, 0, fullwidth, fullheight)
-    glMatrixMode(GL_PROJECTION)
-    glLoadIdentity()
-    gluOrtho2D(0.0, 1.0, 0.0, 1.0)
-    glMatrixMode(GL_MODELVIEW)
-    glLoadIdentity()
+        glViewport(0, 0, width, height)
+        glClear(GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
+        self.svg.transform.translate(width * scale / 2, height * scale / 2)
+        self.svg.transform.rotate(3.141592)
+        self.svg.draw()
 
-    t.bind()
-    glEnable(GL_TEXTURE_2D)
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
+        glViewport(0, 0, fullwidth, fullheight)
+        glMatrixMode(GL_PROJECTION)
+        glLoadIdentity()
+        gluOrtho2D(0.0, 1.0, 0.0, 1.0)
+        glMatrixMode(GL_MODELVIEW)
+        glLoadIdentity()
 
-    glClear(GL_COLOR_BUFFER_BIT)
-    glColor3f(1.0, 1.0, 1.0)
-    glBegin(GL_TRIANGLE_STRIP)
-    glTexCoord2f(0.0, 0.0)
-    glVertex2f(0.0, 0.0)
-    glTexCoord2f(1.0, 0.0)
-    glVertex2f(1.0, 0.0)
-    glTexCoord2f(0.0, 1.0)
-    glVertex2f(0.0, 1.0)
-    glTexCoord2f(1.0, 1.0)
-    glVertex2f(1.0, 1.0)
-    glEnd()
+        t.bind()
+        glEnable(GL_TEXTURE_2D)
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
 
-    self.e.video.flip()
-    import time
-    time.sleep(2)
+        glClear(GL_COLOR_BUFFER_BIT)
+        glColor3f(1.0, 1.0, 1.0)
+        glBegin(GL_TRIANGLE_STRIP)
+        glTexCoord2f(0.0, 0.0)
+        glVertex2f(0.0, 0.0)
+        glTexCoord2f(1.0, 0.0)
+        glVertex2f(1.0, 0.0)
+        glTexCoord2f(0.0, 1.0)
+        glVertex2f(0.0, 1.0)
+        glTexCoord2f(1.0, 1.0)
+        glVertex2f(1.0, 1.0)
+        glEnd()
 
-  def setUp(self):
-    config = Config.load(Version.PROGRAM_UNIXSTYLE_NAME + ".ini", setAsDefault = True)
-    self.e = GameEngine(config)
-    self.e.loadImgDrawing(self, "svg", "mfhlogo.png")
+        self.e.video.flip()
+        import time
+        time.sleep(2)
 
-    while not self.svg:
-      self.e.run()
+    def setUp(self):
+        config = Config.load(Version.PROGRAM_UNIXSTYLE_NAME + ".ini", setAsDefault = True)
+        self.e = GameEngine(config)
+        self.e.loadImgDrawing(self, "svg", "mfhlogo.png")
 
-    glClear(GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
+        while not self.svg:
+            self.e.run()
+
+        glClear(GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
 
 if __name__ == "__main__":
-  unittest.main()
+    unittest.main()

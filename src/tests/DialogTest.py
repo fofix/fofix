@@ -29,25 +29,25 @@ import Config
 import Version
 
 class TestLayer(Layer):
-  def __init__(self, engine):
-    self.text = None
-    self.engine = engine
-  
-  def run(self, ticks):
-    if not self.text:
-      self.text = "tmp"
-      self.text = getText(self.engine, "Enter name:", "Wario")
+    def __init__(self, engine):
+        self.text = None
+        self.engine = engine
+
+    def run(self, ticks):
+        if not self.text:
+            self.text = "tmp"
+            self.text = getText(self.engine, "Enter name:", "Wario")
 
 class DialogTestInteractive(unittest.TestCase):
-  def testGetTest(self):
-    text = getText(self.e, "Please enter your name:", "Wario")
-     
-  def setUp(self):
-    config = Config.load(Version.PROGRAM_UNIXSTYLE_NAME + ".ini", setAsDefault = True)
-    self.e = GameEngine(config)
-    
-  def tearDown(self):
-    self.e.quit()
+    def testGetTest(self):
+        text = getText(self.e, "Please enter your name:", "Wario")
+
+    def setUp(self):
+        config = Config.load(Version.PROGRAM_UNIXSTYLE_NAME + ".ini", setAsDefault = True)
+        self.e = GameEngine(config)
+
+    def tearDown(self):
+        self.e.quit()
 
 if __name__ == "__main__":
-  unittest.main()
+    unittest.main()

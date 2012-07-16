@@ -29,24 +29,24 @@ import unittest
 tests = []
 
 for root, dirs, files in os.walk("."):
-  for f in files:
-    f = os.path.join(root, f)
-    if f.endswith("Test.py"):
-      m = os.path.basename(f).replace(".py", "")
-      d = os.path.dirname(f)
-      sys.path.append(d)
-      tests.append(__import__(m))
+    for f in files:
+        f = os.path.join(root, f)
+        if f.endswith("Test.py"):
+            m = os.path.basename(f).replace(".py", "")
+            d = os.path.dirname(f)
+            sys.path.append(d)
+            tests.append(__import__(m))
 
 suite = unittest.TestSuite()
 
 if "-i" in sys.argv:
-  suffix = "TestInteractive"
+    suffix = "TestInteractive"
 else:
-  suffix = "Test"
+    suffix = "Test"
 
 for test in tests:
-  for item in dir(test):
-    if item.endswith(suffix):
-      suite.addTest(unittest.makeSuite(test.__dict__[item]))
-  
+    for item in dir(test):
+        if item.endswith(suffix):
+            suite.addTest(unittest.makeSuite(test.__dict__[item]))
+
 unittest.TextTestRunner(verbosity = 2).run(suite)

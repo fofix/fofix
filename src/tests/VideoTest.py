@@ -24,12 +24,12 @@ import unittest
 from Video import Video
 
 class VideoTest(unittest.TestCase):
-  def testSetMode(self):
-    v = Video()
-    assert v.setMode((640, 480))
-    assert v.screen
+    def testSetMode(self):
+        v = Video()
+        assert v.setMode((640, 480))
+        assert v.screen
 
-    v.flip()
+        v.flip()
 
 if __name__ == "__main__":
-  unittest.main()
+    unittest.main()

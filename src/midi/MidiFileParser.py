@@ -3,7 +3,7 @@
 # std library
 from struct import unpack
 
-# uhh I don't really like this, but there are so many constants to 
+# uhh I don't really like this, but there are so many constants to
 # import otherwise
 from constants import *
 
@@ -12,10 +12,10 @@ from EventDispatcher import EventDispatcher
 class MidiFileParser:
 
     """
-    
-    The MidiFileParser is the lowest level parser that see the data as 
+
+    The MidiFileParser is the lowest level parser that see the data as
     midi data. It generates events that gets triggered on the outstream.
-    
+
     """
 
     def __init__(self, raw_in, outstream):
@@ -35,9 +35,9 @@ class MidiFileParser:
 
 
     def parseMThdChunk(self):
-        
+
         "Parses the header chunk"
-        
+
         raw_in = self.raw_in
 
         header_chunk_type = raw_in.nextSlice(4)
@@ -51,7 +51,7 @@ class MidiFileParser:
         self.format = raw_in.readBew(2)
         self.nTracks = raw_in.readBew(2)
         self.division = raw_in.readBew(2)
-        
+
         # Theoretically a header larger than 6 bytes can exist
         # but no one has seen one in the wild
         # But correctly ignore unknown data if it is though
@@ -64,15 +64,15 @@ class MidiFileParser:
 
 
     def parseMTrkChunk(self):
-        
+
         "Parses a track chunk. This is the most important part of the parser."
-        
+
         # set time to 0 at start of a track
         self.dispatch.reset_time()
-        
+
         dispatch = self.dispatch
         raw_in = self.raw_in
-        
+
         # Trigger event at the start of a track
         dispatch.start_of_track(self._current_track)
         # position cursor after track header
@@ -82,7 +82,7 @@ class MidiFileParser:
         track_endposition = raw_in.getCursor() + tracklength # absolute position!
 
         while raw_in.getCursor() < track_endposition:
-        
+
             # find relative time of the event
             time = raw_in.readVarLen()
             dispatch.update_time(time)
@@ -100,9 +100,9 @@ class MidiFileParser:
                 status = self._running_status
                 # could it be illegal data ?? Do we need to test for that?
                 # I need more example midi files to be shure.
-                
-                # Also, while I am almost certain that no realtime 
-                # messages will pop up in a midi file, I might need to 
+
+                # Also, while I am almost certain that no realtime
+                # messages will pop up in a midi file, I might need to
                 # change my mind later.
 
             # we need to look at nibbles here
@@ -146,7 +146,7 @@ class MidiFileParser:
                 common_data = raw_in.nextSlice(data_size)
                 common_type = lo_nible
                 dispatch.system_common(common_type, common_data)
-            
+
 
             # Oh! Then it must be a midi event (channel voice message)
             else:
@@ -186,8 +186,8 @@ if __name__ == '__main__':
 #    f = open(test_file, 'rb')
 #    raw_data = f.read()
 #    f.close()
-#    
-#    
+#
+#
 #    # do parsing
     from MidiToText import MidiToText
     from RawInstreamFile import RawInstreamFile
@@ -195,4 +195,3 @@ if __name__ == '__main__':
     midi_in = MidiFileParser(RawInstreamFile(test_file), MidiToText())
     midi_in.parseMThdChunk()
     midi_in.parseMTrkChunks()
-    

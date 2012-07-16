@@ -24,17 +24,16 @@ from OpenGL.GLU import gluLookAt
 
 
 class Camera:
-  def __init__(self):
-    # Camera origin vector
-    self.origin = (10.0, 0.0, 10.0)
-    # Camera target vector
-    self.target = (0.0, 0.0, 0.0)
-    # Camera up vector
-    self.up     = (0.0, 1.0, 0.0)
+    def __init__(self):
+        # Camera origin vector
+        self.origin = (10.0, 0.0, 10.0)
+        # Camera target vector
+        self.target = (0.0, 0.0, 0.0)
+        # Camera up vector
+        self.up     = (0.0, 1.0, 0.0)
 
-  def apply(self):
-    """Load the camera matrix."""
-    gluLookAt(self.origin[0], self.origin[1], self.origin[2],
-              self.target[0], self.target[1], self.target[2],
-              self.up[0],     self.up[1],     self.up[2])
-
+    def apply(self):
+        """Load the camera matrix."""
+        gluLookAt(self.origin[0], self.origin[1], self.origin[2],
+                  self.target[0], self.target[1], self.target[2],
+                  self.up[0],     self.up[1],     self.up[2])
