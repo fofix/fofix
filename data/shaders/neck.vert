@@ -8,12 +8,14 @@ varying vec3 pos;
 
 void main()
 {
-	float alphafog = ( 3.0-gl_Vertex.z ) / 6.0;
-	col = fretcol;
-	col.a *= alphafog;
-	failcol.rgb=vec3(1.0,0.0,0.0);
-	if (isFailing) failcol.a=0.2*max(sin(time*10.0),0.0)*alphafog;
-	else failcol.a=0.0;
-	gl_Position = ftransform();
-	pos=gl_Position.xyz;
-} 
+  float alphafog = (3.0 - gl_Vertex.z) / 6.0;
+  col = fretcol;
+  col.a *= alphafog;
+  failcol.rgb = vec3(1.0, 0.0, 0.0);
+  if (isFailing)
+    failcol.a = 0.2 * max(sin(time * 10.0), 0.0) * alphafog;
+  else
+    failcol.a = 0.0;
+  gl_Position = ftransform();
+  pos = gl_Position.xyz;
+}

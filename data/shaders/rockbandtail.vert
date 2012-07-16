@@ -7,11 +7,11 @@ varying vec2 vTexCoord;
 
 void main()
 {
-   gl_Position = ftransform();
-   pos=gl_Vertex.xyz;
-   
-   vTexCoord = pos.zx;
-   
-   vTexCoord+=offset;
-   vTexCoord/=scalexy;
+  gl_Position = ftransform();
+  pos = gl_Vertex.xyz;
+
+  vTexCoord = pos.zx;
+
+  vTexCoord += offset;
+  vTexCoord /= scalexy;
 }
