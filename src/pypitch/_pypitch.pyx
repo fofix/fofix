@@ -83,5 +83,5 @@ cdef class Analyzer:
             else:
                 formants.append(cur)
         return formants
-    def findTone(self, double minfreq=70.0, double maxfreq=700.0):
+    def findTone(self, double minfreq=65.0, double maxfreq=1000.0):
         return PyTone_FromTone(self._this.findTone(minfreq, maxfreq))
