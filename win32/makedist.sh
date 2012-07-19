@@ -9,7 +9,7 @@ echo -n "Removing unnecessary files (except in bin/ and lib/)... "
 rm -rf dist/deps/build-stamps dist/deps/doc dist/deps/etc dist/deps/share dist/deps/lib/gettext
 echo "done"
 echo -n "Removing libtool libs, existing .def files, and unneeded scripts... "
-rm -f dist/deps/lib/*.la dist/deps/lib/*.def dist/deps/bin/wine-shwrap dist/deps/bin/pkg-config
+rm -f dist/deps/lib/*.la dist/deps/lib/*.def dist/deps/bin/wine-shwrap dist/deps/bin/pkg-config dist/deps/bin/i686-w64-mingw32-gcc dist/deps/bin/i686-w64-mingw32-g++
 echo "done"
 
 echo -n "Generating .def files... "
