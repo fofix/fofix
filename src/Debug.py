@@ -39,7 +39,7 @@ class DebugLayer(Layer):
         self.engine = engine
 
     def className(self, instance):
-        return str(instance.__class__).split(".")[1]
+        return instance.__class__.__name__
 
     def render(self, visibility, topMost):
         with self.engine.view.orthogonalProjection(normalize = True):
