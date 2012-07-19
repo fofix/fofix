@@ -27,6 +27,7 @@ from distutils.core import setup, Extension
 import distutils.ccompiler
 from distutils.dep_util import newer
 from Cython.Distutils import build_ext as _build_ext
+from distutils.command.install import install as _install
 import sys, SceneFactory, Version, glob, os
 import numpy as np
 import shlex
@@ -335,6 +336,14 @@ class build_ext(_build_ext):
 
         return _build_ext.run(self, *args, **kw)
 
+
+# Make "setup.py install" do nothing until we configure something more sensible.
+class install(_install):
+    def run(self, *args, **kw):
+        print >>sys.stderr, 'This is not the correct way to install FoFiX.'
+        sys.exit(1)
+
+
 # Add the common arguments to setup().
 # This includes arguments to cause FoFiX's extension modules to be built.
 setup_args.update({
@@ -348,7 +357,7 @@ setup_args.update({
     Extension('VideoPlayer', ['VideoPlayer.pyx', 'VideoPlayerCore.c'],
               **combine_info(gl_info, ogg_info, theoradec_info, glib_info, swscale_info))
   ],
-  'cmdclass': {'build_ext': build_ext},
+  'cmdclass': {'build_ext': build_ext, 'install': install},
 })
 
 # If we're on Windows, add the dependency directory to the PATH so py2exe will
