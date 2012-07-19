@@ -181,6 +181,22 @@ if test ! -f "$PREFIX"/build-stamps/gettext-runtime; then
   $RM_RF $GETTEXT
 fi
 
+# We don't really need this, but GObject requires it.
+# Not that we're using GObject or anything, but glib's configure script
+# refuses to run without it and this is the path of least resistance.
+LIBFFI="libffi-3.0.11"
+if test ! -f "$PREFIX"/build-stamps/libffi; then
+  download ftp://sourceware.org/pub/libffi/$LIBFFI.tar.gz
+  tar zxvf $LIBFFI.tar.gz
+  cd $LIBFFI
+  ./configure $COMMON_AUTOCONF_FLAGS --enable-portable-binary
+  make
+  make install
+  cd ..
+  touch "$PREFIX"/build-stamps/libffi
+  $RM_RF $LIBFFI
+fi
+
 # GLib
 GLIB="glib-2.26.1"
 if test ! -f "$PREFIX"/build-stamps/glib; then
