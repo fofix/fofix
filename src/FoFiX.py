@@ -227,14 +227,6 @@ def main():
     if not videoLayer:
         engine.setStartupLayer(MainMenu(engine))
 
-    #stump: make psyco optional
-    if Config.get("performance", "use_psyco"):
-        try:
-            import psyco
-            psyco.profile()
-        except:
-            Log.error("Unable to enable psyco as requested: ")
-
     # Run the main game loop.
     try:
         engine.ticksAtStart = pygame.time.get_ticks()

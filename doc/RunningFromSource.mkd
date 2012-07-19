@@ -143,13 +143,6 @@ The following packages are required:
 
 The following packages are optional:
 
-  * psyco ([direct link to 1.6](http://www.voidspace.org.uk/downloads/psyco-1.6.win32-py2.6.exe))
-
-    This is a Python JIT compiler.  It may improve the game's performance;
-    it may not.  If you install it, you may want to see whether you get
-    better performance with it enabled or disabled; you can choose in
-    the game options.
-
   * rtmidi: ([direct link to svn revision 10](http://www.mediafire.com/file/njrzmkyztfg/rtmidi-0.1.win32-py2.6.exe))
 
     This allows you to use MIDI instruments for controller input.
@@ -236,7 +229,6 @@ The following are required:
 The following are optional (refer to the Windows instructions to see
 what each one is needed for):
 
-  * psyco
   * rtmidi
   * pitchbend
   * pyaudio
@@ -247,7 +239,7 @@ following packages: `python-pygame`, `python-opengl`, `python-numpy`,
 `build-essential`, `cython`, `pkg-config`, `libgl1-mesa-dev`,
 `libglu1-mesa-dev`, `libglib2.0-dev`, `libogg-dev`, `libtheora-dev`,
 `libswscale-dev`.  If you're stuck without pygame 1.9, also install
-`python-numeric`.  If you want Psyco, install `python-psyco`.
+`python-numeric`.
 
 Some packages can be troublesome, so we have notes below about certain
 packages.

@@ -960,7 +960,6 @@ class SettingsMenu(Menu.Menu):
         advancedSettings = [
           ConfigChoice(engine, engine.config, "performance", "game_priority", autoApply = True, isQuickset = 1),
           ConfigChoice(engine, engine.config, "performance", "restrict_to_first_processor"),  #stump
-          ConfigChoice(engine, engine.config, "performance", "use_psyco"),
           (_("Debug Settings"), self.debugSettingsMenu, _("Settings for coders to debug. Probably not worth changing.")),
           (_("Log Settings"),    self.logfileSettingsMenu, _("Adds junk information to the logfile. Probably not useful in bug reports.")),
         ]
