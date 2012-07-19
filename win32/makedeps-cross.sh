@@ -172,6 +172,9 @@ fi
 COMMON_AUTOCONF_FLAGS="--prefix=$PREFIX --host=$CROSS_TOOL_PREFIX --disable-static --enable-shared CPPFLAGS=-I$PREFIX/include LDFLAGS=-L$PREFIX/lib"
 
 # Runtime (libintl) of GNU Gettext
+# We build the rest later, after certain libraries are in place, to save
+# space as the tools can link to those libraries rather than use gettext's
+# internal copy. But some of those libs use libintl themselves, so...
 GETTEXT="gettext-0.18.1.1"
 if test ! -f "$PREFIX"/build-stamps/gettext-runtime; then
   download http://ftp.gnu.org/gnu/gettext/$GETTEXT.tar.gz
@@ -234,6 +237,9 @@ if test ! -f "$PREFIX"/build-stamps/pkg-config; then
 fi
 
 # The rest of GNU Gettext
+# See the note on the runtime for why we split the
+# build like this. If libunistring, libxml2, or libcroco
+# are ever added, we should do this after them.
 if test ! -f "$PREFIX"/build-stamps/gettext; then
   download http://ftp.gnu.org/gnu/gettext/$GETTEXT.tar.gz
   tar zxvf $GETTEXT.tar.gz
