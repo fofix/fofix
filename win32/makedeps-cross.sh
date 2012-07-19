@@ -294,6 +294,20 @@ if test ! -f "$PREFIX"/build-stamps/libtheora; then
   $RM_RF $LIBTHEORA
 fi
 
+# libsmf
+LIBSMF="libsmf-1.3"
+if test ! -f "$PREFIX"/build-stamps/libsmf; then
+  download http://download.sourceforge.net/libsmf/$LIBSMF.tar.gz
+  tar zxvf $LIBSMF.tar.gz
+  cd $LIBSMF
+  ./configure $COMMON_AUTOCONF_FLAGS
+  make LDFLAGS=-no-undefined
+  make install
+  cd ..
+  touch "$PREFIX"/build-stamps/libsmf
+  $RM_RF $LIBSMF
+fi
+
 # ffmpeg
 # We only need libswscale.
 if test ! -f "$PREFIX"/build-stamps/ffmpeg; then
