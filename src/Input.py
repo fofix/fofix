@@ -26,31 +26,11 @@ import pygame
 import Log
 import Audio
 
-ports = None
-midi = []
-midiin = None
-portCount = 0
-
 try:
-    import rtmidi
+    import pygame.midi
     haveMidi = True
 except ImportError:
     haveMidi = False
-
-
-if haveMidi:
-    #MFH - check for MIDI input ports
-    try:
-        midiin = rtmidi.RtMidiIn()
-        portCount = midiin.getPortCount()
-        if portCount > 0:
-            ports = range(portCount)
-            for x in ports:
-                midi.append( rtmidi.RtMidiIn() )
-    except Exception, e:
-        Log.error(str(e))
-        ports = None
-
 
 from Task import Task
 import Player
@@ -149,16 +129,24 @@ class Input(Task):
         self.getSystemKeyName = pygame.key.name
         pygame.key.name       = self.getKeyName
 
+        self.midi = []
         if haveMidi:
-            if ports:
-                Log.debug("%d MIDI inputs found." % (len(ports)))
+            pygame.midi.init()
+            for i in range(pygame.midi.get_count()):
+                interface, name, is_input, is_output, is_opened = pygame.midi.get_device_info(i)
+                Log.debug("Found MIDI device: %s on %s" % (name, interface))
+                if not is_input:
+                    Log.debug("MIDI device is not an input device.")
+                    continue
                 try:
-                    for i in ports:
-                        midi[i].openPort(i, False)
-                except Exception, e:
-                    Log.error("Error opening MIDI port %d: %s" % (i,str(e)) )
-            else:
-                Log.warn("No MIDI input ports found.")
+                    self.midi.append(pygame.midi.Input(i))
+                    Log.debug("Device opened as device number %d." % len(self.midi))
+                except pygame.midi.MidiException:
+                    Log.error("Error opening device for input.")
+            if len(self.midi) == 0:
+                Log.debug("No MIDI input ports found.")
+        else:
+            Log.notice("MIDI input support is not available; install at least pygame 1.9 to get it.")
 
     def showMouse(self):
         pygame.mouse.set_visible(True)
@@ -414,33 +402,33 @@ class Input(Task):
                 except KeyError:
                     pass
 
-        if ports:
-            for i in ports:
-                while True:
-                    midimsg = midi[i].getMessage()
-                    if len(midimsg) > 0:
-                        id = self.encodeMidiButton(x, midimsg[1])
-                        #MFH - must check for 0x80 - 0x8F for Note Off events (keyReleased) and 0x90 - 0x9F for Note On events (keyPressed)
-                        noteOn = False
-                        noteOff = False
+        for i, device in enumerate(self.midi):
+            while True:
+                data = device.read(1)
+                if len(data) > 0:
+                    midimsg = data[0][0]
+                    id = self.encodeMidiButton(i, midimsg[1])
+                    #MFH - must check for 0x80 - 0x8F for Note Off events (keyReleased) and 0x90 - 0x9F for Note On events (keyPressed)
+                    noteOn = False
+                    noteOff = False
 
-                        if (midimsg[0] >= 0x90) and (midimsg[0] <= 0x9F):   #note ON range
-                            if midimsg[2] > 0:  #velocity > 0, confirmed note on
-                                noteOn = True
-                            else:   #velocity is 0 - this is pretty much a note off.
-                                noteOff = True
-                        elif (midimsg[0] >= 0x80) and (midimsg[0] <= 0x8F):  #note OFF range
+                    if (midimsg[0] >= 0x90) and (midimsg[0] <= 0x9F):   #note ON range
+                        if midimsg[2] > 0:  #velocity > 0, confirmed note on
+                            noteOn = True
+                        else:   #velocity is 0 - this is pretty much a note off.
                             noteOff = True
+                    elif (midimsg[0] >= 0x80) and (midimsg[0] <= 0x8F):  #note OFF range
+                        noteOff = True
 
-                        if noteOn:
-                            if not self.broadcastEvent(self.priorityKeyListeners, "keyPressed", id, u'\x00'):
-                                self.broadcastEvent(self.keyListeners, "keyPressed", id, u'\x00')
+                    if noteOn:
+                        if not self.broadcastEvent(self.priorityKeyListeners, "keyPressed", id, u'\x00'):
+                            self.broadcastEvent(self.keyListeners, "keyPressed", id, u'\x00')
 
-                        elif noteOff:
-                            if not self.broadcastEvent(self.priorityKeyListeners, "keyReleased", id):
-                                self.broadcastEvent(self.keyListeners, "keyReleased", id)
-                    else:
-                        break
+                    elif noteOff:
+                        if not self.broadcastEvent(self.priorityKeyListeners, "keyReleased", id):
+                            self.broadcastEvent(self.keyListeners, "keyReleased", id)
+                else:
+                    break
 
 
     # glorandwarf: check that there are no control conflicts #FIXME

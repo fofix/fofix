@@ -143,10 +143,6 @@ The following packages are required:
 
 The following packages are optional:
 
-  * rtmidi: ([direct link to svn revision 10](http://www.mediafire.com/file/njrzmkyztfg/rtmidi-0.1.win32-py2.6.exe))
-
-    This allows you to use MIDI instruments for controller input.
-
   * pyopengl-accelerate ([direct link to 3.0.1-r365](http://github.com/downloads/fuzion/pil-2009-raclette/PyOpenGL-accelerate-3.0.1-r365.win32-py2.6.exe))
 
     This will make PyOpenGL go a good bit faster. _Highly recommended!_
@@ -213,7 +209,7 @@ Or file a bug telling us about your procedure._
 The following are required:
 
   * Python (tested with 2.6 on Ubuntu Karmic and Lucid)
-  * pygame (at least version 1.9 is required on x86_64)
+  * pygame (at least version 1.9 is required if you want MIDI instrument input or you're on x86_64)
   * PyOpenGL (3.x)
   * numpy
   * Python Imaging Library (PIL)
@@ -229,7 +225,6 @@ The following are required:
 The following are optional (refer to the Windows instructions to see
 what each one is needed for):
 
-  * rtmidi
   * pitchbend
   * pyaudio
 
@@ -280,20 +275,6 @@ if you're using Python 2.6.
 
 Other distributions that lack pyaudio can find the source for it elsewhere
 on that page.
-
-#### About rtmidi
-Nobody seems to package it, so it must be built directly from svn.
-
-Make sure you have Subversion (`subversion` in Debian and Ubuntu) and
-the ALSA development headers (`libasound2-dev`), then type:
-
-    svn co http://svn2.assembla.com/svn/pkaudio/pyrtmidi/
-    cd pyrtmidi
-    python setup.py build
-
-It can be installed system-wide with (as root):
-
-    python setup.py install
 
 #### About pitchbend
 We're going to be getting rid of it soon, its quality leaves a lot to
