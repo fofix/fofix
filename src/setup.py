@@ -335,11 +335,6 @@ class build_ext(_build_ext):
 
         return _build_ext.run(self, *args, **kw)
 
-# This hides exception handler and conversion warnings that occur when compiling pypitch with msvc.
-extracompileArgs = None
-if distutils.ccompiler.get_default_compiler() == 'msvc':
-    extracompileArgs = ['/wd4530', '/wd4244']
-
 # Add the common arguments to setup().
 # This includes arguments to cause FoFiX's extension modules to be built.
 setup_args.update({
@@ -348,7 +343,6 @@ setup_args.update({
     Extension('cmgl', ['cmgl.pyx'], **combine_info(numpy_info, gl_info)),
     Extension('pypitch._pypitch',
               language='c++',
-              extra_compile_args = extracompileArgs,
               sources=['pypitch/_pypitch.pyx', 'pypitch/pitch.cpp',
                        'pypitch/AnalyzerInput.cpp']),
     Extension('VideoPlayer', ['VideoPlayer.pyx', 'VideoPlayerCore.c'],

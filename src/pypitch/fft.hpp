@@ -71,7 +71,7 @@ namespace da {
 				// Combine the results
 				using math::sqr;
 				using math::sin;
-				const std::complex<T> wp(-2.0 * sqr(sin<1, N>()), -sin<2, N>());
+				const std::complex<T> wp(T(-2.0 * sqr(sin<1, N>())), T(-sin<2, N>()));
 				std::complex<T> w(1.0);
 				for (std::size_t i = 0; i < M; ++i) {
 					std::complex<T> temp = data[i + M] * w;

@@ -18,6 +18,10 @@
  * MA  02110-1301, USA.
  */
 
+#ifdef _MSC_VER
+#define _CRT_SECURE_NO_DEPRECATE
+#endif
+
 #include "VideoPlayer.h"
 
 #include "glwrap.h"
@@ -308,7 +312,7 @@ gboolean video_player_bind_frame(VideoPlayer* player, GError** err)
 
 gboolean video_player_advance(VideoPlayer* player, double newpos, GError** err)
 {
-  player->playback_position = 1000000 * newpos;
+  player->playback_position = (glong)(1000000 * newpos);
 
   while (th_granule_time(player->vdecoder, player->decode_granpos) * 1000000 < player->playback_position) {
     ogg_packet pkt;

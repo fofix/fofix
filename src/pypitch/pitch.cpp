@@ -74,7 +74,7 @@ Analyzer::Analyzer(double rate, std::size_t step):
 {
   	// Hamming window
 	for (size_t i=0; i < FFT_N; i++) {
-		m_window[i] = 0.53836 - 0.46164 * std::cos(2.0 * M_PI * i / (FFT_N - 1));
+		m_window[i] = float(0.53836 - 0.46164 * std::cos(2.0 * M_PI * i / (FFT_N - 1)));
 	}
 }
 
@@ -159,7 +159,7 @@ void Analyzer::calcTones() {
 		double phase = std::arg(m_fft[k]);
 		// process phase difference
 		double delta = phase - m_fftLastPhase[k];
-		m_fftLastPhase[k] = phase;
+		m_fftLastPhase[k] = float(phase);
 		delta -= k * phaseStep;  // subtract expected phase difference
 		delta = remainder(delta, 2.0 * M_PI);  // map delta phase into +/- M_PI interval
 		delta /= phaseStep;  // calculate diff from bin center frequency
