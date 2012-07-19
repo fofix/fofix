@@ -57,6 +57,8 @@ fi
 echo "wine: $WINE"
 
 assert_binary_on_path autoreconf
+assert_binary_on_path bzip2
+assert_binary_on_path gzip
 assert_binary_on_path libtoolize
 assert_binary_on_path make
 assert_binary_on_path pkg-config
@@ -65,6 +67,7 @@ assert_binary_on_path svn
 assert_binary_on_path tar
 assert_binary_on_path unzip
 assert_binary_on_path wget
+assert_binary_on_path xz
 
 SCRIPTDIR="`pwd`"
 export PREFIX="`pwd`"/deps
