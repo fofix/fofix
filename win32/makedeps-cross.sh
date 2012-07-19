@@ -28,7 +28,7 @@ assert_binary_on_path () {
 }
 
 if test -z "$CROSS_TOOL_PREFIX"; then
-  export CROSS_TOOL_PREFIX=i586-mingw32msvc
+  export CROSS_TOOL_PREFIX=i686-w64-mingw32
 fi
 echo "Using cross compilers prefixed with '$CROSS_TOOL_PREFIX-'."
 echo "(Set CROSS_TOOL_PREFIX to change this; don't include the trailing hyphen.)"
