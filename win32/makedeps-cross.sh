@@ -267,10 +267,10 @@ if test ! -f "$PREFIX"/build-stamps/libogg; then
 fi
 
 # libvorbis
-LIBVORBIS="libvorbis-1.3.2"
+LIBVORBIS="libvorbis-1.3.3"
 if test ! -f "$PREFIX"/build-stamps/libvorbis; then
-  download http://downloads.xiph.org/releases/vorbis/$LIBVORBIS.tar.bz2
-  tar jxvf $LIBVORBIS.tar.bz2
+  download http://downloads.xiph.org/releases/vorbis/$LIBVORBIS.tar.xz
+  tar Jxvf $LIBVORBIS.tar.xz
   cd $LIBVORBIS
   ./configure $COMMON_AUTOCONF_FLAGS
   make
