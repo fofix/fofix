@@ -368,6 +368,20 @@ if test ! -f "$PREFIX"/build-stamps/sdl_mixer; then
   $RM_RF $SDLMIXER
 fi
 
+# portaudio
+PORTAUDIO="pa_stable_v19_20111121"
+if test ! -f "$PREFIX"/build-stamps/portaudio; then
+  download http://www.portaudio.com/archives/$PORTAUDIO.tgz
+  tar zxvf $PORTAUDIO.tgz
+  cd portaudio
+  ./configure $COMMON_AUTOCONF_FLAGS --with-winapi=directx
+  make
+  make install
+  cd ..
+  touch "$PREFIX"/build-stamps/portaudio
+  $RM_RF portaudio
+fi
+
 # ffmpeg
 # We only need libswscale.
 if test ! -f "$PREFIX"/build-stamps/ffmpeg; then
