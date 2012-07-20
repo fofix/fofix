@@ -150,7 +150,7 @@ if test ! -f "$PREFIX"/build-stamps/win-iconv; then
 fi
 
 # zlib
-ZLIB="zlib-1.2.5"
+ZLIB="zlib-1.2.7"
 if test ! -f "$PREFIX"/build-stamps/zlib; then
   download http://www.zlib.net/$ZLIB.tar.bz2
   tar jxvf $ZLIB.tar.bz2
@@ -158,7 +158,7 @@ if test ! -f "$PREFIX"/build-stamps/zlib; then
   make -f win32/Makefile.gcc PREFIX="$CROSS_TOOL_PREFIX"- zlib1.dll
   cp -v zlib.h zconf.h "$PREFIX"/include
   cp -v zlib1.dll "$PREFIX"/bin
-  cp -v libzdll.a "$PREFIX"/lib/libz.a
+  cp -v libz.dll.a "$PREFIX"/lib
   cd ..
   touch "$PREFIX"/build-stamps/zlib
   $RM_RF $ZLIB
