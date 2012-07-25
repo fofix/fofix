@@ -100,6 +100,7 @@ class Video:
             # and swap the channels to fit.  Also turn the image upside down as the
             # API wants.
             icon = Image.open(self.icon)
+            icon.load() #fculpo - needed for PIL 1.1.7 stable
             iconFixedUp = Image.merge('RGBA', [icon.split()[i] for i in (2, 1, 0, 3)]).transpose(Image.FLIP_TOP_BOTTOM)
 
             # Scale the images to the icon sizes needed.
