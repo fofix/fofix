@@ -82,7 +82,8 @@ def _log(cls, msg):
     @param msg:   Log message text
     '''
     if not isinstance(msg, unicode):
-        msg = unicode(msg, encoding).encode(encoding, "ignore")
+        msg = unicode(msg, encoding)
+    msg = msg.encode(encoding, "replace") # fculpo - proper encoding
     timeprefix = "[%12.6f] " % (time.time() - _initTime)
     if not quiet:
         print timeprefix + displaylabels[cls] + " " + msg
