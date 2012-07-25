@@ -283,6 +283,9 @@ def pc_info(pkg):
 
 
 ogg_info = pc_info('ogg')
+vorbisfile_info = pc_info('vorbisfile')
+sdl_info = pc_info('sdl')
+sdl_mixer_info = pc_info('SDL_mixer')
 theoradec_info = pc_info('theoradec')
 glib_info = pc_info('glib-2.0')
 swscale_info = pc_info('libswscale')
@@ -355,7 +358,9 @@ setup_args.update({
               sources=['pypitch/_pypitch.pyx', 'pypitch/pitch.cpp',
                        'pypitch/AnalyzerInput.cpp']),
     Extension('VideoPlayer', ['VideoPlayer.pyx', 'VideoPlayerCore.c'],
-              **combine_info(gl_info, ogg_info, theoradec_info, glib_info, swscale_info))
+              **combine_info(gl_info, ogg_info, theoradec_info, glib_info, swscale_info)),
+    Extension('OggStreamer', ['OggStreamer.c'],
+              **combine_info(vorbisfile_info, sdl_info, sdl_mixer_info)),
   ],
   'cmdclass': {'build_ext': build_ext, 'install': install},
 })

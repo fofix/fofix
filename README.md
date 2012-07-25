@@ -148,8 +148,6 @@ The following packages are required:
   * pygame ([direct link to 1.9.1](http://pygame.org/ftp/pygame-1.9.1.win32-py2.6.msi))
   * PyOpenGL ([direct link to 3.0.1](http://pypi.python.org/packages/any/P/PyOpenGL/PyOpenGL-3.0.1.win32.exe))
   * Python Imaging Library ([direct link to 1.1.7+](http://github.com/downloads/fuzion/pil-2009-raclette/PIL-1.1.7-2009-raclette-r358.win32-py2.6.exe))
-  * pyogg ([direct link to 1.3](http://www.mediafire.com/file/qlw2hwyy0rz/pyogg-1.3.win32-py2.6.exe))
-  * pyvorbis ([direct link to 1.5a](http://www.mediafire.com/file/i21ewawljtw/pyvorbis-1.5.win32-py2.6.exe))
   * Cython ([link to 0.14.1](http://www.lfd.uci.edu/~gohlke/pythonlibs/#cython))
 
 The following packages are optional:
@@ -224,14 +222,13 @@ The following are required:
   * PyOpenGL (3.x)
   * numpy
   * Python Imaging Library (PIL)
-  * pyogg
-  * pyvorbis
   * Numeric (only required if you have a pygame version earlier than 1.9)
   * Python's development headers
   * A C++ compiler
   * Cython
   * pkg-config
-  * The OpenGL, GLU, GLib, libogg, libtheora, and libswscale (part of ffmpeg) development headers
+  * The OpenGL, GLU, GLib, SDL, SDL_mixer, libogg, libvorbisfile,
+    libtheora, and libswscale (part of ffmpeg) development headers
 
 The following are optional (refer to the Windows instructions to see
 what each one is needed for):
@@ -241,9 +238,9 @@ what each one is needed for):
 
 For those of you on Debian or Ubuntu, this means installing the
 following packages: `python-pygame`, `python-opengl`, `python-numpy`,
-`python-imaging`, `python-ogg`, `python-pyvorbis`, `python-dev`,
-`build-essential`, `cython`, `pkg-config`, `libgl1-mesa-dev`,
-`libglu1-mesa-dev`, `libglib2.0-dev`, `libogg-dev`, `libtheora-dev`,
+`python-imaging`, `python-dev`, `build-essential`, `cython`, `pkg-config`,
+`libgl1-mesa-dev`, `libglu1-mesa-dev`, `libglib2.0-dev`, `libsdl1.2-dev`,
+`libsdl-mixer1.2-dev`, `libogg-dev`, `libvorbisfile-dev`, `libtheora-dev`,
 `libswscale-dev`.  If you're stuck without pygame 1.9, also install
 `python-numeric`.
 

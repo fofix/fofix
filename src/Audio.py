@@ -23,10 +23,10 @@
 
 import pygame
 import Log
-import time
 import struct
 from Task import Task
 import Config
+import OggStreamer
 
 #stump: check for pitch bending support
 try:
@@ -45,13 +45,6 @@ if not hasattr(pygame.mixer, 'music'):
     __import__('pygame.mixer_music')
     pygame.mixer.music = sys.modules['pygame.mixer_music']
 
-OggStreamer = None
-try:
-    import OggStreamer
-    Log.debug('Using new OggStreamer module for ogg streaming.')
-except ImportError:
-    Log.warn('OggStreamer not found.  Falling back to legacy pyogg/pyvorbis based ogg streamer.')
-    import ogg.vorbis
 
 class Audio:
     def pre_open(self, frequency = 22050, bits = 16, stereo = True, bufferSize = 1024):
@@ -272,156 +265,6 @@ class MicrophonePassthroughStream(Sound, Task):
             self.channel.queue(snd)
         self.channel.set_volume(self.volume)
 
-if OggStreamer is None:
-    class OggStream(object):
-        def __init__(self, inputFileName):
-            self.file = ogg.vorbis.VorbisFile(inputFileName)
-
-        def read(self, bytes = 4096):
-            (data, bytes, bit) = self.file.read(bytes)
-            return data[:bytes]
-
-    class StreamingOggSound(Sound, Task):
-        def __init__(self, engine, channel, fileName):
-            Task.__init__(self)
-            self.engine       = engine
-            self.fileName     = fileName
-            self.channel      = channel
-            self.playing      = False
-            self.bufferSize   = 1024 * 64
-            self.bufferCount  = 8
-            self.volume       = 1.0
-
-                #myfingershurt: buffer is 2D array (one D for each channel) of 16-bit UNSIGNED integers / samples
-                #  2*1024*64 = 131072 samples per channel
-            self.buffer       = zeros((2 * self.bufferSize, 2))
-
-            self.decodingRate = 4
-            self._reset()
-
-        def _reset(self):
-            self.stream        = OggStream(self.fileName)
-
-                #myfingershurt: 2D buffer (L,R) of 16-bit unsigned integer samples, each channel 65536 samples long
-                #.... buffersIn = a list of 9 of these.
-            self.buffersIn     = [pygame.sndarray.make_sound(zeros((self.bufferSize, 2))) for i in range(self.bufferCount + 1)]
-
-            self.buffersOut    = []
-            self.buffersBusy   = []
-            self.bufferPos     = 0
-            self.done          = False
-            self.lastQueueTime = time.time()
-
-            while len(self.buffersOut) < self.bufferCount and not self.done:
-                #myfingershurt: while there are less than 8 sets of 65k sample 2 channel buffers in the buffersOut list,
-                # continue to decode and fill them.
-                self._produceSoundBuffers()
-
-        def __del__(self):
-            self.engine.removeTask(self)
-
-        def streamIsPlaying(self):  #MFH - adding function to check if sound is playing
-            return self.playing
-
-
-        def play(self):
-            if self.playing:
-                return
-
-            self.engine.addTask(self, synchronized = False)
-            self.playing = True
-
-            while len(self.buffersOut) < self.bufferCount and not self.done:
-                #myfingershurt: while there are less than 8 sets of 65k sample 2 channel buffers in the buffersOut list,
-                # continue to decode and fill them.
-                self._produceSoundBuffers()
-
-
-            #once all 8 output buffers are filled, play the first one.
-            self.channel.channel.play(self.buffersOut.pop())
-
-        def stop(self):
-            self.playing = False
-            self.channel.stop()
-            self.engine.removeTask(self)
-            self._reset()
-
-        def setVolume(self, volume):
-            self.volume = volume
-            #myfingershurt: apply volume changes IMMEDIATELY:
-            self.channel.setVolume(self.volume)
-
-        #stump: pitch bending
-        def setPitchBend(self, factor):
-            self.channel.setPitchBend(factor)
-
-        def stopPitchBend(self):
-            self.channel.stopPitchBend()
-
-        def fadeout(self, time):
-            self.stop()
-
-        def _decodeStream(self):
-            # No available buffers to fill?
-            if not self.buffersIn or self.done:
-                return
-
-            data = self.stream.read()
-
-            if not data:
-                self.done = True
-            else:
-                data = struct.unpack("%dh" % (len(data) / 2), data)
-                samples = len(data) / 2
-                self.buffer[self.bufferPos:self.bufferPos + samples, 0] = data[0::2]
-                self.buffer[self.bufferPos:self.bufferPos + samples, 1] = data[1::2]
-                self.bufferPos += samples
-
-            # If we have at least one full buffer decode, claim a buffer and copy the
-            # data over to it.
-            if self.bufferPos >= self.bufferSize or (self.done and self.bufferPos):
-                # Claim the sound buffer and copy the data
-                if self.bufferPos < self.bufferSize:
-                    self.buffer[self.bufferPos:]  = 0
-                soundBuffer = self.buffersIn.pop()
-                pygame.sndarray.samples(soundBuffer)[:] = self.buffer[0:self.bufferSize]
-
-                # Discard the copied sound data
-                n = max(0, self.bufferPos - self.bufferSize)
-                self.buffer[0:n] = self.buffer[self.bufferSize:self.bufferSize+n]
-                self.bufferPos   = n
-
-                return soundBuffer
-
-        def _produceSoundBuffers(self):
-            # Decode enough that we have at least one full sound buffer
-            # ready in the queue if possible
-            while not self.done:
-                for i in xrange(self.decodingRate):
-                    soundBuffer = self._decodeStream()
-                    if soundBuffer:
-                        self.buffersOut.insert(0, soundBuffer)
-                if self.buffersOut:
-                    break
-
-        def run(self, ticks):
-            if not self.playing:
-                return
-
-            if len(self.buffersOut) < self.bufferCount:
-                self._produceSoundBuffers()
-
-            if not self.channel.channel.get_queue() and self.buffersOut:
-                # Queue one decoded sound buffer and mark the previously played buffer as free
-                soundBuffer = self.buffersOut.pop()
-                self.buffersBusy.insert(0, soundBuffer)
-                self.lastQueueTime = time.time()
-                self.channel.channel.queue(soundBuffer)
-                if len(self.buffersBusy) > 2:
-                    self.buffersIn.insert(0, self.buffersBusy.pop())
-
-            if not self.buffersOut and self.done and time.time() - self.lastQueueTime > 4:
-                self.stop()
 
 class StreamingSound(Sound, Task):
     def __init__(self, engine, channel, fileName):
@@ -430,13 +273,7 @@ class StreamingSound(Sound, Task):
         self.channel = channel
 
     def __new__(cls, engine, channel, fileName):
-        if OggStreamer is not None:
-            return OggStreamer.StreamingOggSound(channel.id, fileName)
-
-        frequency, format, stereo = pygame.mixer.get_init()
-        if fileName.lower().endswith(".ogg"):
-
-            return StreamingOggSound(engine, channel, fileName)   #MFH - forced allow of non-matching sample rates
+        return OggStreamer.StreamingOggSound(channel.id, fileName)
 
     def play(self):
         self.channel.play(self)
