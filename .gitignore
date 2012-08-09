@@ -1,6 +1,7 @@
 *.py[cod]
 *.so
 *.exe
+*.exe.log
 *.dll
 *.orig
 .project
