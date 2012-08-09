@@ -246,6 +246,13 @@ def grab_stdout(*args, **kw):
     return stdout
 
 
+# Blacklist MinGW-specific dependency libraries on Windows.
+if os.name == 'nt':
+    lib_blacklist = ['m', 'mingw32']
+else:
+    lib_blacklist = []
+
+
 def pc_info(pkg):
     '''Obtain build options for a library from pkg-config and
     return a dict that can be expanded into the argument list for
@@ -274,7 +281,7 @@ def pc_info(pkg):
     info = {
       'define_macros': [def_split(x[2:]) for x in cflags if x[:2] == '-D'],
       'include_dirs': [x[2:] for x in cflags if x[:2] == '-I'],
-      'libraries': [x[2:] for x in libs if x[:2] == '-l'],
+      'libraries': [x[2:] for x in libs if x[:2] == '-l' and x[2:] not in lib_blacklist],
       'library_dirs': [x[2:] for x in libs if x[:2] == '-L'],
     }
 
