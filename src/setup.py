@@ -346,6 +346,13 @@ class build_ext(_build_ext):
 
         return _build_ext.run(self, *args, **kw)
 
+    def build_extension(self, ext):
+        # If we're using MSVC, specify C++ exception handling behavior to avoid compiler warnings.
+        if self.compiler.compiler_type == 'msvc':
+            ext.extra_compile_args.append('/EHsc')
+
+        return _build_ext.build_extension(self, ext)
+
 
 # Make "setup.py install" do nothing until we configure something more sensible.
 class install(_install):
