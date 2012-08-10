@@ -28,6 +28,7 @@ import distutils.ccompiler
 from distutils.dep_util import newer
 from Cython.Distutils import build_ext as _build_ext
 from distutils.command.install import install as _install
+from distutils.cmd import Command
 import sys, SceneFactory, Version, glob, os
 import numpy as np
 import shlex
@@ -361,6 +362,26 @@ class install(_install):
         sys.exit(1)
 
 
+# Convert .po files into .mo files.
+msgfmt_cmd = find_command('msgfmt')
+class msgfmt(Command):
+    user_options = []
+    description = 'convert .po files in data/po into .mo files in data/translations'
+
+    def initialize_options(self):
+        pass
+
+    def finalize_options(self):
+        pass
+
+    def run(self):
+        for pofile in glob.glob(os.path.join('..', 'data', 'po', '*.po')):
+            mofile = os.path.join('..', 'data', 'translations', os.path.basename(pofile)[:-3]+'.mo')
+            if newer(pofile, mofile):
+                self.mkpath(os.path.dirname(mofile))
+                self.spawn([msgfmt_cmd, '-c', '-o', mofile, pofile])
+
+
 # Add the common arguments to setup().
 # This includes arguments to cause FoFiX's extension modules to be built.
 setup_args.update({
@@ -376,7 +397,7 @@ setup_args.update({
     Extension('OggStreamer', ['OggStreamer.c'],
               **combine_info(vorbisfile_info, sdl_info, sdl_mixer_info)),
   ],
-  'cmdclass': {'build_ext': build_ext, 'install': install},
+  'cmdclass': {'build_ext': build_ext, 'install': install, 'msgfmt': msgfmt},
 })
 
 # If we're on Windows, add the dependency directory to the PATH so py2exe will
