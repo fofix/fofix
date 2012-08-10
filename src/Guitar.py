@@ -30,8 +30,11 @@
 from Neck import Neck
 from copy import deepcopy
 from Shader import shaders
+from Song import Note
+import Log
+import math
 
-from Instrument import *
+from Instrument import Instrument
 from OpenGL.GL import *
 
 class Guitar(Instrument):

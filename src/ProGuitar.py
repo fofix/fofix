@@ -20,10 +20,14 @@
 # MA  02110-1301, USA.                                              #
 #####################################################################
 
+from Song import Note, Tempo
+from Guitar import Guitar
+from Mesh import Mesh
 import random
+import os
 from Shader import shaders
+import Log
 
-from Instrument import *
 from OpenGL.GL import *
 
 class ProGuitar(Guitar):
