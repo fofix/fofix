@@ -39,7 +39,7 @@ LicenseFile=..\COPYING
 InfoBeforeFile=..\README
 InfoAfterFile=..\CREDITS
 OutputBaseFilename=FoFiX-4.0.0-alpha0-pre-setup
-SetupIconFile=..\src\fofix.ico
+SetupIconFile=..\win32\fofix.ico
 Compression=lzma2
 SolidCompression=yes
 
