@@ -64,8 +64,7 @@ class SongChoosingScene(Scene):
         else:
             self.engine.world.sceneName = "SongChoosingScene"
 
-        if self.engine.config.get("debug", "use_new_song_database"):
-            Song.updateSongDatabase(self.engine)
+        Song.updateSongDatabase(self.engine)
 
         self.wizardStarted = False
         self.libraryName   = libraryName
