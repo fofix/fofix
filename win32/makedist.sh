@@ -19,6 +19,11 @@ echo -n "Stripping binaries and libraries... "
 i686-w64-mingw32-strip --strip-all dist/deps/bin/*.exe dist/deps/bin/*.dll
 i686-w64-mingw32-strip --strip-debug dist/deps/lib/*.lib dist/deps/lib/*.a
 echo "done"
+echo -n "Generating README... "
+cat README.deppack.stub dist/deps/URLs >dist/README.txt
+todos dist/README.txt
+rm -f dist/deps/URLs
+echo "done"
 ZIPFILE="fofix-win32-deppack-`date +%Y%m%d`.zip"
 rm -f "$ZIPFILE"
-(cd dist && zip -9r ../"$ZIPFILE" deps)
+(cd dist && zip -9r ../"$ZIPFILE" *)

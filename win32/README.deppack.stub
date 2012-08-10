@@ -1,0 +1,10 @@
+This is the FoFiX Win32 Dependency Pack, an archive of precompiled
+libraries used by FoFiX extension modules on Windows. It should be
+unpacked such that the top-level "deps" directory is a subdirectory of
+the FoFiX source tree's "win32" directory.
+
+It is built using the makedeps-cross.sh script in the FoFiX "win32"
+directory. Some packages have small patches applied to them; these
+patches are in the "win32" directory as well.
+
+URLs for corresponding source code:

@@ -133,6 +133,10 @@ download () {
     wget -c -O "$basename".part "$1"
     mv -v "$basename".part "$basename"
   fi
+  test -f "$PREFIX"/URLs && cp -f "$PREFIX"/URLs "$PREFIX"/URLs.new
+  echo "$1" >>"$PREFIX"/URLs.new
+  sort "$PREFIX"/URLs.new | uniq >"$PREFIX"/URLs
+  rm -f "$PREFIX"/URLs.new
 }
 
 # We use win-iconv instead of full-fledged GNU libiconv because it still does
