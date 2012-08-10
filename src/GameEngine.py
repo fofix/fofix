@@ -136,7 +136,6 @@ Config.define("game",   "player2",             str,  None)
 Config.define("game",   "player3",             str,  None)
 Config.define("game",   "default_neck",        str,  "defaultneck")
 Config.define("game",   "last_theme",          str,  "")
-Config.define("game",   "joysticks",           int,  0)
 
 #myfingershurt: default buffersize changed from 4096 to 2048:
 Config.define("audio",  "buffersize",   int,   2048,  text = _("Buffer Size"), options = [256, 512, 1024, 2048, 4096, 8192, 16384, 32768, 65536], tipText = _("Set your audio buffer size. Higher values will reduce audio popping, but increase game lag. Only change this if you are having audio quality issues, and use the lowest value that sounds right."))

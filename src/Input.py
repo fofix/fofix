@@ -106,7 +106,6 @@ class Input(Task):
         self.joystickNames = {}
         self.joystickAxes  = {}
         self.joystickHats  = {}
-        self.joyOff = False
 
         self.joysticks = [pygame.joystick.Joystick(id) for id in range(pygame.joystick.get_count())]
         for j in self.joysticks:
@@ -114,12 +113,7 @@ class Input(Task):
             self.joystickNames[j.get_id()] = j.get_name()
             self.joystickAxes[j.get_id()]  = [0] * j.get_numaxes()
             self.joystickHats[j.get_id()]  = [(0, 0)] * j.get_numhats()
-        joyNum = len(self.joysticks)
-        Log.debug("%d joysticks found." % (joyNum))
-        oldJoyNum = Config.get("game", "joysticks")
-        if joyNum != oldJoyNum:
-            self.joyOff = True
-        Config.set("game", "joysticks", joyNum)
+        Log.debug("%d joysticks found." % len(self.joysticks))
 
         # Enable music events
         Audio.Music.setEndEvent(MusicFinished)
