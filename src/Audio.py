@@ -23,10 +23,10 @@
 
 import pygame
 import Log
-import struct
 from Task import Task
 import Config
 import OggStreamer
+import numpy as np
 
 #stump: check for pitch bending support
 try:
@@ -215,16 +215,6 @@ class Sound(object):
     def fadeout(self, time):
         self.sound.fadeout(time)
 
-if tuple(int(i) for i in pygame.__version__[:5].split('.')) < (1, 9, 0):
-    # Must use Numeric instead of numpy, since PyGame 1.7.1 is
-    # not compatible with the latter, and 1.8.x isn't either (though it claims to be).
-    import Numeric
-    def zeros(size):
-        return Numeric.zeros(size, typecode='s')   #myfingershurt: typecode s = short = int16
-else:
-    import numpy as np
-    def zeros(size):
-        return np.zeros(size, dtype='h')
 
 #stump: mic passthrough
 class MicrophonePassthroughStream(Sound, Task):
@@ -253,12 +243,11 @@ class MicrophonePassthroughStream(Sound, Task):
         self.mic.passthroughQueue = []
         if chunk == '':
             return
-        samples = len(chunk)/4
-        data = tuple(int(s * 32767) for s in struct.unpack('%df' % samples, chunk))
-        playbuf = zeros((samples, 2))
+        data = np.frombuffer(chunk, dtype=np.float32) * 32767.0
+        playbuf = np.zeros((len(data), 2), dtype=np.int16)
         playbuf[:, 0] = data
         playbuf[:, 1] = data
-        snd = pygame.sndarray.make_sound(playbuf)
+        snd = pygame.mixer.Sound(buffer(playbuf))
         if self.channel is None or not self.channel.get_busy():
             self.channel = snd.play()
         else:

@@ -222,7 +222,6 @@ The following are required:
   * PyOpenGL (3.x)
   * numpy
   * Python Imaging Library (PIL)
-  * Numeric (only required if you have a pygame version earlier than 1.9)
   * Python's development headers
   * A C++ compiler
   * Cython
@@ -241,8 +240,7 @@ following packages: `python-pygame`, `python-opengl`, `python-numpy`,
 `python-imaging`, `python-dev`, `build-essential`, `cython`, `pkg-config`,
 `libgl1-mesa-dev`, `libglu1-mesa-dev`, `libglib2.0-dev`, `libsdl1.2-dev`,
 `libsdl-mixer1.2-dev`, `libogg-dev`, `libvorbisfile-dev`, `libtheora-dev`,
-`libswscale-dev`.  If you're stuck without pygame 1.9, also install
-`python-numeric`.
+`libswscale-dev`.
 
 Some packages can be troublesome, so we have notes below about certain
 packages.
