@@ -1,0 +1,666 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: FretsOnFire\n"
+"POT-Creation-Date: 2006-10-27 23:23+EEST\n"
+"PO-Revision-Date: 2006-10-30 15:02+0300\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: pygettext.py 1.5\n"
+"Language-Team: \n"
+
+msgid "%.2f beats per minute"
+msgstr "%.2f uderzeń na minutę"
+
+msgid "%d points is a new high score! Please enter your name:"
+msgstr "%d punktów uderza w tabelę! Podpisz się pod tym:"
+
+msgid "%s [Folder]"
+msgstr "%s [Folder]"
+
+msgid "'%s' saved."
+msgstr "'%s' zapisano."
+
+msgid "*Sigh*"
+msgstr "Dobra, teraz wciśnij dwa progi."
+
+msgid "2x"
+msgstr "2x"
+
+msgid "4x"
+msgstr "4x"
+
+msgid "6x"
+msgstr "6x"
+
+msgid "8x"
+msgstr "8x"
+
+msgid "<OK>"
+msgstr "<OK>"
+
+msgid "A/V delay"
+msgstr "Opóźnienie A/V"
+
+msgid "Accuracy: %d%%"
+msgstr "Celność: %d%%"
+
+msgid "Ah yes, I know. I'm amazing."
+msgstr "A to bylo niezłe."
+
+msgid "Ah, that was cool."
+msgstr "I witam wszystkich."
+
+msgid "Ah, you missed it!"
+msgstr "No, a teraz skumaj tą prostą zagrywkę."
+
+msgid "All done! %d songs imported. Have fun!"
+msgstr "Po robocie! %d piosenek zaimportowano. Ostrej jazdy!"
+
+msgid "Amazing"
+msgstr "Kosmiczny"
+
+msgid "And now, pick up your keyboard"
+msgstr "właśnie tak."
+
+msgid "And now, try this super easy lick."
+msgstr "Pod moje tempo."
+
+msgid "And remember one thing."
+msgstr "Jestem twoim nowym Bogiem, dziewczynko."
+
+msgid "Antialiasing Quality"
+msgstr "Jakość wygładzania"
+
+msgid "Apply New Settings"
+msgstr "Zatwierdź nowe ustawienia"
+
+msgid "Arrows - Move cursor, "
+msgstr "Strzałki - Ruch kursora, "
+
+msgid "Audio Settings"
+msgstr "Ustawienia dźwięku"
+
+msgid "BUT DON'T PICK IT YET!"
+msgstr "Pudło..."
+
+msgid "Bang Bang, Mystery Man"
+msgstr "Bang Bang, Mystery Man"
+
+msgid "Because you SUCK."
+msgstr "I zapamiętaj jedną rzecz."
+
+msgid "Bigtime."
+msgstr "Dla mnie jest to banalne."
+
+msgid "Browsing Collection..."
+msgstr "Przeszukuję taśmy..."
+
+msgid "Buffer Size"
+msgstr "Rozmiar bufora"
+
+msgid "But since you SUCK,"
+msgstr "będziesz potrzebował tylko"
+
+msgid "Cancel"
+msgstr "Anuluj"
+
+msgid "Change Song"
+msgstr "Zmień kawałek"
+
+msgid "Check this sh*t!"
+msgstr "A teraz złap swoją klawiaturę"
+
+msgid "Chilling..."
+msgstr "Stygnę..."
+
+msgid "Choose a 256x128 PNG format label image."
+msgstr "Wybierz etykietkę w formacie PNG, 265x128px."
+
+msgid "Choose a File"
+msgstr "Wybierz plik"
+
+msgid "Choose a Song"
+msgstr "Wybierz kawałek"
+
+msgid "Choose a difficulty:"
+msgstr "Wybierz poziom trudności:"
+
+msgid "Choose the Background Track (OGG format) or press Escape to skip."
+msgstr "Wybież podkład dźwiękowy (format OGG) albo wciśnij Esc, żeby pominąć."
+
+msgid "Choose the Instrument Track (OGG format)."
+msgstr "Wybierz ścieżkę instrumentalną (format OGG)."
+
+msgid "Connecting..."
+msgstr "Łączę..."
+
+msgid "Connection lost."
+msgstr "Połączenie padło."
+
+msgid "Copyright 2006 by Unreal Voodoo"
+msgstr "Copyright 2006 by Unreal Voodoo"
+
+msgid "Credits"
+msgstr "Autorzy"
+
+msgid "Defy The Machine"
+msgstr "Defy The Machine"
+
+msgid "Delete - Delete note, "
+msgstr "Delete - Kasuj nutę, "
+
+msgid "Don't try this,"
+msgstr "bo sobie zrobisz krzywdę."
+
+msgid "Easy"
+msgstr "Łatwy"
+
+msgid "Edit Existing Song"
+msgstr "Edytuj istniejący kawałek"
+
+msgid "Editing Help"
+msgstr "Pomoc edycyjna"
+
+msgid "Editing keys: "
+msgstr "Klawisze edycji: "
+
+msgid "English"
+msgstr "English"
+
+msgid "Enter - Make note (hold and move for long notes), "
+msgstr "Enter - Postaw nutę (przytrzymaj i przesuń dla długich nut), "
+
+msgid "Enter A/V delay in milliseconds"
+msgstr "Wprowadź wartość opóźnienia A/V w milisekundach"
+
+msgid "Enter Artist Name"
+msgstr "Wpisz nazwę wykonawcy"
+
+msgid "Enter Beats per Minute Value"
+msgstr "Wprowadź ilość uderzeń na minutę"
+
+msgid "Enter Song Name"
+msgstr "Wpisz nazwę utworu"
+
+msgid "Enter a name for the song."
+msgstr "Podaj nazwę dla piosenki."
+
+msgid "Enter cassette color in HTML (#RRGGBB) format."
+msgstr "Podaj kolor kasety w formacie HTML (#RRGGBB)."
+
+msgid "Enter the path to the mounted Guitar Hero (tm) DVD"
+msgstr "Wprowadź ścieżkę dla zamontowanego Guitar Hero (tm) DVD"
+
+msgid "Enter the server address:"
+msgstr "Podaj adres serwera:"
+
+msgid "Enter your name:"
+msgstr "Podaj swoje imię:"
+
+msgid "Estimate Beats per Minute"
+msgstr "Wystukaj uderzenia na minutę"
+
+msgid "Frames per Second"
+msgstr "Klatek na sekundę"
+
+msgid "Fret #1"
+msgstr "Próg #1"
+
+msgid "Fret #2"
+msgstr "Próg #2"
+
+msgid "Fret #3"
+msgstr "Próg #3"
+
+msgid "Fret #4"
+msgstr "Próg #4"
+
+msgid "Fret #5"
+msgstr "Próg #5"
+
+msgid "Frets on Fire"
+msgstr "Frets on Fire"
+
+msgid "Fullscreen Mode"
+msgstr "Pełny ekran"
+
+msgid "Game Design,"
+msgstr "Projekt gry,"
+
+msgid "Game Settings"
+msgstr "Ustawienia gry"
+
+msgid "Get Ready to Rock"
+msgstr "No to jazda"
+
+msgid "Graphics:"
+msgstr "Grafika:"
+
+msgid "Guntherswarchzhaffenstrassen."
+msgstr "I dzisiaj ci pokażę"
+
+msgid "High"
+msgstr "Wysoka"
+
+msgid "Highest Scores (%s)"
+msgstr "Najlepsze wyniki (%s)"
+
+msgid "Host Multiplayer Game"
+msgstr "Załóż grę sieciową"
+
+msgid "However, zie most important"
+msgstr "jest guzik Escape."
+
+msgid "I use the whole keyboard."
+msgstr "Ale póki jesteś cienkopsem,"
+
+msgid "If I play that any faster,"
+msgstr "to by ci mózg wyleciał."
+
+msgid "Import Guitar Hero(tm) Songs"
+msgstr "Importuj piosenki z Guitar Hero(tm)"
+
+msgid "Import New Song"
+msgstr "Importuj nowy utwór"
+
+msgid "Importing Songs"
+msgstr "Importuję utwory"
+
+msgid "Importing..."
+msgstr "Importuję..."
+
+msgid "Introducing:"
+msgstr "Przedstawia:"
+
+msgid "Join Multiplayer Game"
+msgstr "Dołącz do gry sieciowej"
+
+msgid "Jurgen has left the building."
+msgstr "Jurgen opuścił siedzibę."
+
+msgid "Jurgen will show you how it is done."
+msgstr "Jurgen ci pokaże z czym to się je."
+
+msgid "Key Settings"
+msgstr "Ustawienia klawiszy"
+
+msgid "Language"
+msgstr "Język"
+
+msgid "Lefty mode"
+msgstr "Lewy tryb"
+
+msgid "Loading Preview..."
+msgstr "Ładuję podgląd..."
+
+msgid "Loading song..."
+msgstr "Ładuję piosenkę..."
+
+msgid "Loading..."
+msgstr "Ładuję..."
+
+msgid "Lobby (%d players)"
+msgstr "Lobby (%d graczy)"
+
+msgid "Longest note streak: %d"
+msgstr "Najdłużej nut bez fałszu: %d"
+
+msgid "Loud"
+msgstr "Głośno"
+
+msgid "Low"
+msgstr "Niska"
+
+msgid "Made with:"
+msgstr "Wykonane w:"
+
+msgid "Medium"
+msgstr "Średni"
+
+msgid "Mostly Playing Guitar"
+msgstr "Mostly Playing Guitar"
+
+msgid "Move down"
+msgstr "W dół"
+
+msgid "Move left"
+msgstr "W lewo"
+
+msgid "Move right"
+msgstr "W prawo"
+
+msgid "Move up"
+msgstr "W górę"
+
+msgid "Music,"
+msgstr "Muzyka,"
+
+msgid "My name is Jurgen"
+msgstr "Guntherswarchzhaffenstrassen."
+
+msgid "No"
+msgstr "Nie"
+
+msgid "No highscores for cheaters!"
+msgstr "Takiego wała oszuście!"
+
+msgid "No!"
+msgstr "*Ech*"
+
+msgid "None"
+msgstr "Brak"
+
+msgid "Normal"
+msgstr "Normalna"
+
+msgid "Now, hold down two frets."
+msgstr "Meh, pudło!"
+
+msgid "Off"
+msgstr "Wyłączone"
+
+msgid "Ogg Vorbis encoder (oggenc) not found. Please install it and try again."
+msgstr ""
+"Nie znalazłem kodera Ogg Vorbis (oggenc). Zainstaluj go i spróbuj jeszcze "
+"raz."
+
+msgid "Ok, let's try it again."
+msgstr "Poczekaj spokojnie."
+
+msgid "Ok, that is it for now."
+msgstr "Możesz już iść i sprzedać"
+
+msgid "Ok, that was about"
+msgstr "cztery biliony nut na sekundę."
+
+msgid "Ok, there comes your first note."
+msgstr "Możesz już wcisnąć pierwszy próg."
+
+msgid "Ok, wait for it."
+msgstr "Jeszcze chwilka."
+
+msgid "Page Up/Down - Change difficulty"
+msgstr "Page Up/Down - Zmień poziom trudności"
+
+msgid "Painful"
+msgstr "Masakra"
+
+msgid "Pick"
+msgstr "Kostka"
+
+msgid "Pick!"
+msgstr "Kostkuj!"
+
+msgid "Play Game"
+msgstr "Graj"
+
+msgid "Play with the keys and press Escape when you're done."
+msgstr "Graj klawiszami i naciśnij Esc, kiedy skończysz"
+
+msgid "Player"
+msgstr "Gracz"
+
+msgid "Player #%d"
+msgstr "Gracz #%d"
+
+msgid "Playing"
+msgstr "Odtwarzanie"
+
+msgid "Press Enter to Start Game"
+msgstr "Wciśnij Enter aby zacząć grę."
+
+msgid "Press a key for '%s' or Escape to cancel."
+msgstr "Wybierz klawisz dla '%s' albo Esc żeby anulować."
+
+msgid "Programming:"
+msgstr "Programowanie:"
+
+msgid "Quiet"
+msgstr "Cicho"
+
+msgid "Quit"
+msgstr "Wyjdź"
+
+msgid "Quit to Main Menu"
+msgstr "Powrót do menu"
+
+msgid "Reading the archive index."
+msgstr "Pobieranie indeksu archiwum."
+
+msgid "Reading the song list."
+msgstr "Pobieranie listy utworów."
+
+msgid "Ready"
+msgstr "Gotowe"
+
+msgid "Replay"
+msgstr "Powtórka"
+
+msgid "Restart Song"
+msgstr "Od nowa"
+
+msgid "SVG Quality"
+msgstr "Jakość obrazków SVG"
+
+msgid "Sample Bits"
+msgstr "Uderzenia próbek"
+
+msgid "Sample Frequency"
+msgstr "Częstotliwość próbkowania"
+
+msgid "Save Song"
+msgstr "Zapisz piosenkę"
+
+msgid "Saving..."
+msgstr "Zapisuję..."
+
+msgid "Screw Up Sounds"
+msgstr "Rzępolenie"
+
+msgid "Secondary Pick"
+msgstr "Alternatywna kostka"
+
+msgid "Set A/V delay"
+msgstr "Ustaw opóźnienie A/V"
+
+msgid "Set Artist Name"
+msgstr "Nazwa wykonawcy"
+
+msgid "Set Beats per Minute"
+msgstr "Wprowadź uderzenia na minutę"
+
+msgid "Set Cassette Color"
+msgstr "Wybierz kolor taśmy"
+
+msgid "Set Cassette Label"
+msgstr "Wybierz etykietę taśmy"
+
+msgid "Set Song Name"
+msgstr "Nazwa utworu"
+
+msgid "Settings >"
+msgstr "Ustawienia >"
+
+msgid "Song Credits:"
+msgstr "Zagrali dla nas:"
+
+msgid "Song Editor"
+msgstr "Edytor piosenek >"
+
+msgid "Song Finished!"
+msgstr "Koniec utworu!"
+
+msgid "Sound Effects:"
+msgstr "Efekty dźwiękowe:"
+
+msgid "Source Code available under the GNU General Public License"
+msgstr "Kod źródłowy dostępny pod licencją GNU General Public License"
+
+msgid "Space - Play/pause song, "
+msgstr "Spacja - Graj/Wstrzymaj piosenkę, "
+
+msgid "Special thanks to:"
+msgstr "Specjalne podziękowania dla:"
+
+msgid "Stage %d/8: Decoding channel %d into PCM"
+msgstr "Krok %d/8: Dekodowanie kanału %d do PCM"
+
+msgid "Stage 1/8: Splitting VGS file"
+msgstr "Krok 1/8: Dzielenie pliku VGS"
+
+msgid "Stage 6/8: Joining song stereo tracks"
+msgstr "Krok 6/8: Łączenie ścieżek stereo"
+
+msgid "Stage 7/8: Joining guitar stereo tracks"
+msgstr "Krok 7/8: Łączenie ścieżek stereo dla gitary"
+
+msgid "Stage 8/8: Compressing tracks"
+msgstr "Krok 8/8: Kompresowanie ścieżek"
+
+msgid "Stopped"
+msgstr "Zatrzymane"
+
+msgid "Supaeasy"
+msgstr "Banalny"
+
+msgid "Test Keys"
+msgstr "Test klawiszy"
+
+msgid "Testing:"
+msgstr "Testerzy:"
+
+msgid "That isn't a color."
+msgstr "Niezbyt kolorowy ten kolor."
+
+msgid "That isn't a number."
+msgstr "Liczbę wprowadź."
+
+msgid "That song already exists."
+msgstr "Już taka istnieje."
+
+msgid "That's not it. Try again."
+msgstr "Zła ścieżka, spróbuj jeszcze raz."
+
+msgid "There are no changes to save."
+msgstr "Nie ma co zapisać."
+
+msgid "These five frets,"
+msgstr "no i kostki."
+
+msgid "This Week I've Been"
+msgstr "This Week I've Been"
+
+msgid "To me, that is already obvious."
+msgstr "Ok, nadchodzi nutka."
+
+msgid "Tuning Guitar..."
+msgstr "Stroję gitarę..."
+
+msgid "Tutorial"
+msgstr "Samouczek"
+
+msgid "Und hello everyone."
+msgstr "Mam na imię Jurgen"
+
+msgid "Und today I will show you"
+msgstr "jak kminić w tą gierkę."
+
+msgid "Und up to my tempo."
+msgstr "Lepiej nie próbuj,"
+
+msgid "Und zie Pick button."
+msgstr "Jednakże naważniejsiejszy"
+
+msgid "Unreal Voodoo"
+msgstr "Unreal Voodoo"
+
+msgid "Upload Highscores"
+msgstr "Wyślij wyniki w świat"
+
+msgid "Uploading Scores..."
+msgstr "Wysyłam wyniki..."
+
+msgid "Version %s"
+msgstr "Wersję %s"
+
+msgid "Video Resolution"
+msgstr "Rozdzielczość ekranu"
+
+msgid "Video Settings"
+msgstr "Ustawienia ekranu"
+
+msgid "Wait for it."
+msgstr "Nie!"
+
+msgid "When I shred,"
+msgstr "używam całej klawiaturki."
+
+msgid "Yes"
+msgstr "Tak"
+
+msgid "You can already hold down the 1st fret"
+msgstr "ALE NIE KOSTKUJ JESZCZE!"
+
+msgid "You can now go and sell"
+msgstr "swoją klawiaturę na Allegro."
+
+msgid "You missed it."
+msgstr "No to jeszcze raz."
+
+msgid "You will need it,"
+msgstr "kiedy się skapniesz,"
+
+msgid "You will only need"
+msgstr "tych pięciu progów,"
+
+msgid "[Parent Folder]"
+msgstr "[Wstecz]"
+
+msgid "as Groupie"
+msgstr "jako Groupie"
+
+msgid "as Jurgen, Your New God"
+msgstr "jako Jurgen, Twój Nowy Bóg"
+
+msgid "composed and performed by Tommi Inkila"
+msgstr "kompozycja i wykoanie: Tommi Inkila"
+
+msgid "four billion notes per second."
+msgstr "Jeżeli zagrałbym to szybciej,"
+
+msgid "how to play this game."
+msgstr "Skumaj to!"
+
+msgid "is the Escape button."
+msgstr "Będziesz go potrzebował,"
+
+msgid "like this."
+msgstr "Kiedy rżnę gitarę,"
+
+msgid "lyrics by Mary Jo"
+msgstr "słowa: Mary Jo"
+
+msgid "music by Mary Jo and Tommi Inkila"
+msgstr "muzyka: Mary Jo i Tommi Inkila"
+
+msgid "music by Tommi Inkila"
+msgstr "muzyka: Tommi Inkila"
+
+msgid "or you'll just hurt yourself."
+msgstr "To by było na tyle"
+
+msgid "presents"
+msgstr "prezentuje"
+
+msgid "that you SUCK."
+msgstr "Jazda."
+
+msgid "when you finally realize"
+msgstr "że jesteś cienkopsem."
+
+msgid "your keyboards on Ebay."
+msgstr "Ponieważ jesteś cienkopsem."
+
+msgid "your minds would just blow up."
+msgstr "No i po robocie."

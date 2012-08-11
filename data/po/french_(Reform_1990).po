@@ -1,0 +1,2579 @@
+msgid "           QUIT"
+msgstr "           SORTIR"
+
+msgid "         RESUME"
+msgstr "         CONTINUER"
+
+msgid "        OPTIONS"
+msgstr "        OPTIONS"
+
+msgid "        RESTART"
+msgstr "        RECOMMENCER"
+
+msgid "        RESUME"
+msgstr "        CONTINUER"
+
+msgid "       OPTIONS"
+msgstr "       OPTIONS"
+
+msgid "       PRACTICE"
+msgstr "       S'ENTRAINER"
+
+msgid "       RESTART"
+msgstr "       RECOMMENCER"
+
+msgid "      END SONG"
+msgstr "      TERMINER LA CHANSON"
+
+msgid "     QUIT"
+msgstr "     SORTIR"
+
+msgid "   (Random Song)"
+msgstr "   (Chanson Aléatoire)"
+
+msgid "   CHANGE SONG"
+msgstr "   CHANGER DE CHANSON"
+
+msgid "   END SONG"
+msgstr "   TERMINER LA CHANSON"
+
+msgid "   PRACTICE"
+msgstr "   S'ENTRAINER"
+
+msgid "   QUIT"
+msgstr "   SORTIR"
+
+msgid "   RESTART"
+msgstr "   RECOMMENCER"
+
+msgid "   RESUME"
+msgstr "   CONTINUER"
+
+msgid "   SETTINGS"
+msgstr "   PARAMÈTRES"
+
+msgid "  Change Song"
+msgstr "  Changer de Chanson"
+
+msgid "  End Song"
+msgstr "  Terminer la Chanson"
+
+msgid "  Give Up?"
+msgstr "  Abandonner ?"
+
+msgid "  PRACTICE"
+msgstr "  S'ENTRAINER"
+
+msgid "  Practice"
+msgstr "  S'entrainer"
+
+msgid "  Practice?"
+msgstr "  S'entrainer ?"
+
+msgid "  Quit to Main Menu"
+msgstr "  Retourner au Menu Principal"
+
+msgid "  Resume"
+msgstr "  Continuer"
+
+msgid "  Settings"
+msgstr "  Règlages"
+
+msgid "  Start Over"
+msgstr "  Recommencer du Début"
+
+msgid " % ON "
+msgstr "% EN MODE "
+
+msgid " NEW SONG"
+msgstr " NOUVELLE CHANSON"
+
+msgid " PRACTICE"
+msgstr " S'ENTRAINER"
+
+msgid " QUIT"
+msgstr " SORTIR"
+
+msgid " RETRY"
+msgstr " RÉESSAYER"
+
+msgid " Try Again?"
+msgstr " Réessayer ?"
+
+msgid " fretted by "
+msgstr " transcrite par "
+
+msgid "% Complete"
+msgstr "% Terminé(s)"
+
+msgid "%.2f beats per minute"
+msgstr "%.2f battements par minute"
+
+msgid "%d Songs In This Setlist"
+msgstr "%d Chansons Dans Cette Setlist"
+
+msgid "%d points is a new high score! Enter your name:"
+msgstr "%d points est un nouveau record ! Entrez votre nom :"
+
+msgid "%s Credits"
+msgstr "Crédits de %s"
+
+msgid "%s High Scores"
+msgstr "Records de %s"
+
+msgid "%s High Scores for %s"
+msgstr "Records de %s pour %s"
+
+msgid "%s [Folder]"
+msgstr "%s [Répertoire]"
+
+msgid "'%s' saved."
+msgstr "'%s' sauvegardé."
+
+msgid "*Sigh*"
+msgstr "*Soupir*"
+
+msgid "+Excellent!"
+msgstr "+Excellent !"
+
+msgid "-- Locked --"
+msgstr "-- Verrouillée --"
+
+msgid "-Excellent!"
+msgstr "-Excellent !"
+
+msgid "0 (Song Finish)"
+msgstr "0 (Chanson Terminée)"
+
+msgid "0 Idle"
+msgstr "0 Basse"
+
+msgid "0. Least"
+msgstr "0. Le Moins Possible"
+
+msgid "0.25x"
+msgstr "0.25x"
+
+msgid "0.50x"
+msgstr "0.50x"
+
+msgid "0.75x"
+msgstr "0.75x"
+
+msgid "1"
+msgstr "1"
+
+msgid "1 - Pure Speed"
+msgstr "1 - Vitesse Absolue"
+
+msgid "1 Low"
+msgstr "1 Inférieure à la normale"
+
+msgid "1 Star"
+msgstr "1 Étoile"
+
+msgid "1. Less"
+msgstr "1. Moins"
+
+msgid "1. Standard"
+msgstr "1. Standard"
+
+msgid "1.00x"
+msgstr "1.00x"
+
+msgid "1p Only"
+msgstr "1j Seulement"
+
+msgid "2"
+msgstr "2"
+
+msgid "2 - Fast"
+msgstr "2 - Rapide"
+
+msgid "2 Normal"
+msgstr "2 Normale"
+
+msgid "2 Stars"
+msgstr "2 Étoiles"
+
+msgid "2-Line"
+msgstr "2-Ligne"
+
+msgid "2. Normal"
+msgstr "2. Normale"
+
+msgid "2. Tight"
+msgstr "2. Serrée"
+
+msgid "3 - Effects (Recommended)"
+msgstr "3 - Effets (Recommandé)"
+
+msgid "3 Above Normal"
+msgstr "3 Supérieure à la Normale"
+
+msgid "3 Stars"
+msgstr "3 Étoiles"
+
+msgid "3. Most"
+msgstr "3. Le Plus Possible"
+
+msgid "3. Tightest"
+msgstr "3. La Plus Serrée Possible"
+
+msgid "3D Note Rotation"
+msgstr "Rotation de Note 3D"
+
+msgid "4 - Max Quality (Slow)"
+msgstr "4 - Qualité Max (Lent)"
+
+msgid "4 High"
+msgstr "4 Haute"
+
+msgid "4 Stars"
+msgstr "4 Étoiles"
+
+msgid "5 Realtime"
+msgstr "5 Temps Réel"
+
+msgid "5 Stars"
+msgstr "5 Étoiles"
+
+msgid "6 (Gold Stars)"
+msgstr "6 (Étoiles en Or)"
+
+msgid "7 (Full Combo)"
+msgstr "7 (Combinaison Totale)"
+
+msgid "<OK>"
+msgstr "<D'accord>"
+
+msgid "A key conflict exists somewhere. You should fix it."
+msgstr "Des touches entrent en conflit. Vous devriez corriger cela."
+
+msgid "A/V Delay"
+msgstr "Décalage A/V"
+
+msgid "ALPHABETICALLY BY ALBUM"
+msgstr "EN ORDRE ALPHABÉTIQUE PAR ALBUM"
+
+msgid "ALPHABETICALLY BY ARTIST"
+msgstr "EN ORDRE ALPHABÉTIQUE PAR ARTISTE"
+
+msgid "ALPHABETICALLY BY GENRE"
+msgstr "EN ORDRE ALPHABÉTIQUE PAR GENRE"
+
+msgid "ALPHABETICALLY BY TITLE"
+msgstr "EN ORDRE ALPHABÉTIQUE PAR TITRE"
+
+msgid "Accuracy"
+msgstr "Précision"
+
+msgid "Activate Overdrive!"
+msgstr "Activez la Distorsion !"
+
+msgid "Activate Star Power!"
+msgstr "Activez le Star Power !"
+
+msgid "Active Coders:"
+msgstr "Programmeurs Actuels :"
+
+msgid "Actual Color"
+msgstr "Couleur Actuelle"
+
+msgid "Adjusted Score Multiplier:"
+msgstr "Multiplicateur de Score Ajusté :"
+
+msgid "Advanced Audio Settings"
+msgstr "Paramètres Audio Avancés"
+
+msgid "Advanced Gameplay Settings"
+msgstr "Paramètres de Jouabilité Avancés"
+
+msgid "Advanced Settings"
+msgstr "Paramètres Avancés"
+
+msgid "Advanced Video Settings"
+msgstr "Paramètres Vidéo Avancés"
+
+msgid "Advanced Visual Effects"
+msgstr "Effets Visuels Avancés"
+
+msgid "Ah yes, I know. I'm amazing."
+msgstr "Oh oui, je sais. Je suis incroyable."
+
+msgid "Ah, that was cool."
+msgstr "Ah, c'était cool."
+
+msgid "Ah, you missed it!"
+msgstr "Ah, tu l'as raté!"
+
+msgid "Album"
+msgstr "Album"
+
+msgid "Album Covers"
+msgstr "Couvertures d'Album"
+
+msgid "All Tapping"
+msgstr "Tapping Intégral"
+
+msgid "All done! %d songs imported. Have fun!"
+msgstr "Terminé ! %d chansons importées. Amusez-vous !"
+
+msgid "Alt P1 Cancel"
+msgstr "J1, Annuler Alt."
+
+msgid "Alt P1 Fret #1"
+msgstr "J1, Case #1 Alt."
+
+msgid "Alt P1 Fret #2"
+msgstr "J1, Case #2 Alt."
+
+msgid "Alt P1 Fret #3"
+msgstr "J1, Case #3 Alt."
+
+msgid "Alt P1 Fret #4"
+msgstr "J1, Case #4 Alt."
+
+msgid "Alt P1 Fret #5"
+msgstr "J1, Case #5 Alt."
+
+msgid "Alt P1 Killswitch"
+msgstr "J1, Killswitch Alt."
+
+msgid "Alt P1 Move down"
+msgstr "J1, Aller en bas Alt."
+
+msgid "Alt P1 Move left"
+msgstr "J1, Aller à gauche Alt."
+
+msgid "Alt P1 Move right"
+msgstr "J1, Aller à droite Alt."
+
+msgid "Alt P1 Move up"
+msgstr "J1, Aller en haut Alt."
+
+msgid "Alt P1 Pick"
+msgstr "J1, Médiator Alt."
+
+msgid "Alt P1 Secondary Pick"
+msgstr "J1, Médiator Secondaire Alt."
+
+msgid "Alt P1 StarPower"
+msgstr "J1, StarPower Alt."
+
+msgid "Alt P2 Cancel"
+msgstr "J2, Annuler Alt."
+
+msgid "Alt P2 Fret #1"
+msgstr "J2, Case #1 Alt."
+
+msgid "Alt P2 Fret #2"
+msgstr "J2, Case #2 Alt."
+
+msgid "Alt P2 Fret #3"
+msgstr "J2, Case #3 Alt."
+
+msgid "Alt P2 Fret #4"
+msgstr "J2, Case #4 Alt."
+
+msgid "Alt P2 Fret #5"
+msgstr "J2, Case #5 Alt."
+
+msgid "Alt P2 Killswitch"
+msgstr "J2, Killswitch Alt."
+
+msgid "Alt P2 Move down"
+msgstr "J2, Aller en bas Alt."
+
+msgid "Alt P2 Move left"
+msgstr "J2, Aller à gauche Alt."
+
+msgid "Alt P2 Move right"
+msgstr "J2, Aller à droite Alt."
+
+msgid "Alt P2 Move up"
+msgstr "J2, Aller en haut Alt."
+
+msgid "Alt P2 Pick"
+msgstr "J2, Médiator Alt."
+
+msgid "Alt P2 Secondary Pick"
+msgstr "J2, Médiator Secondaire Alt."
+
+msgid "Alt P2 StarPower"
+msgstr "J2, StarPower Alt."
+
+msgid "Alt. Drum Keys"
+msgstr "Touches Alt. pour la Batterie"
+
+msgid "Alternate"
+msgstr "Alternatif"
+
+msgid "Alternative"
+msgstr "Alternative"
+
+msgid "Always"
+msgstr "Toujours"
+
+msgid "Always On"
+msgstr "Toujours Activées"
+
+msgid "And now, pick up your keyboard"
+msgstr "Et maintenant, attrape ton clavier"
+
+msgid "And now, try this super easy lick."
+msgstr "Et maintenant, essaye ce lick super facile."
+
+msgid "And remember one thing."
+msgstr "Et souviens-toi d'une chose."
+
+msgid "Animated"
+msgstr "Animés"
+
+msgid "Animated Stage"
+msgstr "Scène Animée"
+
+msgid "Animated Star Notes"
+msgstr "Notes Étoilées Animées"
+
+msgid "Animation Delay"
+msgstr "Scène Animée - Délai avant Rotation"
+
+msgid "Antialiasing Quality"
+msgstr "Qualité de l'Anticrénelage"
+
+msgid "Are you sure you want to reset this entire career?"
+msgstr ""
+"Êtes-vous sûr de vouloir réinitialiser toute cette carrière?"
+
+msgid "Arrows - Move cursor, "
+msgstr "Flèches - Déplacer le curseur, "
+
+msgid "Artist"
+msgstr "Artiste"
+
+msgid "Ascending"
+msgstr "Montante"
+
+msgid "Audio Settings"
+msgstr "Paramètres Audio"
+
+msgid "Auto"
+msgstr "Auto"
+
+msgid "Auto / Fills"
+msgstr "Auto / Remplissage"
+
+msgid "Auto Kick Bass"
+msgstr "Grosse Caisse Auto"
+
+msgid "Auto MIDI"
+msgstr "MIDI Auto"
+
+msgid "Avg"
+msgstr "Moyenne"
+
+msgid "Awesome"
+msgstr "Impressionnant"
+
+msgid "BAND"
+msgstr "GROUPE"
+
+msgid "BASS"
+msgstr "BASSE"
+
+msgid "BASS GROOVE"
+msgstr "BASS GROOVE"
+
+msgid "BPM"
+msgstr "BPM"
+
+msgid "BPM & Diff"
+msgstr "BPM & Diff."
+
+msgid "BUT DON'T PICK IT YET!"
+msgstr "MAIS NE LA GRATTE PAS ENCORE!"
+
+msgid "BY BAND DIFFICULTY"
+msgstr "PAR DIFFICULTÉ DU GROUPE"
+
+msgid "BY INSTRUMENT DIFFICULTY"
+msgstr "PAR DIFFICULTÉ D'INSTRUMENT"
+
+msgid "BY PLAY COUNT"
+msgstr "PAR NOMBRE DE FOIS JOUÉE"
+
+msgid "BY SONG COLLECTION"
+msgstr "PAR COLLECTION DE CHANSON"
+
+msgid "BY YEAR"
+msgstr "PAR ANNÉE"
+
+msgid "BackNForth"
+msgstr "D'avant en Arrière"
+
+msgid "Band Difficulty"
+msgstr "Difficulté du Groupe"
+
+msgid "Bang Bang Mystery Man song tutorial is from the original FoF"
+msgstr "Chanson didactique ''Bang Bang Mystery Man'' du FoF originel"
+
+msgid "Bass"
+msgstr "Guitare Basse"
+
+msgid "Bass Groove"
+msgstr "Bass Groove"
+
+msgid "Bass Groove Neck"
+msgstr "Manche lors du Bass Groove"
+
+msgid "Bass Groove:"
+msgstr "Bass Groove :"
+
+msgid "Bass drum"
+msgstr "Grosse caisse"
+
+msgid "Because you SUCK."
+msgstr "Parce que tu CRAINS."
+
+msgid "Beta"
+msgstr "Bêta"
+
+msgid "Big Rock Endings"
+msgstr "Big Rock Endings"
+
+msgid "Big Rock Logic"
+msgstr "Logique Big Rock"
+
+msgid "Bigtime."
+msgstr "À mort."
+
+msgid "Blank"
+msgstr "Vide"
+
+msgid "Blue Fret (#4)"
+msgstr "Case Bleue (#4)"
+
+msgid "Board Speed Mode"
+msgstr "Mode de Vitesse de la Touche"
+
+msgid "Board Speed Percent"
+msgstr "Pour-cent de la Vitesse de la Touche"
+
+msgid "Both"
+msgstr "Les deux"
+
+msgid "Bottom"
+msgstr "En bas"
+
+msgid "Brazilian portuguese"
+msgstr "Portugais du Brésil"
+
+msgid "Browsing Collection..."
+msgstr "Exploration de la Collection..."
+
+msgid "Buffer Size"
+msgstr "Taille du Tampon"
+
+msgid "But since you SUCK,"
+msgstr "Mais comme tu CRAINS,"
+
+msgid "By MIDI"
+msgstr "Selon MIDI"
+
+msgid "By MIDI Type"
+msgstr "Selon le Type de MIDI"
+
+msgid "By Song"
+msgstr "Selon Chanson"
+
+msgid "By Theme"
+msgstr "Selon le Thème"
+
+msgid "CD Labels"
+msgstr "Étiquettes CD"
+
+msgid "CD Mode Y-Rotation"
+msgstr "Rotation sur l'axe des Y en Mode CD"
+
+msgid "CDs"
+msgstr "Boitiers de CD"
+
+msgid "COMPLETED"
+msgstr "ACCOMPLI(S) :"
+
+msgid "Cache Song Metadata"
+msgstr "Mettre en Cache les Metadonnées de Chanson"
+
+msgid "Cancel"
+msgstr "Annuler"
+
+msgid "Capo"
+msgstr "Capodastre"
+
+msgid "Career Mode Advance"
+msgstr "Progression du Mode Carrière"
+
+msgid "Center"
+msgstr "au Milieu"
+
+msgid "Center-Bottom"
+msgstr "au Milieu en Bas"
+
+msgid "Change Controls"
+msgstr "Modifier les Commandes"
+
+msgid "Change Score Display"
+msgstr "Changer l'Affichage du Score"
+
+msgid "Change Setlist Path >"
+msgstr "Modifier le Chemin de la Setlist >"
+
+msgid "Cheats"
+msgstr "Triche"
+
+msgid "Check this sh*t!"
+msgstr "Regarde-moi ça!"
+
+msgid "Cheer Loop Delay"
+msgstr "Retard de la Boucle d'Acclamation"
+
+msgid "Choose P1 Neck >"
+msgstr "Choix du Manche pour J1 >"
+
+msgid "Choose P2 Neck >"
+msgstr "Choix du Manche pour J2 >"
+
+msgid "Choose a 256x128 PNG format label image."
+msgstr "Choisissez une image d'étiquette en 256x128 au format PNG."
+
+msgid "Choose a File"
+msgstr "Choisissez un Fichier"
+
+msgid "Choose a Song"
+msgstr "Choisissez une Chanson"
+
+msgid "Choose a new songs directory."
+msgstr "Choisissez un nouveau répertoire de chansons."
+
+msgid "Choose the Background Track (OGG format) or press Escape to skip."
+msgstr ""
+"Choisissez la Piste de Fond (au format OGG) ou appuyez sur Échap pour "
+"passer."
+
+msgid "Choose the Instrument Track (OGG format)."
+msgstr "Choisissez la Piste Instrumentale (au format OGG)."
+
+msgid "Co-Op"
+msgstr "Co-Op"
+
+msgid "Co-Op Mode"
+msgstr "Mode Co-Op"
+
+msgid "Connecting..."
+msgstr "Connexion..."
+
+msgid "Connection lost."
+msgstr "Connexion perdue."
+
+msgid "Continue"
+msgstr "Continuer"
+
+msgid "Control Settings"
+msgstr "Règlages des Commandes"
+
+msgid "Copyright 2006, 2007 by Unreal Voodoo"
+msgstr "Copyright 2006, 2007 par Unreal Voodoo"
+
+msgid "Copyright 2008, 2009 by Team FoFiX"
+msgstr "Copyright 2008, 2009 par l'Équipe FoFiX"
+
+msgid "Countdown"
+msgstr "Décompte"
+
+msgid "Countdown on Resume"
+msgstr "Décompte lors de la Reprise"
+
+msgid "Creators of Career Mode"
+msgstr "Créateurs du Mode Carrière"
+
+msgid "Crowd Cheers"
+msgstr "Acclamations du Public"
+
+msgid "Crowd Volume"
+msgstr "Volume du Public"
+
+msgid "DIFFICULTY"
+msgstr "DIFFICULTÉ"
+
+msgid "DRUM"
+msgstr "BATTERIE"
+
+msgid "Debug Settings"
+msgstr "Paramètres de Débogage"
+
+msgid "Default"
+msgstr "Par défaut"
+
+msgid "Delete - Delete note, "
+msgstr "Suppr - Supprimer la note, "
+
+msgid "Descending"
+msgstr "Descendante"
+
+msgid "Detail"
+msgstr "Détail"
+
+msgid "Difficulty"
+msgstr "Difficulté"
+
+msgid "Difficulty: %s"
+msgstr "Difficulté : %s"
+
+msgid "Disable Variable BPM"
+msgstr "Désactiver les BPM Variables"
+
+msgid "Disabled"
+msgstr "Désactivé(e)"
+
+msgid "Disappear"
+msgstr "Disparaissent"
+
+msgid "Display Settings"
+msgstr "Paramètres d'Affichage"
+
+msgid "Don't try this,"
+msgstr "N'essaye pas ça,"
+
+msgid "Donations to MFH"
+msgstr "Dons envers MFH"
+
+msgid "Drum #1"
+msgstr "Tom #1"
+
+msgid "Drum #2"
+msgstr "Tom #2"
+
+msgid "Drum #3"
+msgstr "Tom #3"
+
+msgid "Drum #4"
+msgstr "Tom #4"
+
+msgid "Drum Assist"
+msgstr "Assitance à la Batterie"
+
+msgid "Drum Keys"
+msgstr "Touches pour la Batterie"
+
+msgid "Drum Miss Penalty"
+msgstr "Pénalité pour les Impro. de Batterie"
+
+msgid "Drum Navigation"
+msgstr "Naviguer avec la batterie"
+
+msgid "Drum Rolls practice tutorial by venom426"
+msgstr "Tutoriel d'entrainement ''Drum Rolls'' par venom426"
+
+msgid "Drum SP"
+msgstr "SP pour la Batterie"
+
+msgid "Drum test song tutorial by Heka"
+msgstr "Chanson didactique de test de batterie par Heka"
+
+msgid "Drums"
+msgstr "Batterie"
+
+msgid "Dual Lyric Prevention"
+msgstr "Prévention des Doublons"
+
+msgid "During SP & Green"
+msgstr "Pendant le SP & Vert"
+
+msgid "During SP Only"
+msgstr "Pendant le SP Uniquement"
+
+msgid "Early"
+msgstr "Tôt"
+
+msgid "Early Hit Window Adjustment"
+msgstr "Ajustement de la Fenêtre de Frappe Prématurée"
+
+msgid "Early Hit-window"
+msgstr "Fenêtre de Frappe Prématurée"
+
+msgid "Easy"
+msgstr "Facile"
+
+msgid "Easy Assist"
+msgstr "Assistance Facile"
+
+msgid "Easy Assist Mode"
+msgstr "Méthode d'Assistance Facile"
+
+msgid "Edit Existing Song"
+msgstr "Éditer une Chanson Existante"
+
+msgid "Editing Help"
+msgstr "Aide de l'Éditeur"
+
+msgid "Editing keys: "
+msgstr "Édition des touches : "
+
+msgid "Effects Debug"
+msgstr "Débogage des Effets"
+
+msgid "Effects Display Mode"
+msgstr "Méthode d'Affichage des Effets"
+
+msgid "Effects Mode"
+msgstr "Type d'Effets"
+
+msgid "Effects Save SP"
+msgstr "Les Effets Économisent du SP"
+
+msgid "Effects Saved SP"
+msgstr "Les Effets Économisèrent du SP"
+
+msgid "Elapsed"
+msgstr "Écoulé"
+
+msgid "Enable Jurgen"
+msgstr "Activer Jurgen"
+
+msgid "Enabled"
+msgstr "Activé(e)"
+
+msgid "End of Career"
+msgstr "Fin de Carrière"
+
+msgid "Enforce"
+msgstr "Empêcher"
+
+msgid "English"
+msgstr "Anglais"
+
+msgid "English (reversed)"
+msgstr "Anglais (à l'envers)"
+
+msgid "Enter - Make note (hold and move for long notes), "
+msgstr ""
+"Entrée - Créer une note (maintenir appuyé et déplacer pour de "
+"longues notes), "
+
+msgid "Enter A/V delay in milliseconds"
+msgstr "Entrez le décalage A/V en millisecondes"
+
+msgid "Enter Artist Name"
+msgstr "Entrez le Nom de l'Artiste"
+
+msgid "Enter Beats per Minute Value"
+msgstr "Entrez le nombre de Battements par Minute"
+
+msgid "Enter Song Name"
+msgstr "Entrez le Nom de la Chanson"
+
+msgid "Enter a name for the song."
+msgstr "Donnez un nom à la chanson."
+
+msgid "Enter cassette color in HTML (#RRGGBB) format."
+msgstr "Entrez la couleur de la cassette au format HTML (#RRVVBB)."
+
+msgid "Enter the path to the mounted Guitar Hero (tm) DVD"
+msgstr "Entrez le point de montage du DVD de Guitar Hero (tm)"
+
+msgid "Enter the server address:"
+msgstr "Entrez l'adresse du serveur :"
+
+msgid "Enter your name:"
+msgstr "Entrez votre nom :"
+
+msgid "Estimate Beats per Minute"
+msgstr "Estimer le nombre de Battements par Minute"
+
+msgid "Even More"
+msgstr "Encore Plus"
+
+msgid "Expert"
+msgstr "Expert"
+
+msgid ""
+"Extracting %s by %s. %d of %d songs imported. Yeah, this is going to take "
+"forever."
+msgstr ""
+"Extraction de %s par %s. %d chansons sur %d importées. Ouais, ça va "
+"prendre une éternité."
+
+msgid "FPS Limiter"
+msgstr "Limitation des IPS "
+
+msgid "FPS: %.2f"
+msgstr "IMS : %.2f"
+
+msgid "Face-Off"
+msgstr "Face À Face"
+
+msgid "Filter: %s"
+msgstr "Filtre : %s"
+
+msgid "First Note"
+msgstr "À la Première Note"
+
+msgid "FoF"
+msgstr "FoF"
+
+msgid "FoFiX Co-Op"
+msgstr "Co-Op FoFiX"
+
+msgid "FoFiX needs to restart to apply setting changes."
+msgstr ""
+"FoFiX a besoin de redémarrer pour appliquer les changements de param"
+"ètre."
+
+msgid "Font Mode"
+msgstr "Méthode d'Affichage des Polices"
+
+msgid "Frames per Second"
+msgstr "Images par Seconde"
+
+msgid "French"
+msgstr "Français"
+
+msgid "French (reform 1990)"
+msgstr "Français (Réforme 1990)"
+
+msgid "Fret Glow Color"
+msgstr "Couleur des Effets Lumineux des Cases"
+
+msgid "Fretboard Settings"
+msgstr "Paramètres de la Touche"
+
+msgid "Frets Under Notes"
+msgstr "Cases Recouvertes par les Notes"
+
+msgid "Friendly"
+msgstr "Conviviale"
+
+msgid "Full (FoF)"
+msgstr "Entière (FoF)"
+
+msgid "Fullscreen Mode"
+msgstr "Mode Plein Écran"
+
+msgid "GH"
+msgstr "GH"
+
+msgid "GH Co-Op"
+msgstr "Co-Op GH"
+
+msgid "GH SP Lights"
+msgstr "GH - Lampes du SP"
+
+msgid "GH Style"
+msgstr "Type GH"
+
+msgid "GH2"
+msgstr "GH2"
+
+msgid "GH2 Sloppy"
+msgstr "GH2 Laxiste"
+
+msgid "GH2 Sloppy Mode"
+msgstr "GH2 Mode Laxiste"
+
+msgid "GH2 Strict"
+msgstr "GH2 Strict"
+
+msgid "GH3"
+msgstr "GH3"
+
+msgid "GUITAR"
+msgstr "GUITARE"
+
+msgid "Gameplay"
+msgstr "Jouabilité"
+
+msgid "Gameplay Settings"
+msgstr "Paramètres de Jouabilité"
+
+msgid "Genre"
+msgstr "Genre"
+
+msgid "German"
+msgstr "Allemand"
+
+msgid "Get Ready to Rock"
+msgstr "Tenez-vous Prêt à Mettre le Feu"
+
+msgid "Good"
+msgstr "Bon"
+
+msgid "Graphical Submenus"
+msgstr "Sous-Menus Graphiques"
+
+msgid "Great"
+msgstr "Fantastique"
+
+msgid "Guitar"
+msgstr "Guitare"
+
+msgid "Guitar Solo Neck"
+msgstr "Manche Lors d'un Solo de Guitare"
+
+msgid "Guitar Volume"
+msgstr "Volume de la Guitare"
+
+msgid "Guntherswarchzhaffenstrassen."
+msgstr "Guntherswarchzhaffenstrassen."
+
+msgid "HO/PO"
+msgstr "HO/PO"
+
+msgid "HO/PO After Chord"
+msgstr "HO/PO Après Accord"
+
+msgid "HO/PO Debug"
+msgstr "Débogage HO/PO"
+
+msgid "HO/PO Frequency"
+msgstr "Fréquence HO/PO"
+
+msgid "HO/PO Frequency Cheats"
+msgstr "Fréquence HO/PO - Triche"
+
+msgid "HO/PO Note Marks"
+msgstr "Marques de Note HO/PO"
+
+msgid "HO/PO Settings"
+msgstr "Paramètres HO/PO"
+
+msgid "HO/PO System"
+msgstr "Système HO/PO"
+
+msgid "HOPO"
+msgstr "HO/PO"
+
+msgid "HOPO Disabled!"
+msgstr "HO/PO Désactivés !"
+
+msgid "HOPO Frequency: Even More"
+msgstr "Fréquence HO/PO : Encore Plus"
+
+msgid "HOPO Frequency: Least"
+msgstr "Fréquence HO/PO : Le Moins Possible"
+
+msgid "HOPO Frequency: Less"
+msgstr "Fréquence HO/PO : Moins"
+
+msgid "HOPO Frequency: More"
+msgstr "Fréquence HO/PO : Plus"
+
+msgid "HOPO Frequency: Most"
+msgstr "Fréquence HO/PO : Le Plus Possible"
+
+msgid "HOPOs"
+msgstr "HOPO"
+
+msgid "Half (GH2)"
+msgstr "Moitié (GH2)"
+
+msgid "Handicap"
+msgstr "Handicap"
+
+msgid "Hard"
+msgstr "Difficile"
+
+msgid "Hebrew"
+msgstr "Hébreu"
+
+msgid "Hide"
+msgstr "Cacher"
+
+msgid "Hide Advanced Options"
+msgstr "Cacher les Options Avancées"
+
+msgid "Hit Accuracy Pos"
+msgstr "Pos. de l'indicateur de Précision de Frappe"
+
+msgid "Hit Margin"
+msgstr "Marge de Frappe"
+
+msgid "Hit Window"
+msgstr "Fenêtre de Frappe"
+
+msgid "Hit Window: Tight!"
+msgstr "Fenêtre de Frappe : Serrée !"
+
+msgid "Hit Window: Tightest!"
+msgstr "Fenêtre de Frappe : La Plus Serrée Possible !"
+
+msgid "Hit Window: Wider"
+msgstr "Fenêtre de Frappe : Plus Large"
+
+msgid "Hit Window: Widest"
+msgstr "Fenêtre de Frappe : La Plus Large"
+
+msgid "Hit-Window Cheat"
+msgstr "Fenêtre de Frappe - Triche"
+
+msgid "Hitflames Color"
+msgstr "Couleur des Hitflames"
+
+msgid "Honorary Credits to:"
+msgstr "Crédits Honoraires à :"
+
+msgid "Host Multiplayer Game"
+msgstr "Héberger une Partie Multijoueur"
+
+msgid "However, zie most important"
+msgstr "Cependant, zie plus important"
+
+msgid "I am your new god, little girls."
+msgstr "Je suis votre nouveau dieu, petites filles."
+
+msgid "I use the whole keyboard."
+msgstr "J'utilise le clavier entier."
+
+msgid "If I play that any faster,"
+msgstr "Si je joue ça plus vite,"
+
+msgid "If you can, please provide a link to your original posting"
+msgstr ""
+"Si possible, fournissez s'il-vous-plait un lien vers l'affichage original"
+
+msgid "If you see your work included in this game and you aren't"
+msgstr "Si vous voyez votre œuvre incluse dans ce jeu et que vous n'êtes"
+
+msgid "Ignore Open Strums"
+msgstr "Ignorer les Frappes de Corde à Vide"
+
+msgid "Import GH(tm) Songs"
+msgstr "Importer des Chansons de GH(tm)"
+
+msgid "Import New Song"
+msgstr "Importer une Nouvelle Chanson"
+
+msgid "Importing Songs"
+msgstr "Import des Chansons"
+
+msgid "Importing..."
+msgstr "Import..."
+
+msgid "In Order"
+msgstr "Dans l'Ordre"
+
+msgid "In-Game Display Settings"
+msgstr "Paramètres d'Affichage En Jeu"
+
+msgid "In-Game Font Shadow"
+msgstr "En Jeu, Ombre de la Police"
+
+msgid "Inc. Neck Mode"
+msgstr "Mode de Montée du Manche"
+
+msgid "Instrument (Setlist Score)"
+msgstr "Instrument (Score de la Setlist)"
+
+msgid "It was an oversight."
+msgstr "C'était une erreur."
+
+msgid "Join Multiplayer Game"
+msgstr "Rejoindre une Partie Multijoueur"
+
+msgid "Jurgen FoF tutorial inspired by adam02"
+msgstr "Tutoriel FoF de Jurgen inspiré par adam02"
+
+msgid "Jurgen Logic"
+msgstr "Logique de Jurgen"
+
+msgid "Jurgen Played!"
+msgstr "Jurgen Joua !"
+
+msgid "Jurgen Player"
+msgstr "Jurgen est le Joueur"
+
+msgid "Jurgen Settings"
+msgstr "Paramètres de Jurgen"
+
+msgid "Jurgen is here"
+msgstr "Jurgen est ici"
+
+msgid "Jurgen was here"
+msgstr "Jurgen était ici"
+
+msgid "Keep on going"
+msgstr "Continuent"
+
+msgid "Key Conflicts"
+msgstr "Conflits de Touches"
+
+msgid "Keyset"
+msgstr "Jeu de touches"
+
+msgid "Kick Bass Sound"
+msgstr "Son de la Grosse Caisse"
+
+msgid "Kill Volume"
+msgstr "Volume du Kill"
+
+msgid "Killswitch"
+msgstr "Killswitch"
+
+msgid "Killswitch %d%%"
+msgstr "Killswith à %d%%"
+
+msgid "Label Type"
+msgstr "Type d'Étiquette"
+
+msgid "Lamina Frames"
+msgstr "Images Lamina"
+
+msgid "Lamina Screen"
+msgstr "Écran Lamina"
+
+msgid "Language"
+msgstr "Langue"
+
+msgid "Large Drum Neck"
+msgstr "Manche Large pour la Batterie"
+
+msgid "Late"
+msgstr "Tard"
+
+msgid "Lead"
+msgstr "Guitare Solo"
+
+msgid "Least"
+msgstr "Le Moins Possible"
+
+msgid "Left"
+msgstr "à Gauche"
+
+msgid "Left-Bottom Corner"
+msgstr "en Bas à Gauche"
+
+msgid "Lefty Mode"
+msgstr "Mode Gaucher"
+
+msgid "Less"
+msgstr "Moins"
+
+msgid "List"
+msgstr "Liste"
+
+msgid "List All"
+msgstr "Tout Lister"
+
+msgid "List/CD"
+msgstr "Liste/CD"
+
+msgid "Loading Phrases"
+msgstr "Phrases de Chargement"
+
+msgid "Loading Preview..."
+msgstr "Chargement de l'Aperçu..."
+
+msgid "Loading necks..."
+msgstr "Chargement des manches..."
+
+msgid "Loading song..."
+msgstr "Chargement de la chanson..."
+
+msgid "Loading..."
+msgstr "Chargement..."
+
+msgid "Lobby (%d players)"
+msgstr "Salle (%d joueurs)"
+
+msgid "Log Class Inits"
+msgstr "Consigner les Initialisations de Classe"
+
+msgid "Log INI Reads"
+msgstr "Consigner les Lectures INI"
+
+msgid "Log Loadings"
+msgstr "Consigner les Chargements"
+
+msgid "Log MIDI Sections"
+msgstr "Consigner les Sections MIDI"
+
+msgid "Log Marker Notes"
+msgstr "Consigner les Notes Repère"
+
+msgid "Log SP Misses"
+msgstr "Consigner les SP Manqués"
+
+msgid "Log Settings"
+msgstr "Paramètres du Fichier Journal"
+
+msgid "Log Undefined GETs"
+msgstr "Consigner les GET Indéfinis"
+
+msgid "Log Unedited MIDIs"
+msgstr "Consigner les MIDI Non Édités"
+
+msgid "Loud"
+msgstr "Fort"
+
+msgid "Lyric Display Mode"
+msgstr "Mode d'Affichage des Paroles"
+
+msgid "Lyrics Settings"
+msgstr "Paramètres des Paroles"
+
+msgid "MFH-Early"
+msgstr "MFH-Anticipée"
+
+msgid "MFH-OnTime1"
+msgstr "MFH-ÀTemps1"
+
+msgid "MFH-OnTime2"
+msgstr "MFH-ÀTemps2"
+
+msgid "MIDI Based"
+msgstr "Basée sur les informations MIDI"
+
+msgid "Made with:"
+msgstr "Créé avec :"
+
+msgid "Main Graphic Contributors:"
+msgstr "Contributeurs Graphiques Principaux :"
+
+msgid "Major Donations:"
+msgstr "Dons Principaux :"
+
+msgid ""
+"Make sure you have at least 500 megabytes of free disk space before using "
+"this importer."
+msgstr ""
+"Assurez-vous d'avoir au moins 500 mébioctets d'espace libre sur le disque "
+"avant d'utiliser cet importateur."
+
+msgid "Manual"
+msgstr "Manuel"
+
+msgid "Manual / Fills"
+msgstr "Manuel / Remplissage"
+
+msgid "Medium"
+msgstr "Moyenne"
+
+msgid "Medium Assist"
+msgstr "Assistance Moyenne"
+
+msgid "Medium Assist Mode"
+msgstr "Méthode d'Assistance Moyenne"
+
+msgid "Messy"
+msgstr "Désordonné"
+
+msgid "Miss Pauses Anim"
+msgstr "Rater Mets l'Anim. en Pause"
+
+msgid "Miss Volume"
+msgstr "Volume des Notes Manquées"
+
+msgid "Missed Notes"
+msgstr "Notes Manquées"
+
+msgid "Mod settings"
+msgstr "Paramètres des Modules"
+
+msgid "Mods, Cheats, AI"
+msgstr "Modules, Triche, IA"
+
+msgid "More"
+msgstr "Plus"
+
+msgid "Most"
+msgstr "Le Plus Possible"
+
+msgid "Move down"
+msgstr "Aller en bas"
+
+msgid "Move left"
+msgstr "Aller à gauche"
+
+msgid "Move right"
+msgstr "Aller à droite"
+
+msgid "Move up"
+msgstr "Aller en haut"
+
+msgid "Mute Last Second"
+msgstr "Rendre Muette la Dernière Seconde"
+
+msgid "My name is Jurgen"
+msgstr "Mon nom est Jurgen"
+
+msgid "Neck"
+msgstr "Manche"
+
+msgid "Never"
+msgstr "Jamais"
+
+msgid "New"
+msgstr "Nouvelle"
+
+msgid "New System"
+msgstr "Nouveau Système"
+
+msgid "Nil"
+msgstr "Néant"
+
+msgid "No"
+msgstr "Non"
+
+msgid "No Fail"
+msgstr "Pas d'Échec"
+
+msgid "No Fail Mode"
+msgstr "Mode Sans Échec"
+
+msgid "No Particular Order"
+msgstr "Sans Ordre De Préférence"
+
+msgid "No check"
+msgstr "Ignorer"
+
+msgid ""
+"No songs could be imported, sorry. Check the log files for more information."
+msgstr ""
+"Aucune chanson n'a pu être importée, désolé. Vérifier les "
+"fichiers de registre pour plus d'information."
+
+msgid "No tutorials found!"
+msgstr "Tutoriels introuvables !"
+
+msgid "No!"
+msgstr "Non!"
+
+msgid "NoName"
+msgstr "SansNom"
+
+msgid "None"
+msgstr "Aucun"
+
+msgid "None (RB2)"
+msgstr "Aucune (RB2)"
+
+msgid "Normal"
+msgstr "Normal(e)"
+
+msgid "Not found"
+msgstr "Introuvable"
+
+msgid "Note Hit-window"
+msgstr "Fenêtre de Frappe de la Note"
+
+msgid "Note Streak!!!"
+msgstr "Notes d'Affilée !!!"
+
+msgid "Notify"
+msgstr "Notifier"
+
+msgid "Now, hold down two frets."
+msgstr "Maintenant, maintiens enfoncée deux cases."
+
+msgid "Numeric"
+msgstr "Numérique"
+
+msgid "Off"
+msgstr "Désactivé(e)"
+
+msgid "Off (Auto Max FPS)"
+msgstr "Désactivée (Max d'IPS Auto)"
+
+msgid "Off (Disabled)"
+msgstr "Absentes (Désactivées)"
+
+msgid "Ogg Vorbis encoder (oggenc) not found. Please install it and try again."
+msgstr ""
+"Encodeur Ogg Vorbis (oggenc) introuvable. Veuillez l'installer et essayez "
+"à nouveau."
+
+msgid ""
+"Ogg Vorbis encoder (oggenc.exe) not found. Please install it to the game "
+"directory and try again."
+msgstr ""
+"Encodeur Ogg Vorbis (oggenc.exe) introuvable. Veuillez l'installer dans le r"
+"épertoire du jeu et essayez à nouveau."
+
+msgid "Ok, let's try it again."
+msgstr "D'accord, essayons encore."
+
+msgid "Ok, that is it for now."
+msgstr "D'accord, c'est tout pour l'instant."
+
+msgid "Ok, that was about"
+msgstr "D'accord, ça faisait à peu près"
+
+msgid "Ok, there comes your first note."
+msgstr "D'accord, voilà ta première note."
+
+msgid "Ok, wait for it."
+msgstr "D'accord, attends-la."
+
+msgid "Okay"
+msgstr "Acceptable"
+
+msgid "Old"
+msgstr "Ancienne"
+
+msgid "On"
+msgstr "Activé(e)"
+
+msgid "On (Set Below)"
+msgstr "Activée (Définir Ci-dessous)"
+
+msgid "On Hit"
+msgstr "Lors de la Frappe"
+
+msgid "One Song In This Setlist"
+msgstr "Une Chanson Dans Cette Setlist"
+
+msgid "One more song can't hurt!"
+msgstr "Une chanson de plus ne peut pas faire de mal !"
+
+msgid "Only Note Streaks"
+msgstr "Uniquement les Enchainements de Note"
+
+msgid "Original"
+msgstr "Originelle"
+
+msgid "Original Score:"
+msgstr "Score Originel :"
+
+msgid "Other Credits:"
+msgstr "Autres Crédits :"
+
+msgid "Other Donations:"
+msgstr "Autres Dons :"
+
+msgid "Overdrive Ready"
+msgstr "Distorsion Prête"
+
+msgid "Overlay"
+msgstr "En Surimpression"
+
+msgid "P1 Analog Effects"
+msgstr "Effets Analogiques du J1"
+
+msgid "P1 Cancel"
+msgstr "J1, Annuler"
+
+msgid "P1 Fret #1"
+msgstr "J1, Case #1"
+
+msgid "P1 Fret #2"
+msgstr "J1, Case #2"
+
+msgid "P1 Fret #3"
+msgstr "J1, Case #3"
+
+msgid "P1 Fret #4"
+msgstr "J1, Case #4"
+
+msgid "P1 Fret #5"
+msgstr "J1, Case #5"
+
+msgid "P1 Killswitch"
+msgstr "J1, Killswitch"
+
+msgid "P1 Lefty mode"
+msgstr "Mode Gaucher J1"
+
+msgid "P1 Move down"
+msgstr "J1, Aller en bas"
+
+msgid "P1 Move left"
+msgstr "J1, Aller à gauche"
+
+msgid "P1 Move right"
+msgstr "J1, Aller à droite"
+
+msgid "P1 Move up"
+msgstr "J1, Aller en haut"
+
+msgid "P1 Pick"
+msgstr "J1, Médiator"
+
+msgid "P1 Secondary Pick"
+msgstr "J1, Médiator Secondaire"
+
+msgid "P1 StarPower"
+msgstr "J1, StarPower"
+
+msgid "P1 Two Key Chords Only"
+msgstr "Accords à 2 Doigts Seulement, pour J1"
+
+msgid "P2 Analog Effects"
+msgstr "Effets Analogiques du J2"
+
+msgid "P2 Cancel"
+msgstr "J2, Annuler"
+
+msgid "P2 Fret #1"
+msgstr "J2, Case #1"
+
+msgid "P2 Fret #2"
+msgstr "J2, Case #2"
+
+msgid "P2 Fret #3"
+msgstr "J2, Case #3"
+
+msgid "P2 Fret #4"
+msgstr "J2, Case #4"
+
+msgid "P2 Fret #5"
+msgstr "J2, Case #5"
+
+msgid "P2 Killswitch"
+msgstr "J2, Killswitch"
+
+msgid "P2 Lefty mode"
+msgstr "Mode Gaucher J2"
+
+msgid "P2 Menu Navigate"
+msgstr "Navigation dans les Menus pour J2"
+
+msgid "P2 Move down"
+msgstr "J2, Aller en bas"
+
+msgid "P2 Move left"
+msgstr "J2, Aller à gauche"
+
+msgid "P2 Move right"
+msgstr "J2, Aller à droite"
+
+msgid "P2 Move up"
+msgstr "J2, Aller en haut"
+
+msgid "P2 Pick"
+msgstr "J2, Médiator"
+
+msgid "P2 Secondary Pick"
+msgstr "J2, Médiator Secondaire"
+
+msgid "P2 StarPower"
+msgstr "J2, StarPower"
+
+msgid "P2 Two Key Chords Only"
+msgstr "Accords à 2 Doigts Seulement, pour J2"
+
+msgid "PS2/PS3/Wii"
+msgstr "PS2/PS3/Wii"
+
+msgid "Page Up/Down - Change difficulty"
+msgstr "Page Précédente/Suivante - Changer la difficulté"
+
+msgid "Painful"
+msgstr "Douloureux"
+
+msgid "Part"
+msgstr "Partition"
+
+msgid "Partial Star Continuous Fillup"
+msgstr "Remplissage Continu des Étoiles Partielles"
+
+msgid "Party Mode"
+msgstr "Mode Festif"
+
+msgid "Party Mode Timer"
+msgstr "Compteur du Mode Festif"
+
+msgid "Past Coders:"
+msgstr "Programmeurs Précédents :"
+
+msgid "Percent"
+msgstr "Pour-cent"
+
+msgid "Percentage"
+msgstr "Pourcentage"
+
+msgid "Perfect"
+msgstr "Parfait"
+
+msgid "Perfect!!"
+msgstr "Parfait !!"
+
+msgid "Performance"
+msgstr "Performance"
+
+msgid "Pick!"
+msgstr "Gratte !"
+
+msgid "Pig latin"
+msgstr "Pig Latin"
+
+msgid "Pitchbend"
+msgstr "Portamento"
+
+msgid "Play To Advance"
+msgstr "Jouez pour Avancer"
+
+msgid "Play To Advance."
+msgstr "Jouez Pour Avancer."
+
+msgid "Play with the keys and press Escape when you're done."
+msgstr ""
+"Testez les touches puis appuyez sur Échap lorsque vous avez terminé."
+
+msgid "Played %d time"
+msgstr "Jouée %d fois"
+
+msgid "Played %d times"
+msgstr "Jouée %d fois"
+
+msgid "Played %d times."
+msgstr "Jouée %d fois."
+
+msgid "Played Once"
+msgstr "Jouée Une Fois"
+
+msgid "Player"
+msgstr "Joueur"
+
+msgid "Player #%d"
+msgstr "Joueur #%d"
+
+msgid "Player 1 Alt. Keys"
+msgstr "Touches Alt. du Joueur 1"
+
+msgid "Player 1 Choose a difficulty:"
+msgstr "Joueur 1, Choisissez la difficulté :"
+
+msgid "Player 1 Choose a part:"
+msgstr "Joueur 1, Choisissez une partition :"
+
+msgid "Player 1 Keys"
+msgstr "Touches du Joueur 1"
+
+msgid "Player 2 Alt. Keys"
+msgstr "Touches Alt. du Joueur 2"
+
+msgid "Player 2 Bass drum"
+msgstr "Joueur 2, Grosse caisse"
+
+msgid "Player 2 Cancel"
+msgstr "Joueur 2, Annuler"
+
+msgid "Player 2 Choose a difficulty:"
+msgstr "Joueur 2, Choisissez la difficulté :"
+
+msgid "Player 2 Choose a part:"
+msgstr "Joueur 2, Choisissez une partition :"
+
+msgid "Player 2 Drum #1"
+msgstr "Joueur 2, Tom #1"
+
+msgid "Player 2 Drum #2"
+msgstr "Joueur 2, Tom #2"
+
+msgid "Player 2 Drum #3"
+msgstr "Joueur 2, Tom #3"
+
+msgid "Player 2 Drum #4"
+msgstr "Joueur 2, Tom #4"
+
+msgid "Player 2 Keys"
+msgstr "Touches du Joueur 2"
+
+msgid "Player 2 Move down"
+msgstr "Joueur 2, Aller en bas"
+
+msgid "Player 2 Move left"
+msgstr "Joueur 2, Aller à gauche"
+
+msgid "Player 2 Move right"
+msgstr "Joueur 2, Aller à droite"
+
+msgid "Player 2 Move up"
+msgstr "Joueur 2, Aller en haut"
+
+msgid "Player One Assist"
+msgstr "Assistance du Joueur Un"
+
+msgid "Player Two Assist"
+msgstr "Assistance du Joueur Deux"
+
+msgid "Player2"
+msgstr "Joueur2"
+
+msgid "Playing"
+msgstr "Lecture"
+
+msgid "Please keep in mind that it is not easy to trace down and"
+msgstr ""
+"Veuillez s'il-vous-plait garder à l'esprit qu'il n'est pas facile de "
+"retrouver et de"
+
+msgid "Point Of View"
+msgstr "Point De Vue"
+
+msgid "Polish"
+msgstr "Polonais"
+
+msgid "Portuguese"
+msgstr "Portugais"
+
+msgid "Practice"
+msgstr "Entrainement"
+
+msgid "Practice Beat Claps"
+msgstr "Métronome Pendant l'Entrainement"
+
+msgid "Preload Glyph Cache"
+msgstr "Précharger le Cache des Glyphes"
+
+msgid "Preload Song Labels"
+msgstr "Précharger les Étiquettes de Chanson"
+
+msgid "Preparing..."
+msgstr "Préparation..."
+
+msgid "Press Enter to Start Game"
+msgstr "Appuyez sur Entrée pour Démarrer le Jeu"
+
+msgid "Press a key for '%s' or Escape to cancel."
+msgstr "Appuyez sur une touche pour '%s' ou Échap pour annuler."
+
+msgid "Print Frames per Second"
+msgstr "Imprimer les Imagesd par Seconde"
+
+msgid "Pro Face-Off"
+msgstr "Face À Face Pro"
+
+msgid "Process Priority"
+msgstr "Priorité de Traitement"
+
+msgid "Quickplay"
+msgstr "Partie Rapide"
+
+msgid "Quickplay Tiers"
+msgstr "Niveaux en Mode Partie Rapide"
+
+msgid "Quickset"
+msgstr "Règlage Rapide"
+
+msgid "Quiet"
+msgstr "Doux"
+
+msgid "Quit"
+msgstr "Quitter"
+
+msgid "Quit to Main"
+msgstr "Retour au Menu Principal"
+
+msgid "Quit to Main Menu"
+msgstr "Retourner au Menu Principal"
+
+msgid "RB"
+msgstr "RB"
+
+msgid "RB Co-Op"
+msgstr "Co-Op RB"
+
+msgid "RB Graphic Mode"
+msgstr "Mode Graphique RB"
+
+msgid "RB SP Neck Glow"
+msgstr "RB - Lueur du Manche lors du SP"
+
+msgid "RB Small 1x Multiplier"
+msgstr "RB - Petit Multiplicateur 1x"
+
+msgid "RB Style"
+msgstr "Type RB"
+
+msgid "RB original"
+msgstr "RB originelle"
+
+msgid "RB simplified"
+msgstr "RB simplifiée"
+
+msgid "RB+GH"
+msgstr "RB+GH"
+
+msgid "RB2"
+msgstr "RB2"
+
+msgid "RETRY SONG"
+msgstr "RÉESSAYER"
+
+msgid "RF-Mod"
+msgstr "RF-Mod"
+
+msgid "RFmod"
+msgstr "RFmod"
+
+msgid "Random"
+msgstr "Aléatoire"
+
+msgid "Random Song"
+msgstr "Chanson Aléatoire"
+
+msgid "Reading the archive index."
+msgstr "Lecture de l'index de l'archive."
+
+msgid "Reading the song list."
+msgstr "Lecture de la liste des chansons."
+
+msgid "Ready"
+msgstr "Prêt"
+
+msgid "Regular"
+msgstr "Classique"
+
+msgid "Relax, it was an excellent show."
+msgstr "Détendez-vous, le spectacle était excellent."
+
+msgid "Remember Play Count"
+msgstr "Se Souvenir des Fois Jouées"
+
+msgid "Replace"
+msgstr "Remplacer"
+
+msgid "Replay"
+msgstr "Rejouer"
+
+msgid "Reset Career"
+msgstr "Réinitialiser la Carrière"
+
+msgid "Reset this entire career"
+msgstr "Réinitialiser toute cette carrière"
+
+msgid "Resetting career..."
+msgstr "Réinitialisation de la carrière..."
+
+msgid "Results Cheer Loop"
+msgstr "Bouclage de l'Acclamation des Résultats"
+
+msgid "Rhythm"
+msgstr "Guitare Rythmique"
+
+msgid "Rhythm Volume"
+msgstr "Volume Rythmique"
+
+msgid "Right"
+msgstr "à Droite"
+
+msgid "Right-top Corner"
+msgstr "en Haut à Droite"
+
+msgid "Rock Band"
+msgstr "Rock Band"
+
+msgid "Rock Band MIDI Events"
+msgstr "Évènements MIDI de Rock Band"
+
+msgid "Rock Rev"
+msgstr "Rock Revolution"
+
+msgid "Rotating CDs"
+msgstr "CD Pivotants"
+
+msgid "Russian"
+msgstr "Russe"
+
+msgid "SFX Volume"
+msgstr "Volume des Effets Spéciaux"
+
+msgid "SORTING:"
+msgstr "TRI :"
+
+msgid "SP Mode"
+msgstr "Mode SP"
+
+msgid "SP Refill Mode"
+msgstr "Mode de Recharge du SP"
+
+msgid "Same as Fret"
+msgstr "Comme la Case"
+
+msgid "Sample Bits"
+msgstr "Bits d'Échantillonage"
+
+msgid "Sample Frequency"
+msgstr "Fréquence d'Échantillonage"
+
+msgid "Save Song"
+msgstr "Sauvegarder la Chanson"
+
+msgid "Saving..."
+msgstr "Sauvegarde..."
+
+msgid "Score Change"
+msgstr "Au Changement de Score"
+
+msgid "Score SFX"
+msgstr "Effets Sonores Lors du Score"
+
+msgid "Score upload failed!  World charts may be down."
+msgstr ""
+"L'envoi des scores a échoué ! Les hit-parades mondiaux peuvent être "
+"en panne."
+
+msgid "Scores uploaded!"
+msgstr "Scores téléchargés !"
+
+msgid "Screw-Up Sounds"
+msgstr "Sons des Cafouillages"
+
+msgid "Script Lyric Display"
+msgstr "Affichage du Script des Paroles"
+
+msgid "Script Lyric Pos"
+msgstr "Pos. du Script des Paroles"
+
+msgid "Scrolling"
+msgstr "Défilement"
+
+msgid "See Advanced Options"
+msgstr "Voir les Options Avancées"
+
+msgid "Set A/V delay"
+msgstr "Définir le décalage A/V"
+
+msgid "Set Artist Name"
+msgstr "Définir le Nom de l'Artiste"
+
+msgid "Set Beats per Minute"
+msgstr "Définir le nombre de Battements par Minute"
+
+msgid "Set Cassette Color"
+msgstr "Définir la Couleur de la Cassette"
+
+msgid "Set Cassette Label"
+msgstr "Définir l'Étiquette de la Cassette"
+
+msgid "Set Song Name"
+msgstr "Définir le Nom de la Chanson"
+
+msgid "Setlist Display Mode"
+msgstr "Méthode d'Affichage de la Setlist"
+
+msgid "Setlist Settings"
+msgstr "Paramètres de la Setlist"
+
+msgid "Show"
+msgstr "Afficher"
+
+msgid "Show Additional Stats"
+msgstr "Montrer Stat. Additionnelles"
+
+msgid "Show Detailed Handicap"
+msgstr "Montrer l'Handicap Détaillé"
+
+msgid "Show Filepath"
+msgstr "Afficher le Chemin d'Accès des Fichiers"
+
+msgid "Show Fill Status"
+msgstr "Afficher Statut de Remplissage"
+
+msgid "Show Fret Glow Effect"
+msgstr "Montrer les Effets Lumineux des Cases"
+
+msgid "Show HO/PO Indicator"
+msgstr "Afficher l'Indicateur HO/PO"
+
+msgid "Show Hit Accuracy"
+msgstr "Montrer Précision de la Frappe"
+
+msgid "Show In-Game Stats"
+msgstr "En Jeu, Afficher les Stat."
+
+msgid "Show In-Game Text"
+msgstr "En Jeu, Afficher le Texte"
+
+msgid "Show MIDI Lyrics"
+msgstr "Afficher les Paroles MIDI"
+
+msgid "Show MIDI Sections"
+msgstr "Afficher les Sections MIDI"
+
+msgid "Show Partial Stars"
+msgstr "Afficher les Étoiles Partielles"
+
+msgid "Show Setlist Size"
+msgstr "Montrer Taille de la Setlist"
+
+msgid "Show Solo Frame"
+msgstr "Afficher Cadre du Solo"
+
+msgid "Show Solo Stats"
+msgstr "Afficher les Stat. de Solo"
+
+msgid "Show Song Type Icons"
+msgstr "Montrer les Icônes de Genre de Chanson"
+
+msgid "Show Stars In-Game"
+msgstr "En Jeu, Afficher les Étoiles"
+
+msgid "Show Theme Version Tag"
+msgstr "Afficher l'Étiquette de Version du Thème"
+
+msgid "Show Unused Events"
+msgstr "Montrer les Évènements Non Utilisés"
+
+msgid "Show at Song Start"
+msgstr "Montrer en Début de Chanson"
+
+msgid "Simple Lines"
+msgstr "Lignes Simples"
+
+msgid "Single Track Miss"
+msgstr "Notes Manquées Sur Une Piste Unique"
+
+msgid "Slideshow"
+msgstr "Diaporama"
+
+msgid "Slideshow Delay"
+msgstr "Retard du Diaporama"
+
+msgid "Slightly Early"
+msgstr "Légèrement Tôt"
+
+msgid "Slightly Late"
+msgstr "Légèrement Tard"
+
+msgid "Sloppy Mode!"
+msgstr "Mode Laxiste !"
+
+msgid "Solid"
+msgstr "Sérieux"
+
+msgid "Solo Stat Positioning"
+msgstr "Positionnement des Stat. de Solo"
+
+msgid "Solo Tour"
+msgstr "Tournée en Solo"
+
+msgid "Solo!"
+msgstr "Solo !"
+
+msgid "Song Collection"
+msgstr "Collection de Chanson"
+
+msgid "Song HO/PO Freq"
+msgstr "Fréquence des HO/PO Tirée de la Chanson"
+
+msgid "Song Previews"
+msgstr "Aperçus des Chansons"
+
+msgid "Song Slowdown"
+msgstr "Chanson au Ralenti"
+
+msgid "Song Stage"
+msgstr "Scène Spécifique à la Chanson"
+
+msgid "Song Start"
+msgstr "Au Début de la Chanson"
+
+msgid "Song Volume"
+msgstr "Volume de la Chanson"
+
+msgid "Sort Direction"
+msgstr "Direction du Tri"
+
+msgid "Sort Setlist By"
+msgstr "Trier Setlist Selon"
+
+msgid "Sorting"
+msgstr "Tri"
+
+msgid "Source Code available under the GNU General Public License"
+msgstr ""
+"Code Source disponible selon les termes de la la License Publique Gén"
+"érale GNU"
+
+msgid "Space - Play/pause song, "
+msgstr "Espace - Jouer/mettre en pause la chanson, "
+
+msgid "Spanish"
+msgstr "Espagnol"
+
+msgid "Speed Factor"
+msgstr "Facteur de Vitesse"
+
+msgid "Speed Select:"
+msgstr "Choix de la Vitesse :"
+
+msgid "Stage 1/8: Splitting VGS file"
+msgstr "Étape 1/8: Division du fichier VGS"
+
+msgid "Stage 6/8: Joining song stereo tracks"
+msgstr "Étape 6/8: Assemblage des pistes stéréo de la chanson"
+
+msgid "Stage 7/8: Joining guitar stereo tracks"
+msgstr "Étape 7/8: Assemblage des pistes stéréo de guitare"
+
+msgid "Stage 8/8: Compressing tracks"
+msgstr "Étape 8/8: Compression des pistes"
+
+msgid "Stage Animation"
+msgstr "Animation de la Scène"
+
+msgid "Stage Selection"
+msgstr "Sélection de la Scène"
+
+msgid "Stage Slideshow"
+msgstr "Diaporama des Scènes"
+
+msgid "Stages Options"
+msgstr "Options des Scènes"
+
+msgid "Standard"
+msgstr "Standard"
+
+msgid "Star Power Ready"
+msgstr "Star Power Prêt"
+
+msgid "Star Scoring Style"
+msgstr "Type d'Étoiles du Score"
+
+msgid "Star Updates"
+msgstr "Mise à Jour des Étoiles"
+
+msgid "StarPower"
+msgstr "StarPower"
+
+msgid "Starpower Claps"
+msgstr "Applaudissements StarPower"
+
+msgid "Start & End"
+msgstr "Au Début & À La Fin"
+
+msgid "Start Only"
+msgstr "Au Début Seulement"
+
+msgid "Start Section:"
+msgstr "Commencer par la Section :"
+
+msgid "Stat Decimal Places"
+msgstr "Nombre de Décimales des Stat."
+
+msgid "Static"
+msgstr "Statiques"
+
+msgid "Static Strings"
+msgstr "Cordes Statiques"
+
+msgid "Stopped"
+msgstr "Arrêtée"
+
+msgid "Sustain Muting"
+msgstr "Étouffement du Sustain"
+
+msgid "Swedish"
+msgstr "Suédois"
+
+msgid ""
+"Tap the Space bar to the beat of the song. Press Enter when done or Escapeto "
+"cancel."
+msgstr ""
+"Tapez sur la barre d'espace au rythme de la chanson. Appuyez sur Entrée "
+"quand vous avez fini ou Échappour annuler."
+
+msgid "Team Hero:"
+msgstr " Team Hero :"
+
+msgid "Test Drums"
+msgstr "Tester la Batterie"
+
+msgid "Test Guitars"
+msgstr "Tester les Guitares"
+
+msgid "Thank you for your contribution."
+msgstr "Merci pour votre participation."
+
+msgid "Thanks for playing!"
+msgstr "Merci d'avoir joué !"
+
+msgid "That isn't a color."
+msgstr "Ça n'est pas une couleur."
+
+msgid "That isn't a number."
+msgstr "Ça n'est pas un nombre."
+
+msgid "That key is already in use. Please choose another."
+msgstr ""
+"Cette touche est déjà utilisée. Veuillez en choisir une autre."
+
+msgid "That song already exists."
+msgstr "Cette chanson existe déjà."
+
+msgid "That's how it's done!"
+msgstr "C'est comme ça que ça se passe !"
+
+msgid "That's not it. Try again."
+msgstr "Ça n'est pas ça. Essayez encore."
+
+msgid "Theme"
+msgstr "Thème"
+
+msgid "Theme Display Settings"
+msgstr "Paramètres d'Affichage du Thème"
+
+msgid "Theme Specific"
+msgstr "Spécifique Au Thème"
+
+msgid "Theme-Based"
+msgstr "Basée sur le Thème"
+
+msgid "Then we can properly credit you."
+msgstr "Ensuite nous pourrons correctement vous créditer."
+
+msgid "There Are %d Songs In This Setlist."
+msgstr "Il Y A %d Chansons Dans Cette Setlist."
+
+msgid "There Is 1 Song In This Setlist"
+msgstr "Il Y A 1 Chanson Dans Cette Setlist"
+
+msgid "There Is 1 Song In This Setlist."
+msgstr "Il Y A 1 Chanson Dans Cette Setlist."
+
+msgid "There are %d songs in this folder"
+msgstr "Il y a %d chansons dans ce répertoire"
+
+msgid "There are no changes to save."
+msgstr "Il n'y a aucun changement à sauvegarder."
+
+msgid "These five frets,"
+msgstr "ces cinq cases,"
+
+msgid "This mod was built on Alarian's mod,"
+msgstr "Ce mod a été fondé sur Alarian's Mod,"
+
+msgid "This song is locked."
+msgstr "Cette chanson est verrouillée."
+
+msgid "Tier"
+msgstr "Niveau"
+
+msgid "Tight"
+msgstr "Serré"
+
+msgid "Tightest"
+msgstr "La Plus Serrée Possible"
+
+msgid "Time Display Format"
+msgstr "Format d'Affichage du Temps"
+
+msgid "Times played"
+msgstr "Fois jouées"
+
+msgid "Title"
+msgstr "Titre"
+
+msgid "To me, that is already obvious."
+msgstr "Pour moi, c'est déjà évident."
+
+msgid "Top"
+msgstr "En haut"
+
+msgid "Truly Amazing!"
+msgstr "Vraiment Incroyable !"
+
+msgid "Tutorials"
+msgstr "Tutoriels"
+
+msgid "Two Note Chords"
+msgstr "Accords à 2 Notes"
+
+msgid "Ultra Wide"
+msgstr "Ultra Large"
+
+msgid "Und hello everyone."
+msgstr "Und bonjour tout le monde."
+
+msgid "Und today I will show you"
+msgstr "Und aujourd'hui je vais te montrer"
+
+msgid "Und up to my tempo."
+msgstr "Und maintenant, à mon rythme."
+
+msgid "Und zie Pick button."
+msgstr "und zie bouton de Médiator."
+
+msgid "Upload Highscores"
+msgstr "Envoyer les Scores"
+
+msgid "Uploading Scores..."
+msgstr "Envoi des Scores..."
+
+msgid "Use (notes-unedited.mid)"
+msgstr "Utiliser (notes-unedited.mid)"
+
+msgid "Use Subfolders"
+msgstr "Utiliser Sous-Répertoires"
+
+msgid "Use Tiers in Quickplay"
+msgstr "Utiliser les Niveaux en Mode Partie Rapide"
+
+msgid "Very Early"
+msgstr "Très Tôt"
+
+msgid "Very Late"
+msgstr "Très Tard"
+
+msgid "Video Resolution"
+msgstr "Résolution Vidéo"
+
+msgid "Volume Settings"
+msgstr "Règlages du Volume"
+
+msgid "WT Style"
+msgstr "Type WT"
+
+msgid "Wait for it."
+msgstr "Attends-la."
+
+msgid "Whammy Changes Sort Order"
+msgstr "Le vibrato Moifie l'Ordre de Tri"
+
+msgid "What an amazing performance!"
+msgstr "Quelle performance incroyable !"
+
+msgid "When I shred,"
+msgstr "Quand je shred,"
+
+msgid "Wide"
+msgstr "Large"
+
+msgid "Widest"
+msgstr "La Plus Large Possible"
+
+msgid "XBOX"
+msgstr "XBOX"
+
+msgid "XBOX Inv"
+msgstr "XBOX Inv"
+
+msgid "Year"
+msgstr "Année"
+
+msgid "Yellow (#3) / Blue (#4) to change:"
+msgstr "Jaune (#3) / Bleu (#4) pour changer :"
+
+msgid "Yellow Fret (#3)"
+msgstr "Case Jaune (#3)"
+
+msgid "Yes"
+msgstr "Oui"
+
+msgid "You Failed!!!!"
+msgstr "Vous Échouâtes !!!!"
+
+msgid "You can already hold down the 1st fret"
+msgstr "Tu peux déjà enfoncer la 1ère case"
+
+msgid "You can now go and sell"
+msgstr "Tu peux maintenant aller vendre"
+
+msgid "You missed it."
+msgstr "Tu l'as manqué."
+
+msgid "You will need it,"
+msgstr "Tu en auras besoin,"
+
+msgid "You will only need"
+msgstr "tu auras juste besoin de"
+
+msgid "Your highscore ranks"
+msgstr "Votre record se classe"
+
+msgid "[Accept Folder]"
+msgstr "[Accepter ce Répertoire]"
+
+msgid "[Parent Folder]"
+msgstr "[Répertoire Parent]"
+
+msgid "__lefttoright__"
+msgstr "__lefttoright__"
+
+msgid "as made famous by"
+msgstr "telle que popularisée par"
+
+msgid "but there was no new highscore."
+msgstr "mais il n'y avait pas de nouveau record."
+
+msgid "but your rank is unknown."
+msgstr "mais votre classement est inconnu."
+
+msgid "by "
+msgstr "par "
+
+msgid "credit every single person who contributed; if your name is"
+msgstr "créditer chaque contributeur ; si votre nom n'est"
+
+msgid "did and when, as specific as possible."
+msgstr "fîtes et quand, aussi circonstancié que possible."
+
+msgid "four billion notes per second."
+msgstr "quatre milliards de notes par seconde."
+
+msgid "how to play this game."
+msgstr "comment jouer à ce jeu."
+
+msgid "in the credits, please leave a polite post stating what you"
+msgstr ""
+"pas dans les crédits, laissez s'il-vous-plait un message poli d"
+"écrivant ce que vous"
+
+msgid "is the Escape button."
+msgstr "c'est le bouton Échap."
+
+msgid "like this."
+msgstr "comme ça."
+
+msgid "ms"
+msgstr "ms"
+
+msgid "not included, it was not meant to slight you."
+msgstr "pas inclus, ce n'était pas dans le but de vous sous-estimer."
+
+msgid "oGL Hack"
+msgstr "Hack oGL"
+
+msgid "of the work in question."
+msgstr "du travail concerné."
+
+msgid "on the world starpower chart!"
+msgstr "ème au hit-parade starpower mondial !"
+
+msgid "or you'll just hurt yourself."
+msgstr "ou tu risques de te blesser."
+
+msgid "pts"
+msgstr "pts"
+
+msgid "settings"
+msgstr " ; paramètres"
+
+msgid "that you SUCK."
+msgstr "que tu CRAINS."
+
+msgid "tut"
+msgstr "tut"
+
+msgid "when you finally realize"
+msgstr "quand tu te seras enfin aperçu"
+
+msgid "which was built on RogueF's RF_mod 4.15,"
+msgstr "qui était fondé sur RF-Mod 4.15 de Rogue_F,"
+
+msgid "which was built on UltimateCoffee's Ultimate mod,"
+msgstr "lui-même fondé sur l'Ultimate Mod d'Ultimate Coffee,"
+
+msgid "which was created by Unreal Voodoo"
+msgstr "créé par Unreal Voodoo"
+
+msgid "which was, of course, built on Frets on Fire 1.2.451,"
+msgstr "qui était, bien entendu, basé sur Frets on Fire 1.2.451,"
+
+msgid "your keyboards on Ebay."
+msgstr "ton clavier sur eBay."
+
+msgid "your minds would just blow up."
+msgstr "tes méninges pourraient exploser."

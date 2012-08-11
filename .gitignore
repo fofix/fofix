@@ -4,6 +4,7 @@
 *.exe.log
 *.dll
 *.orig
+*.mo
 .project
 .pydevproject
 .settings

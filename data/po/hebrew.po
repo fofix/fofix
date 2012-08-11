@@ -1,0 +1,157 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"POT-Creation-Date: \n"
+"PO-Revision-Date: 2006-11-04 13:15+0200\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "*Sigh*"
+msgstr "*אנחה*"
+
+msgid "Ah yes, I know. I'm amazing."
+msgstr "אה, כן. אני מדהים"
+
+msgid "Ah, that was cool."
+msgstr "אה, זה היה קול."
+
+msgid "Ah, you missed it!"
+msgstr "אה, פספסתם!"
+
+msgid "And now, pick up your keyboard"
+msgstr "ועכשיו, הרימו את המקלדת שלכם"
+
+msgid "And now, try this super easy lick."
+msgstr "עכשיו, נסו את הסולם הקליל הזה:"
+
+msgid "And remember one thing."
+msgstr "ותזכרו דבר אחד:"
+
+msgid "BUT DON'T PICK IT YET!"
+msgstr "אבל לא לפרוט עדיין!"
+
+msgid "Because you SUCK."
+msgstr "כי אתם עלובים"
+
+msgid "Bigtime."
+msgstr "שחבל על הזמן."
+
+msgid "But since you SUCK,"
+msgstr "אבל מכיוון שאתם עלובים,"
+
+msgid "Check this sh*t!"
+msgstr "קבלו את זה!"
+
+msgid "Don't try this,"
+msgstr "אל תנסו את זה,"
+
+msgid "Guntherswarchzhaffenstrassen."
+msgstr "גונתרשוורצהאפנשטראסן."
+
+msgid "However, zie most important"
+msgstr "אבל, החשוב ביותר"
+
+msgid "I am your new god, little girls."
+msgstr "אני האליל החדש שלכם, ילדות קטנות."
+
+msgid "I use the whole keyboard."
+msgstr "אני משתמש בכל המקלדת."
+
+msgid "If I play that any faster,"
+msgstr "אם אנגן את זה יותר מהר,"
+
+msgid "My name is Jurgen"
+msgstr "שמי הוא יורגן"
+
+msgid "No!"
+msgstr "לא!"
+
+msgid "Now, hold down two frets."
+msgstr "עכשיו, תלחצו על שני מיתרים."
+
+msgid "Ok, let's try it again."
+msgstr "אוקיי, בואו ננסה שוב."
+
+msgid "Ok, that is it for now."
+msgstr "אוקיי, זה מספיק לעכשיו."
+
+msgid "Ok, that was about"
+msgstr "אוקיי, זה היה בערך "
+
+msgid "Ok, there comes your first note."
+msgstr "אוקיי, הנה מגיע התו הראשון שלכם."
+
+msgid "Ok, wait for it."
+msgstr "אוקיי, חכו לזה."
+
+msgid "These five frets,"
+msgstr "את חמשת המיתרים האלה,"
+
+msgid "To me, that is already obvious."
+msgstr "לי זה כבר ברור."
+
+msgid "Und hello everyone."
+msgstr "ושלום כולם."
+
+msgid "Und today I will show you"
+msgstr "והיום אני אראה לכם"
+
+msgid "Und up to my tempo."
+msgstr "ונעלה לקצב שלי."
+
+msgid "Und zie Pick button."
+msgstr "ואת כפתור המפרט."
+
+msgid "Wait for it."
+msgstr "חכו לזה..."
+
+msgid "When I shred,"
+msgstr "כשאני קורע,"
+
+msgid "You can already hold down the 1st fret"
+msgstr "אפשר כבר ללחוץ על המיתר הראשון"
+
+msgid "You can now go and sell"
+msgstr "אתם יכולים ללכת ולמכור"
+
+msgid "You missed it."
+msgstr "החמצתם אותו."
+
+msgid "You will need it,"
+msgstr "אתם תזדקקו לו,"
+
+msgid "You will only need"
+msgstr "אתם תצטרכו רק"
+
+msgid "__lefttoright__"
+msgstr "__righttoleft__"
+
+msgid "four billion notes per second."
+msgstr "ארבעה מליארד תווים בשניה."
+
+msgid "how to play this game."
+msgstr "איך לשחק במשחק הזה."
+
+msgid "is the Escape button."
+msgstr "הוא מקש האסקייפ."
+
+msgid "like this."
+msgstr "ככה."
+
+msgid "or you'll just hurt yourself."
+msgstr "כי אתם תפגעו בעצמכם."
+
+msgid "that you SUCK."
+msgstr "שאתם עלובים,"
+
+msgid "when you finally realize"
+msgstr "כשסוף סוף תבינו"
+
+msgid "your keyboards on Ebay."
+msgstr "את המקלדת שלכם באי-ביי"
+
+msgid "your minds would just blow up."
+msgstr "המוח שלכם יתפוצץ."

@@ -1,0 +1,716 @@
+msgid ""
+msgstr ""
+"#-#-#-#-#  fretsonfire_rus.po (FretsOnFire)  #-#-#-#-#\n"
+"Project-Id-Version: FretsOnFire\n"
+"POT-Creation-Date: 2006-10-27 23:23+EEST\n"
+"PO-Revision-Date: 2006-10-30 15:02+0300\n"
+"Last-Translator: Clayman <dan.konovalov@gmail.com>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: pygettext.py 1.5\n"
+"Language-Team: \n"
+"#-#-#-#-#  tutorial_rus.po  #-#-#-#-#\n"
+"Project-Id-Version: \n"
+"POT-Creation-Date: \n"
+"PO-Revision-Date: 2006-10-30 20:03+0300\n"
+"Last-Translator: Clayman <dan.konovalov@gmail.com>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "%.2f beats per minute"
+msgstr "%.2f битов в минту."
+
+msgid "%d points is a new high score! Please enter your name:"
+msgstr "%d очков - это новый рекорд! Введите свое имя:"
+
+msgid "%s [Folder]"
+msgstr "%s [Папка]"
+
+msgid "'%s' saved."
+msgstr "Сохрани '%s' "
+
+msgid "*Sigh*"
+msgstr "*Вздох*"
+
+msgid "2x"
+msgstr "2x"
+
+msgid "4x"
+msgstr "4x"
+
+msgid "6x"
+msgstr "6x"
+
+msgid "8x"
+msgstr "8x"
+
+msgid "<OK>"
+msgstr "<OK>"
+
+msgid "A/V delay"
+msgstr "A/V задержка"
+
+msgid "Accuracy: %d%%"
+msgstr "Точность: %d%%"
+
+msgid "Ah yes, I know. I'm amazing."
+msgstr "О да, я знаю. Это неописуемо."
+
+msgid "Ah, that was cool."
+msgstr "И это тоже ничего."
+
+msgid "Ah, you missed it!"
+msgstr "О, ты снова проспал!"
+
+msgid "All done! %d songs imported. Have fun!"
+msgstr "Все сделано! Импорировано %d песен. Наслаждайтесь!"
+
+msgid "Amazing"
+msgstr "Поразительно"
+
+msgid "And now, pick up your keyboard"
+msgstr "А теперь возьми свою клавиатуру"
+
+msgid "And now, try this super easy lick."
+msgstr "А теперь, попробуй этот простейщий кусок."
+
+msgid "And remember one thing."
+msgstr "И запомни одну вещь."
+
+msgid "Antialiasing Quality"
+msgstr "Качество сглаживания (AA)"
+
+msgid "Apply New Settings"
+msgstr "Применть новые настройки"
+
+msgid "Arrows - Move cursor, "
+msgstr "Стрелки - Движение курсора,"
+
+msgid "Audio Settings"
+msgstr "Настройки звука"
+
+msgid "BUT DON'T PICK IT YET!"
+msgstr "НО НЕ ДЕРГАЙ ЕЕ!"
+
+msgid "Bang Bang, Mystery Man"
+msgstr "Bang Bang, Mystery Man"
+
+msgid "Because you SUCK."
+msgstr "Потому что ты СОСУНОК."
+
+msgid "Bigtime."
+msgstr "Самый настоящий."
+
+msgid "Browsing Collection..."
+msgstr "Просмотр коллцекции..."
+
+msgid "Buffer Size"
+msgstr "Размер буфера"
+
+msgid "But since you SUCK,"
+msgstr "Но, если учесть, что ты СОСУНОК,"
+
+msgid "Cancel"
+msgstr "Отмена"
+
+msgid "Change Song"
+msgstr "Смена песни"
+
+msgid "Check this sh*t!"
+msgstr "Зацени-ка вот это!"
+
+msgid "Chilling..."
+msgstr "Можно расслабиться..."
+
+msgid "Choose a 256x128 PNG format label image."
+msgstr "Выберете наклейку в формате 256x128 PNG."
+
+msgid "Choose a File"
+msgstr "Выбор файла"
+
+msgid "Choose a Song"
+msgstr "Выбор песни"
+
+msgid "Choose a difficulty:"
+msgstr "Выберете уровень сложности:"
+
+msgid "Choose the Background Track (OGG format) or press Escape to skip."
+msgstr ""
+"Выберете трэк сопровождения (в формате OGG) или пропустите операцию, нажав "
+"Escape."
+
+msgid "Choose the Instrument Track (OGG format)."
+msgstr "Выберете  трэк с главным инструментов (в формате OGG)"
+
+msgid "Connecting..."
+msgstr "Соединяюсь..."
+
+msgid "Connection lost."
+msgstr "Связь прервана."
+
+msgid "Copyright 2006 by Unreal Voodoo"
+msgstr "Copyright 2006 by Unreal Voodoo"
+
+msgid "Credits"
+msgstr "Авторы"
+
+msgid "Defy The Machine"
+msgstr "Defy The Machine"
+
+msgid "Delete - Delete note, "
+msgstr "Delete - удаление ноты,"
+
+msgid "Don't try this,"
+msgstr "Даже и не пробуй сыграть"
+
+msgid "Easy"
+msgstr "Просто"
+
+msgid "Edit Existing Song"
+msgstr "Редактировать уже существующую песню"
+
+msgid "Editing Help"
+msgstr "Помощь"
+
+msgid "Editing keys: "
+msgstr "Изменение клавиш:"
+
+msgid "English"
+msgstr "Английский"
+
+msgid "Enter - Make note (hold and move for long notes), "
+msgstr ""
+"Enter - Создать ноту (чтобы риовать длинные ноты, зажимте кнопку и двигайте "
+"курсор)"
+
+msgid "Enter A/V delay in milliseconds"
+msgstr "Введите A/V задержку в милискундах."
+
+msgid "Enter Artist Name"
+msgstr "Введите название группы"
+
+msgid "Enter Beats per Minute Value"
+msgstr "Введите количество битов в минуту."
+
+msgid "Enter Song Name"
+msgstr "Введите название песни"
+
+msgid "Enter a name for the song."
+msgstr "Введите название песни."
+
+msgid "Enter cassette color in HTML (#RRGGBB) format."
+msgstr "Укажите цвте кассеты в формате HTML (#RRGGBB)."
+
+msgid "Enter the path to the mounted Guitar Hero (tm) DVD"
+msgstr "Введите путь к DVD диску с Guitar Hero(tm)."
+
+msgid "Enter the server address:"
+msgstr "Введите адрес сервера:"
+
+msgid "Enter your name:"
+msgstr "Введите свое имя?"
+
+msgid "Estimate Beats per Minute"
+msgstr "Среднее число битов в минуту"
+
+msgid ""
+"Extracting %s by %s. %d of %d songs imported. Yeah, this is going to take "
+"forever."
+msgstr ""
+"Извлечение %s, исполненной %s. %d из %d песен уже импоритровано. Да, это "
+"надолго."
+
+msgid "Frames per Second"
+msgstr "Кадров в секунду"
+
+msgid "Fret #1"
+msgstr "Лад #1"
+
+msgid "Fret #2"
+msgstr "Лад #2"
+
+msgid "Fret #3"
+msgstr "Лад #4"
+
+msgid "Fret #4"
+msgstr "Лад #4"
+
+msgid "Fret #5"
+msgstr "Лад #5"
+
+msgid "Frets on Fire"
+msgstr "Frets on Fire"
+
+msgid "Fullscreen Mode"
+msgstr "На полный экран"
+
+msgid "Game Design,"
+msgstr "Дизайн,"
+
+msgid "Game Settings"
+msgstr "Настройки"
+
+msgid "Get Ready to Rock"
+msgstr "Приготовьтесь зажигать"
+
+msgid "Graphics:"
+msgstr "Графика:"
+
+msgid "Guntherswarchzhaffenstrassen."
+msgstr "Гюнтесватенхафэнстазен"
+
+msgid "High"
+msgstr "Высокое"
+
+msgid "Highest Scores (%s)"
+msgstr "Больше всего очков (%s)"
+
+msgid "Host Multiplayer Game"
+msgstr "Открыть игру в мультплеере."
+
+msgid "However, zie most important"
+msgstr "Тем не менее, самой важной для тебя станет"
+
+msgid "I am your new god, little girls."
+msgstr "Маленькие девочки, я ваш новый бог."
+
+msgid "I use the whole keyboard."
+msgstr "я использую клавиатуру целиком."
+
+msgid "If I play that any faster,"
+msgstr "Если бы я сыграл чуть быстрее,"
+
+msgid "Import Guitar Hero(tm) Songs"
+msgstr "Ипмортировать песни из Guitar Hero(TM)"
+
+msgid "Import New Song"
+msgstr "Импорировать новую песню"
+
+msgid "Importing Songs"
+msgstr "Импортирую песни."
+
+msgid "Importing..."
+msgstr "Загружаю..."
+
+msgid "Introducing:"
+msgstr "В ролях:"
+
+msgid "Join Multiplayer Game"
+msgstr "Присоединиться к мультиплеерной игре."
+
+msgid "Jurgen has left the building."
+msgstr "Юрджин покинул здание."
+
+msgid "Jurgen will show you how it is done."
+msgstr "Юрджин сейчас покажет, как это делается."
+
+msgid "Key Settings"
+msgstr "Настрйоки управления"
+
+msgid "Language"
+msgstr "Язык"
+
+msgid "Lefty mode"
+msgstr "Режим левши"
+
+msgid "Loading Preview..."
+msgstr "Загрузка "
+
+msgid "Loading song..."
+msgstr "Загружаю песню..."
+
+msgid "Loading..."
+msgstr "Загрузка..."
+
+msgid "Lobby (%d players)"
+msgstr "Лобби (%d игроков)"
+
+msgid "Longest note streak: %d"
+msgstr "Самая длинная нота: %d"
+
+msgid "Loud"
+msgstr "Громкие"
+
+msgid "Low"
+msgstr "Низкое"
+
+msgid "Made with:"
+msgstr "Сделано с помощью:"
+
+msgid ""
+"Make sure you have at least 500 megabytes of free disk space before using "
+"this importer."
+msgstr ""
+"Удостоверьтесь, что у вас есть как минимум 500 мегабайт свободного места на "
+"диске, прежде чем импортировать песни."
+
+msgid "Medium"
+msgstr "Средне"
+
+msgid "Mostly Playing Guitar"
+msgstr "Mostly Playing Guitar"
+
+msgid "Move down"
+msgstr "Вниз"
+
+msgid "Move left"
+msgstr "Влево"
+
+msgid "Move right"
+msgstr "Вправо"
+
+msgid "Move up"
+msgstr "Вверх"
+
+msgid "Music,"
+msgstr "Музыка:"
+
+msgid "My name is Jurgen"
+msgstr "Меня зовут  Юрджин"
+
+msgid "No"
+msgstr "Нет"
+
+msgid "No highscores for cheaters!"
+msgstr "Никаких рекордов для читеров!"
+
+msgid ""
+"No songs could be imported, sorry. Check the log files for more information."
+msgstr ""
+"Жаль, но ни одна песня не может быть импортирована. В log файлах содержится "
+"вся информация об ошибке."
+
+msgid "No!"
+msgstr "Нет!"
+
+msgid "None"
+msgstr "Нет"
+
+msgid "Normal"
+msgstr "Нормальное"
+
+msgid "Now, hold down two frets."
+msgstr "Теперь зажми струны на двух ладах."
+
+msgid "Off"
+msgstr "Нет"
+
+msgid "Ogg Vorbis encoder (oggenc) not found. Please install it and try again."
+msgstr "Ogg Vorbis кодек (oggenc) не найден. Поставьте его и попробуйте опять."
+
+msgid ""
+"Ogg Vorbis encoder (oggenc.exe) not found. Please install it to the game "
+"directory and try again."
+msgstr ""
+"Ogg Vorbis кодек (oggenc.exe) не найден. Поставьте его в папку с игрой и "
+"снова попробуйте."
+
+msgid "Ok, let's try it again."
+msgstr "Ладно, давай попробуем еще раз."
+
+msgid "Ok, that is it for now."
+msgstr "Ладно, на этот раз все."
+
+msgid "Ok, that was about"
+msgstr "Да, тут было примерно"
+
+msgid "Ok, there comes your first note."
+msgstr "Ладно, вот приближается твоя первая нота."
+
+msgid "Ok, wait for it."
+msgstr "Так, жди."
+
+msgid "Page Up/Down - Change difficulty"
+msgstr "Page Up/Down - Смена уровня сложности"
+
+msgid "Painful"
+msgstr "Оглушающие"
+
+msgid "Pick"
+msgstr "Медиатор"
+
+msgid "Pick!"
+msgstr "Звук!!"
+
+msgid "Play Game"
+msgstr "Играть"
+
+msgid "Play with the keys and press Escape when you're done."
+msgstr "Поиграйтесь с клавишами и нажмите Escape, когда закончите."
+
+msgid "Player"
+msgstr "Игрок"
+
+msgid "Player #%d"
+msgstr "Игрок #%d."
+
+msgid "Playing"
+msgstr "Играю"
+
+msgid "Press Enter to Start Game"
+msgstr "Чтобы начать игру, нажмите Enter."
+
+msgid "Press a key for '%s' or Escape to cancel."
+msgstr "Нажмите кнопку '%s' или Escape для отмены."
+
+msgid "Programming:"
+msgstr "Программирование:"
+
+msgid "Quiet"
+msgstr "Тихие"
+
+msgid "Quit"
+msgstr "Выход"
+
+msgid "Quit to Main Menu"
+msgstr "Выйти в главное меню."
+
+msgid "Reading the archive index."
+msgstr "Читаю индекс архива."
+
+msgid "Reading the song list."
+msgstr "Читаю список песен."
+
+msgid "Ready"
+msgstr "Готово"
+
+msgid "Replay"
+msgstr "Заново"
+
+msgid "Restart Song"
+msgstr "Начать сначала"
+
+msgid "SVG Quality"
+msgstr "Качество SVG графики"
+
+msgid "Sample Bits"
+msgstr "Sam"
+
+msgid "Sample Frequency"
+msgstr "Частота дискретизации"
+
+msgid "Save Song"
+msgstr "Сохранить песню"
+
+msgid "Saving..."
+msgstr "Сохранаю..."
+
+msgid "Screw Up Sounds"
+msgstr "Пропущенные ноты"
+
+msgid "Secondary Pick"
+msgstr "Запасной медиатор"
+
+msgid "Set A/V delay"
+msgstr "A/V задержка"
+
+msgid "Set Artist Name"
+msgstr "Название группы"
+
+msgid "Set Beats per Minute"
+msgstr "Биты в минуту"
+
+msgid "Set Cassette Color"
+msgstr "Цвет кассеты."
+
+msgid "Set Cassette Label"
+msgstr "Прилепить наклейку."
+
+msgid "Set Song Name"
+msgstr "Название песни"
+
+msgid "Settings >"
+msgstr "Настройки >"
+
+msgid "Song Credits:"
+msgstr "Песни:"
+
+msgid "Song Editor"
+msgstr "Редактор песен"
+
+msgid "Song Finished!"
+msgstr "Песня сыграна!"
+
+msgid "Sound Effects:"
+msgstr "Звук:"
+
+msgid "Source Code available under the GNU General Public License"
+msgstr "Исходные тексты доступны под лицензией GNU General Public. "
+
+msgid "Space - Play/pause song, "
+msgstr "Пробле - Играть/пауза"
+
+msgid "Special thanks to:"
+msgstr "Особые благодарности:"
+
+msgid "Stage %d/8: Decoding channel %d into PCM"
+msgstr "Этап %d/8: декодировка канала %d в PCM."
+
+msgid "Stage 1/8: Splitting VGS file"
+msgstr "Этап 1/8: разделение файла VGS."
+
+msgid "Stage 6/8: Joining song stereo tracks"
+msgstr "Этап 6/8: объединение стерео трэков."
+
+msgid "Stage 7/8: Joining guitar stereo tracks"
+msgstr "Этап 7/8: присоединение гитарных стерео трэков."
+
+msgid "Stage 8/8: Compressing tracks"
+msgstr "Stage 8/8: компрессия трэков"
+
+msgid "Stopped"
+msgstr "Остановлено"
+
+msgid "Supaeasy"
+msgstr "Проще некуда"
+
+msgid ""
+"Tap the Space bar to the beat of the song. Press Enter when done or Escape "
+"to cancel."
+msgstr ""
+"Отсуткивайте ритм песни пробелом. Нажмите Enter, когда решите закончить, или "
+"Escape, чтобы выйти."
+
+msgid "Test Keys"
+msgstr "Проверка клавиш"
+
+msgid "Testing:"
+msgstr "Тестирование:"
+
+msgid "That isn't a color."
+msgstr "Это не цвет."
+
+msgid "That isn't a number."
+msgstr "Это не число."
+
+msgid "That song already exists."
+msgstr "Такая песня уже существует."
+
+msgid "That's not it. Try again."
+msgstr "Это не он. Попробуйте еще раз."
+
+msgid "There are no changes to save."
+msgstr "Нужно внести какие-нибудь изменения, чтобы было что сохранять."
+
+msgid "These five frets,"
+msgstr "вот эти пять ладов"
+
+msgid "This Week I've Been"
+msgstr "This Week I`ve Been"
+
+msgid "To me, that is already obvious."
+msgstr "Я это поянл с самого начала."
+
+msgid "Tuning Guitar..."
+msgstr "Настройка гитары..."
+
+msgid "Tutorial"
+msgstr "Обучение"
+
+msgid "Und hello everyone."
+msgstr "И привет всем."
+
+msgid "Und today I will show you"
+msgstr "И сегодня я покажу тебе"
+
+msgid "Und up to my tempo."
+msgstr "А теперь кое-что для меня."
+
+msgid "Und zie Pick button."
+msgstr "и медиатор."
+
+msgid "Unreal Voodoo"
+msgstr "Unreal Voodoo"
+
+msgid "Upload Highscores"
+msgstr "Загружать результаты в таблицу рекордов."
+
+msgid "Uploading Scores..."
+msgstr "Загружаю результаты..."
+
+msgid "Version %s"
+msgstr "Версия %s"
+
+msgid "Video Resolution"
+msgstr "Разрешение"
+
+msgid "Video Settings"
+msgstr "Настрйоки видео"
+
+msgid "Wait for it."
+msgstr "Жди."
+
+msgid "When I shred,"
+msgstr "Когда я запиливаю,"
+
+msgid "Yes"
+msgstr "Да"
+
+msgid "You can already hold down the 1st fret"
+msgstr "Ты уже можешь зажать струну на 1 ладу"
+
+msgid "You can now go and sell"
+msgstr "А теперь можешь пойти и продать"
+
+msgid "You missed it."
+msgstr "Не успел."
+
+msgid "You will need it,"
+msgstr "Ты о ней вспомнишь,"
+
+msgid "You will only need"
+msgstr "то тебе понадобятся только"
+
+msgid "[Parent Folder]"
+msgstr "[Корневая папка]"
+
+msgid "as Groupie"
+msgstr "в роли Группи."
+
+msgid "as Jurgen, Your New God"
+msgstr "в роли Вашего Нового Бога, Юрджина."
+
+msgid "composed and performed by Tommi Inkila"
+msgstr "написана и сыграна Tommy Inkila"
+
+msgid "four billion notes per second."
+msgstr "4 биллиона нот в секунду."
+
+msgid "how to play this game."
+msgstr "как в это вообще можно играть."
+
+msgid "is the Escape button."
+msgstr "кнопка Esacpe."
+
+msgid "like this."
+msgstr "вот так."
+
+msgid "lyrics by Mary Jo"
+msgstr "текст Mary Jo."
+
+msgid "music by Mary Jo and Tommi Inkila"
+msgstr "музыка написана Mary Jo и Tommy Inkila"
+
+msgid "music by Tommi Inkila"
+msgstr "музыка Tommy Inkila"
+
+msgid "or you'll just hurt yourself."
+msgstr "или просто себе навредишь."
+
+msgid "presents"
+msgstr "представляет"
+
+msgid "that you SUCK."
+msgstr "что ты СОСУНОК."
+
+msgid "when you finally realize"
+msgstr "как только поймешь,"
+
+msgid "your keyboards on Ebay."
+msgstr "свою клавиатуру на Ebay."
+
+msgid "your minds would just blow up."
+msgstr "твои мозги бы просто взоравлись."
