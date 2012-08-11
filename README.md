@@ -19,8 +19,9 @@ Table of Contents
 3. [Notes on PyOpenGL versions](#Notes-on-PyOpenGL-versions)
 4. [Setting up Python and third-party dependencies](#Setting-up-Python-and-third-party-dependencies)
 5. [Compiling the native modules](#Compiling-the-native-modules)
-6. [Starting the game](#Starting-the-game)
-7. [Making binaries](#Making-binaries)
+6. [Building the translations](#Building-the-translations)
+7. [Starting the game](#Starting-the-game)
+8. [Making binaries](#Making-binaries)
 
 <a name="Checking-out-the-latest-code"></a>
 Checking out the latest code
@@ -234,13 +235,14 @@ what each one is needed for):
 
   * pitchbend
   * pyaudio
+  * the GNU gettext tools (for translations)
 
 For those of you on Debian or Ubuntu, this means installing the
 following packages: `python-pygame`, `python-opengl`, `python-numpy`,
 `python-imaging`, `python-dev`, `build-essential`, `cython`, `pkg-config`,
 `libgl1-mesa-dev`, `libglu1-mesa-dev`, `libglib2.0-dev`, `libsdl1.2-dev`,
 `libsdl-mixer1.2-dev`, `libogg-dev`, `libvorbisfile-dev`, `libtheora-dev`,
-`libswscale-dev`.
+`libswscale-dev`, and if you want translations, `gettext`.
 
 Some packages can be troublesome, so we have notes below about certain
 packages.
@@ -353,6 +355,29 @@ Install the appropriate package from your distribution's repository.
 
 Under Debian and Ubuntu, you want `build-essential`.
 
+----
+<a name="Building-the-translations"></a>
+Building the translations
+-------------------------
+
+_This part is optional._
+
+FoFiX's interface can appear in languages other than English. If you
+want to try other languages, you must have the GNU gettext tools
+available. (They are included in the Win32 Dependency Pack; under
+Debian-like systems, install the `gettext` package.) Then open a command
+prompt, navigate to the `src` directory in your source tree using the
+`cd` command, and type
+
+    python setup.py msgfmt
+
+to build the translations. Many are incomplete or outdated; improvements
+would be greatly appreciated. (We will write a more detailed guide on
+translating soon.)
+
+If you make or receive changes to a `.po` file for a translation you are
+using, be sure to do this step again to make the game use the modified
+version.
 
 ----
 <a name="Starting-the-game"></a>
