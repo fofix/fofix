@@ -144,7 +144,6 @@ common_options = {
     "bz2",
     "email",
     "calendar",
-    "difflib",
     "doctest",
     "ftplib",
     "getpass",
