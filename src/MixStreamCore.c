@@ -358,6 +358,16 @@ void mix_stream_stop(MixStream* stream)
 }
 
 
+/* Set pitch of a MixStream. */
+void mix_stream_set_pitch_semitones(MixStream* stream, float semitones)
+{
+  _mix_stream_soundtouchify(stream);
+  g_mutex_lock(stream->st_mutex);
+  soundtouch_set_pitch_semitones(stream->soundtouch, semitones);
+  g_mutex_unlock(stream->st_mutex);
+}
+
+
 /* For GErrors we might return. */
 GQuark mix_stream_error_quark(void)
 {

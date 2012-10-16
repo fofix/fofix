@@ -41,6 +41,7 @@ cdef extern from "MixStream.h":
     int mix_stream_play(CMixStream*, int)
     bint mix_stream_is_playing(CMixStream*)
     void mix_stream_stop(CMixStream*)
+    void mix_stream_set_pitch_semitones(CMixStream*, float)
 
 
 class MixStreamError(Exception):
@@ -83,3 +84,6 @@ cdef class VorbisFileMixStream(object):
 
     def stop(self):
         mix_stream_stop(self.stream)
+
+    def set_pitch_semitones(self, float semitones):
+        mix_stream_set_pitch_semitones(self.stream, semitones)
