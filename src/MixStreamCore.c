@@ -36,6 +36,12 @@ struct _MixStream {
   Mix_Chunk chunk;
   gboolean input_eof;
   gboolean eof;
+  int out_freq;
+  Uint16 out_format;
+  int out_channels;
+  int out_sample_size;
+  gboolean out_samples_signed;
+  gboolean byteswap_needed;
 };
 
 static GHashTable* chan_table = NULL;
@@ -62,6 +68,31 @@ MixStream* mix_stream_new(int samprate, int channels, mix_stream_read_cb read_cb
   stream->cb_data = data;
   stream->channel = -1;
   stream->chunk.volume = MIX_MAX_VOLUME;
+
+  if (!Mix_QuerySpec(&stream->out_freq, &stream->out_format, &stream->out_channels)) {
+    g_set_error(err, MIX_STREAM_ERROR, MIX_STREAM_MIXER_UNINIT,
+      "SDL_mixer is not initialized");
+    g_free(stream);
+    return NULL;
+  }
+
+  switch (stream->out_format) {
+    case AUDIO_S8:     stream->out_sample_size = 1; stream->out_samples_signed = TRUE ; stream->byteswap_needed = FALSE; break;
+    case AUDIO_U8:     stream->out_sample_size = 1; stream->out_samples_signed = FALSE; stream->byteswap_needed = FALSE; break;
+#if G_BYTE_ORDER == G_LITTLE_ENDIAN
+    case AUDIO_S16LSB: stream->out_sample_size = 2; stream->out_samples_signed = TRUE ; stream->byteswap_needed = FALSE; break;
+    case AUDIO_U16LSB: stream->out_sample_size = 2; stream->out_samples_signed = FALSE; stream->byteswap_needed = FALSE; break;
+    case AUDIO_S16MSB: stream->out_sample_size = 2; stream->out_samples_signed = TRUE ; stream->byteswap_needed = TRUE ; break;
+    case AUDIO_U16MSB: stream->out_sample_size = 2; stream->out_samples_signed = FALSE; stream->byteswap_needed = TRUE ; break;
+#else
+    case AUDIO_S16LSB: stream->out_sample_size = 2; stream->out_samples_signed = TRUE ; stream->byteswap_needed = TRUE ; break;
+    case AUDIO_U16LSB: stream->out_sample_size = 2; stream->out_samples_signed = FALSE; stream->byteswap_needed = TRUE ; break;
+    case AUDIO_S16MSB: stream->out_sample_size = 2; stream->out_samples_signed = TRUE ; stream->byteswap_needed = FALSE; break;
+    case AUDIO_U16MSB: stream->out_sample_size = 2; stream->out_samples_signed = FALSE; stream->byteswap_needed = FALSE; break;
+#endif
+    default: g_assert_not_reached(); break;
+  }
+
   return stream;
 }
 
@@ -132,13 +163,7 @@ static gboolean _mix_stream_nextchunk(MixStream* stream, gsize size)
   // perform any necessary conversions
   int needed_frames;
   int obtained_frames;
-  int sample_size;
-  gboolean samples_signed;
-  gboolean byteswap_needed;
   float* floatbuf;
-  int out_freq;
-  Uint16 out_format;
-  int out_channels;
   guint8* out_buf;
 
   if (stream->eof)
@@ -150,26 +175,7 @@ static gboolean _mix_stream_nextchunk(MixStream* stream, gsize size)
   }
   out_buf = stream->chunk.abuf;
 
-  Mix_QuerySpec(&out_freq, &out_format, &out_channels);
-
-  switch (out_format) {
-    case AUDIO_S8:     sample_size = 1; samples_signed = TRUE ; byteswap_needed = FALSE; break;
-    case AUDIO_U8:     sample_size = 1; samples_signed = FALSE; byteswap_needed = FALSE; break;
-#if G_BYTE_ORDER == G_LITTLE_ENDIAN
-    case AUDIO_S16LSB: sample_size = 2; samples_signed = TRUE ; byteswap_needed = FALSE; break;
-    case AUDIO_U16LSB: sample_size = 2; samples_signed = FALSE; byteswap_needed = FALSE; break;
-    case AUDIO_S16MSB: sample_size = 2; samples_signed = TRUE ; byteswap_needed = TRUE ; break;
-    case AUDIO_U16MSB: sample_size = 2; samples_signed = FALSE; byteswap_needed = TRUE ; break;
-#else
-    case AUDIO_S16LSB: sample_size = 2; samples_signed = TRUE ; byteswap_needed = TRUE ; break;
-    case AUDIO_U16LSB: sample_size = 2; samples_signed = FALSE; byteswap_needed = TRUE ; break;
-    case AUDIO_S16MSB: sample_size = 2; samples_signed = TRUE ; byteswap_needed = FALSE; break;
-    case AUDIO_U16MSB: sample_size = 2; samples_signed = FALSE; byteswap_needed = FALSE; break;
-#endif
-    default: g_assert_not_reached(); break;
-  }
-
-  needed_frames = size / (out_channels * sample_size);
+  needed_frames = size / (stream->out_channels * stream->out_sample_size);
 
   floatbuf = g_newa(float, needed_frames * stream->channels);
   obtained_frames = _mix_stream_fill_floatbuf(stream, floatbuf, needed_frames, stream->channels);
@@ -179,25 +185,25 @@ static gboolean _mix_stream_nextchunk(MixStream* stream, gsize size)
   while (size > 0) {
     float current_sample = *(floatbuf++);
     /* If we're converting stereo to mono, average this sample with the other channel's. */
-    if (stream->channels == 2 && out_channels == 1)
+    if (stream->channels == 2 && stream->out_channels == 1)
       current_sample = (float)(0.5 * (current_sample + *(floatbuf++)));
 
 #define OUTPUT_SAMPLE(type, value) { *(type*)out_buf = (type)(value); out_buf += sizeof(type); size -= sizeof(type); }
 
     /* Convert and output the sample. */
-    if (samples_signed) {
-      if (sample_size == 1) {
+    if (stream->out_samples_signed) {
+      if (stream->out_sample_size == 1) {
         OUTPUT_SAMPLE(gint8, current_sample * G_MAXINT8);
-      } else if (!byteswap_needed) {
+      } else if (!stream->byteswap_needed) {
         OUTPUT_SAMPLE(gint16, current_sample * G_MAXINT16);
       } else {
         OUTPUT_SAMPLE(guint16, GUINT16_SWAP_LE_BE((guint16)(gint16)(current_sample * G_MAXINT16)));
       }
     } else {
       current_sample = (float)(current_sample * 0.5 + 0.5);
-      if (sample_size == 1) {
+      if (stream->out_sample_size == 1) {
         OUTPUT_SAMPLE(guint8, current_sample * G_MAXUINT8);
-      } else if (!byteswap_needed) {
+      } else if (!stream->byteswap_needed) {
         OUTPUT_SAMPLE(guint16, current_sample * G_MAXUINT16);
       } else {
         OUTPUT_SAMPLE(guint16, GUINT16_SWAP_LE_BE((guint16)(current_sample * G_MAXUINT16)));
@@ -205,8 +211,8 @@ static gboolean _mix_stream_nextchunk(MixStream* stream, gsize size)
     }
 
     /* If we're converting mono to stereo, duplicate the sample. */
-    if (stream->channels == 1 && out_channels == 2) {
-      if (sample_size == 1) {
+    if (stream->channels == 1 && stream->out_channels == 2) {
+      if (stream->out_sample_size == 1) {
         OUTPUT_SAMPLE(guint8, *(guint8*)(out_buf - sizeof(guint8)));
       } else {
         OUTPUT_SAMPLE(guint16, *(guint16*)(out_buf - sizeof(guint16)));

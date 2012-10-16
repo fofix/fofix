@@ -40,4 +40,8 @@ GQuark mix_stream_error_quark(void);
 GQuark mix_stream_ov_error_quark(void);
 #define MIX_STREAM_OV_ERROR mix_stream_ov_error_quark()
 
+typedef enum {
+  MIX_STREAM_MIXER_UNINIT
+} MixStreamError;
+
 #endif
