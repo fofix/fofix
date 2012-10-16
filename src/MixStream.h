@@ -36,6 +36,7 @@ gboolean mix_stream_is_playing(const MixStream* stream);
 void mix_stream_stop(MixStream* stream);
 
 void mix_stream_set_pitch_semitones(MixStream* stream, float semitones);
+void mix_stream_set_speed(MixStream* stream, float speed);
 
 GQuark mix_stream_error_quark(void);
 #define MIX_STREAM_ERROR mix_stream_error_quark()

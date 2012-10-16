@@ -368,6 +368,16 @@ void mix_stream_set_pitch_semitones(MixStream* stream, float semitones)
 }
 
 
+/* Set speed of a MixStream without affecting pitch. */
+void mix_stream_set_speed(MixStream* stream, float speed)
+{
+  _mix_stream_soundtouchify(stream);
+  g_mutex_lock(stream->st_mutex);
+  soundtouch_set_tempo(stream->soundtouch, speed);
+  g_mutex_unlock(stream->st_mutex);
+}
+
+
 /* For GErrors we might return. */
 GQuark mix_stream_error_quark(void)
 {
