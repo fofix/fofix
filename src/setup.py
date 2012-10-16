@@ -295,15 +295,22 @@ sdl_info = pc_info('sdl')
 sdl_mixer_info = pc_info('SDL_mixer')
 theoradec_info = pc_info('theoradec')
 glib_info = pc_info('glib-2.0')
+gthread_info = pc_info('gthread-2.0')
 swscale_info = pc_info('libswscale')
+soundtouch_info = pc_info('soundtouch')
 if os.name == 'nt':
     # Windows systems: we just know what the OpenGL library is.
     gl_info = {'libraries': ['opengl32']}
     # And glib needs a slight hack to work correctly.
     glib_info['define_macros'].append(('inline', '__inline'))
+    # And we use the prebuilt soundtouch-c.
+    soundtouch_info['libraries'].append('soundtouch-c')
+    extra_soundtouch_src = []
 else:
     # Other systems: we ask pkg-config.
     gl_info = pc_info('gl')
+    # And build our own soundtouch-c.
+    extra_soundtouch_src = ['soundtouch-c.cpp']
 # Build a similar info record for the numpy headers.
 numpy_info = {'include_dirs': [np.get_include()]}
 
@@ -395,6 +402,8 @@ setup_args.update({
               **combine_info(gl_info, ogg_info, theoradec_info, glib_info, swscale_info)),
     Extension('OggStreamer', ['OggStreamer.c'],
               **combine_info(vorbisfile_info, sdl_info, sdl_mixer_info)),
+    Extension('MixStream', ['MixStream.pyx', 'MixStreamCore.c', 'MixStreamVorbis.c'] + extra_soundtouch_src,
+              **combine_info(vorbisfile_info, soundtouch_info, glib_info, gthread_info, sdl_info, sdl_mixer_info)),
   ],
   'cmdclass': {'build_ext': build_ext, 'install': install, 'msgfmt': msgfmt},
 })
