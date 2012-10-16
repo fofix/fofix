@@ -93,6 +93,13 @@ MixStream* mix_stream_new(int samprate, int channels, mix_stream_read_cb read_cb
     default: g_assert_not_reached(); break;
   }
 
+  if (stream->samprate != stream->out_freq) {
+    stream->soundtouch = soundtouch_new();
+    soundtouch_set_sample_rate(stream->soundtouch, stream->samprate);
+    soundtouch_set_channels(stream->soundtouch, stream->channels);
+    soundtouch_set_rate(stream->soundtouch, (float)stream->samprate/(float)stream->out_freq);
+  }
+
   return stream;
 }
 
