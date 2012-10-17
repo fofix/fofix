@@ -117,6 +117,8 @@ def fixed_args(args):
         if n == 0:
             yield '-static-libgcc'
             yield '-static-libstdc++'
+            yield '-mpreferred-stack-boundary=2'
+            yield '-mincoming-stack-boundary=2'
 for p in os.environ['PATH'].split(os.pathsep):
     candidate = os.path.join(p, os.path.basename(__file__))
     if os.access(candidate, os.X_OK) and not os.path.samefile(candidate, __file__):
