@@ -1,0 +1,83 @@
+This is upstream commit d74c4b1, minus the changelog edit (which does not
+apply cleanly to the release tarball).
+
+From: jcoalson <jcoalson>
+Date: Sat, 3 Jan 2009 01:59:10 +0000 (+0000)
+Subject: mingw fixes, enable build dll w/ mingw (SF#2000973: https://sourceforge.net/tracker2... 
+X-Git-Url: http://git.xiph.org/?p=mirrors%2Fflac.git;a=commitdiff_plain;h=d74c4b1080cac8d629d78684742ee50f5d75b69c
+
+mingw fixes, enable build dll w/ mingw (SF#2000973: https://sourceforge.net/tracker2/?func=detail&aid=2000973&group_id=13478&atid=313478)
+---
+
+diff --git a/configure.in b/configure.in
+index 73cdf89..e1e2efc 100644
+--- a/configure.in
++++ b/configure.in
+@@ -25,6 +25,9 @@ AM_INIT_AUTOMAKE(flac, 1.2.1)
+ # explicitly requested.  Eases autobuilding -mdz
+ AM_MAINTAINER_MODE
+ 
++# Enable the generation of shared libraries under Win32
++AC_LIBTOOL_WIN32_DLL
++
+ # We need two libtools, one that builds both shared and static, and
+ # one that builds only static.  This is because the resulting libtool
+ # does not allow us to choose which to build at runtime.
+@@ -93,11 +96,19 @@ case "$host" in
+ esac
+ AC_SUBST(OBJ_FORMAT)
+ 
+-# only needed because of ntohl() usage, can get rid of after that's gone:
+ case "$host" in
+-	*-*-cygwin|*mingw*) MINGW_WINSOCK_LIBS=-lwsock32 ;;
+-	*) MINGW_WINSOCK_LIBS= ;;
++	*-*-cygwin|*mingw*)
++		# define this variable for enabling strict exports with libtool; for now, it's only supported by Win32
++		LT_NO_UNDEFINED="-no-undefined"
++		# -lwsock32 only needed because of ntohl() usage, can get rid of after that's gone:
++		MINGW_WINSOCK_LIBS=-lwsock32
++		;;
++	*)
++		LT_NO_UNDEFINED=
++		MINGW_WINSOCK_LIBS=
++		;;
+ esac
++AC_SUBST(LT_NO_UNDEFINED)
+ AC_SUBST(MINGW_WINSOCK_LIBS)
+ 
+ case "$host" in
+diff --git a/src/libFLAC++/Makefile.am b/src/libFLAC++/Makefile.am
+index 0304127..3cd6577 100644
+--- a/src/libFLAC++/Makefile.am
++++ b/src/libFLAC++/Makefile.am
+@@ -46,7 +46,7 @@ EXTRA_DIST = \
+ 	libFLAC++.m4
+ 
+ # see 'http://www.gnu.org/software/libtool/manual.html#Libtool-versioning' for numbering convention
+-libFLAC___la_LDFLAGS = -version-info 8:0:2
++libFLAC___la_LDFLAGS = -version-info 8:0:2 @LT_NO_UNDEFINED@
+ libFLAC___la_LIBADD = ../libFLAC/libFLAC.la
+ 
+ libFLAC___la_SOURCES = \
+diff --git a/src/libFLAC/Makefile.am b/src/libFLAC/Makefile.am
+index a8e98db..d9669e1 100644
+--- a/src/libFLAC/Makefile.am
++++ b/src/libFLAC/Makefile.am
+@@ -69,7 +69,7 @@ endif
+ endif
+ endif
+ 
+-libFLAC_la_LIBADD = $(LOCAL_EXTRA_LIBADD) @OGG_LIBS@
++libFLAC_la_LIBADD = $(LOCAL_EXTRA_LIBADD) @OGG_LIBS@ @MINGW_WINSOCK_LIBS@
+ 
+ SUBDIRS = $(ARCH_SUBDIRS) include .
+ 
+@@ -96,7 +96,7 @@ extra_ogg_sources = \
+ 	ogg_mapping.c
+ endif
+ # see 'http://www.gnu.org/software/libtool/manual.html#Libtool-versioning' for numbering convention
+-libFLAC_la_LDFLAGS = -version-info 10:0:2 -lm $(LOCAL_EXTRA_LDFLAGS)
++libFLAC_la_LDFLAGS = -version-info 10:0:2 -lm $(LOCAL_EXTRA_LDFLAGS) @LT_NO_UNDEFINED@
+ libFLAC_la_SOURCES = \
+ 	bitmath.c \
+ 	bitreader.c \

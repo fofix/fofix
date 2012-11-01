@@ -327,6 +327,24 @@ if test ! -f "$PREFIX"/build-stamps/libtheora; then
   $RM_RF $LIBTHEORA
 fi
 
+# FLAC
+FLAC="flac-1.2.1"
+if test ! -f "$PREFIX"/build-stamps/flac; then
+  download http://downloads.xiph.org/releases/flac/$FLAC.tar.gz
+  tar zxvf $FLAC.tar.gz
+  cd $FLAC
+  patch -Np1 -i ../flac-mingw-dll.patch
+  sed -i -e 's/AM_PATH_XMMS/true; dnl &/' configure.in
+  autoreconf -fiv
+  # Exclude the C++ stuff because we don't use it and it sometimes has build issues.
+  ./configure $COMMON_AUTOCONF_FLAGS --disable-cpplibs
+  make
+  make install
+  cd ..
+  touch "$PREFIX"/build-stamps/flac
+  $RM_RF $FLAC
+fi
+
 # libsmf
 LIBSMF="libsmf-1.3"
 if test ! -f "$PREFIX"/build-stamps/libsmf; then
