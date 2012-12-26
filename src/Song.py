@@ -2230,26 +2230,26 @@ class Song(object):
 
         try:
             if guitarTrackName:
-                self.guitarTrack = Audio.StreamingSound(self.engine, self.engine.audio.getChannel(1), guitarTrackName)
+                self.guitarTrack = Audio.StreamingSound(self.engine.audio.getChannel(1), guitarTrackName)
         except Exception, e:
             Log.warn("Unable to load guitar track: %s" % e)
 
         try:
             if rhythmTrackName:
-                self.rhythmTrack = Audio.StreamingSound(self.engine, self.engine.audio.getChannel(2), rhythmTrackName)
+                self.rhythmTrack = Audio.StreamingSound(self.engine.audio.getChannel(2), rhythmTrackName)
         except Exception, e:
             Log.warn("Unable to load rhythm track: %s" % e)
 
 
         try:
             if drumTrackName:
-                self.drumTrack = Audio.StreamingSound(self.engine, self.engine.audio.getChannel(3), drumTrackName)
+                self.drumTrack = Audio.StreamingSound(self.engine.audio.getChannel(3), drumTrackName)
         except Exception, e:
             Log.warn("Unable to load drum track: %s" % e)
 
         try:
             if crowdTrackName:
-                self.crowdTrack = Audio.StreamingSound(self.engine, self.engine.audio.getChannel(4), crowdTrackName)
+                self.crowdTrack = Audio.StreamingSound(self.engine.audio.getChannel(4), crowdTrackName)
         except Exception, e:
             Log.warn("Unable to load crowd track: %s" % e)
 
