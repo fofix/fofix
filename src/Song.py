@@ -2529,11 +2529,11 @@ class Song(object):
         if self.engine.audioSpeedFactor == 1:
             return self._playing and self.music.isPlaying()
         else:   #altered speed mode!
-            if self.guitarTrack and self.guitarTrack.streamIsPlaying() > 0:
+            if self.guitarTrack and self.guitarTrack.isPlaying():
                 return True
-            if self.rhythmTrack and self.rhythmTrack.streamIsPlaying() > 0:
+            if self.rhythmTrack and self.rhythmTrack.isPlaying():
                 return True
-            if self.drumTrack and self.drumTrack.streamIsPlaying() > 0:
+            if self.drumTrack and self.drumTrack.isPlaying():
                 return True
             else:
                 return self._playing and self.music.isPlaying()

@@ -262,7 +262,7 @@ class StreamingSound(object):
     def setVolume(self, volume):
         self._channel.setVolume(volume)
 
-    def streamIsPlaying(self):  #MFH - adding function to check if sound is playing
+    def isPlaying(self):
         return self._mixstream.is_playing()
 
     def fadeout(self, time):
