@@ -53,7 +53,7 @@ static void _mix_stream_soundtouchify(MixStream* stream);
 
 /* Create a stream that will play data returned by read_cb.
  *   - samprate and channels specify the format returned by read_cb
- *   - free_cb is called on data when the stream is destroyed
+ *   - free_cb is called on data when the stream is destroyed (may be NULL)
  *   - data is passed to the callbacks
  */
 MixStream* mix_stream_new(int samprate, int channels, mix_stream_read_cb read_cb, mix_stream_free_cb free_cb, void* data, GError** err)
@@ -115,7 +115,8 @@ void mix_stream_destroy(MixStream* stream)
   g_mutex_free(stream->st_mutex);
   if (stream->soundtouch != NULL)
     soundtouch_delete(stream->soundtouch);
-  stream->free_cb(stream->cb_data);
+  if (stream->free_cb != NULL)
+    stream->free_cb(stream->cb_data);
   g_free(stream);
 }
 
