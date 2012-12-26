@@ -2417,18 +2417,17 @@ class Song(object):
             else:
                 self.drumTrack.setVolume(volume)
 
-    #stump: pitch bending
-    def setInstrumentPitch(self, pitch, part):
+    def setInstrumentPitch(self, semitones, part):
         if part == parts[GUITAR_PART]:
             if self.guitarTrack:
-                self.guitarTrack.setPitchBend(pitch)
+                self.guitarTrack.setPitchBendSemitones(semitones)
             else:
-                self.songTrack.setPitchBend(pitch)
+                self.songTrack.setPitchBendSemitones(semitones)
         elif part == parts[DRUM_PART]:
             pass
         else:
             if self.rhythmTrack:
-                self.rhythmTrack.setPitchBend(pitch)
+                self.rhythmTrack.setPitchBendSemitones(semitones)
 
     def resetInstrumentPitch(self, part):
         if part == parts[GUITAR_PART]:

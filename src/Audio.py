@@ -249,11 +249,11 @@ class StreamingSound(object):
     def setPosition(self, position):
         return self._mixstream.seek(position)
 
-    def setPitchBend(self, factor):
-        self._mixstream.set_pitch_semitones(factor)
+    def setPitchBendSemitones(self, semitones):
+        self._mixstream.set_pitch_semitones(semitones)
 
     def stopPitchBend(self):
-        self.setPitchBend(0.0)
+        self.setPitchBendSemitones(0.0)
 
     def setSpeed(self, factor):
         self._mixstream.set_speed(factor)
