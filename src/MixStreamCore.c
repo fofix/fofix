@@ -29,6 +29,8 @@ struct _MixStream {
   int samprate;
   int channels;
   mix_stream_read_cb read_cb;
+  mix_stream_seek_cb seek_cb;
+  mix_stream_length_cb length_cb;
   mix_stream_free_cb free_cb;
   void* cb_data;
   int channel;
@@ -53,10 +55,14 @@ static void _mix_stream_soundtouchify(MixStream* stream);
 
 /* Create a stream that will play data returned by read_cb.
  *   - samprate and channels specify the format returned by read_cb
+ *   - seek_cb is called to attempt a seek (may be NULL if not implemented)
+ *   - length_cb is called to get total length (may be NULL if not implemented)
  *   - free_cb is called on data when the stream is destroyed (may be NULL)
  *   - data is passed to the callbacks
  */
-MixStream* mix_stream_new(int samprate, int channels, mix_stream_read_cb read_cb, mix_stream_free_cb free_cb, void* data, GError** err)
+MixStream* mix_stream_new(int samprate, int channels, mix_stream_read_cb read_cb,
+  mix_stream_seek_cb seek_cb, mix_stream_length_cb length_cb,
+  mix_stream_free_cb free_cb, void* data, GError** err)
 {
   MixStream* stream;
 
@@ -67,6 +73,8 @@ MixStream* mix_stream_new(int samprate, int channels, mix_stream_read_cb read_cb
   stream->samprate = samprate;
   stream->channels = channels;
   stream->read_cb = read_cb;
+  stream->seek_cb = seek_cb;
+  stream->length_cb = length_cb;
   stream->free_cb = free_cb;
   stream->cb_data = data;
   stream->channel = -1;
@@ -376,6 +384,43 @@ void mix_stream_set_speed(MixStream* stream, float speed)
   g_mutex_lock(stream->st_mutex);
   soundtouch_set_tempo(stream->soundtouch, speed);
   g_mutex_unlock(stream->st_mutex);
+}
+
+
+/* Seek to time (in seconds) from the beginning of a MixStream's
+ * underlying content and return the new time. Returns a negative
+ * value on error or if the content is unseekable.
+ */
+double mix_stream_seek(MixStream* stream, double time)
+{
+  double new_time;
+  if (stream->seek_cb == NULL)
+    return -1.0;
+  SDL_LockAudio();
+  new_time = stream->seek_cb(time, stream->cb_data);
+  g_mutex_lock(stream->st_mutex);
+  if (stream->soundtouch != NULL)
+    soundtouch_clear(stream->soundtouch);
+  stream->eof = FALSE;
+  stream->input_eof = FALSE;
+  g_mutex_unlock(stream->st_mutex);
+  SDL_UnlockAudio();
+  return new_time;
+}
+
+
+/* Get total length in seconds of a MixStream's underlying content.
+ * Returns a negative value if this quantity is not defined.
+ */
+double mix_stream_get_length(MixStream* stream)
+{
+  double length;
+  if (stream->length_cb == NULL)
+    return -1.0;
+  SDL_LockAudio();
+  length = stream->length_cb(stream->cb_data);
+  SDL_UnlockAudio();
+  return length;
 }
 
 

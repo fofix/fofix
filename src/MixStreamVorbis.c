@@ -70,6 +70,24 @@ static gsize vf_read_cb(float* buf, gsize bufsize, void* data)
 }
 
 
+/* Seek callback for a libvorbisfile-backed stream. */
+static double vf_seek_cb(double time, void* data)
+{
+  int result = ov_time_seek((OggVorbis_File*)data, time);
+  if (result == 0)
+    return time;
+  else
+    return -1.0;
+}
+
+
+/* Length callback for a libvorbisfile-backed stream. */
+static double vf_length_cb(void* data)
+{
+  return ov_time_total((OggVorbis_File*)data, -1);
+}
+
+
 /* Free callback for a libvorbisfile-backed stream. */
 static void vf_free_cb(void* data)
 {
@@ -100,7 +118,7 @@ MixStream* mix_stream_new_vorbisfile(const char* filename, GError** err)
 
   vi = ov_info(vf, -1);
 
-  stream = mix_stream_new(vi->rate, vi->channels, vf_read_cb, vf_free_cb, vf, err);
+  stream = mix_stream_new(vi->rate, vi->channels, vf_read_cb, vf_seek_cb, vf_length_cb, vf_free_cb, vf, err);
   if (stream == NULL) {
     ov_clear(vf);
     g_free(vf);

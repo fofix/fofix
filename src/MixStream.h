@@ -26,14 +26,20 @@
 typedef struct _MixStream MixStream;
 
 typedef gsize(*mix_stream_read_cb)(float* buf, gsize bufsize, void* data);
+typedef double(*mix_stream_seek_cb)(double time, void* data);
+typedef double(*mix_stream_length_cb)(void* data);
 typedef void(*mix_stream_free_cb)(void* data);
-MixStream* mix_stream_new(int samprate, int channels, mix_stream_read_cb read_cb, mix_stream_free_cb free_cb, void* data, GError** err);
+MixStream* mix_stream_new(int samprate, int channels, mix_stream_read_cb read_cb,
+  mix_stream_seek_cb seek_cb, mix_stream_length_cb length_cb,
+  mix_stream_free_cb free_cb, void* data, GError** err);
 MixStream* mix_stream_new_vorbisfile(const char* filename, GError** err);
 void mix_stream_destroy(MixStream* stream);
 
 int mix_stream_play(MixStream* stream, int channel);
 gboolean mix_stream_is_playing(const MixStream* stream);
 void mix_stream_stop(MixStream* stream);
+double mix_stream_seek(MixStream* stream, double time);
+double mix_stream_get_length(MixStream* stream);
 
 void mix_stream_set_pitch_semitones(MixStream* stream, float semitones);
 void mix_stream_set_speed(MixStream* stream, float speed);

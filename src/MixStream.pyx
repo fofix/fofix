@@ -41,6 +41,8 @@ cdef extern from "MixStream.h":
     int mix_stream_play(CMixStream*, int)
     bint mix_stream_is_playing(CMixStream*)
     void mix_stream_stop(CMixStream*)
+    double mix_stream_seek(CMixStream*, double)
+    double mix_stream_get_length(CMixStream*)
     void mix_stream_set_pitch_semitones(CMixStream*, float)
     void mix_stream_set_speed(CMixStream*, float)
 
@@ -85,6 +87,12 @@ cdef class VorbisFileMixStream(object):
 
     def stop(self):
         mix_stream_stop(self.stream)
+
+    def seek(self, double time):
+        return mix_stream_seek(self.stream, time)
+
+    def get_length(self):
+        return mix_stream_get_length(self.stream)
 
     def set_pitch_semitones(self, float semitones):
         mix_stream_set_pitch_semitones(self.stream, semitones)
