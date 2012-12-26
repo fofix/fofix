@@ -2215,11 +2215,7 @@ class Song(object):
 
         self.breMarkerTime = None
 
-        self.music = None
-
-        if songTrackName:
-            self.music       = Audio.Music(songTrackName)
-
+        self.songTrack = None
         self.guitarTrack = None
         self.rhythmTrack = None
 
@@ -2227,6 +2223,12 @@ class Song(object):
         self.drumTrack = None
         #akedrou
         self.crowdTrack = None
+
+        try:
+            if songTrackName:
+                self.songTrack = Audio.StreamingSound(self.engine.audio.getChannel(0), songTrackName)
+        except Exception, e:
+            Log.warn("Unable to load song track: %s" % e)
 
         try:
             if guitarTrackName:
@@ -2255,8 +2257,8 @@ class Song(object):
 
         #MFH - single audio track song detection
         self.singleTrackSong = False
-        if (self.music == None) or (self.guitarTrack == None and self.rhythmTrack == None and self.drumTrack == None):
-            if not (self.music == None and self.guitarTrack == None and self.rhythmTrack == None and self.drumTrack == None):
+        if (self.songTrack == None) or (self.guitarTrack == None and self.rhythmTrack == None and self.drumTrack == None):
+            if not (self.songTrack == None and self.guitarTrack == None and self.rhythmTrack == None and self.drumTrack == None):
                 self.singleTrackSong = True
                 self.missVolume = self.engine.config.get("audio", "single_track_miss_volume")   #MFH - force single-track miss volume setting instead
                 Log.debug("Song with only a single audio track identified - single-track miss volume applied: " + str(self.missVolume))
@@ -2325,14 +2327,16 @@ class Song(object):
         #RF-mod No longer needed?
 
         if self.engine.audioSpeedFactor == 1:  #MFH - shut this track up if slowing audio down!
-            self.music.play(0, start / 1000.0)
+            self.songTrack.setPosition(start / 1000.0)
+            self.songTrack.play()
             if self.singleTrackSong:
-                self.music.setVolume(self.activeVolume)
+                self.songTrack.setVolume(self.activeVolume)
             else:
-                self.music.setVolume(self.backVolume)
+                self.songTrack.setVolume(self.backVolume)
         else:
-            self.music.play(int(math.ceil(1.0/self.engine.audioSpeedFactor)), start / 1000.0)  #tell music to loop 2 times for 1/2 speed, 4 times for 1/4 speed (so it doesn't end early) (it wants an int, though)
-            self.music.setVolume(0.0)
+            self.songTrack.setPosition(start / 1000.0)
+            self.songTrack.play()
+            self.songTrack.setVolume(0.0)
 
         if self.guitarTrack:
             assert start == 0.0
@@ -2350,11 +2354,9 @@ class Song(object):
         self._playing = True
 
     def pause(self):
-        self.music.pause()
         self.engine.audio.pause()
 
     def unpause(self):
-        self.music.unpause()
         self.engine.audio.unpause()
 
     def setInstrumentVolume(self, volume, part):
@@ -2382,14 +2384,14 @@ class Song(object):
         # evilynux - It also falls on this with buggy pygame < 1.9 on 64bit CPUs.
         else:
             if volume == 0:
-                self.music.setVolume(self.missVolume)
+                self.songTrack.setVolume(self.missVolume)
             elif volume == 1:
                 if GUITAR_TRACK in self.activeAudioTracks or self.singleTrackSong:
-                    self.music.setVolume(self.activeVolume)
+                    self.songTrack.setVolume(self.activeVolume)
                 else:
-                    self.music.setVolume(self.backVolume)
+                    self.songTrack.setVolume(self.backVolume)
             else:
-                self.music.setVolume(volume)
+                self.songTrack.setVolume(volume)
 
     def setRhythmVolume(self, volume):
         if self.rhythmTrack:
@@ -2421,7 +2423,7 @@ class Song(object):
             if self.guitarTrack:
                 self.guitarTrack.setPitchBend(pitch)
             else:
-                self.music.setPitchBend(pitch)
+                self.songTrack.setPitchBend(pitch)
         elif part == parts[DRUM_PART]:
             pass
         else:
@@ -2430,12 +2432,12 @@ class Song(object):
 
     def resetInstrumentPitch(self, part):
         if part == -1: #this is just a convenient way to ensure we grab the 'music' channel when resetting pitch (rather; reset bending on all output)
-            self.music.stopPitchBend()
+            self.songTrack.stopPitchBend()
         elif part == parts[GUITAR_PART]:
             if self.guitarTrack:
                 self.guitarTrack.stopPitchBend()
             else:
-                self.music.stopPitchBend()
+                self.songTrack.stopPitchBend()
         elif part == parts[DRUM_PART]:
             pass
         else:
@@ -2444,9 +2446,9 @@ class Song(object):
 
     def setBackgroundVolume(self, volume):
         if volume == 1:
-            self.music.setVolume(self.backVolume)
+            self.songTrack.setVolume(self.backVolume)
         else:
-            self.music.setVolume(volume)
+            self.songTrack.setVolume(volume)
 
     def setCrowdVolume(self, volume):
         if self.crowdTrack:
@@ -2473,10 +2475,8 @@ class Song(object):
                     track.reset()
 
 
-        if self.music:  #MFH
-            self.music.stop()
-            self.music.rewind()
-
+        if self.songTrack:
+            self.songTrack.stop()
         if self.guitarTrack:
             self.guitarTrack.stop()
         if self.rhythmTrack:
@@ -2492,7 +2492,8 @@ class Song(object):
             for track in tracks:
                 track.reset()
 
-        self.music.fadeout(time)
+        if self.songTrack:
+            self.songTrack.fadeout(time)
         if self.guitarTrack:
             self.guitarTrack.fadeout(time)
         if self.rhythmTrack:
@@ -2504,15 +2505,15 @@ class Song(object):
         self._playing = False
 
     def clearPause(self):
-        self.music.isPause = False
-        self.music.toUnpause = False
-        self.music.pausePos = 0.0
+        self.songTrack.isPause = False
+        self.songTrack.toUnpause = False
+        self.songTrack.pausePos = 0.0
 
     def getPosition(self):
         if not (self._playing and Audio.Audio().isMixerInit()):
             pos = 0.0
         else:
-            pos = self.music.getPosition()
+            pos = self.songTrack.getPosition() * 1000.0
 
 
             if self.engine.audioSpeedFactor != 1:   #MFH - to correct for slowdown's positioning
@@ -2527,7 +2528,7 @@ class Song(object):
         #MFH - check here to see if any audio tracks are still playing first!
         #MFH from the Future sez: but only if in slowdown mode!
         if self.engine.audioSpeedFactor == 1:
-            return self._playing and self.music.isPlaying()
+            return self._playing and self.songTrack.isPlaying()
         else:   #altered speed mode!
             if self.guitarTrack and self.guitarTrack.isPlaying():
                 return True
@@ -2536,7 +2537,7 @@ class Song(object):
             if self.drumTrack and self.drumTrack.isPlaying():
                 return True
             else:
-                return self._playing and self.music.isPlaying()
+                return self._playing and self.songTrack.isPlaying()
 
     def getBeat(self):
         return self.getPosition() / self.period
