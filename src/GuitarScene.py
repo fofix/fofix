@@ -1733,8 +1733,6 @@ class GuitarScene(Scene):
             self.song.tracks = None
             self.song.eventTracks = None
             self.song.midiEventTracks = None
-            if self.whammyEffect == 1:
-                self.song.resetInstrumentPitch(-1)
         self.song = None
 
         #MFH - additional cleanup!
