@@ -163,12 +163,6 @@ The following packages are optional:
     distribution.  There's no advantage at all to doing so unless you're
     going to be distributing binaries.
 
-  * pitchbend ([direct link to 0.3-EndOfLife](http://www.mediafire.com/file/zlinjzzj0km/pitchbend-0.3-EndOfLife.win32-py2.6.exe))
-
-    This provides rudimentary, badly-implemented support for a
-    whammy pitchbend effect.  It will be replaced with a much better
-    implementation soon.
-
   * pyaudio ([direct link to 0.2.4](http://people.csail.mit.edu/hubert/pyaudio/packages/pyaudio-0.2.4.py26.exe))
 
     This provides support for microphone input, which is required for
@@ -228,12 +222,11 @@ The following are required:
   * Cython
   * pkg-config
   * The OpenGL, GLU, GLib, SDL, SDL_mixer, libogg, libvorbisfile,
-    libtheora, and libswscale (part of ffmpeg) development headers
+    libtheora, libsoundtouch, and libswscale (part of ffmpeg) development headers
 
 The following are optional (refer to the Windows instructions to see
 what each one is needed for):
 
-  * pitchbend
   * pyaudio
   * the GNU gettext tools (for translations)
 
@@ -242,7 +235,7 @@ following packages: `python-pygame`, `python-opengl`, `python-numpy`,
 `python-imaging`, `python-dev`, `build-essential`, `cython`, `pkg-config`,
 `libgl1-mesa-dev`, `libglu1-mesa-dev`, `libglib2.0-dev`, `libsdl1.2-dev`,
 `libsdl-mixer1.2-dev`, `libogg-dev`, `libvorbisfile-dev`, `libtheora-dev`,
-`libswscale-dev`, and if you want translations, `gettext`.
+`libswscale-dev`, `libsoundtouch-dev`, and if you want translations, `gettext`.
 
 Some packages can be troublesome, so we have notes below about certain
 packages.
@@ -283,24 +276,6 @@ if you're using Python 2.6.
 
 Other distributions that lack pyaudio can find the source for it elsewhere
 on that page.
-
-#### About pitchbend
-We're going to be getting rid of it soon, its quality leaves a lot to
-be desired, and its dependency libraries can be troublesome or might
-not be packaged for your distribution.  Our advice is not to bother
-with pitchbend.
-
-If you want to try it anyway, make sure you have the SDL_mixer
-and libsndobj development headers (under Debian and Ubuntu,
-`libsdl-mixer1.2-dev` and `libsndobj-dev`) and type:
-
-    git clone git://git.jstump.com/git/pitchbend.git
-    cd pitchbend
-    python setup.py build
-
-It can be installed system-wide with (as root):
-
-    python setup.py install
 
 ----
 <a name="Compiling-the-native-modules"></a>
