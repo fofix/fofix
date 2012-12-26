@@ -560,7 +560,7 @@ class GuitarScene(Scene):
         self.drumMisses = self.engine.config.get("game", "T_sound") #Faaa Drum sound
 
         #MFH - constant definitions, ini value retrievals
-        self.pitchBendLowestFactor = .90 #stump: perhaps read this from song.ini and fall back on a specific value?
+        self.pitchBendSemitones = -1.0 #stump: perhaps read this from song.ini and fall back on a specific value?
         self.lineByLineLyricMaxLineWidth = 0.5
         self.lineByLineStartSlopMs = 750
         self.digitalKillswitchStarpowerChunkSize = 0.05 * self.engine.audioSpeedFactor
@@ -624,9 +624,6 @@ class GuitarScene(Scene):
         self.logStarpowerMisses = self.engine.config.get("game", "log_starpower_misses")
         self.soloFrameMode = self.engine.config.get("game", "solo_frame")
         self.whammyEffect = self.engine.config.get("audio",  "whammy_effect")
-        if self.whammyEffect == 1 and not Audio.pitchBendSupported:    #pitchbend
-            Dialogs.showMessage(self.engine, "Pitchbend module not found!  Forcing Killswitch effect.")
-            self.whammyEffect = 0
         shaders.var["whammy"] = self.whammyEffect
         self.bigRockEndings = self.engine.config.get("game", "big_rock_endings")
         self.showFreestyleActive = self.engine.config.get("debug",   "show_freestyle_active")
@@ -2597,7 +2594,7 @@ class GuitarScene(Scene):
                             if self.whammyEffect == 0:    #killswitch
                                 self.song.setInstrumentVolume(whammyVolSet, self.players[i].part)
                             elif self.whammyEffect == 1:    #pitchbend
-                                self.song.setInstrumentPitch(self.pitchBendLowestFactor+((1.0-self.pitchBendLowestFactor)*(1.0-self.whammyVol[i])), self.players[i].part)
+                                self.song.setInstrumentPitch(self.pitchBendSemitones*self.whammyVol[i], self.players[i].part)
 
 
                         elif self.actualWhammyVol[i] > self.targetWhammyVol[i]:
@@ -2606,7 +2603,7 @@ class GuitarScene(Scene):
                             if self.whammyEffect == 0:    #killswitch
                                 self.song.setInstrumentVolume(whammyVolSet, self.players[i].part)
                             elif self.whammyEffect == 1:    #pitchbend
-                                self.song.setInstrumentPitch(self.pitchBendLowestFactor+((1.0-self.pitchBendLowestFactor)*(1.0-self.whammyVol[i])), self.players[i].part)
+                                self.song.setInstrumentPitch(self.pitchBendSemitones*self.whammyVol[i], self.players[i].part)
 
                     elif self.scoring[i].streak > 0:
                         self.song.setInstrumentVolume(1.0, self.players[i].part)
@@ -2622,7 +2619,7 @@ class GuitarScene(Scene):
                                 if self.whammyEffect == 0:    #killswitch
                                     self.song.setInstrumentVolume(self.killVolume, self.players[i].part)  #MFH
                                 elif self.whammyEffect == 1:    #pitchbend
-                                    self.song.setInstrumentPitch(self.pitchBendLowestFactor+((1.0-self.pitchBendLowestFactor)*self.whammyVol[i]), self.players[i].part)
+                                    self.song.setInstrumentPitch(self.pitchBendSemitones*(1.0-self.whammyVol[i]), self.players[i].part)
                                 if self.instruments[i].killPoints:
                                     self.instruments[i].starPower += self.digitalKillswitchStarpowerChunkSize
                                     if self.instruments[i].starPower > 100:

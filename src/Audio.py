@@ -28,9 +28,6 @@ import Config
 from MixStream import VorbisFileMixStream
 import numpy as np
 
-# Temporarily force other code to see no pitchbend support.
-pitchBendSupported = False
-
 #stump: get around some strangeness in pygame when py2exe'd...
 if not hasattr(pygame.mixer, 'music'):
     import sys
@@ -123,16 +120,6 @@ class Music(object):
     def setVolume(self, volume):
         pygame.mixer.music.set_volume(volume)
 
-    #stump: pitch bending
-    # SDL_mixer doesn't support callback processing of the music stream.
-    # Thus, as a workaround, we must bend the whole output.
-    #def setPitchBend(self, factor):
-    #    pygame.pitchbend.start(pygame.pitchbend.ALL)
-    #    pygame.pitchbend.setFactor(pygame.pitchbend.ALL, factor)
-    #
-    #def stopPitchBend(self):
-    #    pygame.pitchbend.stop(pygame.pitchbend.ALL)
-
     def fadeout(self, time):
         pygame.mixer.music.fadeout(time)
 
@@ -162,17 +149,11 @@ class Channel(object):
         self.channel = pygame.mixer.Channel(id)
         self.id = id
 
-    #def __del__(self):
-    #    if pitchBendSupported:
-    #        pygame.pitchbend.stop(self.id)
-
     def play(self, sound):
         self.channel.play(sound.sound)
 
     def stop(self):
         self.channel.stop()
-    #    if pitchBendSupported:
-    #        pygame.pitchbend.stop(self.id)
 
     def setVolume(self, volume):
         self.channel.set_volume(volume)
@@ -180,13 +161,6 @@ class Channel(object):
     def fadeout(self, time):
         self.channel.fadeout(time)
 
-    #stump: pitch bending
-    #def setPitchBend(self, factor):
-    #    pygame.pitchbend.start(self.id)
-    #    pygame.pitchbend.setFactor(self.id, factor)
-    #
-    #def stopPitchBend(self):
-    #    pygame.pitchbend.stop(self.id)
 
 class Sound(object):
     def __init__(self, fileName):
