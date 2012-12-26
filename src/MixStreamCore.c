@@ -22,6 +22,7 @@
 
 #include "soundtouch-c.h"
 #include <SDL_mixer.h>
+#include <SDL.h>
 
 #define FRAMES_PER_CHUNK 4096
 
@@ -45,6 +46,10 @@ struct _MixStream {
   gboolean out_samples_signed;
   gboolean byteswap_needed;
   GMutex* st_mutex;
+  double next_read_time;
+  double out_speed;
+  double chunk_start_time;
+  Uint32 chunk_start_ticks;
 };
 
 static GHashTable* chan_table = NULL;
@@ -79,6 +84,7 @@ MixStream* mix_stream_new(int samprate, int channels, mix_stream_read_cb read_cb
   stream->cb_data = data;
   stream->channel = -1;
   stream->chunk.volume = MIX_MAX_VOLUME;
+  stream->out_speed = 1.0;
 
   if (!Mix_QuerySpec(&stream->out_freq, &stream->out_format, &stream->out_channels)) {
     g_set_error(err, MIX_STREAM_ERROR, MIX_STREAM_MIXER_UNINIT,
@@ -258,6 +264,9 @@ static gboolean _mix_stream_nextchunk(MixStream* stream, gsize size)
 
   }
 
+  stream->chunk_start_time = stream->next_read_time;
+  stream->next_read_time += (stream->out_speed * obtained_frames) / stream->out_freq;
+
   return TRUE;
 }
 
@@ -279,6 +288,7 @@ static void _mix_stream_channel_finished(int channel)
   }
 
   Mix_PlayChannel(channel, &stream->chunk, 0);
+  stream->chunk_start_ticks = SDL_GetTicks();
 }
 
 
@@ -321,6 +331,7 @@ int mix_stream_play(MixStream* stream, int requested_channel)
   g_hash_table_insert(chan_table, g_memdup(&stream->channel, sizeof(int)), stream);
   g_static_mutex_unlock(&chan_table_mutex);
 
+  stream->chunk_start_ticks = SDL_GetTicks();
   if (requested_channel == -1)
     return real_channel;
   else
@@ -383,6 +394,7 @@ void mix_stream_set_speed(MixStream* stream, float speed)
   _mix_stream_soundtouchify(stream);
   g_mutex_lock(stream->st_mutex);
   soundtouch_set_tempo(stream->soundtouch, speed);
+  stream->out_speed = speed;
   g_mutex_unlock(stream->st_mutex);
 }
 
@@ -403,9 +415,35 @@ double mix_stream_seek(MixStream* stream, double time)
     soundtouch_clear(stream->soundtouch);
   stream->eof = FALSE;
   stream->input_eof = FALSE;
+  stream->next_read_time = new_time;
   g_mutex_unlock(stream->st_mutex);
   SDL_UnlockAudio();
   return new_time;
+}
+
+
+/* Get current playback position in seconds (with respect to the
+ * underlying content!) of a MixStream if this is well-defined for
+ * the underlying content. Returns a negative value on error.
+ */
+double mix_stream_get_position(MixStream* stream)
+{
+  /* This is one of the more critical functions to be sure we get right, as the
+   * notes on screen will be positioned based on whatever this function says.
+   */
+  double chunk_time;
+  double time_since_chunk_start;
+  double position;
+
+  if (!mix_stream_is_playing(stream))
+    return -1.0;
+
+  SDL_LockAudio();
+  chunk_time = (double)FRAMES_PER_CHUNK/(double)stream->out_freq;
+  time_since_chunk_start = CLAMP((SDL_GetTicks() - stream->chunk_start_ticks) / 1000.0, 0.0, chunk_time);
+  position = stream->chunk_start_time + stream->out_speed * time_since_chunk_start;
+  SDL_UnlockAudio();
+  return position;
 }
 
 

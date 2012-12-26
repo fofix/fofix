@@ -39,6 +39,7 @@ int mix_stream_play(MixStream* stream, int channel);
 gboolean mix_stream_is_playing(const MixStream* stream);
 void mix_stream_stop(MixStream* stream);
 double mix_stream_seek(MixStream* stream, double time);
+double mix_stream_get_position(MixStream* stream);
 double mix_stream_get_length(MixStream* stream);
 
 void mix_stream_set_pitch_semitones(MixStream* stream, float semitones);
