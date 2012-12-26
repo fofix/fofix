@@ -400,8 +400,6 @@ setup_args.update({
                        'pypitch/AnalyzerInput.cpp']),
     Extension('VideoPlayer', ['VideoPlayer.pyx', 'VideoPlayerCore.c'],
               **combine_info(gl_info, ogg_info, theoradec_info, glib_info, swscale_info)),
-    Extension('OggStreamer', ['OggStreamer.c'],
-              **combine_info(vorbisfile_info, sdl_info, sdl_mixer_info)),
     Extension('MixStream', ['MixStream.pyx', 'MixStreamCore.c', 'MixStreamVorbis.c'] + extra_soundtouch_src,
               **combine_info(vorbisfile_info, soundtouch_info, glib_info, gthread_info, sdl_info, sdl_mixer_info)),
   ],

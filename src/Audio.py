@@ -25,7 +25,7 @@ import pygame
 import Log
 from Task import Task
 import Config
-import OggStreamer
+from MixStream import VorbisFileMixStream
 import numpy as np
 
 # Temporarily force other code to see no pitchbend support.
@@ -247,37 +247,39 @@ class MicrophonePassthroughStream(Sound, Task):
         self.channel.set_volume(self.volume)
 
 
-class StreamingSound(Sound, Task):
+class StreamingSound(object):
     def __init__(self, engine, channel, fileName):
-        Task.__init__(self)
-        Sound.__init__(self, fileName)
-        self.channel = channel
-
-    def __new__(cls, engine, channel, fileName):
-        return OggStreamer.StreamingOggSound(channel.id, fileName)
+        self._mixstream = VorbisFileMixStream(fileName)
+        self._channel = channel
 
     def play(self):
-        self.channel.play(self)
+        self._mixstream.play(self._channel.id)
 
     def stop(self):
-        Sound.stop(self)
-        self.channel.stop()
+        self._mixstream.stop()
+        self._channel.stop()
 
     def setVolume(self, volume):
-        Sound.setVolume(self, volume)
-        self.channel.setVolume(volume)
+        self._channel.setVolume(volume)
 
     def streamIsPlaying(self):  #MFH - adding function to check if sound is playing
-        return Sound.get_num_channels()
-
+        return self._mixstream.is_playing()
 
     def fadeout(self, time):
-        Sound.fadeout(self, time)
-        self.channel.fadeout(time)
+        # TODO
+        self.stop()
 
-    #stump: pitch bending
-    #def setPitchBend(self, factor):
-    #    self.channel.setPitchBend(factor)
-    #
-    #def stopPitchBend(self):
-    #    self.channel.stopPitchBend()
+    def getPosition(self):
+        return self._mixstream.get_position()
+
+    def setPosition(self, position):
+        return self._mixstream.seek(position)
+
+    def setPitchBend(self, factor):
+        self._mixstream.set_pitch_semitones(factor)
+
+    def stopPitchBend(self):
+        self.setPitchBend(0.0)
+
+    def setSpeed(self, factor):
+        self._mixstream.set_speed(factor)
