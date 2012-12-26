@@ -2430,16 +2430,7 @@ class Song(object):
                 self.rhythmTrack.setPitchBendSemitones(semitones)
 
     def resetInstrumentPitch(self, part):
-        if part == parts[GUITAR_PART]:
-            if self.guitarTrack:
-                self.guitarTrack.stopPitchBend()
-            else:
-                self.songTrack.stopPitchBend()
-        elif part == parts[DRUM_PART]:
-            pass
-        else:
-            if self.rhythmTrack:
-                self.rhythmTrack.stopPitchBend()
+        self.setInstrumentPitch(0.0, part)
 
     def setBackgroundVolume(self, volume):
         if volume == 1:

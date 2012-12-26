@@ -252,8 +252,5 @@ class StreamingSound(object):
     def setPitchBendSemitones(self, semitones):
         self._mixstream.set_pitch_semitones(semitones)
 
-    def stopPitchBend(self):
-        self.setPitchBendSemitones(0.0)
-
     def setSpeed(self, factor):
         self._mixstream.set_speed(factor)
