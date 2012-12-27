@@ -2022,8 +2022,6 @@ class GuitarScene(Scene):
             self.song.stop()
         self.resetVariablesToDefaults()
         self.done = True
-        # evilynux - Reset speed
-        self.engine.setSpeedFactor(1.0)
 
         self.engine.view.setViewport(1,0)
         self.engine.view.popLayer(self.menu)
@@ -2050,8 +2048,6 @@ class GuitarScene(Scene):
             self.song.stop()
             self.song  = None
         self.resetVariablesToDefaults()
-        # evilynux - Reset speed
-        self.engine.setSpeedFactor(1.0)
         self.engine.view.setViewport(1,0)
         self.engine.view.popLayer(self.menu)
         self.engine.view.popLayer(self.failMenu)
@@ -2064,8 +2060,6 @@ class GuitarScene(Scene):
             self.song.stop()
             self.song  = None
         self.resetVariablesToDefaults()
-        # evilynux - Reset speed
-        self.engine.setSpeedFactor(1.0)
 
         self.engine.view.setViewport(1,0)
         self.engine.view.popLayer(self.failMenu)

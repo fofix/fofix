@@ -2275,6 +2275,10 @@ class Song(object):
             scriptReader = ScriptReader(self, open(scriptFileName))
             scriptReader.read()
 
+        # set playback speed
+        if self.engine.audioSpeedFactor != 1.0:
+            self.setSpeed(self.engine.audioSpeedFactor)
+
     @property
     def length(self):
         length = 0
@@ -2326,17 +2330,12 @@ class Song(object):
 
         #RF-mod No longer needed?
 
-        if self.engine.audioSpeedFactor == 1:  #MFH - shut this track up if slowing audio down!
-            self.songTrack.setPosition(start / 1000.0)
-            self.songTrack.play()
-            if self.singleTrackSong:
-                self.songTrack.setVolume(self.activeVolume)
-            else:
-                self.songTrack.setVolume(self.backVolume)
+        self.songTrack.setPosition(start / 1000.0)
+        self.songTrack.play()
+        if self.singleTrackSong:
+            self.songTrack.setVolume(self.activeVolume)
         else:
-            self.songTrack.setPosition(start / 1000.0)
-            self.songTrack.play()
-            self.songTrack.setVolume(0.0)
+            self.songTrack.setVolume(self.backVolume)
 
         if self.guitarTrack:
             assert start == 0.0
@@ -2475,6 +2474,18 @@ class Song(object):
             self.crowdTrack.stop()
         self._playing = False
 
+    def setSpeed(self, speed):
+        if self.songTrack:
+            self.songTrack.setSpeed(speed)
+        if self.guitarTrack:
+            self.guitarTrack.setSpeed(speed)
+        if self.rhythmTrack:
+            self.rhythmTrack.setSpeed(speed)
+        if self.drumTrack:
+            self.drumTrack.setSpeed(speed)
+        if self.crowdTrack:
+            self.crowdTrack.setSpeed(speed)
+
     def fadeout(self, time):
         for tracks in self.tracks:
             for track in tracks:
@@ -2503,29 +2514,12 @@ class Song(object):
         else:
             pos = self.songTrack.getPosition() * 1000.0
 
-
-            if self.engine.audioSpeedFactor != 1:   #MFH - to correct for slowdown's positioning
-                #pos /= self.engine.audioSpeedFactor
-                pos *= self.engine.audioSpeedFactor
-
         if pos < 0.0:
             pos = 0.0
-        return pos + self.start - self.delay
+        return pos - self.delay
 
     def isPlaying(self):
-        #MFH - check here to see if any audio tracks are still playing first!
-        #MFH from the Future sez: but only if in slowdown mode!
-        if self.engine.audioSpeedFactor == 1:
-            return self._playing and self.songTrack.isPlaying()
-        else:   #altered speed mode!
-            if self.guitarTrack and self.guitarTrack.isPlaying():
-                return True
-            if self.rhythmTrack and self.rhythmTrack.isPlaying():
-                return True
-            if self.drumTrack and self.drumTrack.isPlaying():
-                return True
-            else:
-                return self._playing and self.songTrack.isPlaying()
+        return self._playing and self.songTrack.isPlaying()
 
     def getBeat(self):
         return self.getPosition() / self.period
@@ -3419,32 +3413,7 @@ def loadSong(engine, name, library = DEFAULT_LIBRARY, seekable = False, playback
         slowDownFactor = practiceSpeed
     else:
         slowDownFactor = engine.config.get("audio", "speed_factor")
-    engine.setSpeedFactor(slowDownFactor)    #MFH
-
-
-    #MFH - check for slowdown mode here.  If slowdown, and single track song (or practice mode),
-    #  duplicate single track to a streamingAudio track so the slowed down version can be heard.
-    if engine.audioSpeedFactor != 1:
-        crowdFile = None
-        #count tracks:
-        audioTrackCount = 0
-        if guitarFile:
-            audioTrackCount += 1
-        if rhythmFile:
-            audioTrackCount += 1
-        if drumFile:
-            audioTrackCount += 1
-        if audioTrackCount < 1:
-            if part[0] == parts[GUITAR_PART] or part[0] == parts[PRO_GUITAR_PART]:
-                guitarFile = songFile
-            elif part[0] == parts[BASS_PART]:
-                rhythmFile = songFile
-            elif part[0] == parts[DRUM_PART] or part[0] == parts[PRO_DRUM_PART]:
-                drumFile = songFile
-            else:
-                guitarFile = songFile
-
-
+    engine.audioSpeedFactor = slowDownFactor
 
 
     if playbackOnly:

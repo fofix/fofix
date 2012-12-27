@@ -229,11 +229,7 @@ class GameEngine(object):
         bits         = self.config.get("audio", "bits")
         stereo       = self.config.get("audio", "stereo")
         bufferSize   = self.config.get("audio", "buffersize")
-
-        self.frequency = frequency    #MFH - store this for later reference!
-        self.bits = bits
-        self.stereo = stereo
-        self.bufferSize = bufferSize
+        self.audio.open(frequency = frequency, bits = bits, stereo = stereo, bufferSize = bufferSize)
 
         self.cmdPlay           = 0
         self.cmdMode           = None
@@ -243,9 +239,7 @@ class GameEngine(object):
         self.gameStarted       = False
         self.world             = None
 
-        #MFH - TODO - Audio speed divisor needs to be changed to audio speed factor, so can support 0.75x (3/4 speed)
-        self.audioSpeedFactor = 0
-        self.setSpeedFactor(1)   #MFH - handles initialization at full speed
+        self.audioSpeedFactor  = 1.0
 
         Log.debug("Initializing video.")
         #myfingershurt: ensuring windowed mode starts up in center of the screen instead of cascading positions:
@@ -382,22 +376,6 @@ class GameEngine(object):
 
         Log.debug("Ready.")
 
-
-    def setSpeedFactor(self, factor):
-        '''
-        allows for slowing down streaming audio tracks
-        @param factor:
-        '''
-        if self.audioSpeedFactor != factor:   #MFH - don't re-init to the same divisor.
-            try:
-                self.audio.close()    #MFH - ensure no audio is playing during the switch!
-                self.audio.pre_open(frequency = int(self.frequency*factor), bits = self.bits, stereo = self.stereo, bufferSize = self.bufferSize)
-                self.audio.open(frequency = int(self.frequency*factor), bits = self.bits, stereo = self.stereo, bufferSize = self.bufferSize)
-                self.audioSpeedFactor = factor
-                pygame.init()
-                Log.debug("Initializing pygame.mixer & audio system at " + str(self.frequency*factor) + " Hz." )
-            except Exception:
-                Log.error("Failed to initialize or re-initialize pygame.mixer & audio system - crash imminent!")
 
     # evilynux - This stops the crowd cheers if they're still playing (issue 317).
     def quit(self):
