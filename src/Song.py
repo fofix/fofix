@@ -2509,7 +2509,7 @@ class Song(object):
         self.songTrack.pausePos = 0.0
 
     def getPosition(self):
-        if not (self._playing and Audio.Audio().isMixerInit()):
+        if not self._playing:
             pos = 0.0
         else:
             pos = self.songTrack.getPosition() * 1000.0

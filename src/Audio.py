@@ -63,9 +63,6 @@ class Audio:
     def findChannel(self):
         return pygame.mixer.find_channel()
 
-    def isMixerInit(self):
-        return pygame.mixer.get_init()
-
     def getChannelCount(self):
         return pygame.mixer.get_num_channels()
 
