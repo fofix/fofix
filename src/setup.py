@@ -376,7 +376,6 @@ class install(_install):
 
 
 # Convert .po files into .mo files.
-msgfmt_cmd = find_command('msgfmt')
 class msgfmt(Command):
     user_options = []
     description = 'convert .po files in data/po into .mo files in data/translations'
@@ -388,6 +387,7 @@ class msgfmt(Command):
         pass
 
     def run(self):
+        msgfmt_cmd = find_command('msgfmt')
         for pofile in glob.glob(os.path.join('..', 'data', 'po', '*.po')):
             mofile = os.path.join('..', 'data', 'translations', os.path.basename(pofile)[:-3]+'.mo')
             if newer(pofile, mofile):
