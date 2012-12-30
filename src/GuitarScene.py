@@ -3777,7 +3777,6 @@ class GuitarScene(Scene):
                     self.getHandicap()
                     self.song.setAllTrackVolumes(1)
                     self.song.setCrowdVolume(0.0)
-                    self.song.clearPause()
                     self.crowdsCheering = False #catches crowdsEnabled != 3, pause before countdown, set to 3
                     self.starPowersActive = 0
                     self.playersInGreen = 0

@@ -2503,11 +2503,6 @@ class Song(object):
             self.crowdTrack.fadeout(time)
         self._playing = False
 
-    def clearPause(self):
-        self.songTrack.isPause = False
-        self.songTrack.toUnpause = False
-        self.songTrack.pausePos = 0.0
-
     def getPosition(self):
         if not self._playing:
             pos = 0.0

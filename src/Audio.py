@@ -24,7 +24,6 @@
 import pygame
 import Log
 from Task import Task
-import Config
 from MixStream import VorbisFileMixStream
 import numpy as np
 
@@ -84,10 +83,6 @@ class Audio:
 class Music(object):
     def __init__(self, fileName):
         pygame.mixer.music.load(fileName)
-        self.pausePos = 0.0
-        self.isPause = False
-        self.toUnpause = False
-        self.buffersize = Config.get("audio","buffersize")
 
     @staticmethod
     def setEndEvent(event = None):
@@ -107,11 +102,8 @@ class Music(object):
 
     def pause(self):
         pygame.mixer.music.pause()
-        self.pausePos = pygame.mixer.music.get_pos()
-        self.isPause = True
 
     def unpause(self):
-        self.isPause = False
         pygame.mixer.music.unpause()
 
     def setVolume(self, volume):
@@ -121,25 +113,11 @@ class Music(object):
         pygame.mixer.music.fadeout(time)
 
     def isPlaying(self):
-        #MFH - gotta catch case when mixer not initialized yet...
-        try:
-            busy = pygame.mixer.music.get_busy()
-        except Exception:
-            busy = True
-        return busy
+        return pygame.mixer.music.get_busy()
 
     def getPosition(self):
-        if self.isPause:
-            self.toUnpause = True
-            return self.pausePos
-        elif self.toUnpause:
-            if pygame.mixer.music.get_pos() < (self.pausePos + 60 + (self.buffersize/32)): #this should technically be buffersize*1000/samplerate; 32 keeps it integer, 60 allows for processing time
-                self.toUnpause = False
-                return pygame.mixer.music.get_pos()
-            else:
-                return self.pausePos
-        else:
-            return pygame.mixer.music.get_pos()
+        return pygame.mixer.music.get_pos()
+
 
 class Channel(object):
     def __init__(self, id):
