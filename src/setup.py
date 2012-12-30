@@ -253,20 +253,27 @@ else:
     lib_blacklist = []
 
 
-def pc_info(pkg):
+def pc_info(pkg, altnames=[]):
     '''Obtain build options for a library from pkg-config and
     return a dict that can be expanded into the argument list for
     L{distutils.core.Extension}.'''
 
     print 'checking for library %s...' % pkg,
     if not pc_exists(pkg):
-        print 'not found'
-        print >>sys.stderr, 'Could not find required library "%s".' % pkg
-        if os.name == 'nt':
-            print >>sys.stderr, '(Check that you have the latest version of the dependency pack installed.)'
+        for name in altnames:
+            if pc_exists(name):
+                pkg = name
+                print '(using alternative name %s)' % pkg,
+                break
         else:
-            print >>sys.stderr, '(Check that you have the appropriate development package installed.)'
-        sys.exit(1)
+            print 'not found'
+            print >>sys.stderr, 'Could not find required library "%s".' % pkg
+            print >>sys.stderr, '(Also tried the following alternative names: %s)' % ', '.join(altnames)
+            if os.name == 'nt':
+                print >>sys.stderr, '(Check that you have the latest version of the dependency pack installed.)'
+            else:
+                print >>sys.stderr, '(Check that you have the appropriate development package installed.)'
+            sys.exit(1)
 
     cflags = shlex.split(grab_stdout([pkg_config, '--cflags', pkg]))
     libs = shlex.split(grab_stdout([pkg_config, '--libs', pkg]))
