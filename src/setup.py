@@ -304,7 +304,7 @@ theoradec_info = pc_info('theoradec')
 glib_info = pc_info('glib-2.0')
 gthread_info = pc_info('gthread-2.0')
 swscale_info = pc_info('libswscale')
-soundtouch_info = pc_info('soundtouch')
+soundtouch_info = pc_info('soundtouch', ['soundtouch-1.4', 'soundtouch-1.0'])
 if os.name == 'nt':
     # Windows systems: we just know what the OpenGL library is.
     gl_info = {'libraries': ['opengl32']}
