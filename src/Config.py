@@ -27,8 +27,8 @@ from ConfigParser import RawConfigParser
 import Log
 import Resource
 import os
+from Unicode import asUTF8Bytes, unicodify
 
-encoding  = "iso-8859-1"
 config    = None
 prototype = {}
 
@@ -114,6 +114,8 @@ def _convertValue(value, type, default=False):
             return default #allows None-default bools to return None
         else:
             return False
+    elif issubclass(type, basestring):
+        return unicodify(value)
     else:
         try:
             return type(value)
@@ -278,12 +280,7 @@ class Config:
         if not self.config.has_section(section):
             self.config.add_section(section)
 
-        if type(value) == unicode:
-            value = value.encode(encoding)
-        else:
-            value = str(value)
-
-        self.config.set(section, option, value)
+        self.config.set(section, option, asUTF8Bytes(value))
 
         f = open(self.fileName, "w")
         self.config.write(f, self.type)
