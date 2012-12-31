@@ -99,6 +99,27 @@ def load(fileName = None, setAsDefault = False, type = 0):
     logUndefinedGets = c.get("game", "log_undefined_gets")
     return c
 
+def _convertValue(value, type, default=False):
+    """
+    Convert a raw config string to the proper data type.
+    @param value: the raw value
+    @param type:  the desired type
+    @return:      the converted value
+    """
+    if type is bool:
+        value = str(value).lower()
+        if value in ("1", "true", "yes", "on"):
+            return True
+        elif value in ("none", ""):
+            return default #allows None-default bools to return None
+        else:
+            return False
+    else:
+        try:
+            return type(value)
+        except:
+            return None
+
 class Config:
     """A configuration registry."""
     def __init__(self, prototype, fileName = None, type = 0):
@@ -149,20 +170,7 @@ class Config:
                 Log.warn("Config key %s.%s not defined while reading %s." % (section, option, self.fileName))
             type, default = str, None
 
-        value = self.config.has_option(section, option) and self.config.get(section, option) or default
-        if type == bool:
-            value = str(value).lower()
-            if value in ("1", "true", "yes", "on"):
-                value = True
-            elif value in ("none", ""):
-                value = default #allows None-default bools to return None
-            else:
-                value = False
-        else:
-            try:
-                value = type(value)
-            except:
-                value = None
+        value = _convertValue(self.config.get(section, option) if self.config.has_option(section, option) else default, type, default)
 
         #myfingershurt: verbose log output
         if logIniReads == 1:
@@ -193,18 +201,7 @@ class Config:
 
         if type != None:
             for i in range(len(options)):
-                value = keys[i]
-                if type == bool:
-                    value = str(value).lower()
-                    if value in ("1", "true", "yes", "on"):
-                        value = True
-                    else:
-                        value = False
-                else:
-                    try:
-                        value = type(value)
-                    except:
-                        value = None
+                value = _convertValue(keys[i], type)
                 optionList.append(value)
 
         #myfingershurt: verbose log output
@@ -254,18 +251,7 @@ class Config:
                 Log.warn("Config key %s.%s not defined while reading %s." % (section, option, self.fileName))
             type, default = str, None
 
-        value = default
-        if type == bool:
-            value = str(value).lower()
-            if value in ("1", "true", "yes", "on"):
-                value = True
-            else:
-                value = False
-        else:
-            try:
-                value = type(value)
-            except:
-                value = None
+        value = _convertValue(default, type)
 
         #myfingershurt: verbose log output
         if logIniReads == 1:
