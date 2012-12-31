@@ -5,6 +5,7 @@
 *.dll
 *.orig
 *.mo
+*.pot
 .project
 .pydevproject
 .settings

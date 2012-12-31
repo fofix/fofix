@@ -395,6 +395,32 @@ class msgfmt(Command):
                 self.spawn([msgfmt_cmd, '-c', '-o', mofile, pofile])
 
 
+# Extract translatable strings.
+class xgettext(Command):
+    user_options = []
+    description = 'extract translatable strings from source code'
+
+    # The function names that indicate a translatable string.
+    FUNCNAMES = ['_', 'N_']
+
+    def initialize_options(self):
+        pass
+
+    def finalize_options(self):
+        pass
+
+    def run(self):
+        xgettext_cmd = find_command('xgettext')
+        potfile = os.path.join('..', 'data', 'po', 'messages.pot')
+        self.spawn([xgettext_cmd,
+          '--package-name='+Version.PROGRAM_NAME,
+          '--package-version='+Version.version(),
+          '--copyright-holder=FoFiX Team',
+          '-o', potfile] +
+         ['-k' + funcname for funcname in self.FUNCNAMES] +
+          glob.glob('*.py'))
+
+
 # Add the common arguments to setup().
 # This includes arguments to cause FoFiX's extension modules to be built.
 setup_args.update({
@@ -410,7 +436,7 @@ setup_args.update({
     Extension('MixStream', ['MixStream.pyx', 'MixStreamCore.c', 'MixStreamVorbis.c'] + extra_soundtouch_src,
               **combine_info(vorbisfile_info, soundtouch_info, glib_info, gthread_info, sdl_info, sdl_mixer_info)),
   ],
-  'cmdclass': {'build_ext': build_ext, 'install': install, 'msgfmt': msgfmt},
+  'cmdclass': {'build_ext': build_ext, 'install': install, 'msgfmt': msgfmt, 'xgettext': xgettext},
 })
 
 # If we're on Windows, add the dependency directory to the PATH so py2exe will

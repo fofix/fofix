@@ -1,4 +1,5 @@
-call GetTranslatableText.bat
+cd ..
+python setup.py xgettext
 python setup.py py2exe
 pause
 cd scripts
