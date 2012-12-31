@@ -779,51 +779,17 @@ class LibraryInfo(object):
 
 class BlankSpaceInfo(object): #MFH
     def __init__(self, nameToDisplay = ""):
-        self.nameToDisplay = nameToDisplay
 
         self.logClassInits = Config.get("game", "log_class_inits")
         if self.logClassInits == 1:
             Log.debug("BlankSpaceInfo class init (song.py)...")
 
+        self.name = nameToDisplay
+        self.color = None
         self.artist = None    #MFH - prevents search errors
-
-    def _set(self, attr, value):
-        if type(value) == unicode:
-            value = value.encode(Config.encoding)
-        else:
-            value = str(value)
-        self.info.set(self.section, attr, value)
-
-    def _get(self, attr, type = None, default = ""):
-        try:
-            v = self.info.get(self.section, attr)
-        except:
-            v = default
-        if v is not None and type:
-            v = type(v)
-        return v
-
-    def getName(self):
-        return self.nameToDisplay
-
-    def setName(self, value):
-        self._set("name", value)
-
-    def getColor(self):
-        c = self._get("color")
-        if c:
-            return Theme.Theme.hexToColor(c)
-
-    def setColor(self, color):
-        self._set("color", Theme.Theme.colorToHex(color))
 
     def getUnlockID(self):
         return ""
-
-
-    name          = property(getName, setName)
-    color         = property(getColor, setColor)
-
 
 
 class CareerResetterInfo(object): #MFH
@@ -833,40 +799,9 @@ class CareerResetterInfo(object): #MFH
         if self.logClassInits == 1:
             Log.debug("CareerResetterInfo class init (song.py)...")
 
+        self.name = _("Reset Career")
+        self.color = None
         self.artist = None    #MFH - prevents search errors
-
-    def _set(self, attr, value):
-        if type(value) == unicode:
-            value = value.encode(Config.encoding)
-        else:
-            value = str(value)
-        self.info.set(self.section, attr, value)
-
-    def _get(self, attr, type = None, default = ""):
-        try:
-            v = self.info.get(self.section, attr)
-        except:
-            v = default
-        if v is not None and type:
-            v = type(v)
-        return v
-
-    def getName(self):
-        return _("Reset Career")
-
-    def setName(self, value):
-        self._set("name", value)
-
-    def getColor(self):
-        c = self._get("color")
-        if c:
-            return Theme.Theme.hexToColor(c)
-
-    def setColor(self, color):
-        self._set("color", Theme.Theme.colorToHex(color))
-
-    name          = property(getName, setName)
-    color         = property(getColor, setColor)
 
 
 class RandomSongInfo(object): #MFH
@@ -875,40 +810,9 @@ class RandomSongInfo(object): #MFH
         if self.logClassInits == 1:
             Log.debug("RandomSongInfo class init (song.py)...")
 
+        self.name = _("   (Random Song)")
+        self.color = None
         self.artist = None    #MFH - prevents search errors
-
-    def _set(self, attr, value):
-        if type(value) == unicode:
-            value = value.encode(Config.encoding)
-        else:
-            value = str(value)
-        self.info.set(self.section, attr, value)
-
-    def _get(self, attr, type = None, default = ""):
-        try:
-            v = self.info.get(self.section, attr)
-        except:
-            v = default
-        if v is not None and type:
-            v = type(v)
-        return v
-
-    def getName(self):
-        return _("   (Random Song)")
-
-    def setName(self, value):
-        self._set("name", value)
-
-    def getColor(self):
-        c = self._get("color")
-        if c:
-            return Theme.Theme.hexToColor(c)
-
-    def setColor(self, color):
-        self._set("color", Theme.Theme.colorToHex(color))
-
-    name          = property(getName, setName)
-    color         = property(getColor, setColor)
 
 
 #coolguy567's unlock system
@@ -963,49 +867,16 @@ class TitleInfo(object):
 class SortTitleInfo(object):
     def __init__(self, nameToDisplay):
 
-        self.nameToDisplay = nameToDisplay
-
         self.logClassInits = Config.get("game", "log_class_inits")
         if self.logClassInits == 1:
             Log.debug("TitleInfo class init (song.py)...")
 
+        self.name = nameToDisplay
+        self.color = None
         self.artist = None    #MFH - prevents search errors
 
-    def _set(self, attr, value):
-        if type(value) == unicode:
-            value = value.encode(Config.encoding)
-        else:
-            value = str(value)
-        self.info.set(self.section, attr, value)
-
-    def _get(self, attr, type = None, default = ""):
-        try:
-            v = self.info.get(self.section, attr)
-        except:
-            v = default
-        if v is not None and type:
-            v = type(v)
-        return v
-
-    def getName(self):
-        return self.nameToDisplay
-
-    def setName(self, value):
-        self._set("name", value)
-
-    def getColor(self):
-        c = self._get("color")
-        if c:
-            return Theme.Theme.hexToColor(c)
-
-    def setColor(self, color):
-        self._set("color", Theme.Theme.colorToHex(color))
-
     def getUnlockID(self):
-        return self.nameToDisplay
-
-    name          = property(getName, setName)
-    color         = property(getColor, setColor)
+        return self.name
 
 
 class Event:
