@@ -32,6 +32,7 @@ import Version
 import traceback
 import time
 import warnings
+from Unicode import asUTF8Bytes
 
 # Whether to output log entries to stdout in addition to the logfile.
 quiet = True
@@ -49,9 +50,6 @@ elif os.name == "nt":
     logFile = open(os.path.join(Resource.getWritableResourcePath(), Version.PROGRAM_UNIXSTYLE_NAME + ".log"), "w")
 else:
     logFile = open(Version.PROGRAM_UNIXSTYLE_NAME + ".log", "w")  #MFH - local logfile!
-
-# Character encoding to use for logging.
-encoding = "iso-8859-1"
 
 if "-v" in sys.argv or "--verbose" in sys.argv:
     quiet = False
@@ -81,9 +79,7 @@ def _log(cls, msg):
     @param cls:   Priority class for the message
     @param msg:   Log message text
     '''
-    if not isinstance(msg, unicode):
-        msg = unicode(msg, encoding)
-    msg = msg.encode(encoding, "replace") # fculpo - proper encoding
+    msg = asUTF8Bytes(msg)
     timeprefix = "[%12.6f] " % (time.time() - _initTime)
     if not quiet:
         print timeprefix + displaylabels[cls] + " " + msg
