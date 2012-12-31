@@ -68,9 +68,9 @@ class ImgDrawing(object):
         self.filename = ImgData
 
         # Detect the type of data passed in
-        if type(ImgData) == file:
+        if isinstance(ImgData, file):
             self.ImgData = ImgData.read()
-        elif type(ImgData) == str:
+        elif isinstance(ImgData, basestring):
             self.texture = Texture(ImgData)
         elif isinstance(ImgData, Image.Image): #stump: let a PIL image be passed in
             self.texture = Texture()
@@ -78,7 +78,7 @@ class ImgDrawing(object):
 
         # Make sure we have a valid texture
         if not self.texture:
-            if type(ImgData) == str:
+            if isinstance(ImgData, basestring):
                 e = "Unable to load texture for %s." % ImgData
             else:
                 e = "Unable to load texture for SVG file."
