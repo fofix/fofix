@@ -298,19 +298,11 @@ class GameResultsScene(Scene):
         else:
             self.hitWindow = _("Standard")
 
-        jurgen   = self.engine.config.get("game", "jurgmode")
-        jurgplay = self.engine.config.get("game", "jurgtype")
-
         self.progressKeys   = []
         self.playerProgressKeys = [[] for i in self.playerList]
         for i, player in enumerate(self.playerList):
             self.progressKeys.extend(player.progressKeys)
             self.playerProgressKeys[i] = player.progressKeys
-        if jurgen == 0:
-            if jurgplay == 1 and len(self.playerList) > 1:
-                self.playerProgressKeys[1] = self.progressKeys
-            else:
-                self.playerProgressKeys = [self.progressKeys for i in self.playerList]
 
         self.part = [None for i in self.playerList]
         self.partImage = True
