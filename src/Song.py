@@ -39,7 +39,7 @@ import copy
 import cPickle  #stump: Cerealizer and sqlite3 don't seem to like each other that much...
 from Language import _
 import VFS
-from Unicode import asUTF8Bytes
+from Unicode import utf8
 
 DEFAULT_BPM = 120.0
 DEFAULT_LIBRARY         = "songs"
@@ -351,7 +351,7 @@ class SongInfo(object):
     def _set(self, attr, value):
         if not self.info.has_section("song"):
             self.info.add_section("song")
-        self.info.set("song", attr, asUTF8Bytes(value))
+        self.info.set("song", attr, utf8(value))
 
     def getObfuscatedScores(self, part = parts[GUITAR_PART]):
         s = {}
@@ -733,7 +733,7 @@ class LibraryInfo(object):
     def _set(self, attr, value):
         if not self.info.has_section("library"):
             self.info.add_section("library")
-        self.info.set("library", attr, asUTF8Bytes(value))
+        self.info.set("library", attr, utf8(value))
 
     def save(self):
         if os.access(os.path.dirname(self.fileName), os.W_OK) == True:
@@ -821,7 +821,7 @@ class TitleInfo(object):
         self.artist = None    #MFH - prevents search errors
 
     def _set(self, attr, value):
-        self.info.set(self.section, attr, asUTF8Bytes(value))
+        self.info.set(self.section, attr, utf8(value))
 
     def _get(self, attr, type = None, default = ""):
         try:

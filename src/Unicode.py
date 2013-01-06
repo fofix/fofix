@@ -47,7 +47,7 @@ def unicodify(s):
         return s.decode('iso-8859-1')
 
 
-def asUTF8Bytes(s):
+def utf8(s):
     '''
     Turns s into a valid UTF-8 bytestring.
     @param s: input

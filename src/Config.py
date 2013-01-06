@@ -27,7 +27,7 @@ from ConfigParser import RawConfigParser
 import Log
 import Resource
 import os
-from Unicode import asUTF8Bytes, unicodify
+from Unicode import utf8, unicodify
 
 config    = None
 prototype = {}
@@ -66,7 +66,7 @@ class MyConfigParser(RawConfigParser):
 
     def set(self, section, option, value=None):
         if value is not None:
-            value = asUTF8Bytes(value)
+            value = utf8(value)
         RawConfigParser.set(self, section, option, value)
 
 class Option:
@@ -288,7 +288,7 @@ class Config:
         if not self.config.has_section(section):
             self.config.add_section(section)
 
-        self.config.set(section, option, asUTF8Bytes(value))
+        self.config.set(section, option, utf8(value))
 
         f = open(self.fileName, "w")
         self.config.write(f, self.type)

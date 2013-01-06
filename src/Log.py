@@ -32,7 +32,7 @@ import Version
 import traceback
 import time
 import warnings
-from Unicode import asUTF8Bytes
+from Unicode import utf8
 
 # Whether to output log entries to stdout in addition to the logfile.
 quiet = True
@@ -79,7 +79,7 @@ def _log(cls, msg):
     @param cls:   Priority class for the message
     @param msg:   Log message text
     '''
-    msg = asUTF8Bytes(msg)
+    msg = utf8(msg)
     timeprefix = "[%12.6f] " % (time.time() - _initTime)
     if not quiet:
         print timeprefix + displaylabels[cls] + " " + msg
