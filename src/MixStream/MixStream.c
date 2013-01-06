@@ -283,7 +283,10 @@ static void _mix_stream_channel_finished(int channel)
     return;
 
   if (!_mix_stream_nextchunk(stream, FRAMES_PER_CHUNK)) {
+    g_static_mutex_lock(&chan_table_mutex);
+    g_hash_table_remove(chan_table, &stream->channel);
     stream->channel = -1;
+    g_static_mutex_unlock(&chan_table_mutex);
     return;
   }
 
