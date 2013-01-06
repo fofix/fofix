@@ -673,8 +673,6 @@ class Neck:
         if not song.readyToGo:
             return
 
-        color = (1,1,1)
-
         v = visibility
         w = self.boardWidth + 0.15
 
@@ -716,8 +714,6 @@ class Neck:
             return
         if not song.readyToGo:
             return
-
-        w = self.boardWidth
 
         track = song.track[self.player]
 

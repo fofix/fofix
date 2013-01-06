@@ -28,7 +28,7 @@
 
 #altered by myfingershurt to adapt to Alarian mod
 
-from Song import Note, Tempo
+from Song import Note
 from Neck import Neck
 from Shader import shaders
 import os

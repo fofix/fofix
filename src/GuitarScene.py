@@ -40,7 +40,6 @@ from Language import _
 import Player
 from Player import STAR, KILL, CANCEL, KEY1A
 import Dialogs
-import Audio
 import Stage
 import Settings
 import Song

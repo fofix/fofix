@@ -40,7 +40,6 @@ from View import Layer, BackgroundLayer
 from Input import KeyListener
 from Menu import Menu
 from Language import _
-from Player import GUITARTYPES, DRUMTYPES, MICTYPES
 import Log
 import Player
 from Unicode import unicodify

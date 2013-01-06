@@ -251,8 +251,6 @@ class Instrument(object):
         self.vbpmLogicType = self.engine.config.get("debug",   "use_new_vbpm_beta")
 
         #Get theme
-        themename = self.engine.data.themeLabel
-        #now theme determination logic is only in data.py:
         self.theme = self.engine.data.theme
 
         self.spRefillMode = self.engine.config.get("game","sp_notes_while_active")
@@ -524,7 +522,6 @@ class Instrument(object):
 
     def loadFrets(self):
         engine = self.engine
-        themename = self.engine.data.themeLabel
 
         get = lambda file: self.checkPath("frets", file)
 
@@ -1516,10 +1513,7 @@ class Instrument(object):
                 self.finalStarSeen = True
                 self.openStarNotesInView = True
 
-            if event.star and self.spEnabled:
-                spNote = True
             if event.finalStar and self.spEnabled:
-                spNote = True
                 if event.played or event.hopod:
                     if event.flameCount < 1 and not self.starPowerGained:
 

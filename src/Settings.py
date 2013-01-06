@@ -228,11 +228,6 @@ class KeyConfigChoice(Menu.Choice):
     def change(self):
         o = self.config.prototype[self.section][self.option]
 
-        if isinstance(o.options, dict):
-            for k, v in o.options.items():
-                if v == value: #FIXME: value?
-                    value = k
-                    break
         if isinstance(o.text, tuple):
             type = self.type
             if len(o.text) == 5:
