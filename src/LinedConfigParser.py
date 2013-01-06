@@ -1,9 +1,10 @@
 # This is Python 2.7's standard library ConfigParser.py, with
 # all write support stripped out, with only RawConfigParser (renamed
-# LinedConfigParser), and with the ability to get the line number on which
-# options are defined.
+# LinedConfigParser), with the ability to get the line number on which
+# options are defined, and with configuration strings being returned
+# in Unicode.
 #
-# Modifications done April 2011 by John Stumpo
+# Modifications done April 2011 and January 2013 by John Stumpo
 # This file may be used under the terms of the same license as Python itself.
 
 """Configuration file parser.
@@ -93,6 +94,7 @@ except ImportError:
     _default_dict = dict
 
 import re
+from Unicode import unicodify
 
 __all__ = ["NoSectionError", "NoOptionError", "ParsingError",
            "MissingSectionHeaderError",
@@ -373,7 +375,7 @@ class LinedConfigParser(object):
         lineno = 0
         e = None                              # None, or an exception
         while True:
-            line = fp.readline()
+            line = unicodify(fp.readline())
             if not line:
                 break
             lineno = lineno + 1
