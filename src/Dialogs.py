@@ -519,7 +519,6 @@ class FileChooser(BackgroundLayer, KeyListener):
 
 
         self.dirSelect      = dirSelect
-        self.spinnyDisabled = self.engine.config.get("game", "disable_spinny")
 
         #Get theme
         #now theme determination logic is only in data.py:
@@ -1392,7 +1391,6 @@ class ItemChooser(BackgroundLayer, KeyListener):
             self.posX = .1    #MFH - default
             self.posY = .05   #MFH - default
             self.menu = Menu(self.engine, choices = [(c, self._callbackForItem(c)) for c in items], onClose = self.close, onCancel = self.cancel, font = self.engine.data.streakFont2)
-        self.spinnyDisabled = self.engine.config.get("game", "disable_spinny")
 
         if selected and selected in items:
             self.menu.selectItem(items.index(selected))

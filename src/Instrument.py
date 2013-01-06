@@ -302,7 +302,6 @@ class Instrument(object):
         self.soloKey = []
 
         self.disableVBPM  = self.engine.config.get("game", "disable_vbpm")
-        self.disableNoteSFX  = self.engine.config.get("video", "disable_notesfx")
         self.disableFretSFX  = self.engine.config.get("video", "disable_fretsfx")
         self.disableFlameSFX  = self.engine.config.get("video", "disable_flamesfx")
 

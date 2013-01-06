@@ -593,7 +593,6 @@ class GuitarScene(Scene):
         self.hitAccuracyPos = self.engine.config.get("game", "accuracy_pos")
         self.showUnusedTextEvents = self.engine.config.get("game", "show_unused_text_events")
         self.bassKickSoundEnabled = self.engine.config.get("game", "bass_kick_sound")
-        self.gameTimeMode = self.engine.config.get("game", "game_time")
         self.midiLyricsEnabled = self.engine.config.get("game", "rb_midi_lyrics")
         self.midiSectionsEnabled = self.engine.config.get("game", "rb_midi_sections") #MFH
         if self.numOfPlayers > 1 and self.midiLyricsEnabled == 1:
@@ -611,7 +610,6 @@ class GuitarScene(Scene):
         self.ignoreOpenStrums = self.engine.config.get("game", "ignore_open_strums") #MFH
         self.muteSustainReleases = self.engine.config.get("game", "sustain_muting") #MFH
         self.hopoIndicatorEnabled = self.engine.config.get("game", "hopo_indicator") #MFH
-        self.fontShadowing = self.engine.config.get("game", "in_game_font_shadowing") #MFH
         self.muteLastSecond = self.engine.config.get("audio", "mute_last_second") #MFH
         self.mutedLastSecondYet = False
         self.muteDrumFill = self.engine.config.get("game", "mute_drum_fill") #MFH
@@ -726,7 +724,6 @@ class GuitarScene(Scene):
 
         self.inGameStats = self.engine.config.get("performance","in_game_stats")
         self.inGameStars = self.engine.config.get("game","in_game_stars")
-        self.partialStars = self.engine.config.get("game","partial_stars")
 
 
         self.guitarSoloAccuracyDisplayMode = self.engine.config.get("game", "gsolo_accuracy_disp")
@@ -825,7 +822,6 @@ class GuitarScene(Scene):
         self.failViz = [0.0 for i in self.playerList]
 
         self.phrases = self.engine.config.get("coffee", "game_phrases")#blazingamer
-        self.starfx = self.engine.config.get("game", "starfx")#blazingamer
 
         #weirdpeople - sets the distances the neck has to move in the animation
         if self.neckintroAnimationType == 0: #Original
@@ -5227,10 +5223,7 @@ class GuitarScene(Scene):
         wBak = w
         hBak = h
 
-        if self.fontShadowing:
-            font    = self.engine.data.shadowFont
-        else:
-            font    = self.engine.data.font
+        font    = self.engine.data.font
         lyricFont = self.engine.data.songFont
         bigFont = self.engine.data.bigFont
         sphraseFont = self.engine.data.streakFont2
