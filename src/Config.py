@@ -61,6 +61,14 @@ class MyConfigParser(RawConfigParser):
         if self.has_section('player'):
             self._writeSection(fp, 'player', self.items('player'))
 
+    def get(self, section, option):
+        return unicodify(RawConfigParser.get(self, section, option))
+
+    def set(self, section, option, value=None):
+        if value is not None:
+            value = asUTF8Bytes(value)
+        RawConfigParser.set(self, section, option, value)
+
 class Option:
     """A prototype configuration key."""
     def __init__(self, **args):
