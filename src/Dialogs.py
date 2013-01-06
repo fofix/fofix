@@ -43,6 +43,7 @@ from Language import _
 from Player import GUITARTYPES, DRUMTYPES, MICTYPES
 import Log
 import Player
+from Unicode import unicodify
 
 #stump: vocals
 import Microphone
@@ -504,7 +505,7 @@ class FileChooser(BackgroundLayer, KeyListener):
     """File choosing layer."""
     def __init__(self, engine, masks, path, prompt = "", dirSelect = False):
         self.masks          = masks
-        self.path           = path
+        self.path           = unicodify(path)
         self.prompt         = prompt
         self.engine         = engine
         self.accepted       = False
@@ -544,7 +545,7 @@ class FileChooser(BackgroundLayer, KeyListener):
         return fileName
 
     def getFiles(self):
-        files = [".."]
+        files = [u".."]
         for fn in os.listdir(self.path):
             if fn.startswith("."): continue
             f = os.path.join(self.path, fn)
@@ -565,17 +566,17 @@ class FileChooser(BackgroundLayer, KeyListener):
         driveLetters=[]
         for drive in string.letters[len(string.letters) / 2:]:
             if win32file.GetDriveType(drive + ":") == win32file.DRIVE_FIXED:
-                driveLetters.append(drive + ":\\")
+                driveLetters.append(drive + u":\\")
         return driveLetters
 
     def updateFiles(self):
         if self.menu:
             self.engine.view.popLayer(self.menu)
 
-        if self.path == "toplevel" and os.name != "nt":
-            self.path = "/"
+        if self.path == u"toplevel" and os.name != "nt":
+            self.path = u"/"
 
-        if self.path == "toplevel":
+        if self.path == u"toplevel":
             self.menu = Menu(self.engine, choices = [(self._getFileText(f), self._getFileCallback(f)) for f in self.getDisks()], onClose = self.close, onCancel = self.cancel)
         else:
             self.menu = Menu(self.engine, choices = [(self._getFileText(f), self._getFileCallback(f)) for f in self.getFiles()], onClose = self.close, onCancel = self.cancel)
@@ -591,14 +592,14 @@ class FileChooser(BackgroundLayer, KeyListener):
                     self.menu = None
                     return
 
-        if self.path == "toplevel":
-            self.path = ""
+        if self.path == u"toplevel":
+            self.path = u""
         path = os.path.abspath(os.path.join(self.path, fileName))
 
         if os.path.isdir(path):
 
-            if path == self.path and fileName == "..":
-                self.path = "toplevel"
+            if path == self.path and fileName == u"..":
+                self.path = u"toplevel"
             else:
                 self.path = path
             self.updateFiles()
@@ -1909,7 +1910,7 @@ def getKey(engine, prompt, key = None, specialKeyList = []):
     _runDialog(engine, d)
     return d.key
 
-def chooseFile(engine, masks = ["*.*"], path = ".", prompt = _("Choose a File"), dirSelect = False):
+def chooseFile(engine, masks = ["*.*"], path = u".", prompt = _("Choose a File"), dirSelect = False):
     """
     Ask the user to select a file.
 
