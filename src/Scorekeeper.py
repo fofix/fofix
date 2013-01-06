@@ -77,7 +77,6 @@ class ScoreCard(object):
         self.totalPercNotes = 0
         self.cheatsApply = False
         self.stars = 0
-        self.partialStars = 0
         self.starRatio = 0.0
         self.star = [0 for i in range(7)]
         if self.starScoring == 1: #GH-style (mult thresholds, hit threshold for 5/6 stars)
@@ -156,7 +155,6 @@ class ScoreCard(object):
         self.handicapValue = 100.0
         self.cheatsApply = False
         self.stars = 0
-        self.partialStars = 0
         self.starRatio = 0.0
         self.endingScore = 0    #MFH
         self.endingStreakBroken = False   #MFH
@@ -171,17 +169,14 @@ class ScoreCard(object):
         if self.starScoring == 1: #GH-style
             if self.hitAccuracy == 100.0 and self.hiStreak == self.totalStreakNotes and not self.cheatsApply:
                 self.stars = 7
-                self.partialStars = 0
                 self.starRatio = 0
                 return 7
             if self.hitAccuracy == 100.0 and not self.cheatsApply:
                 self.stars = 6
-                self.partialStars = 0
                 self.starRatio = 0
                 return 6
             elif (self.hitAccuracy >= 90.0 and not self.cheatsApply) or avMult >= self.star[5]:
                 self.stars = 5
-                self.partialStars = 0
                 self.starRatio = 0
                 return 5
             else:
@@ -189,10 +184,7 @@ class ScoreCard(object):
                     if avMult >= self.star[i]:
                         part = avMult - self.star[i]
                         partPct = part / (self.star[i+1] - self.star[i])
-                        partStar = int(8*partPct)
-                        partStar = min(partStar, 7) #catches 99.very9%, just in case
                         self.stars = i
-                        self.partialStars = partStar
                         self.starRatio = partPct
                         return i
         elif self.starScoring >= 2: #RB-style and RB+GH (and RB2)
@@ -201,17 +193,14 @@ class ScoreCard(object):
                 hundredGold = False
             if hundredGold and self.hitAccuracy == 1.0 and self.hiStreak == self.totalStreakNotes and not self.cheatsApply:
                 self.stars = 7
-                self.partialStars = 0
                 self.starRatio = 0
                 return 7
             if (self.hitAccuracy == 1.0 and hundredGold) or avMult > self.star[6]:
                 self.stars = 6
-                self.partialStars = 0
                 self.starRatio = 0
                 return 6
             elif avMult >= self.star[5]:
                 self.stars = 5
-                self.partialStars = 0
                 self.starRatio = 0
                 return 5
             else:
@@ -219,26 +208,20 @@ class ScoreCard(object):
                     if avMult >= self.star[i]:
                         part = avMult - self.star[i]
                         partPct = part / (self.star[i+1] - self.star[i])
-                        partStar = int(8*partPct)
-                        partStar = min(partStar, 7) #catches 99.very9%, just in case
                         self.stars = i
-                        self.partialStars = partStar
                         self.starRatio = partPct
                         return i
         else: #FoF
             if self.hitAccuracy == 1.0 and self.hiStreak == self.totalStreakNotes and not self.cheatsApply:
                 self.stars = 7
-                self.partialStars = 0
                 self.starRatio = 0
                 return 7
             if self.hitAccuracy == self.star[6]:
                 self.stars = 6
-                self.partialStars = 0
                 self.starRatio = 0
                 return 6
             elif self.hitAccuracy >= self.star[5]:
                 self.stars = 5
-                self.partialStars = 0
                 self.starRatio = 0
                 return 5
             else:
@@ -246,10 +229,7 @@ class ScoreCard(object):
                     if self.hitAccuracy >= self.star[i]:
                         part = self.hitAccuracy - self.star[i]
                         partPct = part / (self.star[i+1] - self.star[i])
-                        partStar = int(8*partPct)
-                        partStar = min(partStar, 7) #catches 99.very9%, just in case
                         self.stars = i
-                        self.partialStars = partStar
                         self.starRatio = partPct
                         return i
 
