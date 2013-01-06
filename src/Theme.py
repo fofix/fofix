@@ -76,8 +76,7 @@ class Theme(Task):
     def __getattr__(self, attr):
         try: #getting to this function is kinda slow. Set it on the first get to keep renders from lagging.
             object.__getattribute__(self, '__dict__')[attr] = defaultDict[attr]
-            if Config.get("game", "log_undefined_gets") == 1:
-                Log.debug("No theme variable for %s - Loading default..." % attr)
+            Log.debug("No theme variable for %s - Loading default..." % attr)
             return object.__getattribute__(self, attr)
         except KeyError:
             if attr in classNames.keys():

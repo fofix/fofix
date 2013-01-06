@@ -905,7 +905,6 @@ class SettingsMenu(Menu.Menu):
           ConfigChoice(engine, engine.config, "game", "log_class_inits", autoApply = True),#myfingershurt
           ConfigChoice(engine, engine.config, "game", "log_loadings", autoApply = True),#myfingershurt
           ConfigChoice(engine, engine.config, "game", "log_sections", autoApply = True),#myfingershurt
-          ConfigChoice(engine, engine.config, "game", "log_undefined_gets", autoApply = True),#myfingershurt
           ConfigChoice(engine, engine.config, "game", "log_marker_notes", autoApply = True),#myfingershurt
           ConfigChoice(engine, engine.config, "game", "log_starpower_misses", autoApply = True),#myfingershurt
           ConfigChoice(engine, engine.config, "log",   "log_unedited_midis", autoApply = True),#myfingershurt

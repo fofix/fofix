@@ -32,7 +32,6 @@ from Unicode import utf8, unicodify
 config    = None
 prototype = {}
 
-logUndefinedGets = 0
 
 class MyConfigParser(RawConfigParser):
     def _writeSection(self, fp, sectionName, sectionItems):
@@ -98,11 +97,10 @@ def define(section, option, type, default = None, text = None, options = None, p
 
 def load(fileName = None, setAsDefault = False, type = 0):
     """Load a configuration with the default prototype"""
-    global config, logUndefinedGets
+    global config
     c = Config(prototype, fileName, type)
     if setAsDefault and not config:
         config = c
-    logUndefinedGets = c.get("game", "log_undefined_gets")
     return c
 
 def _convertValue(value, type, default=False):
@@ -168,15 +166,12 @@ class Config:
         @return:          Key value
         """
 
-        global logUndefinedGets
-
         try:
             type    = self.prototype[section][option].type
             default = self.prototype[section][option].default
         except KeyError:
-            if logUndefinedGets == 1:
-                Log.warn("Config key %s.%s not defined while reading %s." % (section, option, self.fileName))
-            type, default = str, None
+            Log.error("Config key %s.%s not defined while reading %s." % (section, option, self.fileName))
+            raise
 
         value = _convertValue(self.config.get(section, option) if self.config.has_option(section, option) else default, type, default)
 
@@ -190,17 +185,14 @@ class Config:
         @param option:    Option name
         @return:          Tuple of Key list and Values list
         """
-        global logUndefinedGets
-
 
         try:
             options = self.prototype[section][option].options.values()
             keys    = self.prototype[section][option].options.keys()
             type    = self.prototype[section][option].type
         except KeyError:
-            if logUndefinedGets == 1:
-                Log.warn("Config key %s.%s not defined while reading %s." % (section, option, self.fileName))
-            type = None
+            Log.error("Config key %s.%s not defined while reading %s." % (section, option, self.fileName))
+            raise
 
         optionList = []
 
@@ -220,14 +212,11 @@ class Config:
         @return:          Tip Text String
         """
 
-        global logUndefinedGets
-
         try:
             text = self.prototype[section][option].tipText
         except KeyError:
-            if logUndefinedGets == 1:
-                Log.warn("Config key %s.%s not defined while reading %s." % (section, option, self.fileName))
-            text = None
+            Log.error("Config key %s.%s not defined while reading %s." % (section, option, self.fileName))
+            raise
 
         return text
 
@@ -239,16 +228,13 @@ class Config:
         @param option:    Option name
         @return:          Key value
         """
-        global logUndefinedGets
-
 
         try:
             type    = self.prototype[section][option].type
             default = self.prototype[section][option].default
         except KeyError:
-            if logUndefinedGets == 1:
-                Log.warn("Config key %s.%s not defined while reading %s." % (section, option, self.fileName))
-            type, default = str, None
+            Log.error("Config key %s.%s not defined while reading %s." % (section, option, self.fileName))
+            raise
 
         value = _convertValue(default, type)
 
@@ -263,13 +249,11 @@ class Config:
         @param value:     Value name
         """
 
-        global logUndefinedGets
-
         try:
             prototype[section][option]
         except KeyError:
-            if logUndefinedGets == 1:
-                Log.warn("Config key %s.%s not defined while writing %s." % (section, option, self.fileName))
+            Log.error("Config key %s.%s not defined while writing %s." % (section, option, self.fileName))
+            raise
 
         if not self.config.has_section(section):
             self.config.add_section(section)
