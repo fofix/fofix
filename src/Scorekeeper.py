@@ -51,7 +51,7 @@ class ScoreCard(object):
         if logClassInits == 1:
             Log.debug("ScoreCard class init...")
         self.starScoring = Config.get("game", "star_scoring")
-        self.updateOnScore = Config.get("game", "star_score_updates")
+        self.updateOnScore = Config.get("performance", "star_score_updates")
         self.avMult = 0.0
         self.hitAccuracy = 0.0
         self.score  = 0
