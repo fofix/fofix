@@ -21,7 +21,7 @@
 # MA  02110-1301, USA.                                              #
 #####################################################################
 
-# First a thin wrapper around VideoPlayer from VideoPlayerCore.c...
+# First a thin wrapper around VideoPlayer from VideoPlayer.c...
 
 cdef extern from "VideoPlayer.h":
     ctypedef struct CVideoPlayer "VideoPlayer":
@@ -102,7 +102,7 @@ import numpy as np
 import cmgl
 
 # This is Cython after all, so we may as well directly bind to OpenGL for the video layer implementation.
-include "gl.pxi"
+include "../gl.pxi"
 
 class VideoLayer(BackgroundLayer, KeyListener):
     def __init__(self, engine, filename, mute = False, loop = False, cancellable = False):

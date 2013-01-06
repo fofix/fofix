@@ -18,7 +18,7 @@ src/build
 src/pypitch/_pypitch.cpp
 src/cmgl.c
 src/MixStream/_MixStream.c
-src/VideoPlayer.c
+src/VideoPlayer/_VideoPlayer.c
 gstreamer/*
 data/library.zip
 data/users/players/*
