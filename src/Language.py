@@ -26,6 +26,7 @@ import Log
 import gettext
 import os
 import glob
+from Unicode import unicodify
 
 Config.define("game", "language", str, "")
 
@@ -33,7 +34,7 @@ def getAvailableLanguages():
     return [os.path.basename(l).capitalize().replace(".mo", "").replace("_", " ") for l in glob.glob(os.path.join(Version.dataPath(), "translations", "*.mo"))]
 
 def dummyTranslator(string):
-    return string
+    return unicodify(string)
 
 language = Config.load(Version.PROGRAM_UNIXSTYLE_NAME + ".ini").get("game", "language")
 _ = dummyTranslator
