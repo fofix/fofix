@@ -24,7 +24,7 @@
 
 from __future__ import with_statement
 
-from Scene import Scene, SuppressScene
+from Scene import Scene
 import os
 import time
 import Player
@@ -58,11 +58,7 @@ class SongChoosingScene(Scene):
     def __init__(self, engine, libraryName = None, songName = None):
         Scene.__init__(self, engine)
 
-        if self.engine.world.sceneName == "SongChoosingScene":  #MFH - dual / triple loading cycle fix
-            Log.warn("Extra SongChoosingScene was instantiated, but detected and shut down.  Cause unknown.")
-            raise SuppressScene  #stump
-        else:
-            self.engine.world.sceneName = "SongChoosingScene"
+        self.engine.world.sceneName = "SongChoosingScene"
 
         Song.updateSongDatabase(self.engine)
 

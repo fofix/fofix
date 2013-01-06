@@ -32,7 +32,7 @@
 
 from __future__ import with_statement
 
-from Scene import Scene, SuppressScene
+from Scene import Scene
 from Song import Note, TextEvent, PictureEvent, loadSong, Bars, VocalPhrase
 from Menu import Menu
 
@@ -60,12 +60,7 @@ class GuitarScene(Scene):
     def __init__(self, engine, libraryName, songName):
         Scene.__init__(self, engine)
 
-        if self.engine.world.sceneName == "GuitarScene":  #MFH - dual / triple loading cycle fix
-            Log.warn("Extra GuitarScene was instantiated, but detected and shut down.  Cause unknown.")
-            raise SuppressScene  #stump
-        else:
-            self.engine.createdGuitarScene = True
-            self.engine.world.sceneName = "GuitarScene"
+        self.engine.world.sceneName = "GuitarScene"
 
         self.playerList   = self.players
 
@@ -1588,7 +1583,6 @@ class GuitarScene(Scene):
         Dialogs.hideLoadingSplashScreen(self.engine, splash)
         splash = None
 
-        self.engine.createdGuitarScene = False
         #MFH - end of GuitarScene client initialization routine
 
 

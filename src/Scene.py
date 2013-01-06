@@ -29,10 +29,6 @@ from Camera import Camera
 from OpenGL.GL import *
 from OpenGL.GLU import *
 
-#stump: raised by a scene constructor to abort scene processing
-class SuppressScene(Exception):
-    pass
-
 class Scene(BackgroundLayer, KeyListener):
     def __init__(self, engine):
         self.engine  = engine

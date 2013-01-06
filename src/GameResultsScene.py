@@ -29,7 +29,7 @@
 
 from __future__ import with_statement
 
-from Scene import Scene, SuppressScene
+from Scene import Scene
 import Scorekeeper
 import Dialogs
 import Song
@@ -53,11 +53,7 @@ class GameResultsScene(Scene):
     def __init__(self, engine, libraryName, songName, scores = None, coOpType = False, careerMode = False):
         Scene.__init__(self, engine)
 
-        if self.engine.world.sceneName == "GameResultsScene":  #MFH - dual / triple loading cycle fix
-            Log.warn("Extra GameResultsScene was instantiated, but detected and shut down.  Cause unknown.")
-            raise SuppressScene  #stump
-        else:
-            self.engine.world.sceneName = "GameResultsScene"
+        self.engine.world.sceneName = "GameResultsScene"
 
         self.logClassInits = self.engine.config.get("game", "log_class_inits")
         if self.logClassInits == 1:

@@ -151,7 +151,6 @@ class GameEngine(object):
         Log.debug("GameEngine class init (GameEngine.py)...")
         self.mainMenu = None    #placeholder for main menu object - to prevent reinstantiation
 
-        self.createdGuitarScene = False   #MFH - so we only create ONE guitarscene...!
         self.currentScene = None
 
         self.versionString = version  #stump: other version stuff moved to allow full version string to be retrieved without instantiating GameEngine
