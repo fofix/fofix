@@ -317,7 +317,7 @@ else:
     # Other systems: we ask pkg-config.
     gl_info = pc_info('gl')
     # And build our own soundtouch-c.
-    extra_soundtouch_src = ['soundtouch-c.cpp']
+    extra_soundtouch_src = ['MixStream/soundtouch-c.cpp']
 # Build a similar info record for the numpy headers.
 numpy_info = {'include_dirs': [np.get_include()]}
 
@@ -433,7 +433,8 @@ setup_args.update({
                        'pypitch/AnalyzerInput.cpp']),
     Extension('VideoPlayer', ['VideoPlayer.pyx', 'VideoPlayerCore.c'],
               **combine_info(gl_info, ogg_info, theoradec_info, glib_info, swscale_info)),
-    Extension('MixStream', ['MixStream.pyx', 'MixStreamCore.c', 'MixStreamVorbis.c'] + extra_soundtouch_src,
+    Extension('MixStream._MixStream',
+              ['MixStream/_MixStream.pyx', 'MixStream/MixStream.c', 'MixStream/vorbis.c'] + extra_soundtouch_src,
               **combine_info(vorbisfile_info, soundtouch_info, glib_info, gthread_info, sdl_info, sdl_mixer_info)),
   ],
   'cmdclass': {'build_ext': build_ext, 'install': install, 'msgfmt': msgfmt, 'xgettext': xgettext},

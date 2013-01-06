@@ -21,8 +21,6 @@
 # MA  02110-1301, USA.                                              #
 #####################################################################
 
-# First a thin wrapper around VideoPlayer from VideoPlayerCore.c...
-
 cdef extern from "MixStream.h":
     ctypedef struct CMixStream "MixStream":
         pass

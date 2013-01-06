@@ -17,7 +17,7 @@ src/*.idb
 src/build
 src/pypitch/_pypitch.cpp
 src/cmgl.c
-src/MixStream.c
+src/MixStream/_MixStream.c
 src/VideoPlayer.c
 gstreamer/*
 data/library.zip
