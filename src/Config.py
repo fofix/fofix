@@ -32,7 +32,6 @@ from Unicode import utf8, unicodify
 config    = None
 prototype = {}
 
-logIniReads = 0   #MFH - INI reads disabled by default during the startup period
 logUndefinedGets = 0
 
 class MyConfigParser(RawConfigParser):
@@ -99,11 +98,10 @@ def define(section, option, type, default = None, text = None, options = None, p
 
 def load(fileName = None, setAsDefault = False, type = 0):
     """Load a configuration with the default prototype"""
-    global config, logIniReads, logUndefinedGets
+    global config, logUndefinedGets
     c = Config(prototype, fileName, type)
     if setAsDefault and not config:
         config = c
-    logIniReads = c.get("game", "log_ini_reads")
     logUndefinedGets = c.get("game", "log_undefined_gets")
     return c
 
@@ -170,7 +168,7 @@ class Config:
         @return:          Key value
         """
 
-        global logIniReads, logUndefinedGets
+        global logUndefinedGets
 
         try:
             type    = self.prototype[section][option].type
@@ -182,9 +180,6 @@ class Config:
 
         value = _convertValue(self.config.get(section, option) if self.config.has_option(section, option) else default, type, default)
 
-        #myfingershurt: verbose log output
-        if logIniReads == 1:
-            Log.debug("Config.get: %s.%s = %s" % (section, option, value))
         return value
 
     def getOptions(self, section, option):
@@ -195,7 +190,7 @@ class Config:
         @param option:    Option name
         @return:          Tuple of Key list and Values list
         """
-        global logIniReads, logUndefinedGets
+        global logUndefinedGets
 
 
         try:
@@ -214,9 +209,6 @@ class Config:
                 value = _convertValue(keys[i], type)
                 optionList.append(value)
 
-        #myfingershurt: verbose log output
-        if logIniReads == 1:
-            Log.debug("Config.getOptions: %s.%s = %s" % (section, option, str(optionList)))
         return optionList, options
 
     def getTipText(self, section, option):
@@ -228,7 +220,7 @@ class Config:
         @return:          Tip Text String
         """
 
-        global logIniReads, logUndefinedGets
+        global logUndefinedGets
 
         try:
             text = self.prototype[section][option].tipText
@@ -237,9 +229,6 @@ class Config:
                 Log.warn("Config key %s.%s not defined while reading %s." % (section, option, self.fileName))
             text = None
 
-        #myfingershurt: verbose log output
-        if logIniReads == 1:
-            Log.debug("Config.getTipText: %s.%s = %s" % (section, option, text))
         return text
 
     def getDefault(self, section, option):
@@ -250,7 +239,7 @@ class Config:
         @param option:    Option name
         @return:          Key value
         """
-        global logIniReads, logUndefinedGets
+        global logUndefinedGets
 
 
         try:
@@ -263,9 +252,6 @@ class Config:
 
         value = _convertValue(default, type)
 
-        #myfingershurt: verbose log output
-        if logIniReads == 1:
-            Log.debug("Config.getDefault: %s.%s = %s" % (section, option, value))
         return value
 
     def set(self, section, option, value):

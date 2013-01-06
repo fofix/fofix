@@ -210,7 +210,6 @@ Config.define("audio",  "whammy_effect",  int,    0,  text = _("Effects Mode"), 
 
 
 #MFH - log settings
-Config.define("game",   "log_ini_reads",          int, 0,    text = _("Log INI Reads"), options = {0: _("No"), 1: _("Yes")}, tipText = _("Logs any read to an INI file. This is unnecessary information in bug reports; please leave it disabled unless you are certain it is relevant."))
 Config.define("game",   "log_class_inits",          int, 0,    text = _("Log Class Inits"), options = {0: _("No"), 1: _("Yes")}, tipText = _("Logs most class initializations in '__init__'. This is unnecessary information in bug reports; please leave it disabled unless you are certain it is relevant."))
 Config.define("game",   "log_loadings",          int, 0,    text = _("Log Loadings"), options = {0: _("No"), 1: _("Yes")}, tipText = _("Logs resource loads. This is unnecessary information in bug reports; please leave it disabled unless you are certain it is relevant."))
 Config.define("game",   "log_sections",          int, 0,    text = _("Log MIDI Sections"), options = {0: _("No"), 1: _("Yes")}, tipText = _("Logs MIDI sections. This is unnecessary information in bug reports; please leave it disabled unless you are certain it is relevant."))

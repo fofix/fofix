@@ -900,7 +900,6 @@ class SettingsMenu(Menu.Menu):
 
         #MFH - new menu
         self.logfileSettings = [
-          ConfigChoice(engine, engine.config, "game", "log_ini_reads", autoApply = True),#myfingershurt
           ConfigChoice(engine, engine.config, "game", "log_class_inits", autoApply = True),#myfingershurt
           ConfigChoice(engine, engine.config, "game", "log_loadings", autoApply = True),#myfingershurt
           ConfigChoice(engine, engine.config, "game", "log_sections", autoApply = True),#myfingershurt
