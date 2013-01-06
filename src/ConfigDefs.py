@@ -76,6 +76,7 @@ Config.define("audio",  "stereo",       bool,  True)
 Config.define("network",   "uploadscores", bool,  False, text = _("Upload Highscores"),    options = {False: _("No"), True: _("Yes")}, tipText = _("If enabled, your high scores will be sent to the server to rank you against other players."))
 Config.define("network",   "uploadurl_w67_starpower",    str,   "http://www.wembley1967.com/chart/uploadsp.php") # evilynux - new one starting 20080902
 
+Config.define("setlist", "base_library",      str, "")
 Config.define("setlist", "selected_library",  str, "")
 Config.define("setlist", "selected_song",     str, "")
 
@@ -163,6 +164,8 @@ Config.define("game", "bass_kick_sound",      bool, False,  text = _("Kick Bass 
 Config.define("game", "rb_midi_lyrics",           int,  1,   text = _("Show Lyrics in All Modes"), options = {0: _("No"), 1: _("Single Player"), 2: _("Always")}, tipText = _("Sets whether or not MIDI lyrics will be displayed in modes without a vocalist. 'Single Player' will only show lyrics when in Solo modes."))
 Config.define("game", "rb_midi_sections",           int,  0,   text = _("Show MIDI Sections"), options = {0: _("No"), 1: _("Single Player"), 2: _("Always")}, tipText = _("Sets whether or not to scroll the names of sections as marked in the MIDI files."))
 Config.define("game", "key_checker_mode",      int, 1,  text = _("Key Conflicts"), options = sortOptionsByKey({0: _("Don't check"), 1: _("Notify"), 2: _("Enforce")}), tipText = _("Sets how the game handles key conflicts. 'Don't check' doesn't check, but conflicts will affect play. 'Notify' will inform you, but allow you to continue, and 'Enforce' will not allow you to exit the menu until all key conflicts have been resolved."))
+Config.define("performance", "in_game_stats",      int, 0,  text = _("Show In-Game Stats"), options = {0: _("Off"), 1: _("By Theme"), 2: _("On")}, tipText = _("Sets whether or not to show detailed stats as you play. 'By Theme' leaves it to the theme creator."))
+Config.define("game", "in_game_stars",      int, 1,  text = _("Show Stars In-Game"), options = {0: _("Off"), 1: _("By Theme"), 2: _("On")}, tipText = _("Sets whether or not to show your star score as you play. 'By Theme' leaves it to the theme creator."))
 Config.define("game", "hopo_debug_disp",      int, 0,  text = _("HO/PO Debug"), options = {0: _("Off"), 1: _("On")}, tipText = _("If enabled, various log messages will be recorded regarding the HO/PO system. Please leave this disabled if submitting logs for bug reports unless you are certain it is necessary."))
 Config.define("game", "gsolo_accuracy_disp",      int, 1,  text = _("Show Solo Stats"), options = {0: _("Off"), 1: _("Percent"), 2: _("Detail")}, tipText = _("Sets whether to show your solo results when you finish a solo. 'Percent' will only show the percentage, while 'Detail' includes additional information."))
 Config.define("game", "star_scoring",       int, 3,     text = _("Star Scoring Style"), options = sortOptionsByKey({0: _("Accuracy"), 1: _("GH"), 2: _("RB"), 3: _("RB+GH"), 4: _("RB2")}), tipText = _("Sets which system to use to calculate your star score."))#MFH
