@@ -27,7 +27,7 @@ Functions for writing to the logfile.
 
 import sys
 import os
-import Resource
+import VFS
 import Version
 import traceback
 import time
@@ -41,15 +41,11 @@ quiet = True
 if os.name == "posix": # evilynux - logfile in ~/.fofix/ for GNU/Linux and MacOS X
     # evilynux - Under MacOS X, put the logs in ~/Library/Logs
     if os.uname()[0] == "Darwin":
-        logFile = open(os.path.join(Resource.getWritableResourcePath(),
-                                    "..", "..", "Logs",
-                                    Version.PROGRAM_UNIXSTYLE_NAME + ".log"), "w")
+        logFile = open(os.path.expanduser('~/Library/Logs/%s.log' % Version.PROGRAM_UNIXSTYLE_NAME), 'w')
     else: # GNU/Linux et al.
-        logFile = open(os.path.join(Resource.getWritableResourcePath(), Version.PROGRAM_UNIXSTYLE_NAME + ".log"), "w")
-elif os.name == "nt":
-    logFile = open(os.path.join(Resource.getWritableResourcePath(), Version.PROGRAM_UNIXSTYLE_NAME + ".log"), "w")
+        logFile = VFS.open('/userdata/%s.log' % Version.PROGRAM_UNIXSTYLE_NAME, 'w')
 else:
-    logFile = open(Version.PROGRAM_UNIXSTYLE_NAME + ".log", "w")  #MFH - local logfile!
+    logFile = VFS.open('/userdata/%s.log' % Version.PROGRAM_UNIXSTYLE_NAME, 'w')
 
 if "-v" in sys.argv or "--verbose" in sys.argv:
     quiet = False
