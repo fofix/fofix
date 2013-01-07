@@ -132,26 +132,6 @@ def wrapText(font, pos, text, rightMargin = 0.9, scale = 0.002, visibility = 0.0
             x += w + space
     return (x - space, y)
 
-def fadeScreen(v):
-    """
-    Fade the screen to a dark color to make whatever is on top easier to read.
-
-    @param v: Visibility factor [0..1], 0 is fully visible
-    """
-    glEnable(GL_BLEND)
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
-    glEnable(GL_COLOR_MATERIAL)
-
-    glBegin(GL_TRIANGLE_STRIP)
-    glColor4f(0, 0, 0, .3 - v * .3)
-    glVertex2f(0, 0)
-    glColor4f(0, 0, 0, .3 - v * .3)
-    glVertex2f(1, 0)
-    glColor4f(0, 0, 0, .9 - v * .9)
-    glVertex2f(0, 1)
-    glColor4f(0, 0, 0, .9 - v * .9)
-    glVertex2f(1, 1)
-    glEnd()
 
 class MainDialog(Layer, KeyListener):
     def __init__(self, engine):
@@ -284,7 +264,7 @@ class GetText(Layer, KeyListener):
         with self.engine.view.orthogonalProjection(normalize = True):
             v = (1 - visibility) ** 2
 
-            fadeScreen(v)
+            self.engine.fadeScreen(v)
             self.engine.theme.setBaseColor(1 - v)
 
             if (self.time % 10) < 5 and visibility > .9:
@@ -358,7 +338,7 @@ class GetKey(Layer, KeyListener):
         with self.engine.view.orthogonalProjection(normalize = True):
             v = (1 - visibility) ** 2
 
-            fadeScreen(v)
+            self.engine.fadeScreen(v)
             self.engine.theme.setBaseColor(1 - v)
 
             pos = wrapText(font, (.1, .33 - v), self.prompt)
@@ -417,7 +397,7 @@ class LoadingScreen(Layer, KeyListener):
 
         with self.engine.view.orthogonalProjection(normalize = True):
             v = (1 - visibility) ** 2
-            fadeScreen(v)
+            self.engine.fadeScreen(v)
 
             w, h = self.engine.view.geometry[2:4]
             self.loadingImg = self.engine.data.loadingImage
@@ -487,7 +467,7 @@ class MessageScreen(Layer, KeyListener):
 
         with self.engine.view.orthogonalProjection(normalize = True):
             v = (1 - visibility) ** 2
-            fadeScreen(v)
+            self.engine.fadeScreen(v)
 
             x = .1
             y = .3 + v * 2
@@ -1112,7 +1092,7 @@ class AvatarChooser(Layer, KeyListener):
             if self.background:
                 self.engine.drawImage(self.background, scale = (1.0, -1.0), coord = (w/2,h/2), stretched = 3)
             else:
-                fadeScreen(v)
+                self.engine.fadeScreen(v)
             self.engine.theme.setBaseColor(1 - v)
             if len(self.avatars) > 1:
                 lastAv2i  = (int(self.selectedAv)-2) % len(self.avatars)
@@ -1635,7 +1615,7 @@ class KeyTester(Layer, KeyListener):
             else:
                 rotateArrow = None
 
-            fadeScreen(v)
+            self.engine.fadeScreen(v)
 
             glEnable(GL_BLEND)
             glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
@@ -2063,7 +2043,7 @@ class LoadingSplashScreen(Layer, KeyListener):
 
         with self.engine.view.orthogonalProjection(normalize = True):
             v = (1 - visibility) ** 2
-            fadeScreen(v)
+            self.engine.fadeScreen(v)
             w, h = self.engine.view.geometry[2:4]
             if self.loadingImg:
                 self.engine.drawImage(self.loadingImg, scale = (1.0,-1.0), coord = (w/2,h/2), stretched = 3)
@@ -2103,7 +2083,7 @@ class SongLoadingSplashScreen(LoadingSplashScreen):
 
         with self.engine.view.orthogonalProjection(normalize = True):
             v = (1 - visibility) ** 2
-            fadeScreen(v)
+            self.engine.fadeScreen(v)
             w, h = self.engine.view.geometry[2:4]
 
             self.engine.theme.setBaseColor(1 - v)

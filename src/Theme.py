@@ -778,22 +778,6 @@ class Theme(Task):
             retval = tuple(type(n.strip()) for n in vals)
         return retval
 
-    def fadeScreen(self, v):
-        glEnable(GL_BLEND)
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
-        glEnable(GL_COLOR_MATERIAL)
-
-        glBegin(GL_TRIANGLE_STRIP)
-        glColor4f(0, 0, 0, .3 - v * .3)
-        glVertex2f(0, 0)
-        glColor4f(0, 0, 0, .3 - v * .3)
-        glVertex2f(1, 0)
-        glColor4f(0, 0, 0, .9 - v * .9)
-        glVertex2f(0, 1)
-        glColor4f(0, 0, 0, .9 - v * .9)
-        glVertex2f(1, 1)
-        glEnd()
-
     def loadThemeModule(self, moduleName):
         try:
             fp, pathname, description = imp.find_module(moduleName,[self.path])
@@ -944,7 +928,7 @@ class ThemeParts:
         wP = w*self.theme.partDiffPanelSize[0]
         hP = h*self.theme.partDiffPanelSize[1]
         glColor3f(*self.theme.partDiffHeaderColor)
-        self.theme.fadeScreen(-2.00)
+        self.dialog.engine.fadeScreen(-2.00)
         if self.theme.partDiffTitleText:
             dialog.fontDict[self.theme.partDiffTitleTextFont].render(self.theme.partDiffTitleText, self.theme.partDiffTitleTextPos, scale = self.theme.partDiffTitleTextScale, align = self.theme.partDiffTitleTextAlign)
         if self.theme.partDiffSubtitleText:
@@ -2475,7 +2459,7 @@ class Setlist:
         y = 0
         w, h = scene.geometry
         font = scene.fontDict['songListFont']
-        self.theme.fadeScreen(0.25)
+        self.scene.engine.fadeScreen(0.25)
         if scene.moreInfoTime < 500:
             y = 1.0-(float(scene.moreInfoTime)/500.0)
         yI = y*h

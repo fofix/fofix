@@ -687,6 +687,27 @@ class GameEngine(object):
     def clearScreen(self):
         self.svg.clear(*self.theme.backgroundColor)
 
+    def fadeScreen(self, v):
+        """
+        Fade the screen to a dark color to make whatever is on top easier to read.
+
+        @param v: Visibility factor [0..1], 0 is fully visible
+        """
+        glEnable(GL_BLEND)
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
+        glEnable(GL_COLOR_MATERIAL)
+
+        glBegin(GL_TRIANGLE_STRIP)
+        glColor4f(0, 0, 0, .3 - v * .3)
+        glVertex2f(0, 0)
+        glColor4f(0, 0, 0, .3 - v * .3)
+        glVertex2f(1, 0)
+        glColor4f(0, 0, 0, .9 - v * .9)
+        glVertex2f(0, 1)
+        glColor4f(0, 0, 0, .9 - v * .9)
+        glVertex2f(1, 1)
+        glEnd()
+
     def addTask(self, task, synchronized = True):
         """
         Add a task to the engine.

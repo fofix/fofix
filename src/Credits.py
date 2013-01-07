@@ -38,7 +38,6 @@ from Language import _
 import Version
 import Player
 import Config
-import Dialogs
 import Log
 
 from VideoPlayer import VideoLayer, VideoPlayerError
@@ -358,7 +357,7 @@ class Credits(Layer, KeyListener):
             if self.background:
                 self.engine.drawImage(self.background, scale = (1.0,-1.0), coord = (w/2,h/2), stretched = 3)
             else:
-                Dialogs.fadeScreen(.4)
+                self.engine.fadeScreen(.4)
             self.doneList = []
 
             # render the scroller elements

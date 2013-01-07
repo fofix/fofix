@@ -32,7 +32,6 @@ import os
 from View import Layer
 from Input import KeyListener
 import Data
-import Dialogs
 import Player
 
 import Log
@@ -394,7 +393,7 @@ class Menu(Layer, KeyListener):
             tipFont = self.tipFont
 
             if self.fadeScreen:
-                Dialogs.fadeScreen(v)
+                self.engine.fadeScreen(v)
 
             wS, hS = self.engine.view.geometry[2:4]
 

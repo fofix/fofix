@@ -1211,7 +1211,7 @@ class GameResultsScene(Scene):
             font  = self.engine.data.fontDict[self.engine.theme.result_high_score_font]
         except KeyError:
             font  = self.engine.data.font
-        Dialogs.fadeScreen(.2)
+        self.engine.fadeScreen(.2)
         v = ((1 - visibility) **2)
 
         w, h = self.fullView
