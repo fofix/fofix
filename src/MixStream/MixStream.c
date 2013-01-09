@@ -228,6 +228,7 @@ static gboolean _mix_stream_nextchunk(MixStream* stream, gsize size)
     /* If we're converting stereo to mono, average this sample with the other channel's. */
     if (stream->channels == 2 && stream->out_channels == 1)
       current_sample = (float)(0.5 * (current_sample + *(floatbuf++)));
+    current_sample = CLAMP(current_sample, -1.0, 1.0);
 
 #define OUTPUT_SAMPLE(type, value) { *(type*)out_buf = (type)(value); out_buf += sizeof(type); size -= sizeof(type); }
 
