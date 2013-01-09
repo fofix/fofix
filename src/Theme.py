@@ -928,7 +928,7 @@ class ThemeParts:
         wP = w*self.theme.partDiffPanelSize[0]
         hP = h*self.theme.partDiffPanelSize[1]
         glColor3f(*self.theme.partDiffHeaderColor)
-        self.dialog.engine.fadeScreen(-2.00)
+        dialog.engine.fadeScreen(-2.00)
         if self.theme.partDiffTitleText:
             dialog.fontDict[self.theme.partDiffTitleTextFont].render(self.theme.partDiffTitleText, self.theme.partDiffTitleTextPos, scale = self.theme.partDiffTitleTextScale, align = self.theme.partDiffTitleTextAlign)
         if self.theme.partDiffSubtitleText:
@@ -2459,7 +2459,7 @@ class Setlist:
         y = 0
         w, h = scene.geometry
         font = scene.fontDict['songListFont']
-        self.scene.engine.fadeScreen(0.25)
+        scene.engine.fadeScreen(0.25)
         if scene.moreInfoTime < 500:
             y = 1.0-(float(scene.moreInfoTime)/500.0)
         yI = y*h
