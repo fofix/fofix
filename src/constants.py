@@ -27,3 +27,7 @@ RIGHT  = 2
 TOP    = 0
 MIDDLE = 1
 BOTTOM = 2
+
+# Screen sizing scalers
+SCREEN_WIDTH = 640.0
+SCREEN_HEIGHT = 480.0

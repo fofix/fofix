@@ -513,6 +513,7 @@ class GameEngine(object):
                   alignment = CENTER, valignment = 1):
         """
         Draws the image/surface to screen
+        @depreciated please use the specific methods of the image or Im.drawImage
 
         @param image:        The openGL surface
         @param scale:        Scale factor (between 0.0 and 1.0, second value must be negative due to texture flipping)
@@ -522,53 +523,15 @@ class GameEngine(object):
                                  (values are between 0.0 and 1.0)
                                  (can have 3 values or 4, if 3 are given the alpha is automatically set to 1.0)
         @param rect:         The surface rectangle, this is used for cropping the texture
-        @param stretched:    Stretches the image in one of 5 ways according to following passed values
-                                 1) fits it to the width of the viewport
-                                 2) fits it to the height of the viewport
-                                11) fits it to the width of the viewport and scales the height while keeping the aspect ratio
-                                12) fits it to the heigh of the viewport and scales the width while keeping the aspect ratio
-                                 0) stretches it so it fits the whole viewport
+
                              Any other values will have the image maintain its size passed by scale
-        @param fit:          Adjusts the texture so the coordinate for the y-axis placement can be
-                             on the top side (1), bottom side (2), or center point (any other value) of the image
         @param alignment:    Adjusts the texture so the coordinate for x-axis placement can either be
                              on the left side (0), center point (1), or right(2) side of the image
         @param valignment:   Adjusts the texture so the coordinate for y-axis placement can either be
                              on the bottom side (0), center point (1), or top(2) side of the image
         """
 
-        if not isinstance(image, ImgDrawing):
-            return
-
-        width, height = scale
-        x, y = coord
-        if stretched == 1: # fit to width
-            width  = width  / image.pixelSize[0] * self.view.geometry[2]
-        elif stretched == 2: # fit to height
-            height = height / image.pixelSize[1] * self.view.geometry[3]
-        elif stretched == 11: # fit to width and keep ratio
-            width  = width  / image.pixelSize[0] * self.view.geometry[2]
-            height = height / image.pixelSize[0] * self.view.geometry[2]
-        elif stretched == 12: # fit to height and keep ratio
-            width  = width  / image.pixelSize[1] * self.view.geometry[3]
-            height = height / image.pixelSize[1] * self.view.geometry[3]
-        elif not stretched == 0: # fit to screen
-            width  = width  / image.pixelSize[0] * self.view.geometry[2]
-            height = height / image.pixelSize[1] * self.view.geometry[3]
-
-        if fit == 1: #y is on top (not center)
-            y = y - ((image.pixelSize[1] * abs(scale[1]))*.5*(self.view.geometry[3]/480.0))
-        elif fit == 2: #y is on bottom
-            y = y + ((image.pixelSize[1] * abs(scale[1]))*.5*(self.view.geometry[3]/480.0))
-
-        image.setRect(rect)
-        image.setScale(width, height)
-        image.setPosition(x, y)
-        image.setAlignment(alignment)
-        image.setVAlignment(valignment)
-        image.setAngle(rot)
-        image.setColor(color)
-        image.draw()
+        ImgDrawing.drawImage(image, scale, coord, rot, color, rect, stretched, fit, alignment, valignment)
 
     #blazingamer
     def draw3Dtex(self, image, vertex, texcoord, coord = None, scale = None, rot = None, color = (1,1,1), multiples = False, alpha = False, depth = False, vertscale = 0):
