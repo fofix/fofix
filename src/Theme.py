@@ -70,6 +70,8 @@ def valign(value, default='middle'):
         Log.warn('Invalid vertical alignment value - defaulting to %s' % default)
         return valign(default)
 
+def isTrue(value):
+    return value in ["1", "true", "yes", "on"]
 
 class Theme(Task):
 
@@ -113,7 +115,7 @@ class Theme(Task):
             if self.config:
                 if self.config.has_option("theme", value):
                     if type == bool:
-                        return self.config.get("theme", value).lower() in ["1", "true", "yes", "on"]
+                        return isTrue(self.config.get("theme", value).lower())
                     elif type == "color":
                         return self.hexToColor(self.config.get("theme", value))
                     else:
