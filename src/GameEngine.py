@@ -531,7 +531,7 @@ class GameEngine(object):
                              on the bottom side (0), center point (1), or top(2) side of the image
         """
 
-        ImgDrawing.drawImage(image, scale, coord, rot, color, rect, stretched, fit, alignment, valignment)
+        return ImgDrawing.drawImage(image, scale, coord, rot, color, rect, stretched, fit, alignment, valignment)
 
     #blazingamer
     def draw3Dtex(self, image, vertex, texcoord, coord = None, scale = None, rot = None, color = (1,1,1), multiples = False, alpha = False, depth = False, vertscale = 0):

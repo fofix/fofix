@@ -70,7 +70,7 @@ class ImgDrawing(object):
         """
 
         if not isinstance(image, ImgDrawing):
-            return
+            return False
 
         image.setRect(rect)
         image.setScale(scale[0], scale[1], stretched)
@@ -80,6 +80,8 @@ class ImgDrawing(object):
         image.setAngle(rot)
         image.setColor(color)
         image.draw()
+
+        return True
 
     def __init__(self, context, ImgData):
         self.ImgData = None
@@ -236,9 +238,9 @@ class ImgDrawing(object):
         """
         if alignment == CENTER:#center
             self.vshift = -.5
-        if alignment == BOTTOM:#bottom
+        if alignment == TOP:#bottom
             self.vshift = 0
-        elif alignment == TOP:#top
+        elif alignment == BOTTOM:#top
             self.vshift = -1.0
 
     def setColor(self, color):
