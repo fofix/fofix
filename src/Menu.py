@@ -417,7 +417,7 @@ class Menu(Layer, KeyListener):
                     ypos = float(i+self.viewOffset)
                     self.engine.drawImage(self.menuText, scale = (.5*self.menuScale,(-1.0/n*self.menuScale)),
                                           coord = (wS*self.menux,(hS*self.menuy)-(hS*self.vSpace)*i),
-                                          rect = (xpos[0],xpos[1],ypos/n,(ypos+1.0)/n), stretched = 11)
+                                          rect = (xpos[0],xpos[1],ypos/n,(ypos+1.0)/n), stretched = 5)
                 else:
                     text = choice.getText(i + self.viewOffset == self.currentIndex)
                     glPushMatrix()

@@ -159,7 +159,7 @@ class ImgDrawing(object):
         @return the scaled ratio of the pixelw divided by the pixel width of the texture
         """
         width = self.pixelSize[0]
-        if width is not null:
+        if width is not None:
             wfactor = pixelw/width
             return wfactor
         else:
@@ -183,28 +183,33 @@ class ImgDrawing(object):
 
     def setScale(self, width, height, stretched = 0):
         """
-        @param stretched:    Stretches the image in one of 5 ways according to following passed values
+        @param stretched:    Bitmask stretching the image according to the following values
+                                 0) does not stretch the image
                                  1) fits it to the width of the viewport
                                  2) fits it to the height of the viewport
-                                11) fits it to the width of the viewport and scales the height while keeping the aspect ratio
-                                12) fits it to the heigh of the viewport and scales the width while keeping the aspect ratio
-                                 0) stretches it so it fits the whole viewport
+                                 3) stretches it so it fits the viewport
+                                 4) preserves the aspect ratio while stretching
         """
-        if stretched == 0: #do nothing
-            pass
-        elif stretched == 1: # fit to width
-            width  = width  / self.pixelSize[0] * self.context.geometry[2]
-        elif stretched == 2: # fit to height
-            height = height / self.pixelSize[1] * self.context.geometry[3]
-        elif stretched == 11: # fit to width and keep ratio
-            width  = width  / self.pixelSize[0] * self.context.geometry[2]
-            height = height / self.pixelSize[0] * self.context.geometry[2]
-        elif stretched == 12: # fit to height and keep ratio
-            width  = width  / self.pixelSize[1] * self.context.geometry[3]
-            height = height / self.pixelSize[1] * self.context.geometry[3]
-        elif not stretched == 0: # fit to screen
-            width  = width  / self.pixelSize[0] * self.context.geometry[2]
-            height = height / self.pixelSize[1] * self.context.geometry[3]
+        if stretched & FULL_SCREEN: # FULL_SCREEN is FIT_WIDTH | FIT_HEIGHT
+            xStretch = 1
+            yStretch = 1
+            if stretched & FIT_WIDTH:
+                xStretch = float(self.context.geometry[2]) / self.pixelSize[0]
+            if stretched & FIT_HEIGHT:
+                yStretch = float(self.context.geometry[3]) / self.pixelSize[1]
+            if stretched & KEEP_ASPECT:
+                if stretched & FULL_SCREEN == FULL_SCREEN: #Note that on FULL_SCREEN | KEEP_ASPECT we will scale to the larger and clip.
+                    if xStretch > yStretch:
+                       yStretch = xStretch
+                    else:
+                       xStretch = yStretch
+                else:
+                    if stretched & FIT_WIDTH:
+                        yStretch = xStretch
+                    else:
+                        xStretch = yStretch
+            width *= xStretch
+            height *= yStretch
 
         self.scale = [width, height]
 

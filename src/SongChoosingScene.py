@@ -942,20 +942,20 @@ class SongChoosingScene(Scene):
 
         #render the background (including the header and footer)
         if self.setlistStyle == 1 and self.img_list_bg:
-            self.engine.drawImage(self.img_list_bg, scale = (1.0, -1.0), coord = (w/2,h/2), stretched = 11)
+            self.engine.drawImage(self.img_list_bg, scale = (1.0, -1.0), coord = (w/2,h/2), stretched = 5)
         elif self.img_list_bg:
             self.engine.drawImage(self.img_list_bg, scale = (1.0, -1.0), coord = (w/2,h/2), stretched = 3)
         if self.img_list_head:
             o = 0
             if self.setlistStyle == 1:
                 o = self.yPos
-            self.engine.drawImage(self.img_list_head, scale = (1.0, -1.0), coord = (w/2,h+o), stretched = 11, fit = 1)
+            self.engine.drawImage(self.img_list_head, scale = (1.0, -1.0), coord = (w/2,h+o), stretched = 5, fit = 1)
         if self.setlistStyle in [0, 2] and self.img_list_foot:
-            self.engine.drawImage(self.img_list_foot, scale = (1.0, -1.0), coord = (w/2,0), stretched = 11, fit = 2)
+            self.engine.drawImage(self.img_list_foot, scale = (1.0, -1.0), coord = (w/2,0), stretched = 5, fit = 2)
         elif self.img_list_foot:
             maxPos = max(len(self.items) - self.itemsPerPage, 0)
             o = (-self.itemSize[1]*h*maxPos) + self.yPos
-            self.engine.drawImage(self.img_list_foot, scale = (1.0, -1.0), coord = (w/2,o), stretched = 11, fit = 2)
+            self.engine.drawImage(self.img_list_foot, scale = (1.0, -1.0), coord = (w/2,o), stretched = 5, fit = 2)
 
         self.engine.theme.setlist.renderHeader(self)
 

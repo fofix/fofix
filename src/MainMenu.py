@@ -393,7 +393,7 @@ class MainMenu(BackgroundLayer):
                     self.engine.drawImage(self.BGText,
                                         scale = (wFactor*sFactor,-hFactor*sFactor),
                                         coord = textcoord,
-                                        rect  = (xpos[0],xpos[1],ypos[0],ypos[1]), stretched = 11)
+                                        rect  = (xpos[0],xpos[1],ypos[0],ypos[1]), stretched = 5)
 
         #racer: added version tag to main menu:
         if self.version != None:

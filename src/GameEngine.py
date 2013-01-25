@@ -489,11 +489,11 @@ class GameEngine(object):
 
                 if self.data.maskStars:
                     if self.data.theme == 2:
-                        self.drawImage(star, scale = (scale,-scale), coord = (w*(xpos+wide*j)*space**4,h*ypos), color = (1, 1, 0, 1), stretched=11)
+                        self.drawImage(star, scale = (scale,-scale), coord = (w*(xpos+wide*j)*space**4,h*ypos), color = (1, 1, 0, 1), stretched=5)
                     else:
-                        self.drawImage(star, scale = (scale,-scale), coord = (w*(xpos+wide*j)*space**4,h*ypos), color = (0, 1, 0, 1), stretched=11)
+                        self.drawImage(star, scale = (scale,-scale), coord = (w*(xpos+wide*j)*space**4,h*ypos), color = (0, 1, 0, 1), stretched=5)
                 else:
-                    self.drawImage(star, scale = (scale,-scale), coord = (w*(xpos+wide*j)*space**4,h*ypos), stretched=11)
+                    self.drawImage(star, scale = (scale,-scale), coord = (w*(xpos+wide*j)*space**4,h*ypos), stretched=5)
         else:
             for j in range(5):
                 if j < stars:
@@ -506,7 +506,7 @@ class GameEngine(object):
                         star = self.data.star3
                     else:
                         star = self.data.star1
-                self.drawImage(star, scale = (scale,-scale), coord = (w*(xpos+wide*j)*space**4,h*ypos), stretched=11)
+                self.drawImage(star, scale = (scale,-scale), coord = (w*(xpos+wide*j)*space**4,h*ypos), stretched=5)
 
     def drawImage(self, image, scale = (1.0, -1.0), coord = (0, 0), rot = 0, \
                   color = (1,1,1,1), rect = (0,1,0,1), stretched = 0, fit = 0, \

@@ -28,6 +28,12 @@ TOP    = 0
 MIDDLE = 1
 BOTTOM = 2
 
+# Stretching constants
+FIT_WIDTH = 1
+FIT_HEIGHT = 2
+FULL_SCREEN = 3
+KEEP_ASPECT = 4
+
 # Screen sizing scalers
 SCREEN_WIDTH = 640.0
 SCREEN_HEIGHT = 480.0
