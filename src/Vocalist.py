@@ -821,11 +821,11 @@ class Vocalist:
                     degrees = int(360*ratio) - (int(360*ratio) % 5)
                     self.engine.drawImage(self.drawnVocalOverlays[degrees], scale = (self.vocalMeterScale,-self.vocalMeterScale), coord = (w*self.vocalMeterX,h*(self.vocalMeterY-addY)), color = (1,1,1,self.textTrans))
                 else:
-                    self.engine.drawImage(self.vocalFill, scale = (self.vocalFillWidth*ratio, -self.vocalFillWidth), coord = (w*self.vocalMeterX-(ratio*self.vocalFillWidth*w*.5), h*(self.vocalMeterY-addY)), rect = (0,ratio,0,1), color = (1,1,1,self.textTrans), stretched = 11)
+                    self.engine.drawImage(self.vocalFill, scale = (self.vocalFillWidth*ratio, -self.vocalFillWidth), coord = (w*self.vocalMeterX-(ratio*self.vocalFillWidth*w*.5), h*(self.vocalMeterY-addY)), rect = (0,ratio,0,1), color = (1,1,1,self.textTrans), stretched = 5)
         self.engine.drawImage(self.vocalODBottom, scale = (.5,-.5), coord = (w*self.vocalPowerX,h*(self.vocalPowerY-addY)))
         if self.starPower > 0:
             currentSP = self.starPower/100.0
-            self.engine.drawImage(self.vocalODFill, scale = (self.vocalODFillWidth*currentSP,-self.vocalODFillWidth), coord = (w*self.vocalPowerX-((1-currentSP)*self.vocalODFillWidth*w*.5),h*(self.vocalPowerY-addY)), rect = (0,currentSP,0,1), stretched = 11)
+            self.engine.drawImage(self.vocalODFill, scale = (self.vocalODFillWidth*currentSP,-self.vocalODFillWidth), coord = (w*self.vocalPowerX-((1-currentSP)*self.vocalODFillWidth*w*.5),h*(self.vocalPowerY-addY)), rect = (0,currentSP,0,1), stretched = 5)
         if self.vocalODTop:
             self.engine.drawImage(self.vocalODTop, scale = (.5,-.5), coord = (w*self.vocalPowerX,h*(self.vocalPowerY-addY)))
         if self.starPowerActive:
