@@ -37,3 +37,8 @@ KEEP_ASPECT = 4
 # Screen sizing scalers
 SCREEN_WIDTH = 640.0
 SCREEN_HEIGHT = 480.0
+
+#set of values that define as true when loading string values from a file
+def isTrue(value):
+    return value in ["1", "true", "yes", "on"]
+

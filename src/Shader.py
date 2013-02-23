@@ -38,6 +38,8 @@ from OpenGL.GL.ARB.fragment_shader import *
 from OpenGL.GL.ARB.multitexture import *
 from OpenGL.GL.EXT.texture3D import *
 
+from constants import isTrue
+
 class ShaderCompilationError(Exception):
     pass
 
@@ -489,7 +491,7 @@ class ShaderList:
                     value = Config.get("video","shader_"+i)
                     if value != "None":
                         if value == "theme":
-                            if Config.get("theme","shader_"+i).lower() in ["1", "true", "yes", "on"]:
+                            if isTrue(Config.get("theme","shader_"+i).lower()):
                                 value = i
                             else:
                                 continue

@@ -70,9 +70,6 @@ def valign(value, default='middle'):
         Log.warn('Invalid vertical alignment value - defaulting to %s' % default)
         return valign(default)
 
-def isTrue(value):
-    return value in ["1", "true", "yes", "on"]
-
 class Theme(Task):
 
     def __getattr__(self, attr):
