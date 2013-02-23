@@ -42,6 +42,8 @@ import Log
 
 from VideoPlayer import VideoLayer, VideoPlayerError
 
+from constants import *
+
 class Element:
     """A basic element in the credits scroller."""
     def getHeight(self):
@@ -355,7 +357,7 @@ class Credits(Layer, KeyListener):
 
         with self.engine.view.orthogonalProjection(normalize = True):
             if self.background:
-                self.engine.drawImage(self.background, scale = (1.0,-1.0), coord = (w/2,h/2), stretched = 3)
+                self.engine.drawImage(self.background, scale = (1.0,-1.0), coord = (w/2,h/2), stretched = FULL_SCREEN)
             else:
                 self.engine.fadeScreen(.4)
             self.doneList = []

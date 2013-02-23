@@ -52,6 +52,8 @@ from Credits import Credits
 
 import Config
 
+from constants import *
+
 #MFH - for loading phrases
 def wrapCenteredText(font, pos, text, rightMargin = 1.0, scale = 0.002, visibility = 0.0, linespace = 1.0, allowshadowoffset = False, shadowoffset = (.0022, .0005)):
     """
@@ -405,7 +407,7 @@ class LoadingScreen(Layer, KeyListener):
             #MFH - auto-scaling of loading screen
             #Volshebnyi - fit to screen applied
             if self.loadingImg:
-                self.engine.drawImage(self.loadingImg, scale = (1.0,-1.0), coord = (w/2,h/2), stretched = 3)
+                self.engine.drawImage(self.loadingImg, scale = (1.0,-1.0), coord = (w/2,h/2), stretched = FULL_SCREEN)
 
             self.engine.theme.setBaseColor(1 - v)
             w, h = font.getStringSize(self.text)
@@ -616,12 +618,12 @@ class FileChooser(BackgroundLayer, KeyListener):
         #MFH - draw neck black BG in for transparent areas (covers options BG):
         if self.neckBlackBack != None:
             #MFH - auto background scaling
-            self.engine.drawImage(self.neckBlackBack, scale = (1.0,-1.0), coord = (w/2,h/2), stretched = 3)
+            self.engine.drawImage(self.neckBlackBack, scale = (1.0,-1.0), coord = (w/2,h/2), stretched = FULL_SCREEN)
 
 
         #MFH - auto background scaling
         if self.engine.data.optionsBG:
-            self.engine.drawImage(self.engine.data.optionsBG, scale = (1.0,-1.0), coord = (w/2,h/2), stretched = 3)
+            self.engine.drawImage(self.engine.data.optionsBG, scale = (1.0,-1.0), coord = (w/2,h/2), stretched = FULL_SCREEN)
 
 
         font = self.engine.data.font
@@ -800,7 +802,7 @@ class NeckChooser(Layer, KeyListener):
         #MFH - draw neck black BG in for transparent necks (covers options BG):
         if self.neckBlackBack != None:
             #MFH - auto background scaling
-            self.engine.drawImage(self.neckBlackBack, scale = (1.0,-1.0), coord = (w/2,h/2), stretched = 3)
+            self.engine.drawImage(self.neckBlackBack, scale = (1.0,-1.0), coord = (w/2,h/2), stretched = FULL_SCREEN)
 
         currentNeck = self.necks[int(self.selectedNeck)+2]
         lastNeck1 = self.necks[int(self.selectedNeck)]
@@ -879,7 +881,7 @@ class NeckChooser(Layer, KeyListener):
 
         #MFH - draw neck BG on top of necks
         #MFH - auto background scaling
-        self.engine.drawImage(self.neckBG, scale = (1.0,-1.0), coord = (w/2,h/2), stretched = 3)
+        self.engine.drawImage(self.neckBG, scale = (1.0,-1.0), coord = (w/2,h/2), stretched = FULL_SCREEN)
 
 
         font = self.engine.data.font
@@ -1090,7 +1092,7 @@ class AvatarChooser(Layer, KeyListener):
 
         with self.engine.view.orthogonalProjection(normalize = True):
             if self.background:
-                self.engine.drawImage(self.background, scale = (1.0, -1.0), coord = (w/2,h/2), stretched = 3)
+                self.engine.drawImage(self.background, scale = (1.0, -1.0), coord = (w/2,h/2), stretched = FULL_SCREEN)
             else:
                 self.engine.fadeScreen(v)
             self.engine.theme.setBaseColor(1 - v)
@@ -1338,7 +1340,7 @@ class PartDiffChooser(MainDialog):
 
         with self.engine.view.orthogonalProjection(normalize = True):
             if self.img_background:
-                self.engine.drawImage(self.img_background, scale = (1.0, -1.0), coord = (w/2,h/2), stretched = 3)
+                self.engine.drawImage(self.img_background, scale = (1.0, -1.0), coord = (w/2,h/2), stretched = FULL_SCREEN)
             self.theme.partDiff.renderPanels(self)
 
 class ItemChooser(BackgroundLayer, KeyListener):
@@ -1413,7 +1415,7 @@ class ItemChooser(BackgroundLayer, KeyListener):
 
         #MFH - auto background scaling
         if self.engine.data.optionsBG:
-            self.engine.drawImage(self.engine.data.optionsBG, scale = (1.0, -1.0), coord = (w/2,h/2), stretched = 3)
+            self.engine.drawImage(self.engine.data.optionsBG, scale = (1.0, -1.0), coord = (w/2,h/2), stretched = FULL_SCREEN)
 
         with self.engine.view.orthogonalProjection(normalize = True):
             glEnable(GL_BLEND)
@@ -1681,8 +1683,8 @@ class KeyTester(Layer, KeyListener):
                         glColor3f(.4, .4, .4)
                     font.render(text, (.25-wText/2, .45 + v))
                     starC = (1-self.starpower)*.5*w*self.analogBarScale
-                    self.engine.drawImage(self.analogBar, scale = (self.analogBarScale*self.starpower, -self.analogBarScale), coord = ((w*.25)-starC, h*.3), rect = (0, self.starpower, 0, 1), stretched = 5)
-                    self.engine.drawImage(self.analogBox, scale = (self.analogBoxScale, -self.analogBoxScale), coord = (w*.25, h*.3), stretched = 5)
+                    self.engine.drawImage(self.analogBar, scale = (self.analogBarScale*self.starpower, -self.analogBarScale), coord = ((w*.25)-starC, h*.3), rect = (0, self.starpower, 0, 1), stretched = KEEP_ASPECT | FIT_WIDTH)
+                    self.engine.drawImage(self.analogBox, scale = (self.analogBoxScale, -self.analogBoxScale), coord = (w*.25, h*.3), stretched = KEEP_ASPECT | FIT_WIDTH)
                 else:
                     if self.controls.getState(self.keyList[Player.STAR]):
                         self.engine.theme.setSelectedColor(1 - v)
@@ -1761,7 +1763,7 @@ class KeyTester(Layer, KeyListener):
                         glColor3f(.4, .4, .4)
                     font.render(self.names[Player.KILL], (.75-wText/2, .45 + v))
                     whammyC = (1-self.whammy)*.5*w*self.analogBarScale
-                    self.engine.drawImage(self.analogBar, scale = (self.analogBarScale*self.whammy, -self.analogBarScale), coord = (w*.75-whammyC, h*.3), rect = (0, self.whammy, 0, 1), stretched = 5)
+                    self.engine.drawImage(self.analogBar, scale = (self.analogBarScale*self.whammy, -self.analogBarScale), coord = (w*.75-whammyC, h*.3), rect = (0, self.whammy, 0, 1), stretched = KEEP_ASPECT | FIT_WIDTH)
                 else:
                     if self.controls.getState(self.keyList[Player.KILL]):
                         self.engine.theme.setSelectedColor(1 - v)
@@ -1769,7 +1771,7 @@ class KeyTester(Layer, KeyListener):
                         glColor3f(.4, .4, .4)
                     font.render(self.names[Player.KILL], (.75-wText/2, .45 + v))
 
-                self.engine.drawImage(self.analogBox, scale = (self.analogBoxScale, -self.analogBoxScale), coord = (w*.75, h*.3), stretched = 5)
+                self.engine.drawImage(self.analogBox, scale = (self.analogBoxScale, -self.analogBoxScale), coord = (w*.75, h*.3), stretched = KEEP_ASPECT | FIT_WIDTH)
                 if self.controls.getState(self.keyList[Player.ACTION1]) or self.controls.getState(self.keyList[Player.ACTION2]):
                     self.engine.theme.setSelectedColor(1 - v)
                 else:
@@ -2046,7 +2048,7 @@ class LoadingSplashScreen(Layer, KeyListener):
             self.engine.fadeScreen(v)
             w, h = self.engine.view.geometry[2:4]
             if self.loadingImg:
-                self.engine.drawImage(self.loadingImg, scale = (1.0,-1.0), coord = (w/2,h/2), stretched = 3)
+                self.engine.drawImage(self.loadingImg, scale = (1.0,-1.0), coord = (w/2,h/2), stretched = FULL_SCREEN)
 
             self.engine.theme.setBaseColor(1 - v)
             w, h = font.getStringSize(self.text, scale=self.fScale)
@@ -2088,8 +2090,8 @@ class SongLoadingSplashScreen(LoadingSplashScreen):
 
             self.engine.theme.setBaseColor(1 - v)
             if self.songBack:
-                self.engine.drawImage(self.songBack, scale = (1.0,-1.0), coord = (w/2,h/2), stretched = 3)
-            self.engine.drawImage(self.loadingImg, scale = (1.0,-1.0), coord = (w/2,h/2), stretched = 3)
+                self.engine.drawImage(self.songBack, scale = (1.0,-1.0), coord = (w/2,h/2), stretched = FULL_SCREEN)
+            self.engine.drawImage(self.loadingImg, scale = (1.0,-1.0), coord = (w/2,h/2), stretched = FULL_SCREEN)
             w, h = font.getStringSize(self.text, scale=self.fScale)
 
             x = self.loadingx

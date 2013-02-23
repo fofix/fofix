@@ -49,6 +49,8 @@ import random
 import os
 from OpenGL.GL import *
 
+from constants import *
+
 class GameResultsScene(Scene):
     def __init__(self, engine, libraryName, songName, scores = None, coOpType = False, careerMode = False):
         Scene.__init__(self, engine)
@@ -803,7 +805,7 @@ class GameResultsScene(Scene):
 
         w, h = self.fullView
         if self.background:
-            self.engine.drawImage(self.background, scale = (1.0,-1.0), coord = (w/2,h/2), stretched = 3)
+            self.engine.drawImage(self.background, scale = (1.0,-1.0), coord = (w/2,h/2), stretched = FULL_SCREEN)
 
         self.engine.theme.setBaseColor(1-v)
 
@@ -971,7 +973,7 @@ class GameResultsScene(Scene):
 
         w, h = self.fullView
         if self.background:
-            self.engine.drawImage(self.background, scale = (1.0,-1.0), coord = (w/2,h/2), stretched = 3)
+            self.engine.drawImage(self.background, scale = (1.0,-1.0), coord = (w/2,h/2), stretched = FULL_SCREEN)
 
         self.engine.theme.setBaseColor(1-v)
 

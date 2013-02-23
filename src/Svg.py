@@ -63,7 +63,7 @@ class ImgDrawing(object):
     VTX_ARRAY = np.array([[0.0, 1.0], [1.0, 1.0], [1.0, 0.0], [0.0, 0.0]], dtype=np.float32) #hard-coded quad for drawing textures onto
 
     def drawImage(image, scale = (1.0, -1.0), coord = (0, 0), rot = 0, \
-                  color = (1,1,1,1), rect = (0,1,0,1), stretched = 0, fit = 0, \
+                  color = (1,1,1,1), rect = (0,1,0,1), stretched = 0, fit = CENTER, \
                   alignment = CENTER, valignment = CENTER):
         """
         Draws the image/surface to screen
@@ -165,18 +165,18 @@ class ImgDrawing(object):
         else:
             return 0
 
-    def setPosition(self, x, y, fit = 0):
+    def setPosition(self, x, y, fit = CENTER):
         """
         Sets position of this image on screen 
 
         @param fit:          Adjusts the texture so the coordinate for the y-axis placement can be
                              on the top side (1), bottom side (2), or center point (any other value) of the image
         """
-        if fit == 0: #y is center
+        if fit == CENTER: #y is center
             pass
-        elif fit == 1: #y is on top (not center)
+        elif fit == TOP: #y is on top (not center)
             y = y - ((self.pixelSize[1] * abs(self.scale[1]))*.5*(self.context.geometry[3]/SCREEN_HEIGHT))
-        elif fit == 2: #y is on bottom
+        elif fit == BOTTOM: #y is on bottom
             y = y + ((self.pixelSize[1] * abs(self.scale[1]))*.5*(self.context.geometry[3]/SCREEN_HEIGHT))
 
         self.position = [x,y]

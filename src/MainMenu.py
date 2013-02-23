@@ -44,6 +44,8 @@ import string
 
 import Log
 
+from constants import *
+
 class MainMenu(BackgroundLayer):
     def __init__(self, engine):
         self.engine              = engine
@@ -363,16 +365,16 @@ class MainMenu(BackgroundLayer):
         if self.active:
             if self.engine.view.topLayer() is not None:
                 if self.optionsBG:
-                    self.engine.drawImage(self.optionsBG, (self.opt_bkg_size[2],-self.opt_bkg_size[3]), (w*self.opt_bkg_size[0],h*self.opt_bkg_size[1]), stretched = 3)
+                    self.engine.drawImage(self.optionsBG, (self.opt_bkg_size[2],-self.opt_bkg_size[3]), (w*self.opt_bkg_size[0],h*self.opt_bkg_size[1]), stretched = FULL_SCREEN)
 
-                self.engine.drawImage(self.optionsPanel, (1.0,-1.0), (w/2, h/2), stretched = 3)
+                self.engine.drawImage(self.optionsPanel, (1.0,-1.0), (w/2, h/2), stretched = FULL_SCREEN)
             else:
-                self.engine.drawImage(self.engine.data.loadingImage, (1.0,-1.0), (w/2, h/2), stretched = 3)
+                self.engine.drawImage(self.engine.data.loadingImage, (1.0,-1.0), (w/2, h/2), stretched = FULL_SCREEN)
 
         if self.menu.active and self.engine.cmdPlay == 0:
             if self.background != None:
                 #MFH - auto-scaling
-                self.engine.drawImage(self.background, (1.0,-1.0), (w/2, h/2), stretched = 3)
+                self.engine.drawImage(self.background, (1.0,-1.0), (w/2, h/2), stretched = FULL_SCREEN)
 
             if self.BGText:
                 numOfChoices = len(self.menu.choices)
@@ -393,7 +395,7 @@ class MainMenu(BackgroundLayer):
                     self.engine.drawImage(self.BGText,
                                         scale = (wFactor*sFactor,-hFactor*sFactor),
                                         coord = textcoord,
-                                        rect  = (xpos[0],xpos[1],ypos[0],ypos[1]), stretched = 5)
+                                        rect  = (xpos[0],xpos[1],ypos[0],ypos[1]), stretched = KEEP_ASPECT | FIT_WIDTH)
 
         #racer: added version tag to main menu:
         if self.version != None:

@@ -56,6 +56,8 @@ from OpenGL.GL import *
 
 from math import degrees, atan
 
+from constants import *
+
 class GuitarScene(Scene):
     def __init__(self, engine, libraryName, songName):
         Scene.__init__(self, engine)
@@ -5266,7 +5268,7 @@ class GuitarScene(Scene):
                 self.renderVocals()
                 #MFH: render the note sheet just on top of the background:
                 if self.lyricSheet != None and not self.playingVocals:
-                    self.engine.drawImage(self.lyricSheet, scale = (1.0,-1.0), coord = (w/2, h*0.935), stretched = 1)
+                    self.engine.drawImage(self.lyricSheet, scale = (1.0,-1.0), coord = (w/2, h*0.935), stretched = FIT_WIDTH)
                     #the timing line on this lyric sheet image is approx. 1/4 over from the left
                 #MFH - also render the scrolling lyrics & sections before changing viewports:
 
@@ -5460,12 +5462,12 @@ class GuitarScene(Scene):
                             if self.pause:
                                 self.engine.view.setViewport(1,0)
                                 if self.engine.graphicMenuShown == False:
-                                    self.engine.drawImage(self.pauseScreen, scale = (self.pause_bkg[2], -self.pause_bkg[3]), coord = (w*self.pause_bkg[0],h*self.pause_bkg[1]), stretched = 3)
+                                    self.engine.drawImage(self.pauseScreen, scale = (self.pause_bkg[2], -self.pause_bkg[3]), coord = (w*self.pause_bkg[0],h*self.pause_bkg[1]), stretched = FULL_SCREEN)
 
                             if self.finalFailed and self.song:
                                 self.engine.view.setViewport(1,0)
                                 if self.engine.graphicMenuShown == False:
-                                    self.engine.drawImage(self.failScreen, scale = (self.fail_bkg[2], -self.fail_bkg[3]), coord = (w*self.fail_bkg[0],h*self.fail_bkg[1]), stretched = 3)
+                                    self.engine.drawImage(self.failScreen, scale = (self.fail_bkg[2], -self.fail_bkg[3]), coord = (w*self.fail_bkg[0],h*self.fail_bkg[1]), stretched = FULL_SCREEN)
 
                                 # evilynux - Closer to actual GH3
                                 font = self.engine.data.pauseFont

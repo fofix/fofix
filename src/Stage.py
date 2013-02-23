@@ -38,6 +38,7 @@ from VideoPlayer import VideoLayer, VideoPlayerError
 
 import Rockmeter #blazingamer - new 4.0 code for rendering rockmeters through stage.ini
 
+from constants import *
 
 class Layer(object):
     """
@@ -541,13 +542,13 @@ class Stage(object):
         if self.mode != 2:
             if self.rotationMode == 0:
                 self.engine.drawImage(self.background, scale = (1.0,-1.0),
-                                      coord = (self.wFull/2,self.hFull/2), stretched = 3)
+                                      coord = (self.wFull/2,self.hFull/2), stretched = FULL_SCREEN)
 
             #myfingershurt:
             else:
                 #MFH - use precalculated scale factors instead
                 self.engine.drawImage(self.imgArr[self.arrNum], scale = (1.0,-1.0),
-                                      coord = (self.wFull/2,self.hFull/2), stretched = 3)
+                                      coord = (self.wFull/2,self.hFull/2), stretched = FULL_SCREEN)
 
     def updateDelays(self):
         self.rotateDelay = self.engine.config.get("game",  "stage_rotate_delay") #myfingershurt - user defined stage rotate delay

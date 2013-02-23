@@ -43,7 +43,7 @@ class Video:
     def setMode(self, resolution, fullscreen = False, flags = pygame.OPENGL | pygame.DOUBLEBUF,
                 multisamples = 0):
         if fullscreen:
-            flags |= pygame.FULLSCREEN
+            flags |= pygame.FULL_SCREEN
 
         self.flags        = flags
         self.fullscreen   = fullscreen
@@ -150,7 +150,7 @@ class Video:
         Log.warn("Video setup failed. Trying default windowed resolution.")
         self.error.append(_("Video setup failed with your resolution settings, and so were reset to defaults."))
         if self.fullscreen:
-            self.flags ^= pygame.FULLSCREEN
+            self.flags ^= pygame.FULL_SCREEN
             self.fullscreen = False
         try:
             self.screen = pygame.display.set_mode((800,600), self.flags)

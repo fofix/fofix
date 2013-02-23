@@ -866,9 +866,9 @@ class ThemeLobby:
             else:
                 glColor3f(*self.theme.lobbyHeaderColor)
             if i == lobby.keyControl and lobby.img_keyboard_panel:
-                lobby.drawImage(lobby.img_keyboard_panel, scale = (self.theme.lobbyPanelSize[0], -self.theme.lobbyPanelSize[1]), coord = (wP*.5+w*x,hP*.5+h*y), stretched = 3)
+                lobby.drawImage(lobby.img_keyboard_panel, scale = (self.theme.lobbyPanelSize[0], -self.theme.lobbyPanelSize[1]), coord = (wP*.5+w*x,hP*.5+h*y), stretched = FULL_SCREEN)
             elif lobby.img_panel:
-                lobby.drawImage(lobby.img_panel, scale = (self.theme.lobbyPanelSize[0], -self.theme.lobbyPanelSize[1]), coord = (wP*.5+w*x,hP*.5+h*y), stretched = 3)
+                lobby.drawImage(lobby.img_panel, scale = (self.theme.lobbyPanelSize[0], -self.theme.lobbyPanelSize[1]), coord = (wP*.5+w*x,hP*.5+h*y), stretched = FULL_SCREEN)
             if i == lobby.keyControl and lobby.img_keyboard:
                 lobby.drawImage(lobby.img_keyboard, scale = (self.theme.lobbyKeyboardImgScale, -self.theme.lobbyKeyboardImgScale), coord = (wP*self.theme.lobbyKeyboardImgPos[0]+w*x, hP*self.theme.lobbyKeyboardImgPos[1]+h*y))
             controlFont.render(lobby.controls[j], (self.theme.lobbyPanelSize[0]*self.theme.lobbyControlPos[0]+x, self.theme.lobbyPanelSize[1]*self.theme.lobbyControlPos[1]+y), scale = self.theme.lobbyControlScale, align = self.theme.lobbyControlAlign, new = True)
@@ -936,9 +936,9 @@ class ThemeParts:
             glColor3f(*self.theme.partDiffHeaderColor)
             dialog.fontDict[self.theme.partDiffGameModeFont].render(dialog.gameModeText, self.theme.partDiffGameModePos, scale = self.theme.partDiffGameModeScale, align = self.theme.partDiffGameModeAlign)
             if i == dialog.keyControl and dialog.img_keyboard_panel:
-                dialog.drawImage(dialog.img_keyboard_panel, scale = (self.theme.partDiffPanelSize[0], -self.theme.partDiffPanelSize[1]), coord = (wP*.5+w*x,hP*.5+h*y), stretched = 3)
+                dialog.drawImage(dialog.img_keyboard_panel, scale = (self.theme.partDiffPanelSize[0], -self.theme.partDiffPanelSize[1]), coord = (wP*.5+w*x,hP*.5+h*y), stretched = FULL_SCREEN)
             elif dialog.img_panel:
-                dialog.drawImage(dialog.img_panel, scale = (self.theme.partDiffPanelSize[0], -self.theme.partDiffPanelSize[1]), coord = (wP*.5+w*x,hP*.5+h*y), stretched = 3)
+                dialog.drawImage(dialog.img_panel, scale = (self.theme.partDiffPanelSize[0], -self.theme.partDiffPanelSize[1]), coord = (wP*.5+w*x,hP*.5+h*y), stretched = FULL_SCREEN)
             if i == dialog.keyControl and dialog.img_keyboard:
                 dialog.drawImage(dialog.img_keyboard, scale = (self.theme.partDiffKeyboardImgScale, -self.theme.partDiffKeyboardImgScale), coord = (wP*self.theme.partDiffKeyboardImgPos[0]+w*x, hP*self.theme.partDiffKeyboardImgPos[1]+h*y))
             controlFont.render(dialog.players[i].name, (self.theme.partDiffPanelSize[0]*self.theme.partDiffControlPos[0]+x, self.theme.partDiffPanelSize[1]*self.theme.partDiffControlPos[1]+y), scale = self.theme.partDiffControlScale, align = self.theme.partDiffControlAlign, new = True)
@@ -2128,13 +2128,13 @@ class Setlist:
                 font.render(_("Loading Preview..."), (.05, .7), scale = 0.001)
             return
         if scene.img_list_button_guide:
-            scene.drawImage(scene.img_list_button_guide, scale = (.5, -.5), coord = (w*.5,0), fit = 2)
+            scene.drawImage(scene.img_list_button_guide, scale = (.5, -.5), coord = (w*.5,0), fit = BOTTOM)
         if scene.songLoader:
             font.render(_("Loading Preview..."), (.5, .7), align = 1)
         if scene.searching:
             font.render(scene.searchText, (.5, .7), align = 1)
         if scene.img_list_fg:
-            scene.drawImage(scene.img_list_fg, scale = (1.0, -1.0), coord = (w/2,h/2), stretched = 3)
+            scene.drawImage(scene.img_list_fg, scale = (1.0, -1.0), coord = (w/2,h/2), stretched = FULL_SCREEN)
 
     def renderSelectedInfo(self, scene):
         if self.setlist_type == 0: #note... clean this up. this was a rush job.
@@ -2463,7 +2463,7 @@ class Setlist:
             y = 1.0-(float(scene.moreInfoTime)/500.0)
         yI = y*h
         if scene.img_panel:
-            scene.drawImage(scene.img_panel, scale = (1.0, -1.0), coord = (w*.5,h*.5+yI), stretched = 3)
+            scene.drawImage(scene.img_panel, scale = (1.0, -1.0), coord = (w*.5,h*.5+yI), stretched = FULL_SCREEN)
         if scene.img_tabs:
             r0 = (0, (1.0/3.0), 0, .5)
             r1 = ((1.0/3.0),(2.0/3.0), 0, .5)

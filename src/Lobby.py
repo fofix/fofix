@@ -38,6 +38,8 @@ import Dialogs
 import Player
 import Song
 
+from constants import *
+
 class WorldNotStarted(Exception):
     def __str__(self):
         return _("World error. Please try again.")
@@ -450,7 +452,7 @@ class Lobby(Layer, KeyListener):
         with self.engine.view.orthogonalProjection(normalize = True):
             w, h = self.fullView
             if self.img_background:
-                self.engine.drawImage(self.img_background, scale = (1.0, -1.0), coord = (w/2,h/2), stretched = 3)
+                self.engine.drawImage(self.img_background, scale = (1.0, -1.0), coord = (w/2,h/2), stretched = FULL_SCREEN)
             self.engine.theme.themeLobby.renderPanels(self)
 
 class CreateCharacter(Layer, KeyListener):
@@ -729,7 +731,7 @@ class CreateCharacter(Layer, KeyListener):
             v = ((1 - visibility) **2)
             w, h = self.fullView
             if self.img_creator:
-                self.engine.drawImage(self.img_creator, scale = (1.0, -1.0), coord = (w/2,h/2), stretched = 3)
+                self.engine.drawImage(self.img_creator, scale = (1.0, -1.0), coord = (w/2,h/2), stretched = FULL_SCREEN)
             helpFont.render(_("Player %d") % (self.playerNum + 1), pos = (.5, .1), scale = self.engine.theme.characterCreateScale, align = 1)
             for i, option in enumerate(self.options):
                 r, g, b = self.engine.theme.characterCreateHelpColor
@@ -759,4 +761,4 @@ class CreateCharacter(Layer, KeyListener):
                     wText, hText = font.getStringSize(str, scale = self.engine.theme.characterCreateScale)
                     font.render(str, (self.engine.theme.characterCreateOptionX-wText, self.engine.theme.characterCreateY+self.engine.theme.characterCreateSpace*i), scale = self.engine.theme.characterCreateScale)
             if self.img_creator_top:
-                self.engine.drawImage(self.img_creator_top, scale = (1.0, -1.0), coord = (w/2,h/2), stretched = 3)
+                self.engine.drawImage(self.img_creator_top, scale = (1.0, -1.0), coord = (w/2,h/2), stretched = FULL_SCREEN)

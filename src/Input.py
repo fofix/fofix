@@ -32,6 +32,7 @@ try:
 except ImportError:
     haveMidi = False
 
+haveMidi = False
 from Task import Task
 import Player
 from Player import Controls
