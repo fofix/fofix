@@ -233,7 +233,6 @@ class GuitarScene(Scene):
                 self.soloKeysList.append([])
                 self.soloShifts.append([])
 
-        self.guitars = self.instruments #for compatibility - I'll try to fix this...
         Log.debug("GuitarScene keysList: %s" % str(self.keysList))
 
         #for number formatting with commas for Rock Band:

@@ -413,9 +413,9 @@ class Stage(object):
             self.rotationMode = 0
             self.mode = 1
             #separated practice stages for the instruments by k.i.d
-            if self.scene.guitars[0].isDrum:
+            if self.scene.instruments[0].isDrum:
                 background = "practicedrum"
-            elif self.scene.guitars[0].isBassGuitar:
+            elif self.scene.instruments[0].isBassGuitar:
                 background = "practicebass"
             else:
                 background = "practice"
