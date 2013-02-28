@@ -447,6 +447,21 @@ if test ! -f "$PREFIX"/build-stamps/sdl_ttf; then
   $RM_RF $SDLTTF
 fi
 
+# SDL_image
+# http://www.libsdl.org/projects/SDL_image/release/SDL_image-1.2.12.tar.gz
+SDLIMAGE="SDL_image-1.2.12"
+if test ! -f "$PREFIX"/build-stamps/sdl_image; then
+  download http://www.libsdl.org/projects/SDL_image/release/$SDLIMAGE.tar.gz
+  tar zxvf $SDLIMAGE.tar.gz
+  cd $SDLIMAGE
+  ./configure $COMMON_AUTOCONF_FLAGS
+  make
+  make install
+  cd ..
+  touch "$PREFIX"/build-stamps/sdl_image
+  $RM_RF $SDLIMAGE
+fi
+
 # portaudio
 PORTAUDIO="pa_stable_v19_20111121"
 if test ! -f "$PREFIX"/build-stamps/portaudio; then
