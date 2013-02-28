@@ -476,6 +476,24 @@ if test ! -f "$PREFIX"/build-stamps/portaudio; then
   $RM_RF portaudio
 fi
 
+# PortMidi, which unfortunately lacks a decent build system.
+# (Yes, I do see the CMakeLists.txt there, but it insists on building
+# some things that won't fly in this environment.)
+PORTMIDI="portmidi-src-217"
+if test ! -f "$PREFIX"/build-stamps/portmidi; then
+  download http://download.sourceforge.net/portmedia/$PORTMIDI.zip
+  unzip -o $PORTMIDI.zip
+  cd portmidi
+  $CROSS_GCC -g -O2 -W -Wall -Iporttime -DNDEBUG -D_WINDLL -mdll -o porttime.dll -Wl,--out-implib,libporttime.dll.a porttime/ptwinmm.c -lwinmm
+  $CROSS_GCC -g -O2 -W -Wall -Ipm_common -Iporttime -DNDEBUG -D_WINDLL -mdll -o portmidi.dll -Wl,--out-implib,libportmidi.dll.a pm_win/pmwin.c pm_win/pmwinmm.c pm_common/pmutil.c pm_common/portmidi.c -L. -lporttime -lwinmm
+  cp -v portmidi.dll porttime.dll "$PREFIX"/bin
+  cp -v libportmidi.dll.a libporttime.dll.a "$PREFIX"/lib
+  cp -v pm_common/portmidi.h porttime/porttime.h "$PREFIX"/include
+  cd ..
+  touch "$PREFIX"/build-stamps/portmidi
+  $RM_RF portmidi
+fi
+
 # ffmpeg
 # We only need libswscale.
 FFMPEG="ffmpeg-1.1.3"
