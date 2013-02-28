@@ -433,6 +433,20 @@ if test ! -f "$PREFIX"/build-stamps/sdl_mixer; then
   $RM_RF $SDLMIXER
 fi
 
+# SDL_ttf
+SDLTTF="SDL_ttf-2.0.11"
+if test ! -f "$PREFIX"/build-stamps/sdl_ttf; then
+  download http://www.libsdl.org/projects/SDL_ttf/release/$SDLTTF.tar.gz
+  tar zxvf $SDLTTF.tar.gz
+  cd $SDLTTF
+  ./configure $COMMON_AUTOCONF_FLAGS
+  make
+  make install
+  cd ..
+  touch "$PREFIX"/build-stamps/sdl_ttf
+  $RM_RF $SDLTTF
+fi
+
 # portaudio
 PORTAUDIO="pa_stable_v19_20111121"
 if test ! -f "$PREFIX"/build-stamps/portaudio; then
