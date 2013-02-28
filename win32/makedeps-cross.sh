@@ -387,6 +387,20 @@ if test ! -f "$PREFIX"/build-stamps/soundtouch-c; then
   $RM_RF soundtouch-c.o
 fi
 
+# FreeType
+FREETYPE="freetype-2.4.11"
+if test ! -f "$PREFIX"/build-stamps/freetype; then
+  download http://download.savannah.gnu.org/releases/freetype/$FREETYPE.tar.bz2
+  tar jxvf $FREETYPE.tar.bz2
+  cd $FREETYPE
+  ./configure $COMMON_AUTOCONF_FLAGS
+  make
+  make install
+  cd ..
+  touch "$PREFIX"/build-stamps/freetype
+  $RM_RF $FREETYPE
+fi
+
 # SDL
 SDL="SDL-1.2.15"
 if test ! -f "$PREFIX"/build-stamps/sdl; then
