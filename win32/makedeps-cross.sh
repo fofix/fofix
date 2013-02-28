@@ -191,6 +191,20 @@ if test ! -f "$PREFIX"/build-stamps/libpng; then
   $RM_RF $LIBPNG
 fi
 
+# libjpeg
+LIBJPEG="jpegsrc.v9"
+if test ! -f "$PREFIX"/build-stamps/libjpeg; then
+  download http://www.ijg.org/files/$LIBJPEG.tar.gz
+  tar zxvf $LIBJPEG.tar.gz
+  cd jpeg-9
+  ./configure $COMMON_AUTOCONF_FLAGS
+  make
+  make install
+  cd ..
+  touch "$PREFIX"/build-stamps/libjpeg
+  $RM_RF jpeg-9
+fi
+
 # Runtime (libintl) of GNU Gettext
 # We build the rest later, after certain libraries are in place, to save
 # space as the tools can link to those libraries rather than use gettext's
