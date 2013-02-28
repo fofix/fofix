@@ -700,7 +700,6 @@ class Instrument(object):
             notes = [(time, event) for time, event in notes if not (event.hopod or event.played or event.skipped)]
             notes = [(time, event) for time, event in notes if (time >= (pos - self.lateMargin)) and (time <= (pos + self.earlyMargin))]
 
-        sorted(notes, key=lambda x: x[0])
         if self.battleStatus[7]:
             notes = self.getDoubleNotes(notes)
         return sorted(notes, key=lambda x: x[0])    #MFH - what the hell, this should be sorted by TIME not note number....
