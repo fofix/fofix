@@ -177,6 +177,20 @@ fi
 # Flags passed to every dependency's ./configure script, for those deps that use autoconf and friends.
 COMMON_AUTOCONF_FLAGS="--prefix=$PREFIX --host=$CROSS_TOOL_PREFIX --disable-static --enable-shared CPPFLAGS=-I$PREFIX/include LDFLAGS=-L$PREFIX/lib"
 
+# libpng
+LIBPNG="libpng-1.5.14"
+if test ! -f "$PREFIX"/build-stamps/libpng; then
+  download http://download.sourceforge.net/libpng/$LIBPNG.tar.xz
+  tar Jxvf $LIBPNG.tar.xz
+  cd $LIBPNG
+  ./configure $COMMON_AUTOCONF_FLAGS
+  make
+  make install
+  cd ..
+  touch "$PREFIX"/build-stamps/libpng
+  $RM_RF $LIBPNG
+fi
+
 # Runtime (libintl) of GNU Gettext
 # We build the rest later, after certain libraries are in place, to save
 # space as the tools can link to those libraries rather than use gettext's
