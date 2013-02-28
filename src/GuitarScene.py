@@ -345,8 +345,7 @@ class GuitarScene(Scene):
         self.lastSongPos      = 0.0
         self.keyBurstTimeout  = [None for i in self.playerList]
         self.keyBurstPeriod   = 30
-        self.camera.target    = (0.0, 0.0, 4.0)
-        self.camera.origin    = (0.0, 3.0, -3.0)
+
         self.camera.target    = (0.0, 1.0, 8.0)
         self.camera.origin    = (0.0, 2.0, -3.4)
 
