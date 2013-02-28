@@ -1,28 +1,32 @@
 Made known to upstream at https://ffmpeg.org/trac/ffmpeg/ticket/349
+(but changed since then)
 
-From c207567fe0d2985182471076ddcc9725f782d84b Mon Sep 17 00:00:00 2001
+From 607ca5d209ec45e6830604cce6787ec5cfbf7363 Mon Sep 17 00:00:00 2001
 From: John Stumpo <stump@jstump.com>
 Date: Tue, 24 Jul 2012 19:45:35 -0400
 Subject: [PATCH] build: Ignore errors on installing the MSVC import
  libraries, in case those were not built.
 
 ---
- library.mak |    2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ library.mak |    4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/library.mak b/library.mak
-index 53f1ee7..7b60674 100644
+index e849cc2..e0ddf68 100644
 --- a/library.mak
 +++ b/library.mak
-@@ -61,7 +61,7 @@ install-lib$(NAME)-shared: $(SUBDIR)$(SLIBNAME)
+@@ -73,9 +73,9 @@ install-lib$(NAME)-shared: $(SUBDIR)$(SLIBNAME)
  	$$(INSTALL) -m 755 $$< "$(SHLIBDIR)/$(SLIB_INSTALL_NAME)"
  	$$(STRIP) "$(SHLIBDIR)/$(SLIB_INSTALL_NAME)"
  	$(Q)$(foreach F,$(SLIB_INSTALL_LINKS),cd "$(SHLIBDIR)" && $(LN_S) $(SLIB_INSTALL_NAME) $(F);)
 -	$(if $(SLIB_INSTALL_EXTRA_SHLIB),$$(INSTALL) -m 644 $(SLIB_INSTALL_EXTRA_SHLIB:%=$(SUBDIR)%) "$(SHLIBDIR)")
 +	$(if $(SLIB_INSTALL_EXTRA_SHLIB),-$$(INSTALL) -m 644 $(SLIB_INSTALL_EXTRA_SHLIB:%=$(SUBDIR)%) "$(SHLIBDIR)")
  	$(if $(SLIB_INSTALL_EXTRA_LIB),$(Q)mkdir -p "$(LIBDIR)")
- 	$(if $(SLIB_INSTALL_EXTRA_LIB),$$(INSTALL) -m 644 $(SLIB_INSTALL_EXTRA_LIB:%=$(SUBDIR)%) "$(LIBDIR)")
+-	$(if $(SLIB_INSTALL_EXTRA_LIB),$$(INSTALL) -m 644 $(SLIB_INSTALL_EXTRA_LIB:%=$(SUBDIR)%) "$(LIBDIR)")
++	$(if $(SLIB_INSTALL_EXTRA_LIB),-$$(INSTALL) -m 644 $(SLIB_INSTALL_EXTRA_LIB:%=$(SUBDIR)%) "$(LIBDIR)")
  
+ install-lib$(NAME)-static: $(SUBDIR)$(LIBNAME)
+ 	$(Q)mkdir -p "$(LIBDIR)"
 -- 
 1.7.10.4
 

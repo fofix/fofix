@@ -143,7 +143,7 @@ download () {
 
 # We use win-iconv instead of full-fledged GNU libiconv because it still does
 # everything the other deps need and is far smaller.
-WINICONV="win-iconv-0.0.4"
+WINICONV="win-iconv-0.0.6"
 if test ! -f "$PREFIX"/build-stamps/win-iconv; then
   download http://win-iconv.googlecode.com/files/$WINICONV.tar.bz2
   tar jxvf $WINICONV.tar.bz2
@@ -181,7 +181,7 @@ COMMON_AUTOCONF_FLAGS="--prefix=$PREFIX --host=$CROSS_TOOL_PREFIX --disable-stat
 # We build the rest later, after certain libraries are in place, to save
 # space as the tools can link to those libraries rather than use gettext's
 # internal copy. But some of those libs use libintl themselves, so...
-GETTEXT="gettext-0.18.1.1"
+GETTEXT="gettext-0.18.2"
 if test ! -f "$PREFIX"/build-stamps/gettext-runtime; then
   download http://ftp.gnu.org/gnu/gettext/$GETTEXT.tar.gz
   tar zxvf $GETTEXT.tar.gz
@@ -197,7 +197,7 @@ fi
 # We don't really need this, but GObject requires it.
 # Not that we're using GObject or anything, but glib's configure script
 # refuses to run without it and this is the path of least resistance.
-LIBFFI="libffi-3.0.11"
+LIBFFI="libffi-3.0.12"
 if test ! -f "$PREFIX"/build-stamps/libffi; then
   download ftp://sourceware.org/pub/libffi/$LIBFFI.tar.gz
   tar zxvf $LIBFFI.tar.gz
@@ -211,12 +211,12 @@ if test ! -f "$PREFIX"/build-stamps/libffi; then
 fi
 
 # GLib
-GLIB="glib-2.32.4"
+GLIB="glib-2.34.3"
 if test ! -f "$PREFIX"/build-stamps/glib; then
-  download http://ftp.gnome.org/pub/GNOME/sources/glib/2.32/$GLIB.tar.xz
+  download http://ftp.gnome.org/pub/GNOME/sources/glib/2.34/$GLIB.tar.xz
   tar Jxvf $GLIB.tar.xz
   cd $GLIB
-  ./configure $COMMON_AUTOCONF_FLAGS
+  ./configure $COMMON_AUTOCONF_FLAGS --disable-modular-tests
   make -C glib
   make -C gthread
   make -C glib install
@@ -228,12 +228,11 @@ if test ! -f "$PREFIX"/build-stamps/glib; then
 fi
 
 # pkg-config
-PKGCONFIG="pkg-config-0.27"
+PKGCONFIG="pkg-config-0.28"
 if test ! -f "$PREFIX"/build-stamps/pkg-config; then
   download http://pkgconfig.freedesktop.org/releases/$PKGCONFIG.tar.gz
   tar zxvf $PKGCONFIG.tar.gz
   cd $PKGCONFIG
-  patch -Np1 -i ../pkg-config-win32-prefix-escaping.patch
   ./configure $COMMON_AUTOCONF_FLAGS
   make
   make install
@@ -250,7 +249,7 @@ if test ! -f "$PREFIX"/build-stamps/gettext; then
   download http://ftp.gnu.org/gnu/gettext/$GETTEXT.tar.gz
   tar zxvf $GETTEXT.tar.gz
   cd $GETTEXT
-  ./configure $COMMON_AUTOCONF_FLAGS --enable-relocatable --disable-libasprintf --disable-java --disable-csharp CXX="$CROSS_GXX"
+  ./configure $COMMON_AUTOCONF_FLAGS --enable-relocatable --disable-libasprintf --disable-java --disable-csharp
   make
   make install
   cd ..
@@ -315,7 +314,7 @@ if test ! -f "$PREFIX"/build-stamps/libsmf; then
 fi
 
 # soundtouch
-SOUNDTOUCH="soundtouch-1.6.0"
+SOUNDTOUCH="soundtouch-1.7.1"
 if test ! -f "$PREFIX"/build-stamps/soundtouch; then
   download http://www.surina.net/soundtouch/$SOUNDTOUCH.tar.gz
   tar zxvf $SOUNDTOUCH.tar.gz
@@ -390,13 +389,13 @@ fi
 
 # ffmpeg
 # We only need libswscale.
-FFMPEG="ffmpeg-0.11.1"
+FFMPEG="ffmpeg-1.1.3"
 if test ! -f "$PREFIX"/build-stamps/ffmpeg; then
   download http://www.ffmpeg.org/releases/$FFMPEG.tar.bz2
   tar jxvf $FFMPEG.tar.bz2
   cd $FFMPEG
   patch -Np1 -i ../ffmpeg-implib-install.patch
-  ./configure --prefix="$PREFIX" --cc="$CROSS_GCC" --nm="$CROSS_NM" --target-os=mingw32 --arch=i386 --disable-static --enable-shared --enable-runtime-cpudetect --enable-memalign-hack --disable-everything --disable-ffmpeg --disable-ffplay --disable-ffserver --disable-ffprobe --disable-avdevice --disable-avcodec --disable-avformat --disable-avfilter --disable-swresample
+  ./configure --prefix="$PREFIX" --cc="$CROSS_GCC" --nm="$CROSS_NM" --target-os=mingw32 --arch=i386 --disable-static --enable-shared --enable-runtime-cpudetect --enable-memalign-hack --disable-everything --disable-ffmpeg --disable-ffplay --disable-ffserver --disable-ffprobe --disable-avdevice --disable-avcodec --disable-avformat --disable-avfilter --disable-swresample --disable-doc
   make
   make install
   cd ..
