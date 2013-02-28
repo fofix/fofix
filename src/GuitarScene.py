@@ -363,8 +363,7 @@ class GuitarScene(Scene):
         self.neckintroAnimationType = self.engine.config.get("fretboard", "neck_intro_animation")#weirdpeople
         self.neckintroThemeType = self.engine.theme.povIntroAnimation
 
-        povList = [str(self.targetX), str(self.targetY), str(self.targetZ), str(self.originX), str(self.originY), str(self.originZ)]
-        if "None" not in povList:
+        if None not in [self.targetX, self.targetY, self.targetZ, self.originX, self.originY, self.originZ]:
             self.customPOV = True
             Log.debug("All theme POV set. Using custom camera POV.")
 
