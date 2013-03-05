@@ -9,6 +9,8 @@ Repository (GitHub): http://github.com/fofix/fofix
 
   $ git clone git://github.com/fofix/fofix.git
 
+Chat with us on IRC: #fofix on OFTC ([web interface](http://chat.mibbit.com/#fofix@OFTC))
+
 How to set yourself up to run from source
 =========================================
 
