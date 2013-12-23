@@ -2,7 +2,7 @@
 # -*- coding: iso-8859-1 -*-                                        #
 #                                                                   #
 # Frets on Fire                                                     #
-# Copyright (C) 2006 Sami Kyöstilä                                  #
+# Copyright (C) 2006 Sami Kyï¿½stilï¿½                                  #
 #                                                                   #
 # This program is free software; you can redistribute it and/or     #
 # modify it under the terms of the GNU General Public License       #
@@ -24,7 +24,7 @@ import unittest
 import time
 
 from Scene import Scene
-from Resource import Resource
+from core.Resource import Resource
 
 class CityScene(Scene):
     def __init__(self, id = None, manager = None):

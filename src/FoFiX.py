@@ -2,7 +2,7 @@
 # -*- coding: iso-8859-1 -*-
 #####################################################################
 # Frets on Fire X (FoFiX)                                           #
-# Copyright (C) 2006 Sami Kyöstilä                                  #
+# Copyright (C) 2006 Sami Kyï¿½stilï¿½                                  #
 #               2008 evilynux <evilynux@gmail.com>                  #
 #               2012 FoFiX Team                                     #
 #               2009 akedrou                                        #
@@ -60,15 +60,14 @@ if '--opengl-error-checking' not in sys.argv:
         OpenGL.SIZE_1_ARRAY_UNPACK = False
         OpenGL.STORE_POINTERS = False
 
-import Log
-import Config
-from GameEngine import GameEngine
-from MainMenu import MainMenu
-from Language import _
-import Resource
+from util import Log, VFS
+from configuration import Config
+from core.GameEngine import GameEngine
+from views.MainMenu.MainMenu import MainMenu
+from core.Language import _
 import pygame
 import traceback
-from VideoPlayer import VideoLayer, VideoPlayerError
+from graphics.VideoPlayer import VideoLayer, VideoPlayerError
 
 
 def _usage(errmsg=None):
@@ -155,7 +154,7 @@ def main():
     # Load the configuration file.
     if configFile is not None:
         if configFile.lower() == "reset":
-            fileName = os.path.join(Resource.getWritableResourcePath(), Version.PROGRAM_UNIXSTYLE_NAME + ".ini")
+            fileName = os.path.join(VFS.getWritableResourcePath(), Version.PROGRAM_UNIXSTYLE_NAME + ".ini")
             os.remove(fileName)
             config = Config.load(Version.PROGRAM_UNIXSTYLE_NAME + ".ini", setAsDefault = True)
         else:

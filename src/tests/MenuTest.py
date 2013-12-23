@@ -3,7 +3,7 @@
 #                                                                   #
 # FoFiX                                                             #
 # Copyright (C) 2009 Team FoFiX                                     #
-#               2006 Sami Kyöstilä                                  #
+#               2006 Sami Kyï¿½stilï¿½                                  #
 #                                                                   #
 # This program is free software; you can redistribute it and/or     #
 # modify it under the terms of the GNU General Public License       #
@@ -24,7 +24,7 @@
 import unittest
 from GameEngine import GameEngine
 from Menu import Menu
-import Config
+from configuration import Config
 import Version
 
 subMenu = [

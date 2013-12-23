@@ -2,7 +2,7 @@
 # -*- coding: iso-8859-1 -*-                                        #
 #                                                                   #
 # Frets on Fire                                                     #
-# Copyright (C) 2006 Sami Kyöstilä                                  #
+# Copyright (C) 2006 Sami Kyï¿½stilï¿½                                  #
 #                                                                   #
 # This program is free software; you can redistribute it and/or     #
 # modify it under the terms of the GNU General Public License       #
@@ -25,7 +25,7 @@ import shutil, os, sys
 
 from GameEngine import GameEngine
 from Song import Song, Note
-import Config
+from configuration import Config
 import Version
 
 class SongTest(unittest.TestCase):

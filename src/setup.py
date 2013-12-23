@@ -29,7 +29,8 @@ from distutils.dep_util import newer
 from Cython.Distutils import build_ext as _build_ext
 from distutils.command.install import install as _install
 from distutils.cmd import Command
-import sys, SceneFactory, Version, glob, os
+import sys, Version, glob, os
+from views import SceneFactory
 import numpy as np
 import shlex
 import subprocess
@@ -317,7 +318,7 @@ else:
     # Other systems: we ask pkg-config.
     gl_info = pc_info('gl')
     # And build our own soundtouch-c.
-    extra_soundtouch_src = ['MixStream/soundtouch-c.cpp']
+    extra_soundtouch_src = ['audio/MixStream/soundtouch-c.cpp']
 # Build a similar info record for the numpy headers.
 numpy_info = {'include_dirs': [np.get_include()]}
 
@@ -426,17 +427,17 @@ class xgettext(Command):
 setup_args.update({
   'options': options,
   'ext_modules': [
-    Extension('cmgl', ['cmgl.pyx'], **combine_info(numpy_info, gl_info)),
-    Extension('pypitch._pypitch',
+    Extension('lib.cmgl', ['graphics/cmgl/cmgl.pyx'], **combine_info(numpy_info, gl_info)),
+    Extension('lib._pypitch',
               language='c++',
-              sources=['pypitch/_pypitch.pyx', 'pypitch/pitch.cpp',
-                       'pypitch/AnalyzerInput.cpp']),
-    Extension('VideoPlayer._VideoPlayer',
-              ['VideoPlayer/_VideoPlayer.pyx', 'VideoPlayer/VideoPlayer.c'],
+              sources=['audio/pypitch/_pypitch.pyx', 'audio/pypitch/pitch.cpp',
+                       'audio/pypitch/AnalyzerInput.cpp']),
+    Extension('lib._VideoPlayer',
+              ['graphics/VideoPlayer/_VideoPlayer.pyx', 'graphics/VideoPlayer/VideoPlayer.c'],
               **combine_info(gl_info, ogg_info, theoradec_info, glib_info, swscale_info,
               {'include_dirs': ['.']})),
-    Extension('MixStream._MixStream',
-              ['MixStream/_MixStream.pyx', 'MixStream/MixStream.c', 'MixStream/vorbis.c'] + extra_soundtouch_src,
+    Extension('lib._MixStream',
+              ['audio/MixStream/_MixStream.pyx', 'audio/MixStream/MixStream.c', 'audio/MixStream/vorbis.c'] + extra_soundtouch_src,
               **combine_info(vorbisfile_info, soundtouch_info, glib_info, gthread_info, sdl_info, sdl_mixer_info)),
   ],
   'cmdclass': {'build_ext': build_ext, 'install': install, 'msgfmt': msgfmt, 'xgettext': xgettext},

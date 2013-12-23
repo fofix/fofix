@@ -21,7 +21,7 @@
 #####################################################################
 from OpenGL.GL import *
 try:
-    import cmgl
+    from graphics import cmgl
     cmgl_support = True
 except ImportError:
     cmgl_support = False

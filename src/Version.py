@@ -33,7 +33,7 @@ URL = 'http://fofix.googlecode.com'
 RELEASE_ID = 'alpha 2'
 
 def _getTagLine():
-    import VFS  # can't be done at top level due to circular import issues...
+    from util import VFS  # can't be done at top level due to circular import issues...
 
     # Look for a git repository.
     if VFS.isdir('/gameroot/.git'):
