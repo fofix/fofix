@@ -14,11 +14,11 @@ doc/epydoc
 src/*.ini
 src/*.log
 src/*.idb
+src/audio/MixStream/_MixStream.c
+src/audio/pypitch/_pypitch.cpp
 src/build
-src/pypitch/_pypitch.cpp
-src/cmgl.c
-src/MixStream/_MixStream.c
-src/VideoPlayer/_VideoPlayer.c
+src/graphics/VideoPlayer/_VideoPlayer.c
+src/graphics/cmgl/cmgl.c
 gstreamer/*
 data/library.zip
 data/users/players/*
