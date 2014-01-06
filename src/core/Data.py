@@ -388,7 +388,7 @@ class Data(object):
     def checkImgDrawing(self, fileName):
         return self.getImgDrawing(fileName, False)
 
-    def getImgDrawing(self, fileName, openImage=True, dirLoad=False):
+    def getImgDrawing(self, fileName, openImage=True):
         imgDrawing = None
         for dataPath in self.resource.dataPaths:
             fileName1 = os.path.join(dataPath, fileName)
@@ -423,12 +423,11 @@ class Data(object):
                 elif len(files) > 0:
                     return True
         #image not found
-        log = self.logImageNotFound - (dirLoad and 1 or 0)
-        if log > 0:
+        if self.logImageNotFound:
             Log.debug("Image not found: %s" % fileName)
         return False
 
-    def loadImgDrawing(self, target, name, fileName, textureSize = None, dirLoad = False):
+    def loadImgDrawing(self, target, name, fileName, textureSize = None):
         """
         Load an SVG drawing synchronously.
 
@@ -439,7 +438,7 @@ class Data(object):
                             be rendered to an x by y texture
         @return:            L{ImgDrawing} instance
         """
-        imgDrawing = self.getImgDrawing(fileName, dirLoad = dirLoad)
+        imgDrawing = self.getImgDrawing(fileName)
         if not imgDrawing:
             if target and name:
                 setattr(target, name, None)
@@ -474,7 +473,7 @@ class Data(object):
                 continue
             name = os.path.splitext(file)[0]
             name = prefix+name
-            img = self.loadImgDrawing(target, name, os.path.join(directory, file), textureSize, dirLoad = True)
+            img = self.loadImgDrawing(target, name, os.path.join(directory, file), textureSize)
             if img and target is None:
                 imgDict[name] = img
         if target is None and len(imgDict) > 0:
