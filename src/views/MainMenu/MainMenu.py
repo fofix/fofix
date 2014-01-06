@@ -366,8 +366,8 @@ class MainMenu(BackgroundLayer):
             if self.engine.view.topLayer() is not None:
                 if self.optionsBG:
                     self.engine.drawImage(self.optionsBG, (self.opt_bkg_size[2],-self.opt_bkg_size[3]), (w*self.opt_bkg_size[0],h*self.opt_bkg_size[1]), stretched = FULL_SCREEN)
-
-                self.engine.drawImage(self.optionsPanel, (1.0,-1.0), (w/2, h/2), stretched = FULL_SCREEN)
+                if self.optionsPanel:
+                    self.engine.drawImage(self.optionsPanel, (1.0,-1.0), (w/2, h/2), stretched = FULL_SCREEN)
             else:
                 self.engine.drawImage(self.engine.data.loadingImage, (1.0,-1.0), (w/2, h/2), stretched = FULL_SCREEN)
 
