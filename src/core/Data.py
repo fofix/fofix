@@ -242,7 +242,8 @@ class Data(object):
                 Log.debug("Theme sound not found: " + self.sounds[1])
                 self.loadSoundEffect(self, self.sounds[0], os.path.join("sounds",self.sounds[1]))
             else:
-                Log.warn("File not found skipped: " + self.sounds[1])
+                Log.warn("File " + self.sounds[1] + " not found using default instead.")
+                self.loadSoundEffect(self, self.sounds[0], os.path.join("sounds","default.ogg"))
 
         #TODO: Simplify crowdSound stuff so it can join the rest of us.
         #MFH - fallback on sounds/crowdcheers.ogg, and then starpower.ogg. Note if the fallback crowdcheers was used or not.
