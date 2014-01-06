@@ -238,9 +238,11 @@ class Data(object):
         for self.sounds in self.syncSounds:
             if self.fileExists(os.path.join("themes",themename,"sounds",self.sounds[1])):
                 self.loadSoundEffect(self, self.sounds[0], os.path.join("themes",themename,"sounds",self.sounds[1]))
-            else:
+            elif self.fileExists(os.path.join("sounds", self.sounds[1])):
                 Log.debug("Theme sound not found: " + self.sounds[1])
                 self.loadSoundEffect(self, self.sounds[0], os.path.join("sounds",self.sounds[1]))
+            else:
+                Log.warn("File not found skipped: " + self.sounds[1])
 
         #TODO: Simplify crowdSound stuff so it can join the rest of us.
         #MFH - fallback on sounds/crowdcheers.ogg, and then starpower.ogg. Note if the fallback crowdcheers was used or not.
