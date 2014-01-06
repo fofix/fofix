@@ -323,8 +323,15 @@ class Data(object):
         return soundNum-1
 
     def getSoundObjectList(self, soundPath, soundPrefix, numSounds, soundExtension = ".ogg"):   #MFH
-        Log.debug( str(numSounds) + " " + soundPrefix + " sounds found in " + soundPath + ": " + soundPrefix + "1" + soundExtension + " - " + soundPrefix + str(numSounds) + soundExtension )
-        return [Sound(self.resource.fileName(os.path.join(soundPath,"%s%d%s" % (soundPrefix, i, soundExtension) ))) for i in range(1, numSounds+1)]
+        Log.debug("{0}1{2} - {0}{1}{2} found in {3}".format(soundPrefix, numSounds, soundExtension, soundPath))
+        
+        sounds = []
+        for i in xrange(1, numSounds+1):
+            filePath = os.path.join(soundPath, "%s%d%s" % (soundPrefix, i, soundExtension) )
+            soundObject = Sound(self.resource.fileName(filePath))
+            sounds.append(soundObject)
+            
+        return sounds
 
     def loadBackSounds(self):   #MFH - adding optional support for random choice between two back sounds
         soundPathTheme = os.path.join("themes",self.themeLabel,"sounds")
