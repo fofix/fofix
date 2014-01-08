@@ -46,7 +46,6 @@ class Scene(BackgroundLayer, KeyListener):
         self.geometry         = self.engine.view.geometry[2:4]
         self.fontScreenBottom = self.engine.data.fontScreenBottom
         self.aspectRatio      = self.engine.view.aspectRatio
-        self.drawImage        = self.engine.drawImage
         self.drawStarScore    = self.engine.drawStarScore
 
     def addPlayer(self, player):

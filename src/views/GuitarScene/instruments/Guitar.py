@@ -33,6 +33,7 @@ from copy import deepcopy
 from Instrument import Instrument
 from graphics.Shader import shaders
 from graphics.Mesh import Mesh
+from graphics.Image import draw3Dtex
 from game.Song import Note, Tempo
 from OpenGL.GL import *
 from game import Song
@@ -144,7 +145,7 @@ class Guitar(Instrument):
                     elif self.hit[n] or (self.battleStatus[3] and self.battleBreakString == n):#frets on note hit
                         texY = (2.0 / self.fretImgColNumber,1.0)
 
-                self.engine.draw3Dtex(self.fretButtons, vertex = (size[0],size[1],-size[0],-size[1]), texcoord = (texSize[0], texY[0], texSize[1], texY[1]),
+                draw3Dtex(self.fretButtons, vertex = (size[0],size[1],-size[0],-size[1]), texcoord = (texSize[0], texY[0], texSize[1], texY[1]),
                                         coord = (x,v,0), multiples = True,color = fretColor, depth = True)
 
             else:
@@ -212,7 +213,7 @@ class Guitar(Instrument):
                             if step == 0:
                                 hfCount += 1
                             if self.disableFlameSFX != True:
-                                self.engine.draw3Dtex(self.hitflames2Drawing, coord = (x+xOffset[step], y+yOffset[step], 0), rot = (90, 1, 0, 0),
+                                draw3Dtex(self.hitflames2Drawing, coord = (x+xOffset[step], y+yOffset[step], 0), rot = (90, 1, 0, 0),
                                                     scale = (.25 + .05 * step + scaleMod, hfCount/scaleFix[step] + scaleMod, hfCount/scaleFix[step] + scaleMod),
                                                     vertex = (-flameSize * ff,-flameSize * ff,flameSize * ff,flameSize * ff),
                                                     texcoord = (0.0,0.0,1.0,1.0), multiples = True, alpha = True, color = flamecol)
@@ -234,7 +235,7 @@ class Guitar(Instrument):
                                 else: #Default starcolor (Rockband)
                                     flamecol = (.4+.1*step,)*3
                             if self.disableFlameSFX != True:
-                                self.engine.draw3Dtex(self.hitflames1Drawing, coord = (x+xOffset[step], y+yOffset[step], 0), rot = (90, 1, 0, 0),
+                                draw3Dtex(self.hitflames1Drawing, coord = (x+xOffset[step], y+yOffset[step], 0), rot = (90, 1, 0, 0),
                                                     scale = (.25 + .05 * step + scaleMod, hfCount/scaleFix[step] + scaleMod, hfCount/scaleFix[step] + scaleMod),
                                                     vertex = (-flameSize * ff,-flameSize * ff,flameSize * ff,flameSize * ff),
                                                     texcoord = (0.0,0.0,1.0,1.0), multiples = True, alpha = True, color = flamecol)

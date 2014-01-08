@@ -50,6 +50,7 @@ import os
 from OpenGL.GL import *
 
 from constants import *
+from graphics.Image import drawImage
 
 class GameResultsScene(Scene):
     def __init__(self, engine, libraryName, songName, scores = None, coOpType = False, careerMode = False):
@@ -805,7 +806,7 @@ class GameResultsScene(Scene):
 
         w, h = self.fullView
         if self.background:
-            self.engine.drawImage(self.background, scale = (1.0,-1.0), coord = (w/2,h/2), stretched = FULL_SCREEN)
+            drawImage(self.background, scale = (1.0,-1.0), coord = (w/2,h/2), stretched = FULL_SCREEN)
 
         self.engine.theme.setBaseColor(1-v)
 
@@ -954,7 +955,7 @@ class GameResultsScene(Scene):
                 except:
                     font = defFont
                 if text == "$icon$" and self.partImage:
-                    self.engine.drawImage(self.part[i], scale = (float(self.engine.theme.result_stats_part[2]),-float(self.engine.theme.result_stats_part[2])), coord = (w*float(self.engine.theme.result_stats_part[0]),h*float(self.engine.theme.result_stats_part[1])))
+                    drawImage(self.part[i], scale = (float(self.engine.theme.result_stats_part[2]),-float(self.engine.theme.result_stats_part[2])), coord = (w*float(self.engine.theme.result_stats_part[0]),h*float(self.engine.theme.result_stats_part[1])))
                 else:
                     text = _(self.engine.theme.result_stats_part_text) % self.playerList[i].part
                     wText, hText = font.getStringSize(text)
@@ -973,7 +974,7 @@ class GameResultsScene(Scene):
 
         w, h = self.fullView
         if self.background:
-            self.engine.drawImage(self.background, scale = (1.0,-1.0), coord = (w/2,h/2), stretched = FULL_SCREEN)
+            drawImage(self.background, scale = (1.0,-1.0), coord = (w/2,h/2), stretched = FULL_SCREEN)
 
         self.engine.theme.setBaseColor(1-v)
 
@@ -1137,7 +1138,7 @@ class GameResultsScene(Scene):
                     text = self.engine.theme.result_stats_part_text.strip()
 
                 if text == "$icon$" and self.partImage:
-                    self.engine.drawImage(self.part[i], scale = (float(self.engine.theme.result_stats_part[2]),-float(self.engine.theme.result_stats_part[2])), coord = (w*float(self.engine.theme.result_stats_part[0]),h*float(self.engine.theme.result_stats_part[1])))
+                    drawImage(self.part[i], scale = (float(self.engine.theme.result_stats_part[2]),-float(self.engine.theme.result_stats_part[2])), coord = (w*float(self.engine.theme.result_stats_part[0]),h*float(self.engine.theme.result_stats_part[1])))
                 else:
                     try:
                         text = text % self.playerList[i].part

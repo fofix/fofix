@@ -38,6 +38,7 @@ import locale
 from PIL import Image, ImageDraw
 from OpenGL.GL import *
 from graphics import cmgl
+from graphics.Image import drawImage
 
 import math
 from math import *
@@ -274,7 +275,7 @@ class ImageLayer(Layer):
         #frameY  = self.frameY
 
         if bool(eval(self.condition)):
-            self.engine.drawImage(drawing, scale, coord, rot, color, rect,
+            drawImage(drawing, scale, coord, rot, color, rect,
                                   alignment = alignment, valignment = valignment)
 
 #defines layers that are just font instead of images
@@ -410,7 +411,7 @@ class CircleLayer(ImageLayer):
 
         if bool(eval(self.condition)):
             degrees = int(360*ratio) - (int(360*ratio) % 5)
-            self.engine.drawImage(self.drawnOverlays[degrees], scale,
+            drawImage(self.drawnOverlays[degrees], scale,
                                   coord, rot, color, alignment = alignment)
 
 

@@ -61,6 +61,7 @@ from graphics.Shader import shaders
 from constants import *
 
 from graphics import cmgl
+from graphics.Image import drawImage
 
 # evilynux - Grab name and version from Version class.
 version = "%s v%s" % ( Version.PROGRAM_NAME, Version.version() )
@@ -489,11 +490,11 @@ class GameEngine(object):
 
                 if self.data.maskStars:
                     if self.data.theme == 2:
-                        self.drawImage(star, scale = (scale,-scale), coord = (w*(xpos+wide*j)*space**4,h*ypos), color = (1, 1, 0, 1), stretched = KEEP_ASPECT | FIT_WIDTH)
+                        drawImage(star, scale = (scale,-scale), coord = (w*(xpos+wide*j)*space**4,h*ypos), color = (1, 1, 0, 1), stretched = KEEP_ASPECT | FIT_WIDTH)
                     else:
-                        self.drawImage(star, scale = (scale,-scale), coord = (w*(xpos+wide*j)*space**4,h*ypos), color = (0, 1, 0, 1), stretched = KEEP_ASPECT | FIT_WIDTH)
+                        drawImage(star, scale = (scale,-scale), coord = (w*(xpos+wide*j)*space**4,h*ypos), color = (0, 1, 0, 1), stretched = KEEP_ASPECT | FIT_WIDTH)
                 else:
-                    self.drawImage(star, scale = (scale,-scale), coord = (w*(xpos+wide*j)*space**4,h*ypos), stretched = KEEP_ASPECT | FIT_WIDTH)
+                    drawImage(star, scale = (scale,-scale), coord = (w*(xpos+wide*j)*space**4,h*ypos), stretched = KEEP_ASPECT | FIT_WIDTH)
         else:
             for j in range(5):
                 if j < stars:
@@ -506,124 +507,8 @@ class GameEngine(object):
                         star = self.data.star3
                     else:
                         star = self.data.star1
-                self.drawImage(star, scale = (scale,-scale), coord = (w*(xpos+wide*j)*space**4,h*ypos), stretched = KEEP_ASPECT | FIT_WIDTH)
+                drawImage(star, scale = (scale,-scale), coord = (w*(xpos+wide*j)*space**4,h*ypos), stretched = KEEP_ASPECT | FIT_WIDTH)
 
-    def drawImage(self, image, scale = (1.0, -1.0), coord = (0, 0), rot = 0, \
-                  color = (1,1,1,1), rect = (0,1,0,1), stretched = 0, fit = CENTER, \
-                  alignment = CENTER, valignment = MIDDLE):
-        """
-        Draws the image/surface to screen
-        @depreciated please use the specific methods of the image or Im.drawImage
-
-        @param image:        The openGL surface
-        @param scale:        Scale factor (between 0.0 and 1.0, second value must be negative due to texture flipping)
-        @param coord:        Where the image will be translated to on the screen
-        @param rot:          How many degrees it will be rotated
-        @param color:        The color of the image
-                                 (values are between 0.0 and 1.0)
-                                 (can have 3 values or 4, if 3 are given the alpha is automatically set to 1.0)
-        @param rect:         The surface rectangle, this is used for cropping the texture
-
-                             Any other values will have the image maintain its size passed by scale
-        @param alignment:    Adjusts the texture so the coordinate for x-axis placement can either be
-                             on the left side (0), center point (1), or right(2) side of the image
-        @param valignment:   Adjusts the texture so the coordinate for y-axis placement can either be
-                             on the bottom side (0), center point (1), or top(2) side of the image
-        """
-
-        return ImgDrawing.drawImage(image, scale, coord, rot, color, rect, stretched, fit, alignment, valignment)
-
-    #blazingamer
-    def draw3Dtex(self, image, vertex, texcoord, coord = None, scale = None, rot = None, color = (1,1,1), multiples = False, alpha = False, depth = False, vertscale = 0):
-        '''
-        Simplifies tex rendering
-
-        @param image: self.xxx - tells the system which image/resource should be mapped to the plane
-        @param vertex: (Left, Top, Right, Bottom) - sets the points that define where the plane will be drawn
-        @param texcoord: (Left, Top, Right, Bottom) - sets where the texture should be drawn on the plane
-        @param coord: (x,y,z) - where on the screen the plane will be rendered within the 3d field
-        @param scale: (x,y,z) - scales an glplane how far in each direction
-
-        @param rot: (degrees, x-axis, y-axis, z-axis)
-        a digit in the axis is how many times you want to rotate degrees around that axis
-
-        @param color: (r,g,b) - sets the color of the image when rendered
-        0 = No Color, 1 = Full color
-
-        @param multiples: True/False
-        defines whether or not there should be multiples of the plane drawn at the same time
-        only really used with the rendering of the notes, keys, and flames
-
-        @param alpha: True/False - defines whether or not the image should have black turned into transparent
-        only really used with hitglows and flames
-
-        @param depth: True/False - sets the depth by which the object is rendered
-        only really used by keys and notes
-
-        @param vertscale: # - changes the yscale when setting vertex points
-        only really used by notes
-        '''
-
-
-        if not isinstance(image, ImgDrawing):
-            return
-
-        if alpha == True:
-            glBlendFunc(GL_SRC_ALPHA, GL_ONE)
-
-        if len(color) == 4:
-            col_array  = np.array([[color[0],color[1],color[2], color[3]],
-                               [color[0],color[1],color[2], color[3]],
-                               [color[0],color[1],color[2], color[3]],
-                               [color[0],color[1],color[2], color[3]]], dtype=np.float32)
-        else:
-            col_array  = np.array([[color[0],color[1],color[2], 1],
-                               [color[0],color[1],color[2], 1],
-                               [color[0],color[1],color[2], 1],
-                               [color[0],color[1],color[2], 1]], dtype=np.float32)
-
-        glEnable(GL_TEXTURE_2D)
-        image.texture.bind()
-
-        if multiples == True:
-            glPushMatrix()
-
-        if coord != None:
-            glTranslate(coord[0], coord[1], coord[2])
-        if rot != None:
-            glRotate(rot[0], rot[1], rot[2], rot[3])
-        if scale != None:
-            glScalef(scale[0], scale[1], scale[2])
-
-        if depth == True:
-            glDepthMask(1)
-
-        if not isinstance(vertex, np.ndarray):
-            vertex = np.array(
-              [[ vertex[0],  vertscale, vertex[1]],
-               [ vertex[2],  vertscale, vertex[1]],
-               [ vertex[0], -vertscale, vertex[3]],
-               [ vertex[2], -vertscale, vertex[3]]], dtype=np.float32)
-
-        if not isinstance(texcoord, np.ndarray):
-            texcoord = np.array(
-              [[texcoord[0], texcoord[1]],
-               [texcoord[2], texcoord[1]],
-               [texcoord[0], texcoord[3]],
-               [texcoord[2], texcoord[3]]], dtype=np.float32)
-
-        cmgl.drawArrays(GL_TRIANGLE_STRIP, vertices=vertex, colors=col_array, texcoords=texcoord)
-
-        if depth == True:
-            glDepthMask(0)
-
-        if multiples == True:
-            glPopMatrix()
-
-        glDisable(GL_TEXTURE_2D)
-
-        if alpha == True:
-            glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
     #glorandwarf: renamed to retrieve the path of the file
     def fileExists(self, fileName):
         return self.data.fileExists(fileName)

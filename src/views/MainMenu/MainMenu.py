@@ -45,6 +45,7 @@ import string
 from util import Log
 
 from constants import *
+from graphics.Image import drawImage
 
 class MainMenu(BackgroundLayer):
     def __init__(self, engine):
@@ -365,16 +366,16 @@ class MainMenu(BackgroundLayer):
         if self.active:
             if self.engine.view.topLayer() is not None:
                 if self.optionsBG:
-                    self.engine.drawImage(self.optionsBG, (self.opt_bkg_size[2],-self.opt_bkg_size[3]), (w*self.opt_bkg_size[0],h*self.opt_bkg_size[1]), stretched = FULL_SCREEN)
+                    drawImage(self.optionsBG, (self.opt_bkg_size[2],-self.opt_bkg_size[3]), (w*self.opt_bkg_size[0],h*self.opt_bkg_size[1]), stretched = FULL_SCREEN)
                 if self.optionsPanel:
-                    self.engine.drawImage(self.optionsPanel, (1.0,-1.0), (w/2, h/2), stretched = FULL_SCREEN)
+                    drawImage(self.optionsPanel, (1.0,-1.0), (w/2, h/2), stretched = FULL_SCREEN)
             else:
-                self.engine.drawImage(self.engine.data.loadingImage, (1.0,-1.0), (w/2, h/2), stretched = FULL_SCREEN)
+                drawImage(self.engine.data.loadingImage, (1.0,-1.0), (w/2, h/2), stretched = FULL_SCREEN)
 
         if self.menu.active and self.engine.cmdPlay == 0:
             if self.background != None:
                 #MFH - auto-scaling
-                self.engine.drawImage(self.background, (1.0,-1.0), (w/2, h/2), stretched = FULL_SCREEN)
+                drawImage(self.background, (1.0,-1.0), (w/2, h/2), stretched = FULL_SCREEN)
 
             if self.BGText:
                 numOfChoices = len(self.menu.choices)
@@ -392,7 +393,7 @@ class MainMenu(BackgroundLayer):
                     sFactor = self.main_menu_scale
                     wFactor = xpos[1] - xpos[0]
                     hFactor = ypos[1] - ypos[0]
-                    self.engine.drawImage(self.BGText,
+                    drawImage(self.BGText,
                                         scale = (wFactor*sFactor,-hFactor*sFactor),
                                         coord = textcoord,
                                         rect  = (xpos[0],xpos[1],ypos[0],ypos[1]), stretched = KEEP_ASPECT | FIT_WIDTH)
@@ -400,4 +401,4 @@ class MainMenu(BackgroundLayer):
         #racer: added version tag to main menu:
         if self.version != None:
             wfactor = (w * self.engine.theme.versiontagScale) / self.version.width1()
-            self.engine.drawImage(self.version,( wfactor, -wfactor ),(w*self.engine.theme.versiontagposX, h*self.engine.theme.versiontagposY)) #worldrave - Added theme settings to control X+Y positions of versiontag.
+            drawImage(self.version,( wfactor, -wfactor ),(w*self.engine.theme.versiontagposX, h*self.engine.theme.versiontagposY)) #worldrave - Added theme settings to control X+Y positions of versiontag.

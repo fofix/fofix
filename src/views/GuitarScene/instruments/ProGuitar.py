@@ -26,6 +26,8 @@ from graphics.Mesh import Mesh
 import random
 import os
 from graphics.Shader import shaders
+from graphics.Image import draw3Dtex
+
 from util import Log
 
 from OpenGL.GL import *
@@ -176,13 +178,13 @@ class ProGuitar(Guitar):
                     else:
                         texY = (0, 1.0/6.0)
 
-            self.engine.draw3Dtex(noteImage, vertex = (-size[0],size[1],size[0],-size[1]), texcoord = (texSize[0],texY[0],texSize[1],texY[1]),
+            draw3Dtex(noteImage, vertex = (-size[0],size[1],size[0],-size[1]), texcoord = (texSize[0],texY[0],texSize[1],texY[1]),
                                   scale = (1,1,0), rot = (30,1,0,0), multiples = False, color = color, vertscale = .27)
 
             #draws the fret number over the note
             texSize = (string/self.lanenumber,string/self.lanenumber+1/self.lanenumber)
             texY = (fret/13.0, (fret+1)/13.0)
-            self.engine.draw3Dtex(self.fretNumbers, vertex = (-size[0],size[1],size[0],-size[1]),
+            draw3Dtex(self.fretNumbers, vertex = (-size[0],size[1],size[0],-size[1]),
                                   texcoord = (texSize[0],texY[0],texSize[1],texY[1]),
                                   scale = (1,1,0), rot = (30,1,0,0), multiples = False, color = color, vertscale = .27)
 

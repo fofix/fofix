@@ -45,6 +45,7 @@ from core import Settings
 from game import Song
 from game.Scorekeeper import ScoreCard
 from graphics.Shader import shaders
+from graphics.Image import drawImage
 
 from instruments import *
 
@@ -5264,7 +5265,7 @@ class GuitarScene(Scene):
                 self.renderVocals()
                 #MFH: render the note sheet just on top of the background:
                 if self.lyricSheet != None and not self.playingVocals:
-                    self.engine.drawImage(self.lyricSheet, scale = (1.0,-1.0), coord = (w/2, h*0.935), stretched = FIT_WIDTH)
+                    drawImage(self.lyricSheet, scale = (1.0,-1.0), coord = (w/2, h*0.935), stretched = FIT_WIDTH)
                     #the timing line on this lyric sheet image is approx. 1/4 over from the left
                 #MFH - also render the scrolling lyrics & sections before changing viewports:
 
@@ -5438,7 +5439,7 @@ class GuitarScene(Scene):
                                 if self.rockTimer < self.rockCountdown:
                                     self.rockTimer += 1
                                     if self.rockMsg:
-                                        self.engine.drawImage(self.rockMsg, scale = (0.5, -0.5), coord = (w/2,h/2))
+                                        drawImage(self.rockMsg, scale = (0.5, -0.5), coord = (w/2,h/2))
                                 if self.rockTimer >= self.rockCountdown:
                                     self.rockFinished = True
 
@@ -5450,7 +5451,7 @@ class GuitarScene(Scene):
                                 if self.failTimer < 100:
                                     self.failTimer += 1
                                     if self.failMsg:
-                                        self.engine.drawImage(self.failMsg, scale = (0.5, -0.5), coord = (w/2,h/2))
+                                        drawImage(self.failMsg, scale = (0.5, -0.5), coord = (w/2,h/2))
                                 else:
                                     self.finalFailed = True
 
@@ -5458,12 +5459,12 @@ class GuitarScene(Scene):
                             if self.pause:
                                 self.engine.view.setViewport(1,0)
                                 if self.engine.graphicMenuShown == False:
-                                    self.engine.drawImage(self.pauseScreen, scale = (self.pause_bkg[2], -self.pause_bkg[3]), coord = (w*self.pause_bkg[0],h*self.pause_bkg[1]), stretched = FULL_SCREEN)
+                                    drawImage(self.pauseScreen, scale = (self.pause_bkg[2], -self.pause_bkg[3]), coord = (w*self.pause_bkg[0],h*self.pause_bkg[1]), stretched = FULL_SCREEN)
 
                             if self.finalFailed and self.song:
                                 self.engine.view.setViewport(1,0)
                                 if self.engine.graphicMenuShown == False:
-                                    self.engine.drawImage(self.failScreen, scale = (self.fail_bkg[2], -self.fail_bkg[3]), coord = (w*self.fail_bkg[0],h*self.fail_bkg[1]), stretched = FULL_SCREEN)
+                                    drawImage(self.failScreen, scale = (self.fail_bkg[2], -self.fail_bkg[3]), coord = (w*self.fail_bkg[0],h*self.fail_bkg[1]), stretched = FULL_SCREEN)
 
                                 # evilynux - Closer to actual GH3
                                 font = self.engine.data.pauseFont
@@ -5618,7 +5619,7 @@ class GuitarScene(Scene):
                                             tempWScale = frameWidth*self.soloFrameWFactor
                                             tempHScale = -(frameHeight)*self.soloFrameWFactor
 
-                                            self.engine.drawImage(self.soloFrame, scale = (tempWScale,tempHScale), coord = (self.wPlayer[i]*boxXOffset,boxYOffset))
+                                            drawImage(self.soloFrame, scale = (tempWScale,tempHScale), coord = (self.wPlayer[i]*boxXOffset,boxYOffset))
 
                                         self.solo_soloFont.render(text1, (0.5 - Tw/2, yOffset),(1, 0, 0),txtSize)   #centered
                                         self.solo_soloFont.render(text2, (0.5 - Tw2/2, yOffset+lineSpacing),(1, 0, 0),txtSize)   #centered
@@ -5866,7 +5867,7 @@ class GuitarScene(Scene):
                                         self.solo_boxYOffset[i] = self.hPlayer[i]-(self.hPlayer[i]* ((self.solo_yOffset[i] + self.solo_Th[i]/2.0 ) / self.fontScreenBottom) )
                                         tempWScale = frameWidth*self.soloFrameWFactor
                                         tempHScale = -(frameHeight)*self.soloFrameWFactor
-                                        self.engine.drawImage(self.soloFrame, scale = (tempWScale,tempHScale), coord = (self.wPlayer[i]*self.solo_boxXOffset[i],self.solo_boxYOffset[i]))
+                                        drawImage(self.soloFrame, scale = (tempWScale,tempHScale), coord = (self.wPlayer[i]*self.solo_boxXOffset[i],self.solo_boxYOffset[i]))
                                     self.solo_soloFont.render(self.solo_soloText[i], (self.solo_xOffset[i], self.solo_yOffset[i]),(1, 0, 0),self.solo_txtSize)
 
                                 if self.coOpType: #1 BRE in co-op
@@ -5899,7 +5900,7 @@ class GuitarScene(Scene):
                                             boxXOffset = self.wPlayer[i]*xOffset
                                         tempWScale = frameWidth*self.breScoreFrameWFactor
                                         tempHScale = -(frameHeight)*self.breScoreFrameWFactor
-                                        self.engine.drawImage(self.breScoreFrame, scale = (tempWScale,tempHScale), coord = (boxXOffset,boxYOffset))
+                                        drawImage(self.breScoreFrame, scale = (tempWScale,tempHScale), coord = (boxXOffset,boxYOffset))
 
                                     self.solo_soloFont.render(text, (xOffset - tW/2.0, yOffset),(1, 0, 0),self.solo_txtSize/2.0)
 
@@ -5907,7 +5908,7 @@ class GuitarScene(Scene):
                                         freeX = .05*(self.numOfPlayers-1)
                                         freeI = .05*self.numOfPlayers
                                         for j in xrange(self.numOfPlayers):
-                                            self.engine.drawImage(self.part[j], scale = (.15,-.15), coord = (self.wFull*(.5-freeX+freeI*j),self.hFull*.58), color = (.8, .8, .8, 1))
+                                            drawImage(self.part[j], scale = (.15,-.15), coord = (self.wFull*(.5-freeX+freeI*j),self.hFull*.58), color = (.8, .8, .8, 1))
 
                                     text = "%s" % scoreCard.endingScore
                                     if self.theme == 2:
@@ -5928,7 +5929,7 @@ class GuitarScene(Scene):
                                             boxXOffset = self.wPlayer[i]*xOffset
                                         tempWScale = frameWidth*self.breScoreBackgroundWFactor
                                         tempHScale = -(frameHeight)*self.breScoreBackgroundWFactor
-                                        self.engine.drawImage(self.breScoreBackground, scale = (tempWScale,tempHScale), coord = (boxXOffset,boxYOffset))
+                                        drawImage(self.breScoreBackground, scale = (tempWScale,tempHScale), coord = (boxXOffset,boxYOffset))
 
 
                                     if self.breScoreFrame:
@@ -5942,7 +5943,7 @@ class GuitarScene(Scene):
                                             boxXOffset = self.wPlayer[i]*xOffset
                                         tempWScale = frameWidth*self.breScoreFrameWFactor
                                         tempHScale = -(frameHeight)*self.breScoreFrameWFactor
-                                        self.engine.drawImage(self.breScoreFrame, scale = (tempWScale,tempHScale), coord = (boxXOffset,boxYOffset))
+                                        drawImage(self.breScoreFrame, scale = (tempWScale,tempHScale), coord = (boxXOffset,boxYOffset))
                                     self.solo_soloFont.render(text, (xOffset - tW/2.0, yOffset),(1, 0, 0),self.solo_txtSize)
 
                                 elif scoreCard.freestyleWasJustActive and not scoreCard.endingStreakBroken and scoreCard.endingAwarded and oneTime == True:
@@ -5964,7 +5965,7 @@ class GuitarScene(Scene):
                                             boxXOffset = self.wPlayer[i]*xOffset
                                         tempWScale = frameWidth*self.breScoreFrameWFactor
                                         tempHScale = -(frameHeight)*self.breScoreFrameWFactor
-                                        self.engine.drawImage(self.breScoreFrame, scale = (tempWScale,tempHScale), coord = (boxXOffset,boxYOffset))
+                                        drawImage(self.breScoreFrame, scale = (tempWScale,tempHScale), coord = (boxXOffset,boxYOffset))
 
                                     self.solo_soloFont.render(text, (xOffset - tW/2.0, yOffset),(1, 0, 0),self.solo_txtSize/2.0)
 
@@ -5972,7 +5973,7 @@ class GuitarScene(Scene):
                                         freeX = .05*(self.numOfPlayers-1)
                                         freeI = .05*self.numOfPlayers
                                         for j in xrange(self.numOfPlayers):
-                                            self.engine.drawImage(self.part[j], scale = (.15,-.15), coord = (self.wFull*(.5-freeX+freeI*j),self.hFull*.58))
+                                            drawImage(self.part[j], scale = (.15,-.15), coord = (self.wFull*(.5-freeX+freeI*j),self.hFull*.58))
 
                                     text = "%s" % scoreCard.endingScore
                                     if self.theme == 2:
@@ -5993,7 +5994,7 @@ class GuitarScene(Scene):
                                             boxXOffset = self.wPlayer[i]*xOffset
                                         tempWScale = frameWidth*self.breScoreBackgroundWFactor
                                         tempHScale = -(frameHeight)*self.breScoreBackgroundWFactor
-                                        self.engine.drawImage(self.breScoreBackground, scale = (tempWScale,tempHScale), coord = (boxXOffset,boxYOffset))
+                                        drawImage(self.breScoreBackground, scale = (tempWScale,tempHScale), coord = (boxXOffset,boxYOffset))
 
                                     if self.breScoreFrame:
                                         frameWidth = tW*1.15
@@ -6006,7 +6007,7 @@ class GuitarScene(Scene):
                                             boxXOffset = self.wPlayer[i]*xOffset
                                         tempWScale = frameWidth*self.breScoreFrameWFactor
                                         tempHScale = -(frameHeight)*self.breScoreFrameWFactor
-                                        self.engine.drawImage(self.breScoreFrame, scale = (tempWScale,tempHScale), coord = (boxXOffset,boxYOffset))
+                                        drawImage(self.breScoreFrame, scale = (tempWScale,tempHScale), coord = (boxXOffset,boxYOffset))
                                     self.solo_soloFont.render(text, (xOffset - tW/2.0, yOffset),(1, 0, 0),self.solo_txtSize)
 
                                 elif scoreCard.freestyleWasJustActive and scoreCard.endingStreakBroken and oneTime == True:
@@ -6028,7 +6029,7 @@ class GuitarScene(Scene):
                                             boxXOffset = self.wPlayer[i]*xOffset
                                         tempWScale = frameWidth*self.breScoreFrameWFactor
                                         tempHScale = -(frameHeight)*self.breScoreFrameWFactor
-                                        self.engine.drawImage(self.breScoreFrame, scale = (tempWScale,tempHScale), coord = (boxXOffset,boxYOffset))
+                                        drawImage(self.breScoreFrame, scale = (tempWScale,tempHScale), coord = (boxXOffset,boxYOffset))
 
                                     self.solo_soloFont.render(text, (xOffset - tW/2.0, yOffset),(1, 0, 0),self.solo_txtSize/2.0)
 
@@ -6040,7 +6041,7 @@ class GuitarScene(Scene):
                                                 partcolor = (.4, .4, .4, 1)
                                             else:
                                                 partcolor = (.8, .8, .8, 1)
-                                            self.engine.drawImage(self.part[j], scale = (.15,-.15), coord = (self.wFull*(.5-freeX+freeI*j),self.hFull*.58), color = partcolor)
+                                            drawImage(self.part[j], scale = (.15,-.15), coord = (self.wFull*(.5-freeX+freeI*j),self.hFull*.58), color = partcolor)
 
                                     text = "%s" % 0
                                     if self.theme == 2:
@@ -6061,7 +6062,7 @@ class GuitarScene(Scene):
                                             boxXOffset = self.wPlayer[i]*xOffset
                                         tempWScale = frameWidth*self.breScoreBackgroundWFactor
                                         tempHScale = -(frameHeight)*self.breScoreBackgroundWFactor
-                                        self.engine.drawImage(self.breScoreBackground, scale = (tempWScale,tempHScale), coord = (boxXOffset,boxYOffset))
+                                        drawImage(self.breScoreBackground, scale = (tempWScale,tempHScale), coord = (boxXOffset,boxYOffset))
 
                                     if self.breScoreFrame:
                                         frameWidth = tW*1.15
@@ -6074,7 +6075,7 @@ class GuitarScene(Scene):
                                             boxXOffset = self.wPlayer[i]*xOffset
                                         tempWScale = frameWidth*self.breScoreFrameWFactor
                                         tempHScale = -(frameHeight)*self.breScoreFrameWFactor
-                                        self.engine.drawImage(self.breScoreFrame, scale = (tempWScale,tempHScale), coord = (boxXOffset,boxYOffset))
+                                        drawImage(self.breScoreFrame, scale = (tempWScale,tempHScale), coord = (boxXOffset,boxYOffset))
                                     self.solo_soloFont.render(text, (xOffset - tW/2.0, yOffset),(1, 0, 0),self.solo_txtSize)
 
                         self.engine.view.setViewportHalf(1,0)
@@ -6113,7 +6114,7 @@ class GuitarScene(Scene):
                                     fadePeriod = 500.0
                                     f = (1.0 - min(1.0, abs(pos - time) / fadePeriod) * min(1.0, abs(pos - time - event.length) / fadePeriod)) ** 2
 
-                                    self.engine.drawImage(picture, scale = (1, -1), coord = (w / 2, (f * -2 + 1) * h/2+yOffset))
+                                    drawImage(picture, scale = (1, -1), coord = (w / 2, (f * -2 + 1) * h/2+yOffset))
 
                                 elif isinstance(event, TextEvent):
                                     if pos >= time and pos <= time + event.length and not self.ending:    #myfingershurt: to not display events after ending!
@@ -6203,7 +6204,7 @@ class GuitarScene(Scene):
                                         partImgwidth = self.part[i].width1()
                                         partwFactor = 250.000/partImgwidth
                                         partX = ((i*2)+1) / (self.numOfPlayers*2.0)
-                                        self.engine.drawImage(self.part[i], scale = (partwFactor*0.25,partwFactor*-0.25), coord = (w*partX,h*.4), color = (1,1,1, 3.0 - abs(4.0 - self.countdownSeconds)))
+                                        drawImage(self.part[i], scale = (partwFactor*0.25,partwFactor*-0.25), coord = (w*partX,h*.4), color = (1,1,1, 3.0 - abs(4.0 - self.countdownSeconds)))
                                         self.engine.theme.setBaseColor(min(1.0, 3.0 - abs(4.0 - self.countdownSeconds)))
                                         text = player.name
                                         w, h = font.getStringSize(text)
@@ -6213,7 +6214,7 @@ class GuitarScene(Scene):
                                         h = self.hFull
                                         partImgWidth = self.part[i].width1()
                                         partwFactor = 250.000/partImgWidth
-                                        self.engine.drawImage(self.part[i], scale = (partwFactor*0.25, partwFactor*-0.25), coord = (w*.5,h*.75), color = (1,1,1, 3.0 - abs(4.0 - self.countdownSeconds)))
+                                        drawImage(self.part[i], scale = (partwFactor*0.25, partwFactor*-0.25), coord = (w*.5,h*.75), color = (1,1,1, 3.0 - abs(4.0 - self.countdownSeconds)))
                                         self.engine.theme.setBaseColor(min(1.0, 3.0 - abs(4.0 - self.countdownSeconds)))
                                         text = player.name
                                         w, h = font.getStringSize(text)

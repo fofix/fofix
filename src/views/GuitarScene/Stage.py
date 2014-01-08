@@ -35,6 +35,7 @@ from core.Language import _
 import math
 
 from graphics.VideoPlayer import VideoLayer, VideoPlayerError
+from graphics.Image import drawImage
 
 import Rockmeter #blazingamer - new 4.0 code for rendering rockmeters through stage.ini
 
@@ -87,7 +88,7 @@ class Layer(object):
             effect.apply()
 
         glBlendFunc(self.srcBlending, self.dstBlending)
-        self.stage.engine.drawImage(self.drawing, self.transforms[0], self.transforms[1],
+        drawImage(self.drawing, self.transforms[0], self.transforms[1],
                                                   self.transforms[2], self.transforms[3])
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
 
@@ -541,13 +542,13 @@ class Stage(object):
         #myfingershurt: multiple rotation modes
         if self.mode != 2:
             if self.rotationMode == 0:
-                self.engine.drawImage(self.background, scale = (1.0,-1.0),
+                drawImage(self.background, scale = (1.0,-1.0),
                                       coord = (self.wFull/2,self.hFull/2), stretched = FULL_SCREEN)
 
             #myfingershurt:
             else:
                 #MFH - use precalculated scale factors instead
-                self.engine.drawImage(self.imgArr[self.arrNum], scale = (1.0,-1.0),
+                drawImage(self.imgArr[self.arrNum], scale = (1.0,-1.0),
                                       coord = (self.wFull/2,self.hFull/2), stretched = FULL_SCREEN)
 
     def updateDelays(self):

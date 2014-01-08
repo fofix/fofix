@@ -36,6 +36,8 @@ import string
 import math
 from core.Language import _
 from graphics.Shader import shaders
+from graphics.Image import drawImage
+
 from core.Task import Task
 from constants import *
 
@@ -831,17 +833,17 @@ class ThemeLobby:
             return
         if type in GUITARTYPES:
             if self.fadeTime < 1000 or self.nextImage == self.currentImage:
-                lobby.drawImage(lobby.partImages[self.currentImage], scale = scale, coord = coord)
+                drawImage(lobby.partImages[self.currentImage], scale = scale, coord = coord)
             else:
-                lobby.drawImage(lobby.partImages[self.currentImage], scale = scale, coord = coord, color = (1,1,1,((2500.0-self.fadeTime)/1500.0)))
-                lobby.drawImage(lobby.partImages[self.nextImage], scale = scale, coord = coord, color = (1,1,1,((self.fadeTime-1000.0)/1500.0)))
+                drawImage(lobby.partImages[self.currentImage], scale = scale, coord = coord, color = (1,1,1,((2500.0-self.fadeTime)/1500.0)))
+                drawImage(lobby.partImages[self.nextImage], scale = scale, coord = coord, color = (1,1,1,((self.fadeTime-1000.0)/1500.0)))
                 glColor4f(1,1,1,1)
         elif type in DRUMTYPES:
             if lobby.partImages[4]:
-                lobby.drawImage(lobby.partImages[4], scale = scale, coord = coord)
+                drawImage(lobby.partImages[4], scale = scale, coord = coord)
         else:
             if lobby.partImages[5]:
-                lobby.drawImage(lobby.partImages[5], scale = scale, coord = coord)
+                drawImage(lobby.partImages[5], scale = scale, coord = coord)
 
     def renderPanels(self, lobby):
         x = self.theme.lobbyPanelPos[0]
@@ -865,11 +867,11 @@ class ThemeLobby:
             else:
                 glColor3f(*self.theme.lobbyHeaderColor)
             if i == lobby.keyControl and lobby.img_keyboard_panel:
-                lobby.drawImage(lobby.img_keyboard_panel, scale = (self.theme.lobbyPanelSize[0], -self.theme.lobbyPanelSize[1]), coord = (wP*.5+w*x,hP*.5+h*y), stretched = FULL_SCREEN)
+                drawImage(lobby.img_keyboard_panel, scale = (self.theme.lobbyPanelSize[0], -self.theme.lobbyPanelSize[1]), coord = (wP*.5+w*x,hP*.5+h*y), stretched = FULL_SCREEN)
             elif lobby.img_panel:
-                lobby.drawImage(lobby.img_panel, scale = (self.theme.lobbyPanelSize[0], -self.theme.lobbyPanelSize[1]), coord = (wP*.5+w*x,hP*.5+h*y), stretched = FULL_SCREEN)
+                drawImage(lobby.img_panel, scale = (self.theme.lobbyPanelSize[0], -self.theme.lobbyPanelSize[1]), coord = (wP*.5+w*x,hP*.5+h*y), stretched = FULL_SCREEN)
             if i == lobby.keyControl and lobby.img_keyboard:
-                lobby.drawImage(lobby.img_keyboard, scale = (self.theme.lobbyKeyboardImgScale, -self.theme.lobbyKeyboardImgScale), coord = (wP*self.theme.lobbyKeyboardImgPos[0]+w*x, hP*self.theme.lobbyKeyboardImgPos[1]+h*y))
+                drawImage(lobby.img_keyboard, scale = (self.theme.lobbyKeyboardImgScale, -self.theme.lobbyKeyboardImgScale), coord = (wP*self.theme.lobbyKeyboardImgPos[0]+w*x, hP*self.theme.lobbyKeyboardImgPos[1]+h*y))
             controlFont.render(lobby.controls[j], (self.theme.lobbyPanelSize[0]*self.theme.lobbyControlPos[0]+x, self.theme.lobbyPanelSize[1]*self.theme.lobbyControlPos[1]+y), scale = self.theme.lobbyControlScale, align = self.theme.lobbyControlAlign, new = True)
             self.drawPartImage(lobby, lobby.types[j], scale = (self.theme.lobbyPartScale, -self.theme.lobbyPartScale), coord = (wP*self.theme.lobbyPartPos[0]+w*x, hP*self.theme.lobbyPartPos[1]+h*y))
             #self.drawControlImage(lobby, lobby.types[j], scale = (self.theme.lobbyControlImgScale, -self.theme.lobbyControlImgScale), coord = (wP*self.theme.lobbyControlImgPos[0]+w*x, hP*self.theme.lobbyControlImgPos[1]+h*y))
@@ -879,13 +881,13 @@ class ThemeLobby:
                     break
                 if lobby.selected[j] == k and (j not in lobby.blockedPlayers or j in lobby.selectedPlayers):
                     if lobby.img_selected:
-                        lobby.drawImage(lobby.img_selected, scale = (.5, -.5), coord = (wP*.5+w*x, hP*(.46*.75)+h*y-(h*.04*l)/.75))
+                        drawImage(lobby.img_selected, scale = (.5, -.5), coord = (wP*.5+w*x, hP*(.46*.75)+h*y-(h*.04*l)/.75))
                     if lobby.avatars[k]:
-                        lobby.drawImage(lobby.avatars[k], scale = (lobby.avatarScale[k], -lobby.avatarScale[k]), coord = (wP*.5+w*x, hP*.7+h*y))
+                        drawImage(lobby.avatars[k], scale = (lobby.avatarScale[k], -lobby.avatarScale[k]), coord = (wP*.5+w*x, hP*.7+h*y))
                     elif k == 0 and lobby.img_newchar_av:
-                        lobby.drawImage(lobby.img_newchar_av, scale = (lobby.newCharAvScale, -lobby.newCharAvScale), coord = (wP*.5+w*x, hP*.7+h*y))
+                        drawImage(lobby.img_newchar_av, scale = (lobby.newCharAvScale, -lobby.newCharAvScale), coord = (wP*.5+w*x, hP*.7+h*y))
                     elif lobby.img_default_av:
-                        lobby.drawImage(lobby.img_default_av, scale = (lobby.defaultAvScale, -lobby.defaultAvScale), coord = (wP*.5+w*x, hP*.7+h*y))
+                        drawImage(lobby.img_default_av, scale = (lobby.defaultAvScale, -lobby.defaultAvScale), coord = (wP*.5+w*x, hP*.7+h*y))
                     glColor3f(*self.theme.lobbySelectedColor)
                 elif k in lobby.blockedItems or j in lobby.blockedPlayers:
                     glColor3f(*self.theme.lobbyDisabledColor)
@@ -893,7 +895,7 @@ class ThemeLobby:
                     glColor3f(*self.theme.lobbyOptionColor)
                 if k == 1:
                     if lobby.img_save_char:
-                        lobby.drawImage(lobby.img_save_char, scale = (.5, -.5), coord = (wP*.5+w*x, hP*(.46*.75)+h*y-(h*.04*l)/.75))
+                        drawImage(lobby.img_save_char, scale = (.5, -.5), coord = (wP*.5+w*x, hP*(.46*.75)+h*y-(h*.04*l)/.75))
                     else:
                         glColor3f(*self.theme.lobbySaveCharColor)
                         lobby.fontDict[self.theme.lobbySaveCharFont].render(lobby.options[k], (self.theme.lobbyPanelSize[0]*self.theme.lobbyOptionPos[0]+x,self.theme.lobbyPanelSize[1]*self.theme.lobbyOptionPos[1]+y+self.theme.lobbyOptionSpace*l), scale = self.theme.lobbySaveCharScale, align = self.theme.lobbySaveCharAlign, new = True)
@@ -909,13 +911,13 @@ class ThemeParts:
     def drawPartImage(self, dialog, part, scale, coord):
         if part in [0, 2, 4, 5]:
             if dialog.partImages[part]:
-                dialog.drawImage(dialog.partImages[part], scale = scale, coord = coord)
+                drawImage(dialog.partImages[part], scale = scale, coord = coord)
         else:
             if dialog.partImages[part]:
-                dialog.drawImage(dialog.partImages[part], scale = scale, coord = coord)
+                drawImage(dialog.partImages[part], scale = scale, coord = coord)
             else:
                 if dialog.partImages[0]:
-                    dialog.drawImage(dialog.partImages[0], scale = scale, coord = coord)
+                    drawImage(dialog.partImages[0], scale = scale, coord = coord)
     def renderPanels(self, dialog):
         x = self.theme.partDiffPanelPos[0]
         y = self.theme.partDiffPanelPos[1]
@@ -935,11 +937,11 @@ class ThemeParts:
             glColor3f(*self.theme.partDiffHeaderColor)
             dialog.fontDict[self.theme.partDiffGameModeFont].render(dialog.gameModeText, self.theme.partDiffGameModePos, scale = self.theme.partDiffGameModeScale, align = self.theme.partDiffGameModeAlign)
             if i == dialog.keyControl and dialog.img_keyboard_panel:
-                dialog.drawImage(dialog.img_keyboard_panel, scale = (self.theme.partDiffPanelSize[0], -self.theme.partDiffPanelSize[1]), coord = (wP*.5+w*x,hP*.5+h*y), stretched = FULL_SCREEN)
+                drawImage(dialog.img_keyboard_panel, scale = (self.theme.partDiffPanelSize[0], -self.theme.partDiffPanelSize[1]), coord = (wP*.5+w*x,hP*.5+h*y), stretched = FULL_SCREEN)
             elif dialog.img_panel:
-                dialog.drawImage(dialog.img_panel, scale = (self.theme.partDiffPanelSize[0], -self.theme.partDiffPanelSize[1]), coord = (wP*.5+w*x,hP*.5+h*y), stretched = FULL_SCREEN)
+                drawImage(dialog.img_panel, scale = (self.theme.partDiffPanelSize[0], -self.theme.partDiffPanelSize[1]), coord = (wP*.5+w*x,hP*.5+h*y), stretched = FULL_SCREEN)
             if i == dialog.keyControl and dialog.img_keyboard:
-                dialog.drawImage(dialog.img_keyboard, scale = (self.theme.partDiffKeyboardImgScale, -self.theme.partDiffKeyboardImgScale), coord = (wP*self.theme.partDiffKeyboardImgPos[0]+w*x, hP*self.theme.partDiffKeyboardImgPos[1]+h*y))
+                drawImage(dialog.img_keyboard, scale = (self.theme.partDiffKeyboardImgScale, -self.theme.partDiffKeyboardImgScale), coord = (wP*self.theme.partDiffKeyboardImgPos[0]+w*x, hP*self.theme.partDiffKeyboardImgPos[1]+h*y))
             controlFont.render(dialog.players[i].name, (self.theme.partDiffPanelSize[0]*self.theme.partDiffControlPos[0]+x, self.theme.partDiffPanelSize[1]*self.theme.partDiffControlPos[1]+y), scale = self.theme.partDiffControlScale, align = self.theme.partDiffControlAlign, new = True)
             panelNameFont.render(dialog.players[i].name.lower(), (x+w*self.theme.partDiffPanelNamePos[0], y+h*self.theme.partDiffPanelNamePos[1]), scale = self.theme.partDiffPanelNameScale, align = self.theme.partDiffPanelNameAlign, new = True)
             if dialog.mode[i] == 0:
@@ -947,7 +949,7 @@ class ThemeParts:
                 for p in range(len(dialog.parts[i])):
                     if dialog.selected[i] == p:
                         if dialog.img_selected:
-                            dialog.drawImage(dialog.img_selected, scale = (.5, -.5), coord = (wP*.5+w*x, hP*(.46*.75)+h*y-(h*.04*p)/.75))
+                            drawImage(dialog.img_selected, scale = (.5, -.5), coord = (wP*.5+w*x, hP*(.46*.75)+h*y-(h*.04*p)/.75))
                         glColor3f(*self.theme.partDiffSelectedColor)
                     else:
                         glColor3f(*self.theme.partDiffOptionColor)
@@ -957,14 +959,14 @@ class ThemeParts:
                 for d in range(len(dialog.info.partDifficulties[dialog.players[i].part.id])):
                     if dialog.selected[i] == d:
                         if dialog.img_selected:
-                            dialog.drawImage(dialog.img_selected, scale = (.5, -.5), coord = (wP*.5+w*x, hP*(.46*.75)+h*y-(h*.04*d)/.75))
+                            drawImage(dialog.img_selected, scale = (.5, -.5), coord = (wP*.5+w*x, hP*(.46*.75)+h*y-(h*.04*d)/.75))
                         glColor3f(*self.theme.partDiffSelectedColor)
                     else:
                         glColor3f(*self.theme.partDiffOptionColor)
                     font.render(str(dialog.info.partDifficulties[dialog.players[i].part.id][d]), (.2*.5+x,.8*.46+y+.04*d), scale = .001, align = 1, new = True)
                 if i in dialog.readyPlayers:
                     if dialog.img_ready:
-                        dialog.drawImage(dialog.img_ready, scale = (.5, -.5), coord = (wP*.5+w*x,hP*(.75*.46)+h*y))
+                        drawImage(dialog.img_ready, scale = (.5, -.5), coord = (wP*.5+w*x,hP*(.75*.46)+h*y))
             x += .24
 
 class Setlist:
@@ -1243,7 +1245,7 @@ class Setlist:
                 wfactor = 381.1/imgwidth
                 hfactor = 24.000/imgheight
                 if isinstance(item, Song.TitleInfo) or isinstance(item, Song.SortTitleInfo) and scene.img_tier:
-                    scene.drawImage(scene.img_tier, scale = (wfactor,-hfactor), coord = (w/1.587, h-((0.055*h)*(n+1))-(0.219*h)))
+                    drawImage(scene.img_tier, scale = (wfactor,-hfactor), coord = (w/1.587, h-((0.055*h)*(n+1))-(0.219*h)))
 
             icon = None
             if isinstance(item, Song.SongInfo):
@@ -1252,7 +1254,7 @@ class Setlist:
                         icon = scene.itemIcons[item.icon]
                         imgwidth = icon.width1()
                         wfactor = 23.000/imgwidth
-                        scene.drawImage(icon, scale = (wfactor,-wfactor), coord = (w/2.86, h-((0.055*h)*(n+1))-(0.219*h)))
+                        drawImage(icon, scale = (wfactor,-wfactor), coord = (w/2.86, h-((0.055*h)*(n+1))-(0.219*h)))
                     except KeyError:
                         pass
             elif isinstance(item, Song.LibraryInfo):
@@ -1260,7 +1262,7 @@ class Setlist:
                     icon = scene.itemIcons["Library"]
                     imgwidth = icon.width1()
                     wfactor = 23.000/imgwidth
-                    scene.drawImage(icon, scale = (wfactor,-wfactor), coord = (w/2.86, h-((0.055*h)*(n+1))-(0.219*h)))
+                    drawImage(icon, scale = (wfactor,-wfactor), coord = (w/2.86, h-((0.055*h)*(n+1))-(0.219*h)))
                 except KeyError:
                     pass
             elif isinstance(item, Song.RandomSongInfo):
@@ -1268,7 +1270,7 @@ class Setlist:
                     icon = scene.itemIcons["Random"]
                     imgwidth = icon.width1()
                     wfactor = 23.000/imgwidth
-                    scene.drawImage(icon, scale = (wfactor,-wfactor), coord = (w/2.86, h-((0.055*h)*(n+1))-(0.219*h)))
+                    drawImage(icon, scale = (wfactor,-wfactor), coord = (w/2.86, h-((0.055*h)*(n+1))-(0.219*h)))
                 except KeyError:
                     pass
 
@@ -1380,7 +1382,7 @@ class Setlist:
             y = h*(.88-(.125*n))
             if scene.img_item_select:
                 wfactor = scene.img_item_select.widthf(pixelw = 635.000)
-                scene.drawImage(scene.img_item_select, scale = (wfactor,-wfactor), coord = (w/2.1, y))
+                drawImage(scene.img_item_select, scale = (wfactor,-wfactor), coord = (w/2.1, y))
             glColor4f(0,0,0,1)
             if isinstance(item, Song.SongInfo) or isinstance(item, Song.RandomSongInfo):
                 c1,c2,c3 = self.song_name_selected_color
@@ -1504,7 +1506,7 @@ class Setlist:
             glColor4f(1,1,1,1)
             if scene.img_selected:
                 imgwidth = scene.img_selected.width1()
-                scene.drawImage(scene.img_selected, scale = (1, -1), coord = (self.song_listcd_list_xpos * w + (imgwidth*.64/2), y*1.2-h*.215))
+                drawImage(scene.img_selected, scale = (1, -1), coord = (self.song_listcd_list_xpos * w + (imgwidth*.64/2), y*1.2-h*.215))
             text = scene.library
             font.render(text, (.05, .01))
             if scene.songLoader:
@@ -1598,7 +1600,7 @@ class Setlist:
                 wfactor = 381.1/imgwidth
                 hfactor = 24.000/imgheight
                 if isinstance(item, Song.TitleInfo) or isinstance(item, Song.SortTitleInfo):
-                    scene.drawImage(scene.img_tier, scale = (wfactor,-hfactor), coord = (w/1.587, h-((0.055*h)*(n+1))-(0.219*h)))
+                    drawImage(scene.img_tier, scale = (wfactor,-hfactor), coord = (w/1.587, h-((0.055*h)*(n+1))-(0.219*h)))
 
             if scene.img_selected:
                 imgwidth = scene.img_selected.width1()
@@ -1606,7 +1608,7 @@ class Setlist:
                 wfactor = 381.5/imgwidth
                 hfactor = 36.000/imgheight
 
-                scene.drawImage(scene.img_selected, scale = (wfactor,-hfactor), coord = (w/1.587, y*1.2-h*.213))
+                drawImage(scene.img_selected, scale = (wfactor,-hfactor), coord = (w/1.587, y*1.2-h*.213))
 
 
             icon = None
@@ -1616,7 +1618,7 @@ class Setlist:
                         icon = scene.itemIcons[item.icon]
                         imgwidth = icon.width1()
                         wfactor = 23.000/imgwidth
-                        scene.drawImage(icon, scale = (wfactor,-wfactor), coord = (w/2.86, h-((0.055*h)*(n+1))-(0.219*h)))
+                        drawImage(icon, scale = (wfactor,-wfactor), coord = (w/2.86, h-((0.055*h)*(n+1))-(0.219*h)))
                     except KeyError:
                         pass
 
@@ -1641,7 +1643,7 @@ class Setlist:
                     icon = scene.itemIcons["Library"]
                     imgwidth = icon.width1()
                     wfactor = 23.000/imgwidth
-                    scene.drawImage(icon, scale = (wfactor,-wfactor), coord = (w/2.86, h-((0.055*h)*(n+1))-(0.219*h)))
+                    drawImage(icon, scale = (wfactor,-wfactor), coord = (w/2.86, h-((0.055*h)*(n+1))-(0.219*h)))
                 except KeyError:
                     pass
                 c1,c2,c3 = self.library_selected_color
@@ -1661,7 +1663,7 @@ class Setlist:
                     icon = scene.itemIcons["Random"]
                     imgwidth = icon.width1()
                     wfactor = 23.000/imgwidth
-                    scene.drawImage(icon, scale = (wfactor,-wfactor), coord = (w/2.86, h-((0.055*h)*(n+1))-(0.219*h)))
+                    drawImage(icon, scale = (wfactor,-wfactor), coord = (w/2.86, h-((0.055*h)*(n+1))-(0.219*h)))
                 except KeyError:
                     pass
                 text = _("Random Song")
@@ -2075,9 +2077,9 @@ class Setlist:
                     wfactor = 155.000/imgwidth
                     img = scene.img_empty_label
             if img:
-                scene.drawImage(img, scale = (wfactor,-wfactor), coord = (.21*w,.59*h))
+                drawImage(img, scale = (wfactor,-wfactor), coord = (.21*w,.59*h))
             if lockImg:
-                scene.drawImage(lockImg, scale = (wfactor2,-wfactor2), coord = (.21*w,.59*h))
+                drawImage(lockImg, scale = (wfactor2,-wfactor2), coord = (.21*w,.59*h))
 
     def renderForeground(self, scene):
         font = scene.fontDict['songListFont']
@@ -2135,13 +2137,13 @@ class Setlist:
                 font.render(_("Loading Preview..."), (.05, .7), scale = 0.001)
             return
         if scene.img_list_button_guide:
-            scene.drawImage(scene.img_list_button_guide, scale = (.5, -.5), coord = (w*.5,0), fit = BOTTOM)
+            drawImage(scene.img_list_button_guide, scale = (.5, -.5), coord = (w*.5,0), fit = BOTTOM)
         if scene.songLoader:
             font.render(_("Loading Preview..."), (.5, .7), align = 1)
         if scene.searching:
             font.render(scene.searchText, (.5, .7), align = 1)
         if scene.img_list_fg:
-            scene.drawImage(scene.img_list_fg, scale = (1.0, -1.0), coord = (w/2,h/2), stretched = FULL_SCREEN)
+            drawImage(scene.img_list_fg, scale = (1.0, -1.0), coord = (w/2,h/2), stretched = FULL_SCREEN)
 
     def renderSelectedInfo(self, scene):
         from game import Song
@@ -2450,12 +2452,12 @@ class Setlist:
                             font.render("N/A", (.18, .5585 + i*.025), scale = 0.0014)
                         elif diff == 6:
                             for k in range(0,5):
-                                scene.drawImage(scene.img_diff3, scale = (wfactor1,-wfactor1), coord = ((.19+.03*k)*w, (0.2354-.0333*i)*h))
+                                drawImage(scene.img_diff3, scale = (wfactor1,-wfactor1), coord = ((.19+.03*k)*w, (0.2354-.0333*i)*h))
                         else:
                             for k in range(0,diff):
-                                scene.drawImage(scene.img_diff2, scale = (wfactor1,-wfactor1), coord = ((.19+.03*k)*w, (0.2354-.0333*i)*h))
+                                drawImage(scene.img_diff2, scale = (wfactor1,-wfactor1), coord = ((.19+.03*k)*w, (0.2354-.0333*i)*h))
                             for k in range(0, 5-diff):
-                                scene.drawImage(scene.img_diff1, scale = (wfactor1,-wfactor1), coord = ((.31-.03*k)*w, (0.2354-.0333*i)*h))
+                                drawImage(scene.img_diff1, scale = (wfactor1,-wfactor1), coord = ((.31-.03*k)*w, (0.2354-.0333*i)*h))
 
     def renderMoreInfo(self, scene):
         if not scene.items:
@@ -2472,14 +2474,14 @@ class Setlist:
             y = 1.0-(float(scene.moreInfoTime)/500.0)
         yI = y*h
         if scene.img_panel:
-            scene.drawImage(scene.img_panel, scale = (1.0, -1.0), coord = (w*.5,h*.5+yI), stretched = FULL_SCREEN)
+            drawImage(scene.img_panel, scale = (1.0, -1.0), coord = (w*.5,h*.5+yI), stretched = FULL_SCREEN)
         if scene.img_tabs:
             r0 = (0, (1.0/3.0), 0, .5)
             r1 = ((1.0/3.0),(2.0/3.0), 0, .5)
             r2 = ((2.0/3.0),1.0,0,.5)
             if scene.infoPage == 0:
                 r0 = (0, (1.0/3.0), .5, 1.0)
-                scene.drawImage(scene.img_tab1, scale = (.5, -.5), coord = (w*.5,h*.5+yI))
+                drawImage(scene.img_tab1, scale = (.5, -.5), coord = (w*.5,h*.5+yI))
                 text = item.name
                 if item.artist != "":
                     text += " by %s" % item.artist
@@ -2490,11 +2492,11 @@ class Setlist:
                 if scene.itemLabels[i]:
                     imgwidth = scene.itemLabels[i].width1()
                     wfactor = 95.000/imgwidth
-                    scene.drawImage(scene.itemLabels[i], (wfactor, -wfactor), (w*.375,h*.5+yI))
+                    drawImage(scene.itemLabels[i], (wfactor, -wfactor), (w*.375,h*.5+yI))
                 elif scene.img_empty_label:
                     imgwidth = scene.img_empty_label.width1()
                     wfactor = 95.000/imgwidth
-                    scene.drawImage(scene.img_empty_label, (wfactor, -wfactor), (w*.375,h*.5+yI))
+                    drawImage(scene.img_empty_label, (wfactor, -wfactor), (w*.375,h*.5+yI))
                 text = item.album
                 if text == "":
                     text = _("No Album")
@@ -2507,13 +2509,13 @@ class Setlist:
                 font.render(text, (.56, .35-y), scale = scale)
             elif scene.infoPage == 1:
                 r1 = ((1.0/3.0),(2.0/3.0), .5, 1.0)
-                scene.drawImage(scene.img_tab2, scale = (.5, -.5), coord = (w*.5,h*.5+yI))
+                drawImage(scene.img_tab2, scale = (.5, -.5), coord = (w*.5,h*.5+yI))
             elif scene.infoPage == 2:
                 r2 = ((2.0/3.0),1.0, .5, 1.0)
-                scene.drawImage(scene.img_tab3, scale = (.5, -.5), coord = (w*.5,h*.5+yI))
-            scene.drawImage(scene.img_tabs, scale = (.5*(1.0/3.0), -.25), coord = (w*.36,h*.72+yI), rect = r0)
-            scene.drawImage(scene.img_tabs, scale = (.5*(1.0/3.0), -.25), coord = (w*.51,h*.72+yI), rect = r1)
-            scene.drawImage(scene.img_tabs, scale = (.5*(1.0/3.0), -.25), coord = (w*.66,h*.72+yI), rect = r2)
+                drawImage(scene.img_tab3, scale = (.5, -.5), coord = (w*.5,h*.5+yI))
+            drawImage(scene.img_tabs, scale = (.5*(1.0/3.0), -.25), coord = (w*.36,h*.72+yI), rect = r0)
+            drawImage(scene.img_tabs, scale = (.5*(1.0/3.0), -.25), coord = (w*.51,h*.72+yI), rect = r1)
+            drawImage(scene.img_tabs, scale = (.5*(1.0/3.0), -.25), coord = (w*.66,h*.72+yI), rect = r2)
 
     def renderMiniLobby(self, scene):
         return

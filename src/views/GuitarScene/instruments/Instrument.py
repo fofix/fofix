@@ -31,6 +31,7 @@ import numpy as np
 
 from graphics.Shader import shaders
 from graphics.Mesh import Mesh
+from graphics.Image import draw3Dtex
 
 
 class Instrument(object):
@@ -852,7 +853,7 @@ class Instrument(object):
                             HIndex = 0
                         texX = (HIndex*(1.0/self.HFrameLimit), HIndex*(1.0/self.HFrameLimit)+(1.0/self.HFrameLimit))
 
-                        self.engine.draw3Dtex(self.hitglowAnim, coord = (x, y, z), rot = self.hitGlowsRotation, scale = (2.4, 1, 3.3),
+                        draw3Dtex(self.hitglowAnim, coord = (x, y, z), rot = self.hitGlowsRotation, scale = (2.4, 1, 3.3),
                                               vertex = (-vtx,-vtx,vtx,vtx),texcoord = (texX[0],0.0,texX[1],1.0), multiples = True,
                                               alpha = alphaEnabled, color = (1,1,1))
 
@@ -867,7 +868,7 @@ class Instrument(object):
                         elif self.spNote and self.powerGainColorToggle:
                             flamecol = self.spColor
 
-                        self.engine.draw3Dtex(self.hitglowDrawing, coord = (x, y + .15, z), rot = self.hitGlowsRotation,
+                        draw3Dtex(self.hitglowDrawing, coord = (x, y + .15, z), rot = self.hitGlowsRotation,
                                               scale = (0.5 + .6 * ms * ff, 1.5 + .6 * ms * ff, 1 + .6 * ms * ff),
                                               vertex = (-vtx,-vtx,vtx,vtx), texcoord = (0.0,0.0,1.0,1.0),
                                               multiples = True, alpha = alphaEnabled, color = flamecol)
@@ -886,7 +887,7 @@ class Instrument(object):
                         elif self.spNote and self.powerGainColorToggle:
                             flamecol = self.spColor
 
-                        self.engine.draw3Dtex(self.hitglow2Drawing, coord = (x, y, z), rot = self.hitGlowsRotation,
+                        draw3Dtex(self.hitglow2Drawing, coord = (x, y, z), rot = self.hitGlowsRotation,
                                               scale = (.40 + .6 * ms * ff, 1.5 + .6 * ms * ff, 1 + .6 * ms * ff),
                                               vertex = (-vtx,-vtx,vtx,vtx), texcoord = (0.0,0.0,1.0,1.0),
                                               multiples = True, alpha = alphaEnabled, color = flamecol)
@@ -955,7 +956,7 @@ class Instrument(object):
                             else:
                                 texture = self.hitflamesAnim
 
-                            self.engine.draw3Dtex(texture, coord = (x, y + .665, z), rot = self.hitFlameRotation,
+                            draw3Dtex(texture, coord = (x, y + .665, z), rot = self.hitFlameRotation,
                                                   scale = (1.6, 1.6, 4.9), vertex = (-vtx,-vtx,vtx,vtx),
                                                   texcoord = (texX[0],0.0,texX[1],1.0),  multiples = True,
                                                   alpha = alphaEnabled, color = (1,1,1))
@@ -1029,13 +1030,13 @@ class Instrument(object):
                         self.HCountAni = True
 
                     if event.flameCount < flameLimitHalf and self.hitflames2Drawing:
-                        self.engine.draw3Dtex(self.hitflames2Drawing, coord = (x, y + .20, z), rot = self.hitFlameRotation,
+                        draw3Dtex(self.hitflames2Drawing, coord = (x, y + .20, z), rot = self.hitFlameRotation,
                                               scale = (.25 + .6 * ms * ff, event.flameCount/6.0 + .6 * ms * ff, event.flameCount / 6.0 + .6 * ms * ff),
                                               vertex = (-vtx,-vtx,vtx,vtx), texcoord = (0.0,0.0,1.0,1.0),
                                               multiples = True, alpha = alphaEnabled, color = flameColor)
 
                         for i in range(3):
-                            self.engine.draw3Dtex(self.hitflames2Drawing, coord = (x-.005, y + .255, z), rot = self.hitFlameRotation,
+                            draw3Dtex(self.hitflames2Drawing, coord = (x-.005, y + .255, z), rot = self.hitFlameRotation,
                                                   scale = (.30 + i*0.05 + .6 * ms * ff, event.flameCount/(5.5 - i*0.4) + .6 * ms * ff, event.flameCount / (5.5 - i*0.4) + .6 * ms * ff),
                                                   vertex = (-vtx,-vtx,vtx,vtx), texcoord = (0.0,0.0,1.0,1.0),
                                                   multiples = True, alpha = alphaEnabled, color = flameColor)
@@ -1054,14 +1055,14 @@ class Instrument(object):
                             yzscaleMod = (event.flameCount + 1)/ scaleChange[step]
 
                         if self.hitflames1Drawing:
-                            self.engine.draw3Dtex(self.hitflames1Drawing, coord = (x - .005, y + yOffset[step], z), rot = self.hitFlameRotation,
+                            draw3Dtex(self.hitflames1Drawing, coord = (x - .005, y + yOffset[step], z), rot = self.hitFlameRotation,
                                                   scale = (.25 + step*.05 + scaleMod, yzscaleMod + scaleMod, yzscaleMod + scaleMod),
                                                   vertex = (-vtx,-vtx,vtx,vtx), texcoord = (0.0,0.0,1.0,1.0),
                                                   multiples = True, alpha = alphaEnabled, color = flamecol)
 
                         #draw lightning in GH themes on SP gain
                         if step == 0 and event.finalStar and self.spEnabled and self.hitlightning:
-                            self.engine.draw3Dtex(self.hitlightning, coord = (xlightning, ff / 6, 3.3), rot = (90, 1, 0, 0),
+                            draw3Dtex(self.hitlightning, coord = (xlightning, ff / 6, 3.3), rot = (90, 1, 0, 0),
                                                   scale = (.15 + .5 * ms * ff, event.flameCount / 3.0 + .6 * ms * ff, 2), vertex = (.4,-2,.4,2),
                                                   texcoord = (0.0,0.0,1.0,1.0), multiples = True, alpha = True, color = (1,1,1))
 
@@ -1166,7 +1167,7 @@ class Instrument(object):
                 noteImage = self.noteButtons
                 texCoord = self.noteTexCoord[y][fret]
 
-            self.engine.draw3Dtex(noteImage, vertex = self.noteVtx, texcoord = texCoord,
+            draw3Dtex(noteImage, vertex = self.noteVtx, texcoord = texCoord,
                                   scale = (1,1,1), rot = (self.camAngle ,1,0,0), multiples = False, color = color)
 
         else: #3d Notes
@@ -1678,11 +1679,11 @@ class Instrument(object):
                 f += 2
 
                 if self.battleStatus[4]:
-                    self.engine.draw3Dtex(self.glowDrawing, coord = (x, self.battleWhammyNow * .15, 0.01), rot = (f * 90 + self.time, 0, 1, 0),
+                    draw3Dtex(self.glowDrawing, coord = (x, self.battleWhammyNow * .15, 0.01), rot = (f * 90 + self.time, 0, 1, 0),
                                         texcoord = (0.0, 0.0, 1.0, 1.0), vertex = (-size * f, -size * f, size * f, size * f),
                                         multiples = True, alpha = True, color = glowcol)
                 else:
-                    self.engine.draw3Dtex(self.glowDrawing, coord = (x, 0, 0.01), rot = (f * 90 + self.time, 0, 1, 0),
+                    draw3Dtex(self.glowDrawing, coord = (x, 0, 0.01), rot = (f * 90 + self.time, 0, 1, 0),
                                         texcoord = (0.0, 0.0, 1.0, 1.0), vertex = (-size * f, -size * f, size * f, size * f),
                                         multiples = True, alpha = True, color = glowcol)
 
@@ -1820,7 +1821,7 @@ class Instrument(object):
 
                 glDisable(GL_TEXTURE_2D)
 
-                self.engine.draw3Dtex(tex2, vertex = (-size[0], size[1], size[0], size[1] + .6), texcoord = (0.0, 0.0, 1.0, 1.0), color = tailcol) # render the end of a tail
+                draw3Dtex(tex2, vertex = (-size[0], size[1], size[0], size[1] + .6), texcoord = (0.0, 0.0, 1.0, 1.0), color = tailcol) # render the end of a tail
 
                 shaders.disable()
 
@@ -1863,11 +1864,11 @@ class Instrument(object):
             tex1 = self.freestyle1
             tex2 = self.freestyle2
 
-            self.engine.draw3Dtex(tex1, vertex = (-size[0], 0, size[0], size[1]), texcoord = (0.0, 0.0, 1.0, 1.0), color = tailcol) #Middle of freestyle tail
+            draw3Dtex(tex1, vertex = (-size[0], 0, size[0], size[1]), texcoord = (0.0, 0.0, 1.0, 1.0), color = tailcol) #Middle of freestyle tail
 
-            self.engine.draw3Dtex(tex2, vertex = (-size[0], size[1], size[0], size[1] + (zsize)), texcoord = (0.0, 0.05, 1.0, 0.95), color = tailcol)#end of freestyle tail
+            draw3Dtex(tex2, vertex = (-size[0], size[1], size[0], size[1] + (zsize)), texcoord = (0.0, 0.05, 1.0, 0.95), color = tailcol)#end of freestyle tail
 
-            self.engine.draw3Dtex(tex2, vertex = (-size[0], 0-(zsize), size[0], 0 + (.05)), texcoord = (0.0, 0.95, 1.0, 0.05), color = tailcol)#beginning of freestyle tail
+            draw3Dtex(tex2, vertex = (-size[0], 0-(zsize), size[0], 0 + (.05)), texcoord = (0.0, 0.95, 1.0, 0.05), color = tailcol)#beginning of freestyle tail
 
     def renderFreestyleLanes(self, visibility, song, pos, controls):
         if not song:

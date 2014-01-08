@@ -35,6 +35,7 @@ from core import Data
 from game import Player
 
 from util import Log
+from graphics.Image import drawImage
 
 class Choice:
     def __init__(self, text, callback, name = None, values = None, valueIndex = 0, append_submenu_char = True, tipText = None):
@@ -399,7 +400,7 @@ class Menu(Layer, KeyListener):
 
             if self.graphicMenu and self.menuBackground:
                 #volshebnyi - better menu scaling
-                self.engine.drawImage(self.menuBackground, scale = (1.0,-1.0), coord = (wS/2,hS/2), stretched = FULL_SCREEN)
+                drawImage(self.menuBackground, scale = (1.0,-1.0), coord = (wS/2,hS/2), stretched = FULL_SCREEN)
             else:
                 glEnable(GL_BLEND)
                 glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
@@ -415,7 +416,7 @@ class Menu(Layer, KeyListener):
                     else:
                         xpos = (0,.5)
                     ypos = float(i+self.viewOffset)
-                    self.engine.drawImage(self.menuText, scale = (.5*self.menuScale,(-1.0/n*self.menuScale)),
+                    drawImage(self.menuText, scale = (.5*self.menuScale,(-1.0/n*self.menuScale)),
                                           coord = (wS*self.menux,(hS*self.menuy)-(hS*self.vSpace)*i),
                                           rect = (xpos[0],xpos[1],ypos/n,(ypos+1.0)/n), stretched = KEEP_ASPECT | FIT_WIDTH)
                 else:
@@ -480,7 +481,7 @@ class Menu(Layer, KeyListener):
                         Tw, Th = font.getStringSize(text,scale)
                         boxXOffset = (x + (Tw/2))*wS
                         boxYOffset = (1.0 - (y*4.0/3.0) - (Th*1.2/2))*hS
-                        self.engine.drawImage(self.engine.data.submenuSelect,
+                        drawImage(self.engine.data.submenuSelect,
                                               scale = (tempWScale,tempHScale), #FIXME
                                               coord = (boxXOffset,boxYOffset))
 

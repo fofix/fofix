@@ -41,6 +41,7 @@ from configuration import Config
 from util import Log
 
 from graphics.VideoPlayer import VideoLayer, VideoPlayerError
+from graphics.Image import drawImage
 
 from constants import *
 
@@ -94,7 +95,7 @@ class Picture(Element):
     def render(self, offset):
         offset = (offset*4.0)/3.0  #stump: get it back into alignment...
         w, h = self.engine.view.geometry[2:4]
-        self.engine.drawImage(self.drawing, scale = (1, -1),
+        drawImage(self.drawing, scale = (1, -1),
                               coord = (.5 * w, h - (.5 * self.height + offset) * h * float(w) / float(h)))
 
 # evilynux - Updated to latest MFH-Alarian mod. Alot changed compared to upstream FoF.
@@ -357,7 +358,7 @@ class Credits(Layer, KeyListener):
 
         with self.engine.view.orthogonalProjection(normalize = True):
             if self.background:
-                self.engine.drawImage(self.background, scale = (1.0,-1.0), coord = (w/2,h/2), stretched = FULL_SCREEN)
+                drawImage(self.background, scale = (1.0,-1.0), coord = (w/2,h/2), stretched = FULL_SCREEN)
             else:
                 self.engine.fadeScreen(.4)
             self.doneList = []
@@ -379,4 +380,4 @@ class Credits(Layer, KeyListener):
                 hPos = h - ((self.topLayer.height1() * wFactor)*.75)
                 if hPos < h * .6:
                     hPos = h * .6
-                self.engine.drawImage(self.topLayer, scale = (wFactor,-wFactor), coord = (w/2,hPos))
+                drawImage(self.topLayer, scale = (wFactor,-wFactor), coord = (w/2,hPos))

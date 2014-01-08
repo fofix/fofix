@@ -32,6 +32,7 @@ from views.GuitarScene.Neck import Neck
 from Instrument import Instrument
 from graphics.Shader import shaders
 from graphics.Mesh import Mesh
+from graphics.Image import draw3Dtex
 from game.Song import Note, Tempo
 from OpenGL.GL import *
 from game import Song
@@ -273,7 +274,7 @@ class Drum(Instrument):
                     noteImage = self.noteButtons
                     texCoord = self.noteTexCoord[y][fret]
 
-            self.engine.draw3Dtex(noteImage, vertex = vtx, texcoord = texCoord,
+            draw3Dtex(noteImage, vertex = vtx, texcoord = texCoord,
                                   scale = (1,1,1), rot = (self.camAngle,1,0,0), multiples = False, color = color)
 
         else: #3d Notes
@@ -416,7 +417,7 @@ class Drum(Instrument):
                         else:
                             texY = (0.0, 1.0 / self.fretImgColNumber)
 
-                self.engine.draw3Dtex(self.fretButtons, vertex = (size[0],size[1],-size[0],-size[1]), texcoord = (texSize[0], texY[0], texSize[1], texY[1]),
+                draw3Dtex(self.fretButtons, vertex = (size[0],size[1],-size[0],-size[1]), texcoord = (texSize[0], texY[0], texSize[1], texY[1]),
                                         coord = (x,v,0), multiples = True,color = fretColor, depth = True)
 
             else:
@@ -493,7 +494,7 @@ class Drum(Instrument):
                             else: #Default starcolor (Rockband)
                                 flamecol = (.1,.1,.1)
                         if self.disableFlameSFX != True:
-                            self.engine.draw3Dtex(self.hitflames2Drawing, coord = (x, y + .20, 0), rot = (90, 1, 0, 0),
+                            draw3Dtex(self.hitflames2Drawing, coord = (x, y + .20, 0), rot = (90, 1, 0, 0),
                                                   scale = (.25 + .6 * ms * ff, self.freestyleHitFlameCounts[fretNum]/6.0 + .6 * ms * ff, self.freestyleHitFlameCounts[fretNum] / 6.0 + .6 * ms * ff),
                                                   vertex = (-flameSize * ff,-flameSize * ff,flameSize * ff,flameSize * ff),
                                                   texcoord = (0.0,0.0,1.0,1.0), multiples = True, alpha = True, color = flamecol)
@@ -505,7 +506,7 @@ class Drum(Instrument):
                             else: #Default starcolor (Rockband)
                                 flamecol = (.1,.1,.1)
                         if self.disableFlameSFX != True:
-                            self.engine.draw3Dtex(self.hitflames2Drawing, coord = (x - .005, y + .25 + .005, 0), rot = (90, 1, 0, 0),
+                            draw3Dtex(self.hitflames2Drawing, coord = (x - .005, y + .25 + .005, 0), rot = (90, 1, 0, 0),
                                                   scale = (.30 + .6 * ms * ff, (self.freestyleHitFlameCounts[fretNum] + 1) / 5.5 + .6 * ms * ff, (self.freestyleHitFlameCounts[fretNum] + 1) / 5.5 + .6 * ms * ff),
                                                   vertex = (-flameSize * ff,-flameSize * ff,flameSize * ff,flameSize * ff),
                                                   texcoord = (0.0,0.0,1.0,1.0), multiples = True, alpha = True, color = flamecol)
@@ -518,7 +519,7 @@ class Drum(Instrument):
                                 #flamecol = glColor3f(.2,.2,.2)
                                 flamecol = (.2,.2,.2)
                         if self.disableFlameSFX != True:
-                            self.engine.draw3Dtex(self.hitflames2Drawing, coord = (x+.005, y +.25 +.005, 0), rot = (90, 1, 0, 0),
+                            draw3Dtex(self.hitflames2Drawing, coord = (x+.005, y +.25 +.005, 0), rot = (90, 1, 0, 0),
                                                   scale = (.35 + .6 * ms * ff, (self.freestyleHitFlameCounts[fretNum] + 1) / 5.0 + .6 * ms * ff, (self.freestyleHitFlameCounts[fretNum] + 1) / 5.0 + .6 * ms * ff),
                                                   vertex = (-flameSize * ff,-flameSize * ff,flameSize * ff,flameSize * ff),
                                                   texcoord = (0.0,0.0,1.0,1.0), multiples = True, alpha = True, color = flamecol)
@@ -530,7 +531,7 @@ class Drum(Instrument):
                             else: #Default starcolor (Rockband)
                                 flamecol = (.3,.3,.3)
                         if self.disableFlameSFX != True:
-                            self.engine.draw3Dtex(self.hitflames2Drawing, coord = (x, y +.25 +.005, 0), rot = (90, 1, 0, 0),
+                            draw3Dtex(self.hitflames2Drawing, coord = (x, y +.25 +.005, 0), rot = (90, 1, 0, 0),
                                                   scale = (.40 + .6 * ms * ff, (self.freestyleHitFlameCounts[fretNum] + 1)/ 4.7 + .6 * ms * ff, (self.freestyleHitFlameCounts[fretNum] + 1) / 4.7 + .6 * ms * ff),
                                                   vertex = (-flameSize * ff,-flameSize * ff,flameSize * ff,flameSize * ff),
                                                   texcoord = (0.0,0.0,1.0,1.0), multiples = True, alpha = True, color = flamecol)
@@ -543,7 +544,7 @@ class Drum(Instrument):
 
                         #MFH - hit lightning logic is not needed for freestyle flames...
                         if self.disableFlameSFX != True:
-                            self.engine.draw3Dtex(self.hitflames1Drawing, coord = (x, y + .35, 0), rot = (90, 1, 0, 0),
+                            draw3Dtex(self.hitflames1Drawing, coord = (x, y + .35, 0), rot = (90, 1, 0, 0),
                                                   scale = (.25 + .6 * ms * ff, self.freestyleHitFlameCounts[fretNum] / 3.0 + .6 * ms * ff, self.freestyleHitFlameCounts[fretNum] / 3.0 + .6 * ms * ff),
                                                   vertex = (-flameSize * ff,-flameSize * ff,flameSize * ff,flameSize * ff),
                                                   texcoord = (0.0,0.0,1.0,1.0), multiples = True, alpha = True, color = flamecol)
@@ -560,7 +561,7 @@ class Drum(Instrument):
                             else: #Default starcolor (Rockband)
                                 flamecol = (.5,.5,.5)
                         if self.disableFlameSFX != True:
-                            self.engine.draw3Dtex(self.hitflames1Drawing, coord = (x - .005, y + .40 + .005, 0), rot = (90, 1, 0, 0),
+                            draw3Dtex(self.hitflames1Drawing, coord = (x - .005, y + .40 + .005, 0), rot = (90, 1, 0, 0),
                                                   scale = (.30 + .6 * ms * ff, (self.freestyleHitFlameCounts[fretNum] + 1)/ 2.5 + .6 * ms * ff, (self.freestyleHitFlameCounts[fretNum] + 1) / 2.5 + .6 * ms * ff),
                                                   vertex = (-flameSize * ff,-flameSize * ff,flameSize * ff,flameSize * ff),
                                                   texcoord = (0.0,0.0,1.0,1.0), multiples = True, alpha = True, color = flamecol)
@@ -576,7 +577,7 @@ class Drum(Instrument):
                             else: #Default starcolor (Rockband)
                                 flamecol = (.6,.6,.6)
                         if self.disableFlameSFX != True:
-                            self.engine.draw3Dtex(self.hitflames1Drawing, coord = (x + .005, y + .35 + .005, 0), rot = (90, 1, 0, 0),
+                            draw3Dtex(self.hitflames1Drawing, coord = (x + .005, y + .35 + .005, 0), rot = (90, 1, 0, 0),
                                                   scale = (.35 + .6 * ms * ff, (self.freestyleHitFlameCounts[fretNum] + 1) / 2.0 + .6 * ms * ff, (self.freestyleHitFlameCounts[fretNum] + 1) / 2.0 + .6 * ms * ff),
                                                   vertex = (-flameSize * ff,-flameSize * ff,flameSize * ff,flameSize * ff),
                                                   texcoord = (0.0,0.0,1.0,1.0), multiples = True, alpha = True, color = flamecol)
@@ -592,7 +593,7 @@ class Drum(Instrument):
                             else: #Default starcolor (Rockband)
                                 flamecol = (.7,.7,.7)
                         if self.disableFlameSFX != True:
-                            self.engine.draw3Dtex(self.hitflames1Drawing, coord = (x + .005, y + .35 + .005, 0), rot = (90, 1, 0, 0),
+                            draw3Dtex(self.hitflames1Drawing, coord = (x + .005, y + .35 + .005, 0), rot = (90, 1, 0, 0),
                                                   scale = (.40 + .6 * ms * ff, (self.freestyleHitFlameCounts[fretNum] + 1) / 1.7 + .6 * ms * ff, (self.freestyleHitFlameCounts[fretNum] + 1) / 1.7 + .6 * ms * ff),
                                                   vertex = (-flameSize * ff,-flameSize * ff,flameSize * ff,flameSize * ff),
                                                   texcoord = (0.0,0.0,1.0,1.0), multiples = True, alpha = True, color = flamecol)
