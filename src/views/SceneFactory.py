@@ -21,17 +21,16 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,        #
 # MA  02110-1301, USA.                                              #
 #####################################################################
-
 import importlib
-import glob
 
 #dictionary of scenes
-scenes = [
-   "SongChoosingScene",
-   "GuitarScene",
-   "GuitarResultsScene",
-]
+sceneInfo = {
+   "SongChoosingScene": "views.SongChoosingScene",
+   "GuitarScene": "views.GuitarScene",
+   "GameResultsScene": "views.GameResultsScene",
+}
+scenes = sceneInfo.values()
 
 def create(engine, name, **args):
-    scene_name = importlib.import_module(".%s" % (name), "views")
+    scene_name = importlib.import_module(sceneInfo[name])
     return getattr(scene_name, name)(engine = engine, **args)
