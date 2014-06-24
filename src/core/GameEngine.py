@@ -63,6 +63,8 @@ from constants import *
 from graphics import cmgl
 from graphics.Image import drawImage
 
+from util.timer import FpsTimer
+
 # evilynux - Grab name and version from Version class.
 version = "%s v%s" % ( Version.PROGRAM_NAME, Version.version() )
 
@@ -193,7 +195,8 @@ class GameEngine(object):
         self.currentTask = None
         self.paused = []
         self.running = True
-        self.clock = pygame.time.Clock()
+        self.clock = FpsTimer()
+        self.tickDelta = 0
 
         self.title             = self.versionString
         self.restartRequested  = False
@@ -213,7 +216,6 @@ class GameEngine(object):
             self.video.disableScreensaver()
 
         self.audio             = Audio()
-        self.frames            = 0
         self.fpsEstimate       = 0
         self.priority          = self.config.get("engine", "highpriority")
         self.show_fps          = self.config.get("video", "show_fps")
@@ -641,30 +643,27 @@ class GameEngine(object):
         if self.debugLayer:
             self.debugLayer.render(1.0, True)
         self.video.flip()
-        # evilynux - Estimate the rendered frames per second.
-        self.frames = self.frames+1
-        # Estimate every 120 frames when highpriority is True.
-        # Estimate every 2*config.fps when highpriority is False,
-        # if you are on target, that should be every 2 seconds.
-        if( not self.priority and self.frames == (self.fps << 1) ) or ( self.priority and self.frames == 120 ):
-            self.fpsEstimate = self.clock.get_fps()
+
+        # Calculate FPS every 2 seconds
+        if self.clock.fpsTime >= 2000:
             # evilynux - Printing on the console with a frozen binary may cause a crash.
+            self.fpsEstimate = self.clock.get_fps()
             if self.show_fps and not Version.isWindowsExe():
                 print("%.2f fps" % self.fpsEstimate)
-            self.frames = 0
         return done
 
     def doRun(self):
         """Run one cycle of the task scheduler engine."""
         if not self.frameTasks and not self.tasks:
             return False
+            
+        self.tickDelta = self.clock.tick()
 
         for task in self.frameTasks:
             self._runTask(task)
-        tick = self.clock.get_time()
         for task in self.tasks:
-            self._runTask(task, tick)
-        self.clock.tick(self.fps)
+            self._runTask(task, self.tickDelta)
+        self.clock.delay(self.fps)
         return True
 
     def run(self):

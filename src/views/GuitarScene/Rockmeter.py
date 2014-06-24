@@ -475,7 +475,7 @@ class IncrementEffect(Effect):
     #gets the rate at which time is passing, usable in finding the rates of things in
     #terms of milliseconds instead of frames
     def getTime(self, time):
-        t = time * (max(self.engine.clock.get_fps(), _minFPS)) / 1000.0
+        t = time * (max(1000.0/self.engine.tickDelta, _minFPS)) / 1000.0
         return max(t, 1.0)
 
     #updates the rates at which values between start and end should change to reach
