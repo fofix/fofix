@@ -2,7 +2,7 @@
 # -*- coding: iso-8859-1 -*-                                        #
 #                                                                   #
 # Frets on Fire X                                                   #
-# Copyright (C) 2006 Sami Ky�stil�                                  #
+# Copyright (C) 2006 Sami Kyöstilä                                  #
 #               2008 rchiav                                         #
 #               2009 Team FoFiX                                     #
 #               2009 akedrou                                        #

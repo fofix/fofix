@@ -3,7 +3,7 @@
 #                                                                   #
 # FoFiX                                                             #
 # Copyright (C) 2009 Team FoFiX                                     #
-#               2006 Sami Ky�stil�                                  #
+#               2006 Sami Kyöstilä                                  #
 #                                                                   #
 # This program is free software; you can redistribute it and/or     #
 # modify it under the terms of the GNU General Public License       #

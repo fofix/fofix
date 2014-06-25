@@ -2,7 +2,7 @@
 # -*- coding: iso-8859-1 -*-                                        #
 #                                                                   #
 # Frets on Fire                                                     #
-# Copyright (C) 2006 Sami Ky�stil�                                  #
+# Copyright (C) 2006 Sami Kyöstilä                                  #
 #                                                                   #
 # This program is free software; you can redistribute it and/or     #
 # modify it under the terms of the GNU General Public License       #

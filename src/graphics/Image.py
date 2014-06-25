@@ -2,7 +2,7 @@
 # -*- coding: iso-8859-1 -*-                                        #
 #                                                                   #
 # Frets on Fire X                                                   #
-# Copyright (C) 2006 Sami Ky�stil�                                  #
+# Copyright (C) 2006 Sami Kyöstilä                                  #
 #               2008 myfingershurt                                  #
 #               2008 evilynux <evilynux@gmail.com>                  #
 #                                                                   #
