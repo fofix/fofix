@@ -120,7 +120,8 @@ class Main():
         self.init_oneshot()
 
         self.videoLayer = False
-        
+        self.restartRequested = False
+
     @staticmethod
     def load_config(configPath):
         ''' Load the configuration file. '''
@@ -186,35 +187,7 @@ class Main():
     def restart(self):
         Log.notice("Restarting.")
         self.engine.audio.close()
-        try:
-            # Extra arguments to insert between the executable we call and our
-            # command line arguments.
-            args = []
-            # Figure out what executable to call.
-            if hasattr(sys, "frozen"):
-                if os.name == "nt":
-                    # When py2exe'd, sys.executable is the name of the EXE.
-                    exe = os.path.abspath(unicode(sys.executable, sys.getfilesystemencoding()))
-                elif sys.frozen == "macosx_app":
-                    # When py2app'd, sys.executable is a Python interpreter copied
-                    # into the same dir where we live.
-                    exe = os.path.join(os.path.dirname(sys.executable), 'FoFiX')  # FIXME: don't hard-code "FoFiX" here
-                else:
-                    raise RuntimeError, "Don't know how to restart when sys.frozen is %s" % repr(sys.frozen)
-            else:
-                # When running from source, sys.executable is the Python interpreter
-                # being used to run the program.
-                exe = sys.executable
-                # Pass the optimization level on if python version >= 2.6.0 as
-                # sys.flags has been introduced in 2.6.0.
-                if sys.version_info[:3] >= (2,6,0) and sys.flags.optimize > 0:
-                    args.append('-%s' % ('O' * sys.flags.optimize))
-                args.append(sys.argv[0])
-            os.execv(exe, [sys.executable] + args + sys.argv[1:])
-        except:
-            Log.error("Restart failed: ")
-            raise
-
+        self.restartRequested = True
 
     def run(self):
 
@@ -258,8 +231,12 @@ class Main():
 
 if __name__ == '__main__':
     try:
-        main = Main()
-        main.run()
+        while True:
+            main = Main()
+            main.run()
+            if not main.restartRequested:
+                break
+
     except (KeyboardInterrupt, SystemExit):
         raise
     except:
