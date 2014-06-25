@@ -26,22 +26,18 @@
 '''
 Main game executable.
 '''
-
-# So we can enable pyOpenGL error checking if asked to.
-import getopt
+import argparse
 import sys
 import os
-import Version
 
 # Add the directory of DLL dependencies to the PATH if we're running
 # from source on Windows so we pick them up when those bits are imported.
 if os.name == 'nt' and not hasattr(sys, 'frozen'):
     os.environ['PATH'] = os.path.abspath(os.path.join('..', 'win32', 'deps', 'bin')) + os.pathsep + os.environ['PATH']
 
-#stump: disable pyOpenGL error checking if we are not asked for it.
-# This must be before *anything* that may import pyOpenGL!
-assert 'OpenGL' not in sys.modules
-if '--opengl-error-checking' not in sys.argv:
+def disable_gl_checks():
+    assert 'OpenGL' not in sys.modules
+    
     import OpenGL
     if OpenGL.__version__ >= '3':
         OpenGL.ERROR_CHECKING = False
@@ -51,6 +47,37 @@ if '--opengl-error-checking' not in sys.argv:
         OpenGL.SIZE_1_ARRAY_UNPACK = False
         OpenGL.STORE_POINTERS = False
 
+def cmd_args():
+    parser = argparse.ArgumentParser(description='Frets On Fire X (FoFiX)')
+    # Where the name automatically assigned to the metavar option is to long i used x in its place.
+    # Might go back and 
+    options = parser.add_argument_group('Options')
+    options.add_argument('-r', '--resolution', type=str,  metavar='x',    help='Force a specific resolution to be used.')
+    options.add_argument('-f', '--fullscreen',  action='store_true',       help='Force usage of full-screen mode.')
+    options.add_argument('-c', '--config',     type=str,  metavar='x',     help='Use this configuration file instead of the fofix.ini in its default location.  Use "reset" to use the usual fofix.ini but clear it first.')
+    options.add_argument('-t', '--theme',      type=str,  metavar='x', help='Force the specified theme to be used. Remember to quote the theme name if it contains spaces (e.g. %(prog)s -t "Guitar Hero III")')
+    options.add_argument('-s', '--song',       type=str,                  help='Play a song in one-shot mode. (See "One-shot mode options" below.)')
+
+    osm = parser.add_argument_group('One-Shot Mode')
+    osm.add_argument('-p', '--part',    type=int, help='0: Guitar, 1: Rhythm, 2: Bass, 3: Lead')
+    osm.add_argument('-d', '--diff',    type=int, help='0: Expert, 1: Hard, 2: Medium, 3: Easy (Only applies if "part" is set)')
+    osm.add_argument('-m', '--mode',    type=int, help='0: Quickplay, 1: Practice, 2: Career')
+    osm.add_argument('-n', '--players', type=int, help='Number of multiplayer players.')
+
+    adv = parser.add_argument_group('Advanced')
+    adv.add_argument('-v', '--verbose',        action='store_true', help='Verbose messages')
+    adv.add_argument('-g', '--gl-error-check', action='store_true', help='Enable OpenGL error checking.')
+
+    return vars(parser.parse_args())
+
+args = cmd_args()
+
+#stump: disable pyOpenGL error checking if we are not asked for it.
+# This must be before *anything* that may import pyOpenGL!
+if args['gl_error_check']:
+    disable_gl_checks()
+
+import Version
 from util import Log, VFS
 from configuration import Config
 from core.GameEngine import GameEngine
@@ -61,86 +88,18 @@ import traceback
 from graphics.VideoPlayer import VideoLayer, VideoPlayerError
 
 
-def _usage(errmsg=None):
-    usage = """Usage: %(prog)s [options]
-
-Options:
-  --help,    -h                       Show this help.
-  --config=, -c [configfile]          Use this configuration file instead of
-                                      fofix.ini from its standard location on
-                                      your platform.  Use "reset" to use the
-                                      usual fofix.ini but clear it first.
-  --fullscreen=, -f [true/false]      Force (non-)usage of full-screen mode.
-  --resolution=, -r [resolution]      Force a specific resolution to be used.
-  --theme=,  -t [theme]               Force the specified theme to be used.
-                                      Remember to quote the theme name if it
-                                      contains spaces (e.g.
-                                        %(prog)s -t "Guitar Hero III")
-  --song=,   -s [songdir]             Play a song in one-shot mode.
-                                      (See "One-shot mode options" below.)
-
-Advanced options:
-  --verbose, -v                       Verbose messages
-  --opengl-error-checking             Enable OpenGL error checking
-
-One-shot mode options (ignored unless in one-shot mode):
-  --part=,   -p [part number]         0: Guitar, 1: Rhythm, 2: Bass, 3: Lead
-                                      4: Drum,   5: Vocals
-  --diff=,   -d [difficulty]          0: Expert, 1: Hard, 2: Medium, 3: Easy
-                                      (Only applies if "part" is set)
-  --mode=,   -m [game mode]           0: Quickplay, 1: Practice, 2: Career
-""" % {"prog": sys.argv[0]}
-    if errmsg is not None:
-        usage = '%s: %s\n\n%s' % (sys.argv[0], errmsg, usage)
-    if hasattr(sys, 'frozen') and os.name == 'nt':
-        import win32api
-        import win32con
-        win32api.MessageBox(0, usage, '%s %s' % (Version.PROGRAM_NAME, Version.version()), win32con.MB_OK)
-    else:
-        print usage
-    sys.exit(1)
-
-
 def main():
-    try:
-        opts, args = getopt.getopt(sys.argv[1:], "hvc:f:r:t:s:p:l:d:m:n:", ["help", "verbose", "config=", "fullscreen=", "resolution=", "theme=", "song=", "part=", "diff=", "mode=", "nbrplayers=", "opengl-error-checking"])
-    except getopt.GetoptError, e:
-        _usage(str(e))  # str(e): error message from getopt, e.g. "option --some-invalid-option not recognized"
+    global args
 
-    playing = None
-    configFile = None
-    fullscreen = None
-    resolution = None
-    theme = None
-    difficulty = None
-    part = None
-    mode = 0
-    nbrplayers = 1
-
-    for opt, arg in opts:
-        if opt in ["--help", "-h"]:
-            _usage()
-        if opt in ["--verbose", "-v"]:
-            Log.quiet = False
-        if opt in ["--config", "-c"]:
-            configFile = arg
-        if opt in ["--fullscreen", "-f"]:
-            fullscreen = arg
-        if opt in ["--resolution", "-r"]:
-            resolution = arg
-        if opt in ["--theme", "-t"]:
-            theme = arg
-        if opt in ["--song", "-s"]:
-            playing = arg
-        if opt in ["--part", "-p"]:
-            part = arg
-        if opt in ["--diff", "-d", "-l"]:
-            difficulty = arg
-        #evilynux - Multiplayer and mode selection support
-        if opt in ["--mode", "-m"]:
-            mode = int(arg)
-        if opt in ["--nbrplayers", "-n"]:
-            nbrplayers = int(arg)
+    playing = args['song']
+    configFile = args['config']
+    fullscreen = args['fullscreen']
+    resolution = args['resolution']
+    theme = args['theme']
+    diff = args['diff']
+    part = args['part']
+    mode = args['mode']
+    players = args['players']
 
     # Load the configuration file.
     if configFile is not None:
@@ -183,15 +142,15 @@ def main():
         Log.debug('Entering one-shot mode.')
         Config.set("setlist", "selected_song", playing)
         engine.cmdPlay = 1
-        if difficulty is not None:
-            engine.cmdDiff = int(difficulty)
+        if diff is not None:
+            engine.cmdDiff = int(diff)
         if part is not None:
             engine.cmdPart = int(part)
         #evilynux - Multiplayer and mode selection support
-        if nbrplayers == 1:
-            engine.cmdMode = nbrplayers, mode, 0
+        if players == 1:
+            engine.cmdMode = players, mode, 0
         else:
-            engine.cmdMode = nbrplayers, 0, mode
+            engine.cmdMode = players, 0, mode
 
     # Play the intro video if it is present, we have the capability, and
     # we are not in one-shot mode.
@@ -279,6 +238,7 @@ if __name__ == '__main__':
           _("The log file already includes the traceback given above."))
 
         if os.name == 'nt':
+            # If we move to PySDL2 we can replace this with a call to SDL_ShowSimpleMessageBox
             import win32api
             import win32con
             if win32api.MessageBox(0, "%s\n\n%s" % (_errmsg, _("Open the logfile now?")), "%s %s" % (Version.PROGRAM_NAME, Version.version()), win32con.MB_YESNO|win32con.MB_ICONSTOP) == win32con.IDYES:
