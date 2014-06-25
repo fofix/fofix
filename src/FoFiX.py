@@ -86,6 +86,7 @@ from core.Language import _
 import pygame
 import traceback
 from graphics.VideoPlayer import VideoLayer, VideoPlayerError
+
 class Main():
     def __init__(self):
         global args
@@ -146,6 +147,7 @@ class Main():
 
     def init_oneshot(self):
         ''' Determine if oneshot mode is valid. '''
+        # I think this code can be moved elsewhere...
         self.engine.cmdPlay = 0
 
         # Check for a valid invocation of one-shot mode.
@@ -191,6 +193,7 @@ class Main():
 
     def run(self):
 
+        # Perhapse this could be implemented in a better way...
         # Play the intro video if it is present, we have the capability, and
         # we are not in one-shot mode.
         if not self.engine.cmdPlay:
@@ -231,6 +234,7 @@ class Main():
 
 if __name__ == '__main__':
     try:
+        # This loop restarts the game if a restart is requested
         while True:
             main = Main()
             main.run()
