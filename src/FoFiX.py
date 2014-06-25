@@ -86,109 +86,106 @@ from core.Language import _
 import pygame
 import traceback
 from graphics.VideoPlayer import VideoLayer, VideoPlayerError
+class Main():
+    def __init__(self):
+        global args
+        self.args = args
 
+        self.playing = self.args['song']
+        self.configFile = self.args['config']
+        self.fullscreen = self.args['fullscreen']
+        self.resolution = self.args['resolution']
+        self.theme = self.args['theme']
+        self.diff = self.args['diff']
+        self.part = self.args['part']
+        self.mode = self.args['mode']
+        self.players = self.args['players']
 
-def main():
-    global args
+        self.config = self.load_config(self.configFile)
 
-    playing = args['song']
-    configFile = args['config']
-    fullscreen = args['fullscreen']
-    resolution = args['resolution']
-    theme = args['theme']
-    diff = args['diff']
-    part = args['part']
-    mode = args['mode']
-    players = args['players']
+        #Lysdestic - Allow support for manipulating fullscreen via CLI
+        if self.fullscreen is not None:
+            Config.set("video", "fullscreen", self.fullscreen)
 
-    # Load the configuration file.
-    if configFile is not None:
-        if configFile.lower() == "reset":
-            fileName = os.path.join(VFS.getWritableResourcePath(), Version.PROGRAM_UNIXSTYLE_NAME + ".ini")
-            os.remove(fileName)
-            config = Config.load(Version.PROGRAM_UNIXSTYLE_NAME + ".ini", setAsDefault = True)
-        else:
-            config = Config.load(configFile, setAsDefault = True)
-    else:
-        config = Config.load(Version.PROGRAM_UNIXSTYLE_NAME + ".ini", setAsDefault = True)
+        #Lysdestic - Change resolution from CLI
+        if self.resolution is not None:
+            Config.set("video", "resolution", self.resolution)
 
-    #Lysdestic - Allow support for manipulating fullscreen via CLI
-    if fullscreen is not None:
-        Config.set("video", "fullscreen", fullscreen)
+        #Lysdestic - Alter theme from CLI
+        if self.theme is not None:
+            Config.set("coffee", "themename", self.theme)
 
-    #Lysdestic - Change resolution from CLI
-    if resolution is not None:
-        Config.set("video", "resolution", resolution)
+        self.engine = GameEngine(self.config)
 
-    #Lysdestic - Alter theme from CLI
-    if theme is not None:
-        Config.set("coffee", "themename", theme)
+        self.init_oneshot()
 
-    engine = GameEngine(config)
-    engine.cmdPlay = 0
+        self.videoLayer = False
+        
+    @staticmethod
+    def load_config(configPath):
+        ''' Load the configuration file. '''
+        if configPath is not None:
+            if configPath.lower() == "reset":
 
-    # Check for a valid invocation of one-shot mode.
-    if playing is not None:
-        Log.debug('Validating song directory for one-shot mode.')
-        library = Config.get("setlist","base_library")
-        basefolder = os.path.join(Version.dataPath(),library,"songs",playing)
-        if not (os.path.exists(os.path.join(basefolder, "song.ini")) and (os.path.exists(os.path.join(basefolder, "notes.mid")) or os.path.exists(os.path.join(basefolder, "notes-unedited.mid"))) and (os.path.exists(os.path.join(basefolder, "song.ogg")) or os.path.exists(os.path.join(basefolder, "guitar.ogg")))):
-            Log.warn("Song directory provided ('%s') is not a valid song directory. Starting up FoFiX in standard mode." % playing)
-            engine.startupMessages.append(_("Song directory provided ('%s') is not a valid song directory. Starting up FoFiX in standard mode.") % playing)
-            playing = None
+                # Get os specific location of config file, and remove it.
+                fileName = os.path.join(VFS.getWritableResourcePath(), Version.PROGRAM_UNIXSTYLE_NAME + ".ini")
+                os.remove(fileName)
 
-    # Set up one-shot mode if the invocation is valid for it.
-    if playing is not None:
-        Log.debug('Entering one-shot mode.')
-        Config.set("setlist", "selected_song", playing)
-        engine.cmdPlay = 1
-        if diff is not None:
-            engine.cmdDiff = int(diff)
-        if part is not None:
-            engine.cmdPart = int(part)
-        #evilynux - Multiplayer and mode selection support
-        if players == 1:
-            engine.cmdMode = players, mode, 0
-        else:
-            engine.cmdMode = players, 0, mode
+                # Recreate it
+                config = Config.load(Version.PROGRAM_UNIXSTYLE_NAME + ".ini", setAsDefault = True)
 
-    # Play the intro video if it is present, we have the capability, and
-    # we are not in one-shot mode.
-    videoLayer = False
-    if not engine.cmdPlay:
-        themename = Config.get("coffee", "themename")
-        vidSource = os.path.join(Version.dataPath(), 'themes', themename, \
-                                 'menu', 'intro.ogv')
-        if os.path.isfile(vidSource):
-            try:
-                vidPlayer = VideoLayer(engine, vidSource, cancellable=True)
-            except (IOError, VideoPlayerError):
-                Log.error("Error loading intro video:")
             else:
-                vidPlayer.play()
-                engine.view.pushLayer(vidPlayer)
-                videoLayer = True
-                engine.ticksAtStart = pygame.time.get_ticks()
-                while not vidPlayer.finished:
-                    engine.run()
-                engine.view.popLayer(vidPlayer)
-                engine.view.pushLayer(MainMenu(engine))
-    if not videoLayer:
-        engine.setStartupLayer(MainMenu(engine))
+                # Load specified config file
+                config = Config.load(configPath, setAsDefault = True)
+        else:
+            # Use default configuration file
+            config = Config.load(Version.PROGRAM_UNIXSTYLE_NAME + ".ini", setAsDefault = True)
 
-    # Run the main game loop.
-    try:
-        engine.ticksAtStart = pygame.time.get_ticks()
-        while engine.run():
-            pass
-    except KeyboardInterrupt:
-        Log.notice("Left mainloop due to KeyboardInterrupt.")
-        # don't reraise
+        return config
 
-    # Restart the program if the engine is asking that we do so.
-    if engine.restartRequested:
+    def init_oneshot(self):
+        ''' Determine if oneshot mode is valid. '''
+        self.engine.cmdPlay = 0
+
+        # Check for a valid invocation of one-shot mode.
+        if self.playing is not None:
+            Log.debug('Validating song directory for one-shot mode.')
+
+            library = Config.get("setlist","base_library")
+            basefolder = os.path.join(Version.dataPath(),library,"songs",self.playing)
+
+
+            if not os.path.exists(os.path.join(basefolder, "song.ini")):
+
+                if not (os.path.exists(os.path.join(basefolder, "notes.mid")) or
+                        os.path.exists(os.path.join(basefolder, "notes-unedited.mid"))):
+
+                    if not (os.path.exists(os.path.join(basefolder, "song.ogg")) or
+                            os.path.exists(os.path.join(basefolder, "guitar.ogg"))):
+
+                        Log.warn("Song directory provided ('%s') is not a valid song directory. Starting up FoFiX in standard mode." % self.playing)
+                        self.engine.startupMessages.append(_("Song directory provided ('%s') is not a valid song directory. Starting up FoFiX in standard mode.") % self.playing)
+                        return
+
+            # Set up one-shot mode
+            Log.debug('Entering one-shot mode.')
+            Config.set("setlist", "selected_song", playing)
+
+            self.engine.cmdPlay = 1
+
+            if diff is not None:
+                self.engine.cmdDiff = int(diff)
+            if part is not None:
+                self.engine.cmdPart = int(part)
+
+            if players == 1:
+                self.engine.cmdMode = players, mode, 0
+            else:
+                self.engine.cmdMode = players, 0, mode
+
+    def restart(self):
         Log.notice("Restarting.")
-        engine.audio.close()
+        self.engine.audio.close()
         try:
             # Extra arguments to insert between the executable we call and our
             # command line arguments.
@@ -218,13 +215,51 @@ def main():
             Log.error("Restart failed: ")
             raise
 
-    # evilynux - MainMenu class already calls this - useless?
-    engine.quit()
 
+    def run(self):
+
+        # Play the intro video if it is present, we have the capability, and
+        # we are not in one-shot mode.
+        if not self.engine.cmdPlay:
+            themename = Config.get("coffee", "themename")
+            vidSource = os.path.join(Version.dataPath(), 'themes', themename, 'menu', 'intro.ogv')
+            if os.path.isfile(vidSource):
+                try:
+                    vidPlayer = VideoLayer(self.engine, vidSource, cancellable=True)
+                except (IOError, VideoPlayerError):
+                    Log.error("Error loading intro video:")
+                else:
+                    vidPlayer.play()
+                    self.engine.view.pushLayer(vidPlayer)
+                    self.videoLayer = True
+                    self.engine.ticksAtStart = pygame.time.get_ticks()
+                    while not vidPlayer.finished:
+                        self.engine.run()
+                    self.engine.view.popLayer(vidPlayer)
+                    self.engine.view.pushLayer(MainMenu(self.engine))
+        if not self.videoLayer:
+            self.engine.setStartupLayer(MainMenu(self.engine))
+
+        # Run the main game loop.
+        try:
+            self.engine.ticksAtStart = pygame.time.get_ticks()
+            while self.engine.run():
+                pass
+        except KeyboardInterrupt:
+            Log.notice("Left mainloop due to KeyboardInterrupt.")
+            # don't reraise
+
+        # Restart the program if the engine is asking that we do so.
+        if self.engine.restartRequested:
+            self.restart()
+
+        # evilynux - MainMenu class already calls this - useless?
+        self.engine.quit()
 
 if __name__ == '__main__':
     try:
-        main()
+        main = Main()
+        main.run()
     except (KeyboardInterrupt, SystemExit):
         raise
     except:
