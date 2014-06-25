@@ -27,15 +27,6 @@
 Main game executable.
 '''
 
-# Register the latin-1 encoding
-import codecs
-import encodings.iso8859_1
-import encodings.utf_8
-codecs.register(lambda encoding: encodings.iso8859_1.getregentry())
-codecs.register(lambda encoding: encodings.utf_8.getregentry())
-assert codecs.lookup("iso-8859-1")
-assert codecs.lookup("utf-8")
-
 # So we can enable pyOpenGL error checking if asked to.
 import getopt
 import sys
