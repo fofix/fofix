@@ -2,7 +2,7 @@
 # -*- coding: iso-8859-1 -*-                                        #
 #                                                                   #
 # Frets on Fire                                                     #
-# Copyright (C) 2006 Sami Kyöstilä                                  #
+# Copyright (C) 2006 Sami Ky�stil�                                  #
 #               2008 Alarian                                        #
 #               2008 myfingershurt                                  #
 #               2008 Glorandwarf                                    #
@@ -47,13 +47,13 @@ BASS_GROOVE_SCORE_MULTIPLIER = [0, 10, 20, 30, 40, 50]
 
 #like Guitar Hero
 GH_STAR_VALUES = [0.0, 0.2, 0.4, 1.2, 2.0, 2.8]
-        
+
 #like Rockband
 RB_STAR_VALUES = [0.0, 0.21, 0.46, 0.77, 1.85, 3.08, 4.52]
 RB_BASS_STAR_VALUES = [0.0, 0.21, 0.5, 0.9, 2.77, 4.62, 6.78]
 RB_DRUM_STAR_VALUES = [0.0, 0.21, 0.46, 0.77, 1.85, 3.08, 4.29]
 RB_VOC_STAR_VALUES = [0.0, 0.21, 0.46, 0.77, 1.85, 3.08, 4.18]
-                    
+
 #RB+GH mix
 MIX_STAR_VALUES = [0.0, 0.25, 0.5, 1.0, 2.0, 3.0, 5.3]
 MIX_BASS_STAR_VALUES = [0.0, 0.25, 0.5, 1.0, 2.0, 3.0, 4.8]
@@ -68,13 +68,13 @@ class ScoreCard(object):
         self.coOpType = coOpType            #does the score card belong to a CoOp system
         self.instrument = instrument        # 0 = Guitar, 2 = Bass, 4 = Drum
         self.bassGrooveEnabled = False      #is the player in bass groove
-        
+
         logClassInits = Config.get("game", "log_class_inits")
         if logClassInits == 1:
             Log.debug("ScoreCard class init...")
-            
-                                                                                
-        self.avMult = 0.0                   #vocal multiplier percentage 
+
+
+        self.avMult = 0.0                   #vocal multiplier percentage
         self.hitAccuracy = 0.0              #accuracy rating/delay
         self.score  = 0                     #player's score
         
@@ -89,11 +89,11 @@ class ScoreCard(object):
         self.notesMissed = 0                #number of notes missed
         self.hiStreak = 0                   #highest streak done by the player
         self.streak  = 0                    #current streak
-        
+
         self.totalStreakNotes = 0
         self.totalNotes = 0
         self.totalPercNotes = 0
-        
+
         #cheating/handicap system
         self.cheatsApply = False
         self.cheats = []                    
@@ -102,7 +102,7 @@ class ScoreCard(object):
         self.handicap = 0
         self.longHandicap  = ""
         self.handicapValue = 100.0
-        
+
         #star scoring
         self.starScoring = Config.get("game", "star_scoring")
                                             #star scoring type
@@ -110,7 +110,7 @@ class ScoreCard(object):
         self.stars = 0                      #current number of stars
         self.starRatio = 0.0                #percentage of how close the player is to the next star
         self.star = [0 for i in range(7)]   #keep track of values required to know when the player has hit the next star value
-        
+
         #figure out which star setting to use
         s = ""
         if self.starScoring == 1: #GH-style (mult thresholds, hit threshold for 5/6 stars)
@@ -120,7 +120,7 @@ class ScoreCard(object):
                 s += "RB"
             else:
                 s += "MIX"
-                
+
             if self.coOpType:
                 s += "_COOP"
             elif self.instrument[0] == Song.DRUM_PART:
@@ -132,9 +132,9 @@ class ScoreCard(object):
         else: #hit accuracy thresholds
             s += "FOF"
         s += "_STAR_VALUES"
-        
+
         self.star = globals()[s]
-        
+
         self.endingScore = 0
         self.endingStreakBroken = False
         self.endingAwarded = False          
@@ -213,7 +213,7 @@ class ScoreCard(object):
                 self.stars = 5
                 self.starRatio = 0
                 return 5
-        
+
         for i in range(4, -1, -1):
             if avMult >= self.star[i]:
                 part = avMult - self.star[i]
@@ -221,7 +221,7 @@ class ScoreCard(object):
                 self.stars = i
                 self.starRatio = partPct
                 return i
-        
+
     def updateAvMult(self):
         try:
             self.hitAccuracy = (float(self.notesHit) / float(self.totalStreakNotes) ) * 100.0
@@ -234,7 +234,7 @@ class ScoreCard(object):
                 self.avMult = self.score/float(self.totalNotes*self.baseScore)
         except ZeroDivisionError:
             self.avMult      = 1.0
-    
+
     def updateHandicapValue(self):
         self.handicapValue = 100.0
         slowdown = Config.get("audio","speed_factor")
@@ -252,16 +252,16 @@ class ScoreCard(object):
                         self.handicapValue *= earlyHitHandicap
                 else:
                     self.handicapValue *= HANDICAPS[j]
-    
+
     def getStreak(self):
         return self._streak
-        
+
     def setStreak(self, value):
         self._streak = value
         self.hiStreak = max(self._streak, self.hiStreak)
-    
+
     streak = property(getStreak, setStreak)
-    
+
     def addScore(self, score):
         self.score += score * self.getScoreMultiplier()
 
@@ -310,7 +310,7 @@ class RockmeterScoring(object):
         self.plusRock = _pluBase        #amount of rock to add when increasing
         self.player = player
         self.instrument = player.instrument
-        
+
     #starts the process
     def start(self):
         self.rock = _rockMax/2.0
@@ -321,23 +321,23 @@ class RockmeterScoring(object):
         self.percentage = .5
         self.minusRock = _minBase
         self.plusRock = _pluBase
-            
+
     #increases the player's rock
     def increaseRock(self, vScore = 0):
-        
+
         if self.instrument.isVocal:
             rockPlusAmt = 500 + (500 * (vScore-2))
             self.rock += rockPlusAmt
             return
-            
+
         if self.instrument.isDrum: 
             self.drumStart = True
-    
+
         self.plusRock = min(self.plusRock + _pluGain*self.mult, _pluMax)
         self.rock += self.plusRock
-                    
+
         self.minusRock = _minBase
-        
+
     #decreases the rock of the player
     #if they have a lot of missed notes it should take off more
     def decreaseRock(self, more = False, less = False, vScore = 0):
@@ -347,7 +347,7 @@ class RockmeterScoring(object):
             rockMinusAmount = 500 * (3 - vScore)
             self.rock -= rockMinusAmount
             return
-            
+
         if more:
             self.minusRock += _minGain/self.mult
             rockMinusAmount = self.minusRock/self.mult
@@ -367,23 +367,23 @@ class RockmeterScoring(object):
     def run(self):
         #locks the rockmeter so you can't go above/below the boundary values
         self.rock = min(max(self.rock, _rockMin), _rockMax)
-        
+
         self.inGreen = self.rock > _rockHi
         self.failing = self.rock < _rockLo
         self.failed = self.rock <= _rockMin
         self.percentage = self.rock/_rockMax
-        
+
         multMax = _multHi
         if self.instrument.isBassGuitar:
             multMax = _multBassHi
 
-        
+
         #starpower mult boost
         self.mult = self.player.scoreCard.getScoreMultiplier()
         if self.instrument.starPowerActive:
             self.mult *= 2
-        
-        
+
+
 _drainRate = 500000    #amount of microseconds that need to pass before it drains rock again
 
 #Different rockmeter for keeping track of coOp modes
@@ -403,7 +403,7 @@ class CoOpRockmeterScoring(RockmeterScoring):
         self.players = players
         self.drainTime = 0              #time in microseconds recorded to know when to 
                                         # drain from the rockmeter again
-        
+
     #starts the process
     def start(self):
         self.rock = _rockMax/2.0
@@ -413,20 +413,20 @@ class CoOpRockmeterScoring(RockmeterScoring):
         self.percentage = .5
         self.minusRock = _minBase
         self.plusRock = _pluBase
-            
+
     #increases the player's rock
     def increaseRock(self, vScore = 0):
     
         self.plusRock = min(self.plusRock + _pluGain*self.mult, _pluMax)
         self.rock += self.plusRock
-                    
+
         self.minusRock = _minBase
-        
+
     #decreases the rock of the player
     #if they have a lot of missed notes it should take off more
     def decreaseRock(self, more = False, less = False, vScore = 0):
         rockMinusAmount = 0
-            
+
         if more:
             self.minusRock += _minGain/self.mult
             rockMinusAmount = self.minusRock/self.mult
@@ -437,18 +437,18 @@ class CoOpRockmeterScoring(RockmeterScoring):
             self.rock -= rockMinusAmount
 
         self.plusRock = _pluBase 
-        
+
     def drain(self):
         self.minusRock += _minGain/10.0/self.mult
         self.rock -= self.minusRock
-                    
+
     def run(self):
         self.rock = min(max(self.rock, _rockMin), _rockMax)
         self.percentage = self.rock/_rockMax
         self.numDead = len(self.deadList)
-        
+
         self.failed = self.rock <= _rockMin
-                
+
         self.mult = 1
         self.failing = self.rock <= _rockLo
 
@@ -463,11 +463,11 @@ class CoOpRockmeterScoring(RockmeterScoring):
                 self.rock += player.rockCard.rock
             self.rock /= len(self.players)
             self.rock *= 3.0/2.0
-            
+
         for player in self.players:
             if player.instrument.starPowerActive:
                 self.mult *= 2
             if player.rockCard.failed:
                 if not player in self.deadList:
                     self.deadList.append(player)
-        
+
