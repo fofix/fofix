@@ -656,15 +656,16 @@ class GameEngine(object):
         """Run one cycle of the task scheduler engine."""
         if not self.frameTasks and not self.tasks:
             return False
-            
-        self.tickDelta = self.clock.tick()
 
         for task in self.frameTasks:
             self._runTask(task)
         for task in self.tasks:
             self._runTask(task, self.tickDelta)
-        self.clock.delay(self.fps)
         return True
 
     def run(self):
-        return self.mainloop()
+        # Move tick and fps limiting here, the old location did not work well.
+        self.tickDelta = self.clock.tick()
+        rtn = self.mainloop()
+        self.clock.delay(self.fps)
+        return rtn

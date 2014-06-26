@@ -77,6 +77,8 @@ class FpsTimer(Timer):
 
     def get_fps(self):
         ''' Calculates and return the average fps then resets the counter. '''
+        if self.fpsTime == 0:
+            self.fpsTime += 1
         self.fps = self.frames / (self.fpsTime / 1000.0)
         self.fpsTime = 0
         self.frames = 0
@@ -88,10 +90,15 @@ class FpsTimer(Timer):
 
         if fps:
             endtime = 1000.0/fps
-            delay = int( endtime - (self.time() - self.currentTime) )
-
+            delay = (endtime - (self.time() - self.currentTime))
             if delay < 0:
                 delay = 0
 
-            pygame.time.delay(delay)
+            # Limit FPS
+            # pygame did a very inaccurate job because the imput value
+            # needed to be an integer
+            while (delay):
+                curr = self.time() - self.currentTime
+                if endtime <= curr:
+                    break
 
