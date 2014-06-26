@@ -629,9 +629,9 @@ class Scale(IncrementEffect):
 
         w, h, = self.engine.view.geometry[2:4]
         self.start = [eval(self.getexpr("startX", "0.0")), eval(self.getexpr("startY", "0.0"))]
-                                                                    #starting dimensions of the image
+                                                                                                                                #starting dimensions of the image
         self.end   = [eval(self.getexpr("endX",   "0.0")), eval(self.getexpr("endY",   "0.0"))]
-                                                                    #ending dimensions of the image
+                                                                                                                                #ending dimensions of the image
 
         self.current = self.start[:]
 
@@ -837,8 +837,10 @@ class Group(Layer):
         super(Group, self).__init__(stage, section)
         self.layers      = {}   #the layers the group controls
         for num in self.get("layers", str, "").split(","):
-            self.layers[int(num)] = self.stage.layers[int(num)]
-
+            try:
+                self.layers[int(num)] = self.stage.layers[int(num)]
+            except KeyError:
+                continue
 
     def updateLayer(self, playerNum):
         w, h, = self.engine.view.geometry[2:4]
@@ -884,10 +886,10 @@ class Group(Layer):
             layer.render(visibility, playerNum)
 
 
-class Rockmeter(ConfigGetMixin):
+_layerLimit = 99    #limit to how many layers can be loaded
+_groupLimit = 50    #limit to how many groups can be loaded
 
-    _layerLimit = 99    #limit to how many layers can be loaded
-    _groupLimit = 50    #limit to how many groups can be loaded
+class Rockmeter(ConfigGetMixin):
 
     def __init__(self, guitarScene, configFileName, coOp = False):
 
@@ -916,7 +918,7 @@ class Rockmeter(ConfigGetMixin):
             Log.notice("Custom Rockmeter layers are not available")
 
         # Build the layers
-        for i in range(Rockmeter._layerLimit):
+        for i in range(_layerLimit):
             types = [
                      "Image",
                      "Text",
@@ -939,16 +941,13 @@ class Rockmeter(ConfigGetMixin):
                         self.createImage(self.section, i)
                     break
 
-        for i in range(Rockmeter._groupLimit):
+        for i in range(_groupLimit):
             self.section = "Group%d" % i
             if not self.config.has_section(self.section):
                 continue
             else:
                 self.createGroup(self.section, i)
 
-        print self.layerGroups
-        print self.sharedLayerGroups
-        print self.layersForRender
         self.reset()
 
     def reset(self):
@@ -1098,43 +1097,39 @@ class Rockmeter(ConfigGetMixin):
         global score, rock, coop_rock, streak, streakMax, power, stars, partialStars, multiplier, bassgroove, boost, player, part, playerNum
         scene = self.scene
         playerNum = p
-        player = scene.instruments[playerNum]
-        playerName = self.scene.playerList[p].name
-        part = player.__class__.__name__
+        player = self.scene.playerList[p]
+        playerName = player.name
+        part = player.instrument.__class__.__name__
 
         #this is here for when I finally get coOp worked in
         if self.coOp:
             score = scene.coOpScoreCard.score
             stars = scene.coOpScoreCard.stars
             partialStars = scene.coOpScoreCard.starRatio
-            coop_rock  = scene.rock[scene.coOpPlayerMeter] / scene.rockMax
+            coop_rock  = scene.coOpPlayerMeter.percentage
         else:
-            score = scene.scoring[playerNum].score
-            stars = scene.scoring[playerNum].stars
-            partialStars = scene.scoring[playerNum].starRatio
-        rock  = scene.rock[playerNum] / scene.rockMax
+            score = player.scoreCard.score
+            stars = player.scoreCard.stars
+            partialStars = player.scoreCard.starRatio
+        rock  = player.rockCard.percentage
 
-        streak = scene.scoring[playerNum].streak
-        power  = player.starPower/100.0
+        streak = player.scoreCard.streak
+        power  = player.instrument.starPower/100.0
 
         #allows for bassgroove
-        if player.isBassGuitar:
+        if player.instrument.isBassGuitar:
             streakMax = 50
         else:
             streakMax = 30
 
-        if streak >= streakMax:
-            multiplier = int(streakMax*.1) + 1
-        else:
-            multiplier = int(streak*.1) + 1
-
-        boost = player.starPowerActive
+        multiplier = player.scoreCard.getScoreMultiplier()
+        boost = player.instrument.starPowerActive
 
         #doubles the multiplier number when starpower is activated
         if boost:
             multiplier *= 2
 
-        if player.isBassGuitar and streak >= 40:
+        if player.instrument.isBassGuitar and streak >= 40:
             bassgroove = True
         else:
             bassgroove = False
@@ -1174,6 +1169,10 @@ class Rockmeter(ConfigGetMixin):
 
             self.engine.view.setViewportHalf(1,0)
             for layer in self.sharedLayersForRender.values():
+                layer.updateLayer(0)
+                for effect in layer.effects:
+                    effect.update()
                 layer.render(visibility, 0)
             for group in self.sharedLayerGroups.values():
                 group.render(visibility, 0)
+

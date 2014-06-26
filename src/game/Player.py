@@ -871,7 +871,10 @@ class Player(object):
         self.controlType  = -1
 
         self.guitarNum    = None
-        self.number       = number
+        self.scoreCard    = None        # keeps track of in-game stats
+        self.rockCard     = None        # keeps track of more in-game stats revolving around the rockmeter
+        self.number       = number      # player refrence number
+        self.instrument   = None        # player's instrument object 
 
         self.bassGrooveEnabled = False
         self.currentTheme = 1

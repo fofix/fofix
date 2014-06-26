@@ -43,7 +43,7 @@ from views import Dialogs
 import Stage
 from core import Settings
 from game import Song
-from game.Scorekeeper import ScoreCard
+from game.Scorekeeper import  ScoreCard, RockmeterScoring, CoOpRockmeterScoring
 from graphics.Shader import shaders
 from graphics.Image import drawImage
 
@@ -81,7 +81,7 @@ class GuitarScene(Scene):
         self.ready = False
         Log.debug("GuitarScene init...")
 
-        self.coOpPlayerMeter = 0
+        self.coOpPlayerMeter = None
 
         #myfingershurt: new loading place for "loading" screen for song preparation:
         #blazingamer new loading phrases
@@ -206,6 +206,7 @@ class GuitarScene(Scene):
                 self.instruments.append(inst)
                 if player.part.id == Song.LEAD_PART or player.part.id == Song.GUITAR_PART:    #both these selections should get guitar solos
                     self.instruments[j].canGuitarSolo = True
+            player.instrument = inst
 
             if player.practiceMode:
                 self.practiceMode = True
@@ -424,33 +425,22 @@ class GuitarScene(Scene):
                 instrument.starPowerDecreaseDivisor /= self.numOfPlayers
 
 
-        self.rockMax = 30000.0
-        self.rockMedThreshold = self.rockMax/3.0    #MFH
-        self.rockHiThreshold = self.rockMax/3.0*2   #MFH
-        self.rock = [self.rockMax/2 for i in self.playerList]
-        self.arrowRotation    = [.5 for i in self.playerList]
+        for i, player in enumerate(self.playerList):
+                player.rockCard = RockmeterScoring(player)
+
         self.starNotesMissed = [False for i in self.playerList]  #MFH
         self.notesMissed = [False for i in self.playerList]
         self.lessMissed = [False for i in self.playerList]
         self.notesHit = [False for i in self.playerList]
         self.lessHit = False
-        self.minBase = 400
-        self.pluBase = 15
-        self.minGain = 2
-        self.pluGain = 7
         self.battleMax = 300 #QQstarS:new2  the max adding when battle
-        self.minusRock = [self.minBase for i in self.playerList]
-        self.plusRock = [self.pluBase for i in self.playerList]
         self.coOpMulti = 1
         self.coOpFailDone = [False for i in self.playerList]
         if self.coOpRB: #akedrou
-            self.coOpPlayerMeter = len(self.rock)
-            self.rock.append(self.rockMax/2)
-            self.minusRock.append(0.0)
-            self.plusRock.append(0.0)
+            self.coOpPlayerMeter = CoOpRockmeterScoring(self.playerList, coOp = "RB")
             self.timesFailed  = [0 for i in self.playerList]
         if self.coOp or self.coOpGH:
-            self.coOpPlayerMeter = len(self.rock)-1 #make sure it's the last one
+            self.coOpPlayerMeter = CoOpRockmeterScoring(self.playerList)
 
 
         #Dialogs.changeLoadingSplashScreenText(self.engine, splash, phrase + " \n " + _("Loading Stage..."))
@@ -727,24 +717,21 @@ class GuitarScene(Scene):
         self.guitarSoloBroken = [False for i in self.playerList]
 
 
-        self.deadPlayerList = [] #akedrou - keep the order failed.
-        self.numDeadPlayers = 0
         coOpInstruments = []
-        self.scoring = []
-        for instrument in self.instruments:
-            if instrument.isDrum:
+        for player in self.playerList:
+            if player.instrument.isDrum:
                 this = Song.DRUM_PART
                 coOpInstruments.append(this)
-            elif instrument.isBassGuitar:
+            elif player.instrument.isBassGuitar:
                 this = Song.BASS_PART
                 coOpInstruments.append(this)
-            elif instrument.isVocal:
+            elif player.instrument.isVocal:
                 this = Song.VOCAL_PART
                 coOpInstruments.append(this)
             else:
                 this = Song.GUITAR_PART
                 coOpInstruments.append(this) #while different guitars exist, they don't affect scoring.
-            self.scoring.append(ScoreCard([this]))
+            player.scoreCard = ScoreCard([this])
         if self.coOpType:
             self.coOpScoreCard = ScoreCard(coOpInstruments, coOpType = True)
         else:
@@ -862,8 +849,8 @@ class GuitarScene(Scene):
                 for d in range(len(Song.difficulties)):
                     self.song.tracks[i][d].flipDrums()
 
-        for scoreCard in self.scoring:
-            scoreCard.bassGrooveEnabled = self.bassGrooveEnabled
+        for player in self.playerList:
+            player.scoreCard.bassGrooveEnabled = self.bassGrooveEnabled
 
         #MFH - single audio track song detection
         self.isSingleAudioTrack = self.song.isSingleAudioTrack
@@ -905,8 +892,8 @@ class GuitarScene(Scene):
                 tempHandicap += ( (self.automaticEarlyHitWindow - self.effectiveEarlyHitWindow) * 0.05 )
             elif self.automaticEarlyHitWindow < self.effectiveEarlyHitWindow:   #MFH - negative handicap
                 tempHandicap -= ( (self.effectiveEarlyHitWindow - self.automaticEarlyHitWindow) * 0.05 )
-            for scoreCard in self.scoring:
-                scoreCard.earlyHitWindowSizeHandicap = tempHandicap
+            for player in self.playerList:
+                player.scoreCard.earlyHitWindowSizeHandicap = tempHandicap
             if self.coOpType:
                 self.coOpScoreCard.earlyHitWindowSizeHandicap = tempHandicap
 
@@ -1099,7 +1086,7 @@ class GuitarScene(Scene):
 
         totalBreNotes = 0
         #count / init solos and notes
-        for i,instrument in enumerate(self.instruments):
+        for i, player in enumerate(self.instruments):
             #MFH - go through, locate, and mark the last drum note.  When this is encountered, drum scoring should be turned off.
             lastDrumNoteTime = 0.0
             lastDrumNoteEvent = None
@@ -1111,13 +1098,13 @@ class GuitarScene(Scene):
             if instrument.isDrum:
                 self.lastDrumNoteTime = lastDrumNoteTime
                 Log.debug("Last drum note located at time = " + str(self.lastDrumNoteTime) )
-                self.scoring[i].totalStreakNotes = len([1 for time, event in self.song.track[i].getEvents(self.playerList[i].startPos,self.lastEvent) if isinstance(event, Note)])
+                self.playerList[i].scoreCard.totalStreakNotes = len([1 for time, event in self.song.track[i].getEvents(self.playerList[i].startPos,self.lastEvent) if isinstance(event, Note)])
             elif instrument.isVocal:
-                self.scoring[i].totalStreakNotes = len([1 for time, event in self.song.track[i].getEvents(self.playerList[i].startPos,self.lastEvent) if isinstance(event, VocalPhrase)])
+                self.playerList[i].scoreCard.totalStreakNotes = len([1 for time, event in self.song.track[i].getEvents(self.playerList[i].startPos,self.lastEvent) if isinstance(event, VocalPhrase)])
             else:
-                self.scoring[i].totalStreakNotes = len(set(time for time, event in self.song.track[i].getEvents(self.playerList[i].startPos,self.lastEvent) if isinstance(event, Note)))
-            self.scoring[i].lastNoteEvent = lastDrumNoteEvent
-            self.scoring[i].lastNoteTime  = lastDrumNoteTime
+                self.playerList[i].scoreCard.totalStreakNotes = len(set(time for time, event in self.song.track[i].getEvents(self.playerList[i].startPos,self.lastEvent) if isinstance(event, Note)))
+            self.playerList[i].scoreCard.lastNoteEvent = lastDrumNoteEvent
+            self.playerList[i].scoreCard.lastNoteTime  = lastDrumNoteTime
             self.lastNoteTimes[i] = lastDrumNoteTime
             if lastDrumNoteEvent:
                 if isinstance(lastDrumNoteEvent, Note):
@@ -1128,11 +1115,11 @@ class GuitarScene(Scene):
                 Log.debug("Last note event not found and is None!")
 
             if instrument.isVocal:
-                self.scoring[i].totalNotes = self.scoring[i].totalStreakNotes - len(instrument.tapNoteTotals)
-                self.scoring[i].totalPercNotes = sum(instrument.tapNoteTotals)
-                self.scoring[i].baseScore  = (instrument.vocalBaseScore * self.scoring[i].totalNotes) + (self.scoring[i].totalPercNotes * instrument.baseScore)
+                self.playerList[i].scoreCard.totalNotes = self.playerList[i].scoreCard.totalStreakNotes - len(instrument.tapNoteTotals)
+                self.playerList[i].scoreCard.totalPercNotes = sum(instrument.tapNoteTotals)
+                self.playerList[i].scoreCard.baseScore  = (instrument.vocalBaseScore * self.playerList[i].scoreCard.totalNotes) + (self.playerList[i].scoreCard.totalPercNotes * instrument.baseScore)
             else:
-                self.scoring[i].totalNotes = len([1 for Ntime, event in self.song.track[i].getAllEvents() if isinstance(event, Note)])
+                self.playerList[i].scoreCard.totalNotes = len([1 for Ntime, event in self.song.track[i].getAllEvents() if isinstance(event, Note)])
 
             if self.song.midiEventTrack[i] is not None: # filters out vocals
                 #MFH - determine which marker is BRE, and count streak notes behind it to remove from the scorecard
@@ -1148,7 +1135,7 @@ class GuitarScene(Scene):
                                     breStart = time
                                     breEnd = time + event.length
                                     numBreStreakNotes = len(set(time for time, event in self.song.track[i].getEvents(breStart, breEnd) if isinstance(event, Note)))
-                                    self.scoring[i].totalStreakNotes -= numBreStreakNotes   #MFH - remove BRE notes correctly from streak count.
+                                    self.playerList[i].scoreCard.totalStreakNotes -= numBreStreakNotes   #MFH - remove BRE notes correctly from streak count.
                                     Log.debug("Removed %d streak notes from player %d" % (numBreStreakNotes, i) )
                                     totalBreNotes += numBreStreakNotes
 
@@ -1271,7 +1258,7 @@ class GuitarScene(Scene):
 
         self.numMidiLyricLines = len(self.midiLyricLines)
 
-
+        self.scoring = []
         self.coOpTotalStreakNotes = 0
         self.coOpTotalNotes = 0
         if self.coOpScoreCard:
@@ -1708,7 +1695,6 @@ class GuitarScene(Scene):
         self.failScreen = None
         self.failMsg = None
         self.menu = None
-        self.mult = None
         self.pauseScreen = None
         self.rockTop = None
         self.rockMsg = None
@@ -1725,19 +1711,9 @@ class GuitarScene(Scene):
 
         #MFH - additional cleanup!
         self.lyricSheet = None
-        self.starWhite = None
-        self.starGrey = None
-        self.starPerfect = None
-        self.starGrey1 = None
-        self.starGrey2 = None
-        self.starGrey3 = None
-        self.starGrey4 = None
-        self.starGrey5 = None
-        self.starGrey6 = None
-        self.starGrey7 = None
         self.part = [None for i in self.playerList]
-        for scoreCard in self.scoring:
-            scoreCard.lastNoteEvent = None
+        for player in self.playerList:
+            player.scoreCard.lastNoteEvent = None
         if self.coOpType:
             self.coOpScoreCard.lastNoteEvent = None
 
@@ -1750,7 +1726,8 @@ class GuitarScene(Scene):
             songHopo = int(self.song.info.hopofreq)
         except Exception:
             songHopo = 1
-        for i, scoreCard in enumerate(self.scoring):
+        for i, player in enumerate(self.playerList):
+            scoreCard = player.scoreCard
             if self.instruments[i].isVocal:
                 if self.engine.audioSpeedFactor != 1 or scoreCard.earlyHitWindowSizeHandicap != 1.0: #scalable handicaps
                     if (scoreCard.handicap>>1)&1 != 1:
@@ -1993,8 +1970,8 @@ class GuitarScene(Scene):
     def endSong(self):
         self.engine.view.popLayer(self.menu)
         validScoreFound = False
-        for scoreCard in self.scoring:  #MFH - what if 2p (human) battles 1p (Jurgen / CPU)?  He needs a valid score too!
-            if scoreCard.score > 0:
+        for player in self.playerList:  #MFH - what if 2p (human) battles 1p (Jurgen / CPU)?  He needs a valid score too!
+            if player.scoreCard.score > 0:
                 validScoreFound = True
                 break
         if self.coOpType:
@@ -2093,8 +2070,8 @@ class GuitarScene(Scene):
         for instrument in self.instruments:
             instrument.spEnabled = True
             instrument.bigRockEndingMarkerSeen = False
-        for scoreCard in self.scoring:
-            scoreCard.reset()
+        for player in self.playerList:
+            player.scoreCard.reset()
         self.crowdsCheering = False #akedrou
         if self.coOpType:
             self.coOpScoreCard.reset()
@@ -2127,21 +2104,13 @@ class GuitarScene(Scene):
             if not self.battleSuddenDeath:
                 self.rock = [self.rockMax/2 for i in self.playerList]
         else:
-            self.rock = [self.rockMax/2 for i in self.playerList]
-        self.minusRock = [0.0 for i in self.playerList]
-        self.plusRock = [0.0 for i in self.playerList]
+            for player in self.playerList:
+                player.rockCard.start()
         self.coOpMulti = 1
-        self.deadPlayerList = []
-        self.numDeadPlayers  = 0
         self.coOpFailDone = [False for i in self.playerList]
         self.rockFailUp = True
         self.rockFailViz  = 0.0
         self.failViz = [0.0 for i in self.playerList]
-        if self.coOpRB:
-            self.rock.append(self.rockMax/2)
-            self.minusRock.append(0.0)
-            self.plusRock.append(0.0)
-            self.timesFailed = [0 for i in self.playerList]
         if self.battleGH:
             self.battleJustUsed = [0 for i in self.playerList]
         for instrument in self.instruments:
@@ -2387,7 +2356,7 @@ class GuitarScene(Scene):
             soloScoreMult = 0
             self.engine.data.failSound.play()    #liquid
         soloBonusScore = soloScoreMult * self.instruments[i].currentGuitarSoloHitNotes
-        self.scoring[i].score += soloBonusScore
+        self.playerList[i].scoreCard.score += soloBonusScore
         if self.coOpType:
             self.coOpScoreCard.score += soloBonusScore
         trimmedSoloNoteAcc = self.roundDecimalForDisplay(self.guitarSoloAccuracy[i])
@@ -2585,7 +2554,7 @@ class GuitarScene(Scene):
                             elif self.whammyEffect == 1:    #pitchbend
                                 self.song.setInstrumentPitch(self.pitchBendSemitones*self.whammyVol[i], self.players[i].part)
 
-                    elif self.scoring[i].streak > 0:
+                    elif self.playerList[i].scoreCard.streak > 0:
                         self.song.setInstrumentVolume(1.0, self.players[i].part)
                         if self.whammyEffect == 1:    #pitchbend
                             self.song.resetInstrumentPitch(self.players[i].part)
@@ -2611,12 +2580,12 @@ class GuitarScene(Scene):
 
                             else:
                                 self.killswitchEngaged[i] = None
-                        elif self.scoring[i].streak > 0:
+                        elif self.playerList[i].scoreCard.streak > 0:
                             self.song.setInstrumentVolume(1.0, self.players[i].part)
                             if self.whammyEffect == 1:    #pitchbend
                                 self.song.resetInstrumentPitch(self.players[i].part)
                             self.killswitchEngaged[i] = False
-                    elif self.scoring[i].streak > 0:
+                    elif self.playerList[i].scoreCard.streak > 0:
                         self.song.setInstrumentVolume(1.0, self.players[i].part)
                         if self.whammyEffect == 1:    #pitchbend
                             self.song.resetInstrumentPitch(self.players[i].part)
@@ -2774,12 +2743,13 @@ class GuitarScene(Scene):
         i = playerNum
         num = playerNum
         guitar = self.instruments[num]
+        rock = self.playerList[num].rockCard
 
         if self.resumeCountdown > 0:    #MFH - conditions to completely ignore picks
             return
 
         #MFH - only actually pick if the player has not failed already!
-        if self.rock[i] > 0 and guitar.battleStatus[4] == False:
+        if not rock.failed and guitar.battleStatus[4] == False:
 
             # Volshebnyi - new BRE and drum fills scoring
             if guitar.freestyleActive or (guitar.isDrum and guitar.drumFillsActive):
@@ -2818,18 +2788,18 @@ class GuitarScene(Scene):
                     #   and only reward if all notes after the BRE are hit without breaking streak!
                     if guitar.freestyleActive:   #MFH - only want to add the score if this is a BRE - drum fills get no scoring...
                         if self.coOpType:
-                            self.scoring[num].endingScore += score
-                            self.scoring[num].endingStreakBroken = False
-                            self.scoring[num].freestyleWasJustActive = True
+                            self.playerList[num].scoreCard.endingScore += score
+                            self.playerList[num].scoreCard.endingStreakBroken = False
+                            self.playerList[num].scoreCard.freestyleWasJustActive = True
                             self.coOpScoreCard.endingScore += score
                             self.coOpScoreCard.endingStreakBroken = False
                             self.coOpScoreCard.freestyleWasJustActive = True
                         else:
-                            self.scoring[num].endingScore += score
+                            self.playerList[num].scoreCard.endingScore += score
                             #also, when this happens, want to set a flag indicating that all of the remaining notes in the song must be hit without
                             # breaking streak, or this score will not be kept!
-                            self.scoring[num].endingStreakBroken = False
-                            self.scoring[num].freestyleWasJustActive = True
+                            self.playerList[num].scoreCard.endingStreakBroken = False
+                            self.playerList[num].scoreCard.freestyleWasJustActive = True
 
                 #MFH - also must ensure notes that pass during this time are marked as skipped without resetting the streak
                 #missedNotes = self.guitars[num].getMissedNotesMFH(self.song, pos, catchup = True)
@@ -2840,7 +2810,7 @@ class GuitarScene(Scene):
                         if self.coOpType:
                             self.coOpScoreCard.totalStreakNotes -= 1
                         else:
-                            self.scoring[num].totalStreakNotes -= 1
+                            self.playerList[num].scoreCard.totalStreakNotes -= 1
 
             else:
                 if guitar.isDrum:
@@ -3075,10 +3045,11 @@ class GuitarScene(Scene):
                                     self.controls.toggle(k, False)
 
 
+    #decreases the rockmeter for the player when a note is missed
     def rockmeterDecrease(self, playerNum, vScore = 0):
         i = playerNum
+        rock = self.playerList[i].rockCard
 
-        rockMinusAmount = 0 #akedrou - simplify the various incarnations of minusRock.
         if self.instruments[i].isDrum:
             self.drumStart = True
             if not self.drumScoringEnabled:   #MFH - ignore when drum scoring is disabled
@@ -3087,174 +3058,33 @@ class GuitarScene(Scene):
         if not self.failingEnabled or self.practiceMode:
             return
 
-        if self.instruments[i].isVocal:
-            rockMinusAmount = 500 * (3 - vScore)
-            self.rock[i] -= rockMinusAmount
-            if (not self.coOpRB) and (self.rock[i]/self.rockMax <= 0.667) and ((self.rock[i]+rockMinusAmount)/self.rockMax > 0.667): #akedrou
-                self.playersInGreen -= 1
-            return
+        rock.decreaseRock(self.notesMissed[i], self.lessMissed[i], vScore)
+        if self.coOpRB:
+            self.coOpPlayerMeter.decreaseRock(vScore)
 
-        if self.battle and self.numOfPlayers > 1: #battle mode
-            if self.notesMissed[i]:
-                self.minusRock[i] += self.minGain/self.multi[i]
-                if self.plusRock[i] > self.pluBase:
-                    self.plusRock[i] -= self.pluGain*2.0/self.multi[i]
-                if self.plusRock[i] <= self.pluBase:
-                    self.plusRock[i] = self.pluBase/self.multi[i]
-            if self.lessMissed[i]: #QQstarS:Set [i] to [i]
-                self.minusRock[i] += self.minGain/5.0/self.multi[i]
-                if self.plusRock[i] > self.pluBase:
-                    self.plusRock[i] -= self.pluGain/2.5/self.multi[i]
-
-        elif (self.coOp or self.coOpGH) and self.numOfPlayers > 1: #co-op mode
-            if self.notesMissed[i]:
-                self.minusRock[self.coOpPlayerMeter] += self.minGain/self.multi[i]
-                rockMinusAmount = self.minusRock[self.coOpPlayerMeter]/self.multi[i]
-                self.rock[self.coOpPlayerMeter] -= rockMinusAmount
-                if self.plusRock[self.coOpPlayerMeter] > self.pluBase:
-                    self.plusRock[self.coOpPlayerMeter] -= self.pluGain*2.0/self.multi[i]
-                if self.plusRock[self.coOpPlayerMeter] <= self.pluBase:
-                    self.plusRock[self.coOpPlayerMeter] = self.pluBase/self.multi[i]
-            if self.lessMissed[i]:
-                self.minusRock[self.coOpPlayerMeter] += self.minGain/5.0/self.multi[i]
-                rockMinusAmount = self.minusRock[0]/5.0/self.multi[i]
-                self.rock[self.coOpPlayerMeter] -= rockMinusAmount
-                if self.plusRock[self.coOpPlayerMeter] > self.pluBase:
-                    self.plusRock[self.coOpPlayerMeter] -= self.pluGain/2.5/self.multi[i]
-            if (self.rock[self.coOpPlayerMeter]/self.rockMax <= 0.667) and ((self.rock[self.coOpPlayerMeter]+rockMinusAmount)/self.rockMax > 0.667): #akedrou
-                self.playersInGreen -= 1
-
-        elif self.coOpRB and self.numOfPlayers > 1: #RB co-op mode
-            if self.notesMissed[i]:
-                self.minusRock[i] += self.minGain/self.coOpMulti
-                if self.numDeadPlayers > 0:
-                    self.minusRock[self.coOpPlayerMeter] += self.minGain/self.coOpMulti
-                    rockMinusAmount = self.minusRock[self.coOpPlayerMeter]/self.coOpMulti
-                    self.rock[self.coOpPlayerMeter] -= rockMinusAmount/self.numOfPlayers
-                self.rock[i] -= self.minusRock[i]/self.coOpMulti
-                if self.plusRock[i] > self.pluBase:
-                    self.plusRock[i] -= self.pluGain*2.0/self.coOpMulti
-                if self.plusRock[i] <= self.pluBase:
-                    self.plusRock[i] = self.pluBase/self.coOpMulti
-            if self.lessMissed[i]:
-                self.minusRock[i] += self.minGain/5.0/self.coOpMulti
-                if self.numDeadPlayers > 0:
-                    self.minusRock[self.coOpPlayerMeter] += self.minGain/5.0/self.coOpMulti
-                    rockMinusAmount = self.minusRock[i]/5.0/self.coOpMulti
-                    self.rock[self.coOpPlayerMeter] -= rockMinusAmount/(self.numOfPlayers - self.numDeadPlayers)
-                self.rock[i] -= self.minusRock[i]/5.0/self.coOpMulti
-                if self.plusRock[i] > self.pluBase:
-                    self.plusRock[i] -= self.pluGain/2.5/self.coOpMulti
-
-        else:   #normal mode
-            if self.notesMissed[i]:
-                self.minusRock[i] += self.minGain/self.multi[i]
-                rockMinusAmount = self.minusRock[i]/self.multi[i]
-                self.rock[i] -= rockMinusAmount
-                if self.plusRock[i] > self.pluBase:
-                    self.plusRock[i] -= self.pluGain*2.0/self.multi[i]
-                if self.plusRock[i] <= self.pluBase:
-                    self.plusRock[i] = self.pluBase/self.multi[i]
-            if self.lessMissed[i]:
-                self.minusRock[i] += self.minGain/5.0/self.multi[i]
-                rockMinusAmount = self.minusRock[i]/5.0/self.multi[i]
-                self.rock[i] -= rockMinusAmount
-                if self.plusRock[i] > self.pluBase:
-                    self.plusRock[i] -= self.pluGain/2.5/self.multi[i]
-            if (self.rock[i]/self.rockMax <= 0.667) and ((self.rock[i]+rockMinusAmount)/self.rockMax > 0.667): #akedrou
-                self.playersInGreen -= 1
-
-        if self.minusRock[i] <= self.minBase:
-            self.minusRock[i] = self.minBase
-        if self.plusRock[i] <= self.pluBase:
-            self.plusRock[i] = self.pluBase
-
-
-
+    #increases the rockmeter for a player when a note is hit
     def rockmeterIncrease(self, playerNum, vScore = 0):
         i = playerNum
+        rock = self.playerList[i].rockCard
+
         if self.instruments[i].isVocal:
-            rockPlusAmt = 500 + (500 * (vScore-2))
-            self.rock[i] += rockPlusAmt
-            if self.rock[i] >= self.rockMax:
-                self.rock[i] = self.rockMax
-            if not self.coOpRB:
-                if (self.rock[i]/self.rockMax > 0.667) and ((self.rock[i]-rockPlusAmt)/self.rockMax <= 0.667):
-                    self.playersInGreen += 1
-                    if self.engine.data.cheerSoundFound > 0: #haven't decided whether or not to cut crowdSound with crowdsEnabled = 0, but would have to do it at solos too...
-                        self.engine.data.crowdSound.play()
             return
+
         if self.instruments[i].isDrum:
             self.drumStart = True
+
         if not self.failingEnabled or self.practiceMode:
             return
-        if not self.notesHit[i]: return
-        if self.battle and self.numOfPlayers > 1: #battle mode
-            if self.notesHit[i]:
-                if self.rock[i] < self.rockMax:
-                    self.plusRock[i] += self.pluGain*self.multi[i]
-                    if self.plusRock[i] > self.battleMax:
-                        self.plusRock[i] = self.battleMax
-                    self.rock[i] += self.plusRock[i]*self.multi[i]
-                    self.rock[self.battleTarget[i]] -= self.plusRock[i]*self.multi[i]
-                if self.rock[self.battleTarget[i]] < 0:
-                    self.rock[self.battleTarget[i]] = 0
-                if self.rock[i] >= self.rockMax:
-                    self.rock[i] = self.rockMax
-                if self.minusRock[i] > self.minBase:
-                    self.minusRock[i] -= self.minGain/2.0*self.multi[i]
 
-        #MFH TODO maintain separate rock status for each player
-        elif (self.coOp or self.coOpGH) and self.numOfPlayers > 1:
-            if self.rock[self.coOpPlayerMeter] < self.rockMax:
-                self.plusRock[self.coOpPlayerMeter] += self.pluGain*self.multi[i]
-                self.rock[self.coOpPlayerMeter] += self.plusRock[self.coOpPlayerMeter]*self.multi[i]
-            if self.rock[self.coOpPlayerMeter] >= self.rockMax:
-                self.rock[self.coOpPlayerMeter] = self.rockMax
-            if self.minusRock[self.coOpPlayerMeter] > self.minBase:
-                self.minusRock[self.coOpPlayerMeter] -= self.minGain/2.0*self.multi[i]
-            if (self.rock[self.coOpPlayerMeter]/self.rockMax > 0.667) and ((self.rock[self.coOpPlayerMeter]-(self.plusRock[self.coOpPlayerMeter]*self.multi[i]))/self.rockMax <= 0.667):
-                self.playersInGreen += 1
-                if self.engine.data.cheerSoundFound > 0: #haven't decided whether or not to cut crowdSound with crowdsEnabled = 0, but would have to do it at solos too...
-                    self.engine.data.crowdSound.play()
+        if not self.notesHit[i]:
+            return
 
-        elif self.coOpRB and self.numOfPlayers > 1:
-            if self.rock[i] < self.rockMax:
-                self.plusRock[i] += self.pluGain*self.coOpMulti
-                self.rock[i] += (self.plusRock[i]*self.coOpMulti)
-            if self.rock[i] >= self.rockMax:
-                self.rock[i] = self.rockMax
-            if self.minusRock[i] > self.minBase:
-                self.minusRock[i] -= self.minGain/2.0*self.coOpMulti
-
-
-        else:   #normal mode
-
-            if self.rock[i] < self.rockMax:
-                self.plusRock[i] += self.pluGain*self.multi[i]
-                self.rock[i] += self.plusRock[i]*self.multi[i]
-            if self.rock[i] >= self.rockMax:
-                self.rock[i] = self.rockMax
-            if self.minusRock[i] > self.minBase:
-                self.minusRock[i] -= self.minGain/2.0*self.multi[i]
-            if (self.rock[i]/self.rockMax > 0.667) and ((self.rock[i]-(self.plusRock[i]*self.multi[i]))/self.rockMax <= 0.667):
-                self.playersInGreen += 1
-                if self.engine.data.cheerSoundFound > 0: #haven't decided whether or not to cut crowdSound with crowdsEnabled = 0, but would have to do it at solos too...
-                    self.engine.data.crowdSound.play()
-
-        if self.minusRock[i] <= self.minBase:
-            self.minusRock[i] = self.minBase
-        if self.plusRock[i] <= self.pluBase:
-            self.plusRock[i] = self.pluBase
-
+        rock.increaseRock(vScore)
+        if self.coOpRB:
+            self.coOpPlayerMeter.increaseRock(vScore)
 
     def rockmeterDrain(self, playerNum):
-        if self.battleGH:
-            self.rock[playerNum] -= 70.0
-        else:
-            self.rock[playerNum] -= 15.0
-        self.minusRock[playerNum] += self.minGain/10/self.coOpMulti
-
+        self.playerList[playerNum].rockCard.drain()
 
     def run(self, ticks): #QQstarS: Fix this funcion
         if self.song and self.song.readyToGo and not self.pause and not self.failed:
@@ -3270,7 +3100,7 @@ class GuitarScene(Scene):
             if self.vbpmLogicType == 1:
                 self.handleTempo(self.song, pos)  #MFH - new global tempo / BPM handling logic
 
-            if self.bossBattle and self.rock[1] < 0:
+            if self.bossBattle and self.playerList[1].rockCard.failed:
                 if self.careerMode and not self.song.info.completed:
                     if self.song.info.count:
                         count = int(self.song.info.count)
@@ -3284,34 +3114,16 @@ class GuitarScene(Scene):
 
             #MFH - new failing detection logic
             if self.failingEnabled:
-                if self.numOfPlayers > 1 and self.coOpType:
-                    if self.rock[self.coOpPlayerMeter] <= 0:
-                        self.failed = True
-                    else:
-                        if self.coOpRB:
-                            for i, player in enumerate(self.playerList):
-                                if self.rock[i] <= 0 and not self.coOpFailDone[i]:
-                                    self.instruments[i].coOpFailed = True
-                                    self.instruments[i].starPower  = 0.0
-                                    self.engine.data.coOpFailSound.play()
-                                    self.deadPlayerList.append(i)
-                                    self.numDeadPlayers += 1
-                                    self.timesFailed[i] += 1
-                                    self.crowdsCheering = False
-                                    self.song.setInstrumentVolume(0.0, self.players[i].part)
-                                    if self.whammyEffect == 1:    #pitchbend
-                                        self.song.resetInstrumentPitch(self.players[i].part)
-                                    self.coOpFailDone[i] = True
-                elif self.numOfPlayers > 1 and self.battleGH:
-                    for i, player in enumerate(self.playerList):
-                        if self.rock[i] <= 0:
-                            self.failed = True
+                fail = 0
+                for i, player in enumerate(self.playerList):
+                    player.rockCard.run()
+                    if player.rockCard.failed:
+                        fail += 1;
+                if self.coOpRB:
+                    self.coOpPlayerMeter.run()
+                    self.failed = self.coOpPlayerMeter.failed
                 else:
-                    somebodyStillAlive = False
-                    for i, player in enumerate(self.playerList):
-                        if self.rock[i] > 0:
-                            somebodyStillAlive = True
-                    if not somebodyStillAlive:    #only if everybody has failed
+                    if fail >= self.numOfPlayers:
                         self.failed = True
 
             if pos > self.lastDrumNoteTime:   #MFH - disable drum scoring so that the drummer can get down with his bad self at the end of the song without penalty.
@@ -3324,20 +3136,20 @@ class GuitarScene(Scene):
                     scoreBack = instrument.getScoreChange()
                     if scoreBack is not None:
                         points, scoreThresh, taps = scoreBack
-                        self.scoring[i].score += points * instrument.scoreMultiplier * self.multi[i]
-                        self.scoring[i].percNotesHit += taps
+                        self.playerList[i].scoreCard.score += points * instrument.scoreMultiplier * self.multi[i]
+                        self.playerList[i].scoreCard.percNotesHit += taps
                         scoreThresh = 5-scoreThresh
                         if scoreThresh > 3:
                             self.rockmeterIncrease(i, scoreThresh)
-                            self.scoring[i].notesHit += 1
-                            self.scoring[i].streak += 1
+                            self.playerList[i].scoreCard.notesHit += 1
+                            self.playerList[i].scoreCard.streak += 1
                         elif scoreThresh == 3:
-                            self.scoring[i].streak = 0
+                            self.playerList[i].scoreCard.streak = 0
                         elif scoreThresh < 3:
                             self.rockmeterDecrease(i, scoreThresh)
-                            self.scoring[i].streak = 0
-                        self.scoring[i].updateAvMult()
-                        self.scoring[i].getStarScores()
+                            self.playerList[i].scoreCard.streak = 0
+                        self.playerList[i].scoreCard.updateAvMult()
+                        self.playerList[i].scoreCard.getStarScores()
                     if instrument.starPowerGained:
                         if instrument.starPower >= 50 and not instrument.starPowerActive:
                             self.engine.data.starReadySound.play()
@@ -3448,7 +3260,7 @@ class GuitarScene(Scene):
                                 self.engine.data.starActivateSound.play()
                             scoreCard.endingAwarded = True
                 else:
-                    scoreCard = self.scoring[playerNum]
+                    scoreCard =self.playerList[playerNum].scoreCard
                     if scoreCard.freestyleWasJustActive and not scoreCard.endingAwarded:
                         if scoreCard.lastNoteEvent and not scoreCard.endingStreakBroken:
                             if scoreCard.lastNoteEvent.played or scoreCard.lastNoteEvent.hopod:
@@ -3521,7 +3333,7 @@ class GuitarScene(Scene):
                         if guitar.isDrum:
                             if self.coOpType:
                                 self.coOpScoreCard.totalStreakNotes -= 1
-                            self.scoring[playerNum].totalStreakNotes -= 1
+                            self.playerList[playerNum].scoreCard.totalStreakNotes -= 1
 
                 else:
                     missedNotes = guitar.getMissedNotesMFH(self.song, pos)
@@ -3532,7 +3344,7 @@ class GuitarScene(Scene):
                             self.drumStart = True
                         self.lessMissed[i] = True  #QQstarS:Set [0] to [i]
                         for tym, theNote in missedNotes:  #MFH
-                            self.scoring[playerNum].notesMissed += 1
+                            self.playerList[playerNum].scoreCard.notesMissed += 1
                             if self.coOpType:
                                 self.coOpScoreCard.notesMissed += 1
                             if theNote.star or theNote.finalStar:
@@ -3542,7 +3354,7 @@ class GuitarScene(Scene):
                                 if self.unisonActive:
                                     self.inUnison[i] = False
 
-                    if (self.scoring[i].streak != 0 or not self.processedFirstNoteYet) and not guitar.playedNotes and len(missedNotes) > 0:
+                    if (self.playerList[i].scoreCard.streak != 0 or not self.processedFirstNoteYet) and not guitar.playedNotes and len(missedNotes) > 0:
                         if not self.processedFirstNoteYet:
                             self.stage.triggerMiss(pos)
                             self.notesMissed[i] = True
@@ -3557,8 +3369,8 @@ class GuitarScene(Scene):
                         if self.coOpType:
                             self.coOpScoreCard.streak = 0
                             self.coOpScoreCard.endingStreakBroken = True
-                        self.scoring[playerNum].streak = 0
-                        self.scoring[playerNum].endingStreakBroken = True   #MFH
+                        self.playerList[playerNum].scoreCard.streak = 0
+                        self.playerList[playerNum].endingStreakBroken = True   #MFH
                         if self.hopoDebugDisp == 1:
                             missedNoteNums = [noat.number for time, noat in missedNotes]
                             Log.debug("Miss: run(), found missed note(s)... %(missedNotes)s, Song time=%(songTime)s" % \
@@ -3603,7 +3415,7 @@ class GuitarScene(Scene):
                     self.rbOverdriveBarGlowFadeOut = False
 
             for playerNum in range(self.numOfPlayers):
-                self.handlePhrases(playerNum, self.scoring[playerNum].streak)   #MFH - streak #1 for player #1...
+                self.handlePhrases(playerNum, self.playerList[playerNum].scoreCard.streak)   #MFH - streak #1 for player #1...
                 self.handleAnalogSP(playerNum, ticks)
                 self.handleWhammy(playerNum)
                 if self.playerList[playerNum].controlType == 4:
@@ -3641,16 +3453,9 @@ class GuitarScene(Scene):
                             self.unisonActive = True
                             self.firstUnison = True
                             self.unisonNum = len(self.unisonPlayers[self.unisonIndex])
-                if self.starPowersActive > 0:
-                    self.coOpMulti = 2 * self.starPowersActive
-                else:
-                    self.coOpMulti = 1
                 #MFH - rewritten rockmeter / starpower miss logic, and Faaa's drum sounds:
                 #the old logic was ridiculously complicated
                 # For each existing player
-            if self.coOpRB:
-                oldCoOpRock = self.rock[self.coOpPlayerMeter]
-                coOpRock = 0.0
             for i in range(self.numOfPlayers):
                 if (self.coOpRB and not guitar.coOpFailed) or not self.coOpRB:
                     if self.notesMissed[i] or self.lessMissed[i]:   #(detects missed note or overstrum)
@@ -3665,14 +3470,9 @@ class GuitarScene(Scene):
                             self.rockmeterDecrease(i)
                     if self.notesHit[i]:
                         self.rockmeterIncrease(i)
-                    if self.coOpRB:
-                        coOpRock += self.rock[i]
                 else:
                     if not self.instruments[i].coOpRestart:
                         self.rockmeterDrain(self.coOpPlayerMeter)
-                    else:
-                        oldCoOpRock = 0.0
-                        coOpRock += self.rock[i]
                 self.notesMissed[i] = False
                 self.starNotesMissed[i] = False
                 self.notesHit[i] = False
@@ -3688,15 +3488,6 @@ class GuitarScene(Scene):
                     if self.rock[i] <= 0:
                         self.newScalingText(i, self.tsYouFailedBattle )
                         guitar.actions = [0,0,0]
-            if self.coOpRB: #RB co-op meter is just an average until someone dies.
-                if self.numDeadPlayers == 0:
-                    self.rock[self.coOpPlayerMeter] = coOpRock/self.numOfPlayers
-                    if (self.rock[self.coOpPlayerMeter]/self.rockMax > 0.667) and (oldCoOpRock/self.rockMax <= 0.667):
-                        self.playersInGreen = 1
-                        if self.engine.data.cheerSoundFound > 0: #haven't decided whether or not to cut crowdSound with crowdsEnabled = 0, but would have to do it at solos too...
-                            self.engine.data.crowdSound.play()
-                if (self.rock[self.coOpPlayerMeter]/self.rockMax <= 0.667) and (oldCoOpRock/self.rockMax > 0.667):
-                    self.playersInGreen = 0
 
             if self.unisonActive: #akedrou unison bonuses
                 if self.firstUnison:
@@ -3722,25 +3513,26 @@ class GuitarScene(Scene):
                     self.haveUnison = [False for i in self.playerList]
                     self.inUnison = [False for i in self.playerList]
             #akedrou Song/Crowd logic
-            if self.numDeadPlayers == 0:
-                if self.crowdsEnabled == 3 and self.crowdsCheering == False and not self.countdown: #prevents cheer-cut-cheer
-                    self.crowdsCheering = True
-                elif self.crowdsEnabled == 0 and self.crowdsCheering == True: #setting change
-                    self.crowdsCheering = False
-                elif self.crowdsEnabled == 1:
-                    if self.starPowersActive > 0:
-                        if self.crowdsCheering == False:
-                            self.crowdsCheering = True
-                    else:
-                        if self.crowdsCheering == True:
-                            self.crowdsCheering = False
-                elif self.crowdsEnabled == 2:
-                    if self.starPowersActive > 0 or self.playersInGreen > 0:
-                        if self.crowdsCheering == False:
-                            self.crowdsCheering = True
-                    else:
-                        if self.crowdsCheering == True:
-                            self.crowdsCheering = False
+            if self.coOpPlayerMeter is not None:
+                if self.coOpPlayerMeter.numDead == 0:
+                    if self.crowdsEnabled == 3 and self.crowdsCheering == False and not self.countdown: #prevents cheer-cut-cheer
+                        self.crowdsCheering = True
+                    elif self.crowdsEnabled == 0 and self.crowdsCheering == True: #setting change
+                        self.crowdsCheering = False
+                    elif self.crowdsEnabled == 1:
+                        if self.starPowersActive > 0:
+                            if self.crowdsCheering == False:
+                                self.crowdsCheering = True
+                        else:
+                            if self.crowdsCheering == True:
+                                self.crowdsCheering = False
+                    elif self.crowdsEnabled == 2:
+                        if self.starPowersActive > 0 or self.playersInGreen > 0:
+                            if self.crowdsCheering == False:
+                                self.crowdsCheering = True
+                        else:
+                            if self.crowdsCheering == True:
+                                self.crowdsCheering = False
 
             #Crowd fade-in/out
             if self.crowdsCheering == True and self.crowdFaderVolume < self.crowdVolume:
@@ -3886,11 +3678,11 @@ class GuitarScene(Scene):
             scoreTemp = score*self.multi[num]
             if self.coOpType:
                 if not self.coOpGH:
-                    self.coOpScoreCard.score += (scoreTemp*self.scoring[num].getScoreMultiplier())
+                    self.coOpScoreCard.score += (scoreTemp*self.playerList[num].scoreCard.getScoreMultiplier())
                 else: #shared mult
                     self.coOpScoreCard.addScore(scoreTemp)
             else:
-                self.scoring[num].addScore(scoreTemp)
+                self.playerList[num].scoreCard.addScore(scoreTemp)
 
     def render3D(self):
         if self.stage.mode == 3:
@@ -3925,25 +3717,20 @@ class GuitarScene(Scene):
                 guitar.render(self.visibility, self.song, self.getSongPosition(), self.controls, self.killswitchEngaged[i])  #QQstarS: new
                 glPopMatrix()
             if self.coOp or self.coOpGH:
-                guitar.rockLevel = self.rock[self.coOpPlayerMeter] / self.rockMax
-                if self.rock[self.coOpPlayerMeter]< self.rockMax/3.0 and self.failingEnabled:
-                    self.neckrender[i].isFailing = True
-                else:
-                    self.neckrender[i].isFailing = False
+                guitar.rockLevel = self.coOpPlayerMeter.rockCard.percentage
+
+                self.neckrender[i].isFailing = False
+                if self.failingEnabled:
+                    self.neckrender[i].isFailing = self.playerList[i].rockCard.failing or self.coOpPlayerMeter.failing
             elif self.coOpRB:
-                guitar.rockLevel = self.rock[i] / self.rockMax
-                if self.rock[i]< self.rockMax/3.0 and self.failingEnabled:
-                    self.neckrender[i].isFailing = True
-                elif self.numDeadPlayers > 0 and self.rock[self.coOpPlayerMeter]< self.rockMax/6.0 and self.failingEnabled:
-                    self.neckrender[i].isFailing = True
-                else:
-                    self.neckrender[i].isFailing = False
+                guitar.rockLevel = self.playerList[i].rockCard.percentage
+
+                self.neckrender[i].isFailing = False
+                if self.failingEnabled:
+                    self.neckrender[i].isFailing = self.playerList[i].rockCard.failing or self.coOpPlayerMeter.failing
             else:
-                guitar.rockLevel = self.rock[i] / self.rockMax
-                if self.rock[i]< self.rockMax/3.0 and self.failingEnabled:
-                    self.neckrender[i].isFailing = True
-                else:
-                    self.neckrender[i].isFailing = False
+                guitar.rockLevel = self.playerList[i].rockCard.percentage
+                self.neckrender[i].isFailing = self.playerList[i].rockCard.failing
 
         self.engine.view.setViewport(1,0)
 
@@ -3977,6 +3764,7 @@ class GuitarScene(Scene):
             return
 
         pos = self.getSongPosition()
+        scoreCard = self.playerList[num].scoreCard
 
         if self.instruments[num].playedNotes:
             # If all the played notes are tappable, there are no required notes and
@@ -3991,9 +3779,6 @@ class GuitarScene(Scene):
 
         if self.coOpType:
             scoreCard = self.coOpScoreCard
-        else:
-            scoreCard = self.scoring[num]
-
 
         self.killswitchEngaged[num] = False   #always reset killswitch status when picking / tapping
 
@@ -4009,9 +3794,9 @@ class GuitarScene(Scene):
 
             tempScoreValue = len(self.instruments[num].playedNotes) * self.baseScore * self.multi[num]
             if self.coOpType and not self.coOpGH:
-                scoreCard.score += (tempScoreValue*self.scoring[num].getScoreMultiplier())
+                scoreCard.score += (tempScoreValue*scoreCard.getScoreMultiplier())
             else:
-                self.scoring[num].addScore(tempScoreValue)
+                scoreCard.addScore(tempScoreValue)
 
             scoreCard.notesHit += 1
             #MFH - tell ScoreCard to update its totalStreak counter if we've just passed 100% for some reason:
@@ -4021,15 +3806,14 @@ class GuitarScene(Scene):
 
             scoreCard.streak += 1
             if self.coOpType:
-                self.scoring[num].notesHit += 1
+                scoreCard.notesHit += 1
 
 
                 #MFH - tell ScoreCard to update its totalStreak counter if we've just passed 100% for some reason:
-                if self.scoring[num].notesHit > self.scoring[num].totalStreakNotes:
-                    self.scoring[num].totalStreakNotes = self.scoring[num].notesHit
+                if scoreCard.notesHit > scoreCard.totalStreakNotes:
+                    scoreCard.totalStreakNotes = scoreCard.notesHit
 
-
-                self.scoring[num].streak += 1
+                scoreCard.streak += 1
             scoreCard.updateAvMult()
             star = scoreCard.stars
             a = scoreCard.getStarScores()
@@ -4042,9 +3826,9 @@ class GuitarScene(Scene):
                     self.lastMultTime[num] = pos
                     self.instruments[num].setMultiplier(scoreCard.getScoreMultiplier())
             elif not self.battleGH:
-                if self.scoring[num].streak % 10 == 0:
+                if scoreCard.streak % 10 == 0:
                     self.lastMultTime[num] = pos
-                    self.instruments[num].setMultiplier(self.scoring[num].getScoreMultiplier())
+                    self.instruments[num].setMultiplier(scoreCard.getScoreMultiplier())
 
             #myfingershurt
             if self.showAccuracy:
@@ -4072,8 +3856,8 @@ class GuitarScene(Scene):
                     self.song.resetInstrumentPitch(self.playerList[num].part)
                 scoreCard.streak = 0
                 if self.coOpType:
-                    self.scoring[num].streak = 0
-                    self.scoring[num].endingStreakBroken = True
+                    scoreCard.streak = 0
+                    scoreCard.endingStreakBroken = True
                 self.instruments[num].setMultiplier(1)
                 self.currentlyAnimating = False
                 self.stage.triggerMiss(pos)
@@ -4109,14 +3893,14 @@ class GuitarScene(Scene):
         if self.coOpType:
             scoreCard = self.coOpScoreCard
         else:
-            scoreCard = self.scoring[num]
+            scoreCard = self.playerList[num].scoreCard
 
         if len(missedNotes) > 0:
             self.processedFirstNoteYet = True
             scoreCard.streak = 0
             if self.coOpType:
-                self.scoring[num].streak = 0
-                self.scoring[num].endingStreakBroken = True
+                scoreCard.streak = 0
+                scoreCard.endingStreakBroken = True
             self.instruments[num].setMultiplier(1)
             self.instruments[num].hopoActive = 0
             self.instruments[num].wasLastNoteHopod = False
@@ -4147,12 +3931,12 @@ class GuitarScene(Scene):
                 scoreCard.streak += 1
                 self.currentlyAnimating = True
                 if self.coOpType:
-                    self.scoring[num].streak += 1
-                    self.scoring[num].notesHit += 1
+                    scoreCard.streak += 1
+                    scoreCard.notesHit += 1
 
                     #MFH - tell ScoreCard to update its totalStreak counter if we've just passed 100% for some reason:
-                    if self.scoring[num].notesHit > self.scoring[num].totalStreakNotes:
-                        self.scoring[num].totalStreakNotes = self.scoring[num].notesHit
+                    if scoreCard.notesHit > scoreCard.totalStreakNotes:
+                        scoreCard.totalStreakNotes = scoreCard.notesHit
 
 
                 self.notesHit[num] = True #QQstarS:Set [0] to [i]
@@ -4167,7 +3951,7 @@ class GuitarScene(Scene):
                 tempScoreValue = len(self.instruments[num].playedNotes) * self.baseScore * self.multi[num]
 
             if self.coOpType and not self.coOpGH:
-                scoreCard.score += (tempScoreValue*self.scoring[num].getScoreMultiplier())
+                scoreCard.score += (tempScoreValue*scoreCard.getScoreMultiplier())
             else:
                 scoreCard.addScore(tempScoreValue)
 
@@ -4182,9 +3966,9 @@ class GuitarScene(Scene):
                     self.lastMultTime[num] = pos
                     self.instruments[num].setMultiplier(scoreCard.getScoreMultiplier())
             elif not self.battleGH:
-                if self.scoring[num].streak % 10 == 0:
+                if scoreCard.streak % 10 == 0:
                     self.lastMultTime[num] = pos
-                    self.instruments[num].setMultiplier(self.scoring[num].getScoreMultiplier())
+                    self.instruments[num].setMultiplier(scoreCard.getScoreMultiplier())
 
 
             isFirst = True
@@ -4204,8 +3988,8 @@ class GuitarScene(Scene):
                 self.song.resetInstrumentPitch(self.playerList[num].part)
             scoreCard.streak = 0
             if self.coOpType:
-                self.scoring[num].streak = 0
-                self.scoring[num].endingStreakBroken = True
+                scoreCard.streak = 0
+                scoreCard.endingStreakBroken = True
             self.instruments[num].setMultiplier(1)
             self.stage.triggerMiss(pos)
             self.guitarSoloBroken[num] = True
@@ -4235,14 +4019,14 @@ class GuitarScene(Scene):
         if self.coOpType:
             scoreCard = self.coOpScoreCard
         else:
-            scoreCard = self.scoring[num]
+            scoreCard = self.playerList[num]
 
         if len(missedNotes) > 0:
             self.processedFirstNoteYet = True
             scoreCard.streak = 0
             if self.coOpType:
-                self.scoring[num].streak = 0
-                self.scoring[num].endingStreakBroken = True
+                scoreCard.streak = 0
+                scoreCard.endingStreakBroken = True
             self.instruments[num].setMultiplier(1)
             self.instruments[num].hopoActive = 0
             self.instruments[num].wasLastNoteHopod = False
@@ -4274,8 +4058,8 @@ class GuitarScene(Scene):
             if len(self.instruments[num].missedNotes) != 0:
                 scoreCard.streak = 0
                 if self.coOpType:
-                    self.scoring[num].streak = 0
-                    self.scoring[num].endingStreakBroken = True
+                    scoreCard.streak = 0
+                    scoreCard.endingStreakBroken = True
                 self.guitarSoloBroken[num] = True
                 scoreCard.endingStreakBroken = True   #MFH
 
@@ -4306,18 +4090,18 @@ class GuitarScene(Scene):
             tempScoreValue = len(self.instruments[num].playedNotes) * self.baseScore * self.multi[num]
 
             if self.coOpType:
-                self.scoring[num].streak += 1
-                self.scoring[num].notesHit += 1
+                scoreCard.streak += 1
+                scoreCard.notesHit += 1
 
                 #MFH - tell ScoreCard to update its totalStreak counter if we've just passed 100% for some reason:
-                if self.scoring[num].notesHit > self.scoring[num].totalStreakNotes:
-                    self.scoring[num].totalStreakNotes = self.scoring[num].notesHit
+                if scoreCard.notesHit > scoreCard.totalStreakNotes:
+                    scoreCard.totalStreakNotes = scoreCard.notesHit
 
 
                 if self.coOpGH:
                     scoreCard.addScore(tempScoreValue)
                 else:
-                    scoreCard.score += (tempScoreValue*self.scoring[num].getScoreMultiplier())
+                    scoreCard.score += (tempScoreValue*scoreCard.getScoreMultiplier())
             else:
                 scoreCard.addScore(tempScoreValue)
 
@@ -4334,9 +4118,9 @@ class GuitarScene(Scene):
                     self.lastMultTime[num] = pos
                     self.instruments[num].setMultiplier(scoreCard.getScoreMultiplier())
             else:
-                if self.scoring[num].streak % 10 == 0:
+                if scoreCard.streak % 10 == 0:
                     self.lastMultTime[num] = pos
-                    self.instruments[num].setMultiplier(self.scoring[num].getScoreMultiplier())
+                    self.instruments[num].setMultiplier(scoreCard.getScoreMultiplier())
 
             #myfingershurt
             if self.showAccuracy:
@@ -4353,8 +4137,8 @@ class GuitarScene(Scene):
                 self.song.resetInstrumentPitch(self.playerList[num].part)
             scoreCard.streak = 0
             if self.coOpType:
-                self.scoring[num].streak = 0
-                self.scoring[num].endingStreakBroken = True
+                scoreCard.streak = 0
+                scoreCard.endingStreakBroken = True
             self.guitarSoloBroken[num] = True
             scoreCard.endingStreakBroken = True   #MFH
             self.instruments[num].setMultiplier(1)
@@ -4384,15 +4168,15 @@ class GuitarScene(Scene):
         if self.coOpType:
             scoreCard = self.coOpScoreCard
         else:
-            scoreCard = self.scoring[num]
+            scoreCard = self.playerList[num].scoreCard
 
         missedNotes = self.instruments[num].getMissedNotesMFH(self.song, pos, catchup = True)
         if len(missedNotes) > 0:
             self.processedFirstNoteYet = True
             scoreCard.streak = 0
             if self.coOpType:
-                self.scoring[num].streak = 0
-                self.scoring[num].endingStreakBroken = True
+                scoreCard.streak = 0
+                scoreCard.endingStreakBroken = True
             self.guitarSoloBroken[num] = True
             scoreCard.endingStreakBroken = True   #MFH
             self.instruments[num].setMultiplier(1)
@@ -4477,8 +4261,8 @@ class GuitarScene(Scene):
 
                 scoreCard.streak = 0
                 if self.coOpType:
-                    self.scoring[num].streak = 0
-                    self.scoring[num].endingStreakBroken = True
+                    scoreCard.streak = 0
+                    scoreCard.endingStreakBroken = True
                 self.guitarSoloBroken[num] = True
                 scoreCard.endingStreakBroken = True   #MFH
                 self.notesMissed[num] = True #QQstarS:Set [0] to [i]
@@ -4513,17 +4297,17 @@ class GuitarScene(Scene):
             tempScoreValue = len(self.instruments[num].playedNotes) * self.baseScore * self.multi[num]
 
             if self.coOpType:
-                self.scoring[num].streak += 1 #needed in co-op GH for RF HO/PO
-                self.scoring[num].notesHit += 1
+                scoreCard.streak += 1 #needed in co-op GH for RF HO/PO
+                scoreCard.notesHit += 1
 
                 #MFH - tell ScoreCard to update its totalStreak counter if we've just passed 100% for some reason:
-                if self.scoring[num].notesHit > self.scoring[num].totalStreakNotes:
-                    self.scoring[num].totalStreakNotes = self.scoring[num].notesHit
+                if scoreCard.notesHit > scoreCard.totalStreakNotes:
+                    scoreCard.totalStreakNotes = scoreCard.notesHit
 
                 if self.coOpGH:
                     scoreCard.addScore(tempScoreValue)
                 else:
-                    scoreCard.score += (tempScoreValue*self.scoring[num].getScoreMultiplier())
+                    scoreCard.score += (tempScoreValue*scoreCard.getScoreMultiplier())
             else:
                 scoreCard.addScore(tempScoreValue)
 
@@ -4535,9 +4319,9 @@ class GuitarScene(Scene):
                 self.engine.data.starDingSound.play()
 
             self.stage.triggerPick(pos, [n[1].number for n in self.instruments[num].playedNotes])
-            if self.scoring[num].streak % 10 == 0:
+            if scoreCard.streak % 10 == 0:
                 self.lastMultTime[num] = self.getSongPosition()
-                self.instruments[num].setMultiplier(self.scoring[num].getScoreMultiplier())
+                self.instruments[num].setMultiplier(scoreCard.getScoreMultiplier())
 
             if self.showAccuracy:
                 self.accuracy[num] = self.instruments[num].playedNotes[0][0] - pos
@@ -4594,8 +4378,8 @@ class GuitarScene(Scene):
                     self.song.resetInstrumentPitch(self.playerList[num].part)
                 scoreCard.streak = 0
                 if self.coOpType:
-                    self.scoring[num].streak = 0
-                    self.scoring[num].endingStreakBroken = True
+                    scoreCard.streak = 0
+                    scoreCard.endingStreakBroken = True
                 self.guitarSoloBroken[num] = True
                 scoreCard.endingStreakBroken = True   #MFH
                 self.instruments[num].setMultiplier(1)
@@ -4709,15 +4493,15 @@ class GuitarScene(Scene):
             guitar = self.instruments[num]
             if guitar.starPower >= 50: #QQstarS:Set [0] to [i]
                 if self.coOpRB:
-                    while len(self.deadPlayerList) > 0:
-                        i = self.deadPlayerList.pop(0) #keeps order intact (with >2 players)
-                        if self.instruments[i].coOpFailed and self.timesFailed[i]<3:
-                            self.instruments[i].coOpRescue(self.getSongPosition())
-                            self.rock[i] = self.rockMax * 0.667
+                    #revives the dead players
+                    while len(self.coOpPlayerMeter.deadList) > 0:
+                        player = self.coOpPlayerMeter.deadList.pop(0)
+                        if player.instrument.coOpFailed and player.rockCard.timesFailed < 3:
+                            player.instrument.coOpRescue(self.getSongPosition())
+                            player.rockCard.coOpRescue()
                             guitar.starPower -= 50
                             self.engine.data.rescueSound.play()
                             self.coOpFailDone[i] = False
-                            self.numDeadPlayers -= 1
                             if not guitar.isVocal:
                                 self.hopFretboard(num, 0.07)  #stump
                                 guitar.neck.overdriveFlashCount = 0  #MFH - this triggers the oFlash strings & timer
@@ -4750,8 +4534,8 @@ class GuitarScene(Scene):
                 player.twoChord = self.instruments[i].twoChord
 
                 if self.playerList[0].practiceMode:
-                    self.scoring[i].score = 0
-                if self.scoring[i].score > 0:
+                    self.playerList[i].scoreCard.score = 0
+                if self.playerList[i].scoreCard.score > 0:
                     noScore = False
                     break
             else:
@@ -4862,9 +4646,9 @@ class GuitarScene(Scene):
             pos   = self.getSongPosition()
             notes = self.instruments[num].getRequiredNotesMFH(self.song, pos)
 
-            if ((self.scoring[num].streak > 0 and self.instruments[num].areNotesTappable(notes)) or \
+            if ((scoreCard.streak > 0 and self.instruments[num].areNotesTappable(notes)) or \
                 (self.instruments[num].guitarSolo and control in self.soloKeysList[num])) and \
-               self.instruments[num].controlsMatchNotes(self.controls, notes):
+                 self.instruments[num].controlsMatchNotes(self.controls, notes):
                 self.doPick(num)
         elif control in Player.starts:
             if self.ending == True:
@@ -5096,7 +4880,8 @@ class GuitarScene(Scene):
         if self.coOpType:
             scoreCard = self.coOpScoreCard
         else:
-            scoreCard = self.scoring[num]
+            scoreCard = self.playerList[num].scoreCard
+
         noteCount  = len(self.instruments[num].playedNotes)
         pickLength = self.instruments[num].getPickLength(self.getSongPosition())
         if pickLength > 1.1 * self.song.period / 4:
@@ -5133,8 +4918,8 @@ class GuitarScene(Scene):
             pos   = self.getSongPosition()
             notes = self.instruments[num].getRequiredNotesMFH(self.song, pos)
 
-            if ((self.scoring[num].streak > 0 and self.instruments[num].areNotesTappable(notes)) or \
-                (self.instruments[num].guitarSolo and control in self.soloKeysList[num])) and \
+            if ((scoreCard.streak > 0 and self.instruments[num].areNotesTappable(notes)) or \
+               (self.instruments[num].guitarSolo and control in self.soloKeysList[num])) and \
                self.instruments[num].controlsMatchNotes(self.controls, notes):
                 self.doPick(num)
             # Otherwise we end the pick if the notes have been playing long enough
@@ -5545,11 +5330,11 @@ class GuitarScene(Scene):
                                 sAvMult = self.coOpScoreCard.avMult
                                 sEfHand = self.coOpScoreCard.handicapValue
                             else:
-                                sNotesHit   = self.scoring[i].notesHit
-                                sTotalNotes = self.scoring[i].totalStreakNotes
-                                sHitAcc = self.scoring[i].hitAccuracy
-                                sAvMult = self.scoring[i].avMult
-                                sEfHand = self.scoring[i].handicapValue
+                                sNotesHit   = self.playerList[i].scoreCard.notesHit
+                                sTotalNotes = self.playerList[i].scoreCard.totalStreakNotes
+                                sHitAcc = self.playerList[i].scoreCard.hitAccuracy
+                                sAvMult = self.playerList[i].scoreCard.avMult
+                                sEfHand = self.playerList[i].scoreCard.handicapValue
                             trimmedTotalNoteAcc = self.roundDecimalForDisplay(sHitAcc)
                             text = "%(notesHit)s/%(totalNotes)s: %(hitAcc)s%%" % \
                               {'notesHit': str(sNotesHit), 'totalNotes': str(sTotalNotes), 'hitAcc': str(trimmedTotalNoteAcc)}
@@ -5593,7 +5378,7 @@ class GuitarScene(Scene):
                             if self.dispSoloReview[i] and not self.pause and not self.failed:
                                 if self.soloReviewCountdown[i] < self.soloReviewDispDelay:
                                     self.soloReviewCountdown[i] += 1
-                                    if not (self.instruments[i].freestyleActive or self.scoring[i].freestyleWasJustActive):
+                                    if not (self.instruments[i].freestyleActive or self.playerList[i].scoreCard.freestyleWasJustActive):
                                         glColor3f(1, 1, 1)
                                         text1 = self.soloReviewText[i][0]
                                         text2 = self.soloReviewText[i][1]
@@ -5859,7 +5644,7 @@ class GuitarScene(Scene):
                                 #MFH - render guitar solo in progress - stats
                                 if self.instruments[i].guitarSolo:
 
-                                            #MFH - scale and display self.soloFrame behind / around the solo accuracy text display
+                                    #MFH - scale and display self.soloFrame behind / around the solo accuracy text display
 
                                     if self.soloFrame:
                                         frameWidth = self.solo_Tw[i]*1.15
@@ -5878,7 +5663,7 @@ class GuitarScene(Scene):
                                     else:
                                         oneTime = False
                                 else:
-                                    scoreCard = self.scoring[i]
+                                    scoreCard = self.playerList[i].scoreCard
                                     oneTime = True
                                 #MFH - show BRE temp score frame
                                 if (self.instruments[i].freestyleActive or (scoreCard.freestyleWasJustActive and not scoreCard.endingStreakBroken and not scoreCard.endingAwarded)) and oneTime == True:
@@ -6037,7 +5822,7 @@ class GuitarScene(Scene):
                                         freeX = .05*(self.numOfPlayers-1)
                                         freeI = .05*self.numOfPlayers
                                         for j in xrange(self.numOfPlayers):
-                                            if self.scoring[j].endingStreakBroken:
+                                            if self.playerList[j].scoreCard.endingStreakBroken:
                                                 partcolor = (.4, .4, .4, 1)
                                             else:
                                                 partcolor = (.8, .8, .8, 1)
