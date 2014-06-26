@@ -14,11 +14,11 @@ doc/epydoc
 fofix/*.ini
 fofix/*.log
 fofix/*.idb
-fofix/audio/MixStream/_MixStream.c
-fofix/audio/pypitch/_pypitch.cpp
+fofix/core/cmgl/cmgl.c
+fofix/core/MixStream/_MixStream.c
+fofix/core/VideoPlayer/_VideoPlayer.c
+fofix/core/pypitch/_pypitch.cpp
 build
-fofix/graphics/VideoPlayer/_VideoPlayer.c
-fofix/graphics/cmgl/cmgl.c
 gstreamer/*
 data/library.zip
 data/users/players/*
