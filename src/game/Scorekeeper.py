@@ -46,19 +46,19 @@ SCORE_MULTIPLIER = [0, 10, 20, 30]
 BASS_GROOVE_SCORE_MULTIPLIER = [0, 10, 20, 30, 40, 50]
 
 #like Guitar Hero
-GH_STAR_VALUES = [0.0, 0.2, 0.4, 1.2, 2.0, 2.8]  
+GH_STAR_VALUES = [0.0, 0.2, 0.4, 1.2, 2.0, 2.8]
         
 #like Rockband
-RB_STAR_VALUES = [0.0, 0.21, 0.46, 0.77, 1.85, 3.08, 4.52] 
+RB_STAR_VALUES = [0.0, 0.21, 0.46, 0.77, 1.85, 3.08, 4.52]
 RB_BASS_STAR_VALUES = [0.0, 0.21, 0.5, 0.9, 2.77, 4.62, 6.78]
-RB_DRUM_STAR_VALUES = [0.0, 0.21, 0.46, 0.77, 1.85, 3.08, 4.29] 
+RB_DRUM_STAR_VALUES = [0.0, 0.21, 0.46, 0.77, 1.85, 3.08, 4.29]
 RB_VOC_STAR_VALUES = [0.0, 0.21, 0.46, 0.77, 1.85, 3.08, 4.18]
                     
 #RB+GH mix
-MIX_STAR_VALUES = [0.0, 0.25, 0.5, 1.0, 2.0, 3.0, 5.3]  
-MIX_BASS_STAR_VALUES = [0.0, 0.25, 0.5, 1.0, 2.0, 3.0, 4.8] 
-MIX_DRUM_STAR_VALUES = [0.0, 0.25, 0.5, 1.0, 2.0, 3.0, 4.65] 
-MIX_COOP_STAR_VALUES = [0.0, 0.25, 0.5, 1.0, 2.0, 3.0, 4.8] 
+MIX_STAR_VALUES = [0.0, 0.25, 0.5, 1.0, 2.0, 3.0, 5.3]
+MIX_BASS_STAR_VALUES = [0.0, 0.25, 0.5, 1.0, 2.0, 3.0, 4.8]
+MIX_DRUM_STAR_VALUES = [0.0, 0.25, 0.5, 1.0, 2.0, 3.0, 4.65]
+MIX_COOP_STAR_VALUES = [0.0, 0.25, 0.5, 1.0, 2.0, 3.0, 4.8]
 
 #accuracy-based
 FOF_STAR_VALUES = [0, 10, 30, 50, 75, 95, 100]
