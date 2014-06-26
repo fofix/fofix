@@ -320,7 +320,7 @@ else:
     # Other systems: we ask pkg-config.
     gl_info = pc_info('gl')
     # And build our own soundtouch-c.
-    extra_soundtouch_src = ['audio/MixStream/soundtouch-c.cpp']
+    extra_soundtouch_src = ['fofix/core/MixStream/soundtouch-c.cpp']
 # Build a similar info record for the numpy headers.
 numpy_info = {'include_dirs': [np.get_include()]}
 
