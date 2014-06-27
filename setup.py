@@ -55,8 +55,10 @@ if os.name == 'nt':
         #stump: sometimes py2.6 py2exe thinks parts of pygame are "system" DLLs...
         __orig_isSystemDLL = py2exe.build_exe.isSystemDLL
         def isSystemDLL(pathname):
-            if pathname.lower().find('pygame') != -1:
-                return 0
+            exclude = ['pygame', 'libogg']
+            for dll in exclude:
+                if pathname.lower().find(dll) != -1:
+                    return 0
             return __orig_isSystemDLL(pathname)
         py2exe.build_exe.isSystemDLL = isSystemDLL
 
