@@ -124,6 +124,7 @@ if int(OpenGL.__version__[0]) > 2:
       "OpenGL.arrays.lists",
       "OpenGL.arrays.numbers",
       "OpenGL.arrays.strings",  #stump: needed by shader code
+      "OpenGL.arrays.ctypesparameters",
     ]
     if os.name == 'nt':
         extraIncludes.append("OpenGL.platform.win32")
