@@ -515,7 +515,7 @@ class SongInfo(object):
     def cassetteColor(self):
         c = self._get("cassettecolor")
         if c:
-            return hexToColor(c)
+            return self.engine.theme.hexToColor(c)
 
     def getScoreHash(self, difficulty, score, stars, name):
         if isinstance(difficulty, Difficulty):
