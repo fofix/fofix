@@ -88,7 +88,7 @@ def hexToColor(color):
         else:
             colorData = [color[i:i+2] for i in xrange(0, len(color), 2)]
 
-        rgbColor = tuple([int(i, 16) / 255 for i in colorData])
+        rgbColor = tuple([int(i, 16) / 255.0 for i in colorData])
 
     return rgbColor
 
