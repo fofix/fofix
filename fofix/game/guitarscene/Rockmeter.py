@@ -39,6 +39,7 @@ from OpenGL.GL import *
 from fofix.core.LinedConfigParser import LinedConfigParser
 from fofix.core.Theme import halign, valign
 from fofix.core.Image import ImgDrawing
+from fofix.core.Theme import hexToColor
 from fofix.core.Image import drawImage
 from fofix.core.constants import *
 from fofix.core import Version
@@ -143,7 +144,7 @@ class Layer(ConfigGetMixin):
 
         if self.config.has_option(section, "color"):
                                             #color of the image (#FFFFFF is white on text, on images it is full color)
-            self.color   = list(self.engine.theme.hexToColor(self.get("color", str, "#FFFFFF")))
+            self.color   = list(hexToColor(self.get("color", str, "#FFFFFF")))
             if len(self.color) == 3:
                 self.color.append(1.0)
             self.r, self.g, self.b, self.a = [str(c) for c in self.color]
@@ -679,13 +680,13 @@ class Fade(IncrementEffect):
         super(Fade, self).__init__(layer, section)
 
         #starting color
-        color = list(self.engine.theme.hexToColor(self.get("color", str, "#FFFFFF")))
+        color = list(hexToColor(self.get("color", str, "#FFFFFF")))
         self.start = list(color)
         if len(self.start) == 3:
             self.start.append(1.0)
 
         #the color to fade to
-        self.end = list(self.engine.theme.hexToColor(self.get("fadeTo", str, "#FFFFFF")))
+        self.end = list(hexToColor(self.get("fadeTo", str, "#FFFFFF")))
         #makes sure alpha is added
         if len(self.end) == 3:
             color.append(1.0)

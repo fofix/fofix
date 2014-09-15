@@ -1443,11 +1443,11 @@ class GuitarScene(Scene):
         #MFH - new theme.ini color options:
 
         self.ingame_stats_color = self.engine.theme.ingame_stats_colorVar
-        self.pause_text_color = self.engine.theme.hexToColor(self.engine.theme.pause_text_colorVar)
-        self.pause_selected_color = self.engine.theme.hexToColor(self.engine.theme.pause_selected_colorVar)
-        self.fail_text_color = self.engine.theme.hexToColor(self.engine.theme.fail_text_colorVar)
-        self.fail_selected_color = self.engine.theme.hexToColor(self.engine.theme.fail_selected_colorVar)
-        self.fail_completed_color = self.engine.theme.hexToColor(self.engine.theme.fail_completed_colorVar)
+        self.pause_text_color = self.engine.theme.pause_text_colorVar
+        self.pause_selected_color = self.engine.theme.pause_selected_colorVar
+        self.fail_text_color = self.engine.theme.fail_text_colorVar
+        self.fail_selected_color = self.engine.theme.fail_selected_colorVar
+        self.fail_completed_color = self.engine.theme.fail_completed_colorVar
 
         settingsMenu = Settings.GameSettingsMenu(self.engine, self.pause_text_color, self.pause_selected_color, players = self.playerList)
         careerSettingsMenu = Settings.GameCareerSettingsMenu(self.engine, self.pause_text_color, self.pause_selected_color, players = self.playerList)

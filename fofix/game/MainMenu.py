@@ -152,8 +152,8 @@ class MainMenu(BackgroundLayer):
         ]
 
         self.opt_bkg_size = [float(i) for i in self.engine.theme.opt_bkg_size]
-        self.opt_text_color = self.engine.theme.hexToColor(self.engine.theme.opt_text_colorVar)
-        self.opt_selected_color = self.engine.theme.hexToColor(self.engine.theme.opt_selected_colorVar)
+        self.opt_text_color = self.engine.theme.opt_text_colorVar
+        self.opt_selected_color = self.engine.theme.opt_selected_colorVar
 
         if self.BGText:
             strCareer = ""

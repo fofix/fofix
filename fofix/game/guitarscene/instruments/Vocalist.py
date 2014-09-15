@@ -194,7 +194,7 @@ class Vocalist:
         self.vocalFillupCenterY = int(self.engine.theme.vocalFillupCenterY*olFactor)
         self.vocalFillupInRadius = int(self.engine.theme.vocalFillupInRadius*olFactor)
         self.vocalFillupOutRadius = int(self.engine.theme.vocalFillupOutRadius*olFactor)
-        self.vocalFillupColor = self.engine.theme.colorToHex(self.engine.theme.vocalFillupColor)
+        self.vocalFillupColor = self.engine.theme.vocalFillupColor
         self.vocalContinuousAvailable = self.engine.theme.vocalCircularFillup and \
           None not in (self.vocalFillupCenterX, self.vocalFillupCenterY, self.vocalFillupInRadius, self.vocalFillupOutRadius, self.vocalFillupColor)
         if self.vocalContinuousAvailable:

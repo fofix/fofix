@@ -32,6 +32,7 @@ import cPickle  #stump: Cerealizer and sqlite3 don't seem to like each other tha
 import hashlib
 import binascii
 
+from fofix.core.Theme import hexToColor, colorToHex
 from fofix.core.Unicode import utf8
 from fofix.core.Language import _
 from fofix.core.Theme import *

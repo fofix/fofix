@@ -652,8 +652,8 @@ class SettingsMenu(Menu.Menu):
                 self.opt_text_y = .14
 
 
-        self.opt_text_color = self.engine.theme.hexToColor(self.engine.theme.opt_text_colorVar)
-        self.opt_selected_color = self.engine.theme.hexToColor(self.engine.theme.opt_selected_colorVar)
+        self.opt_text_color = self.engine.theme.opt_text_colorVar
+        self.opt_selected_color = self.engine.theme.opt_selected_colorVar
 
         if self.opt_text_color == None:
             self.opt_text_color = (1,1,1)
@@ -1133,8 +1133,8 @@ class BasicSettingsMenu(Menu.Menu):
                 self.opt_text_y = .14
 
 
-        self.opt_text_color = self.engine.theme.hexToColor(self.engine.theme.opt_text_colorVar)
-        self.opt_selected_color = self.engine.theme.hexToColor(self.engine.theme.opt_selected_colorVar)
+        self.opt_text_color = self.engine.theme.opt_text_colorVar
+        self.opt_selected_color = self.engine.theme.opt_selected_colorVar
 
         if self.opt_text_color == None:
             self.opt_text_color = (1,1,1)

@@ -70,6 +70,35 @@ def valign(value, default='middle'):
         Log.warn('Invalid vertical alignment value - defaulting to %s' % default)
         return valign(default)
 
+
+def hexToColor(color):
+    ''' Convert hexadecimal color string to tuple containing rgb or rgba values '''
+
+    if not isinstance(color, str):
+        raise TypeError('Invalid input type: {}'.format(type(color)))
+
+    elif color[0] != '#':
+        raise ValueError('Invalid color')
+
+    else:
+        color = color[1:]
+
+        if len(color) < 4:
+            colorData = [color[i]+color[i] for i in xrange(0, len(color))]
+        else:
+            colorData = [color[i:i+2] for i in xrange(0, len(color), 2)]
+
+        rgbColor = tuple([int(i, 16) / 255 for i in colorData])
+
+    return rgbColor
+
+def colorToHex(color):
+    if not isinstance(color, tuple):
+        raise TypeError
+
+    colorData = [ "%02x" % int(c * 255) for c in color]
+    return "#%s" % "".join(colorData)
+
 class Theme(Task):
 
     def __getattr__(self, attr):
@@ -114,12 +143,20 @@ class Theme(Task):
                     if type == bool:
                         return isTrue(self.config.get("theme", value).lower())
                     elif type == "color":
-                        return self.hexToColor(self.config.get("theme", value))
+                        try:
+                            value = hexToColor(self.config.get("theme", value))
+                        except ValueError:
+                            value = self.config.get("theme", value)
+
+                        return value
                     else:
                         return type(self.config.get("theme", value))
-
             if type == "color":
-                return self.hexToColor(default)
+                try:
+                    value = hexToColor(default)
+                except ValueError:
+                    value = default
+                return value
             return default
 
         #These colors are very important
@@ -153,19 +190,20 @@ class Theme(Task):
         #since the original Frets on Fire.  What glow_color allows you to do is set it so
         #the glow is either the color of the fret it's over or it can be the color the image
         #actually is (if the image is white then no matter what key is hit the glow will be white)
-        self.hitGlowColor   = get("hit_glow_color",       str,    "frets")
+        
+        self.hitGlowColor   = get("hit_glow_color", str, "frets")
         if not self.hitGlowColor == "frets":
-            self.hitGlowColor = self.hexToColor(self.hitGlowColor)
+            self.hitGlowColor = hexToColor(self.hitGlowColor)
 
         #Sets the color of the glow.png
         self.glowColor   = get("glow_color",       str,    "frets")
         if not self.glowColor == "frets":
-            self.glowColor = self.hexToColor(self.glowColor)
+            self.glowColor = hexToColor(self.glowColor)
 
         #Acts similar to the glowColor but its does so for flames instead
         self.flamesColor   = get("flames_color",       str,    "frets")
         if not self.flamesColor == "frets":
-            self.flamesColor = self.hexToColor(self.flamesColor)
+            self.flamesColor = hexToColor(self.flamesColor)
 
         #Note Colors (this applies to frets and notes)
         #default is green, red, yellow, blue, orange, purple (I don't know why there's a 6th color)
@@ -180,7 +218,7 @@ class Theme(Task):
         #Color of the tails when whammied, default is set to the colors of the frets
         self.killNoteColor  = get("fretK_color",       str,    "frets")
         if not self.killNoteColor == "frets":
-            self.killNoteColor = self.hexToColor(self.killNoteColor)
+            self.killNoteColor = hexToColor(self.killNoteColor)
 
         #just like glow_color, this allows you to have tails use either the color of the note
         #or the actual color of the tail
@@ -723,51 +761,11 @@ class Theme(Task):
         glColor4f(*(self.baseColor + (alpha,)))
 
     def hexToColorResults(self, color):
-        if isinstance(color, tuple):
-            return color
-        elif color is None:
+        # TODO - Go through GameResultsScene and remove the usage of this.
+        try:
+            return hexToColor(color)
+        except ValueError, TypeError:
             return self.baseColor
-        color = color.strip()
-        if color[0] == "#":
-            color = color[1:]
-            if len(color) == 3:
-                return (int(color[0], 16) / 15.0, int(color[1], 16) / 15.0, int(color[2], 16) / 15.0)
-            return (int(color[0:2], 16) / 255.0, int(color[2:4], 16) / 255.0, int(color[4:6], 16) / 255.0)
-        return self.baseColor
-
-    @staticmethod
-    def hexToColor(color):
-        if isinstance(color, tuple):
-            return color
-        elif color is None:
-            return (0,0,0)
-        if color[0] == "#":
-            color = color[1:]
-            if len(color) == 3:
-                return (int(color[0], 16) / 15.0, int(color[1], 16) / 15.0, int(color[2], 16) / 15.0)
-            elif len(color) == 4:
-                return (int(color[0], 16) / 15.0, int(color[1], 16) / 15.0, int(color[2], 16) / 15.0, int(color[3], 16) / 15.0)
-            elif len(color) == 8:
-                return (int(color[0:2], 16) / 255.0, int(color[2:4], 16) / 255.0, int(color[4:6], 16) / 255.0, int(color[6:8], 16) / 255.0)
-            return (int(color[0:2], 16) / 255.0, int(color[2:4], 16) / 255.0, int(color[4:6], 16) / 255.0)
-        elif color.lower() == "off":
-            return (-1, -1, -1)
-        elif color.lower() == "fret":
-            return (-2, -2, -2)
-        return (0, 0, 0)
-
-    def rgbToColor(self, color):
-        retVal = []
-        for c in color:
-            if isinstance(c, int) and c > 1:
-                retVal.append(float(c)/255.0)
-        return tuple(retVal)
-
-    @staticmethod
-    def colorToHex(color):
-        if isinstance(color, str):
-            return color
-        return "#" + ("".join(["%02x" % int(c * 255) for c in color]))
 
     def packTupleKey(self, key, type = str):
         vals = key.split(',')
