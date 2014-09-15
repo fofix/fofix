@@ -74,7 +74,7 @@ def valign(value, default='middle'):
 def hexToColor(color):
     ''' Convert hexadecimal color string to tuple containing rgb or rgba values '''
 
-    if not isinstance(color, str):
+    if not (isinstance(color, str) or isinstance(color, unicode)):
         raise TypeError('Invalid input type: {}'.format(type(color)))
 
     elif color[0] != '#':
