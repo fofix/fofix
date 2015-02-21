@@ -1193,7 +1193,8 @@ class GameResultsScene(Scene):
                 text4 = self.originalScore[i]
             wText, hText = font.getStringSize(text, scale = float(self.engine.theme.result_cheats_info[2]))
             try:
-                r, g, b = self.engine.theme.hexToColorResults(self.engine.theme.result_cheats_color)
+                #r, g, b = self.engine.theme.hexToColorResults(self.engine.theme.result_cheats_color)
+                r, g, b = self.engine.theme.result_cheats_color
                 glColor3f(r, g, b)
             except IndexError:
                 self.engine.theme.setBaseColor(1-v)

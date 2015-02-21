@@ -30,7 +30,7 @@ try:
 except ImportError:
     haveMidi = False
 
-haveMidi = False
+#haveMidi = False
 from fofix.core.Player import Controls
 from fofix.core.Task import Task
 from fofix.core import Player

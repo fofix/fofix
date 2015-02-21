@@ -2010,7 +2010,7 @@ class NoteTrack(Track):   #MFH - special Track type for note events, with markin
 
 
 class Song(object):
-    def __init__(self, engine, infoFileName, songTrackName, guitarTrackName, rhythmTrackName, noteFileName, scriptFileName = None, partlist = [parts[GUITAR_PART]], drumTrackName = None, crowdTrackName = None):
+    def __init__(self, engine, infoFileName, songTrackName, guitarTrackName, rhythmTrackName, noteFileName, scriptFileName = None, partlist = [parts[GUITAR_PART]], drumTrackNames = [], crowdTrackName = None, vocalTrackName = None):
         self.engine        = engine
 
         self.logClassInits = self.engine.config.get("game", "log_class_inits")
@@ -2082,9 +2082,10 @@ class Song(object):
         self.rhythmTrack = None
 
         #myfingershurt:
-        self.drumTrack = None
+        self.drumTracks = []
         #akedrou
         self.crowdTrack = None
+        self.vocalTrack = None
 
         try:
             if songTrackName:
@@ -2104,23 +2105,32 @@ class Song(object):
         except Exception, e:
             Log.warn("Unable to load rhythm track: %s" % e)
 
-
+        i = 3
         try:
-            if drumTrackName:
-                self.drumTrack = Audio.StreamingSound(self.engine.audio.getChannel(3), drumTrackName)
+            if drumTrackNames:
+                for drumTrackName in drumTrackNames:
+                    self.drumTracks.append(Audio.StreamingSound(self.engine.audio.getChannel(i), drumTrackName))
+                    i += 1
         except Exception, e:
             Log.warn("Unable to load drum track: %s" % e)
 
         try:
             if crowdTrackName:
-                self.crowdTrack = Audio.StreamingSound(self.engine.audio.getChannel(4), crowdTrackName)
+                self.crowdTrack = Audio.StreamingSound(self.engine.audio.getChannel(i), crowdTrackName)
         except Exception, e:
             Log.warn("Unable to load crowd track: %s" % e)
 
+        try:
+            if vocalTrackName:
+                print "vocal track added"
+                self.vocalTrack = Audio.StreamingSound(self.engine.audio.getChannel(i), vocalTrackName)
+        except Exception, e:
+            Log.warn("Unable to load vocal track: %s" % e)
+
         #MFH - single audio track song detection
         self.singleTrackSong = False
-        if (self.songTrack == None) or (self.guitarTrack == None and self.rhythmTrack == None and self.drumTrack == None):
-            if not (self.songTrack == None and self.guitarTrack == None and self.rhythmTrack == None and self.drumTrack == None):
+        if (self.songTrack == None) or (self.guitarTrack == None and self.rhythmTrack == None and self.drumTracks == None and self.vocalTrack == None):
+            if not (self.songTrack == None and self.guitarTrack == None and self.rhythmTrack == None and self.drumTracks == None and self.vocalTrack == None):
                 self.singleTrackSong = True
                 self.missVolume = self.engine.config.get("audio", "single_track_miss_volume")   #MFH - force single-track miss volume setting instead
                 Log.debug("Song with only a single audio track identified - single-track miss volume applied: " + str(self.missVolume))
@@ -2206,12 +2216,16 @@ class Song(object):
             assert start == 0.0
             self.rhythmTrack.play()
         #myfingershurt
-        if self.drumTrack:
-            assert start == 0.0
-            self.drumTrack.play()
+        if self.drumTracks:
+            for drumTrack in self.drumTracks:
+                assert start == 0.0
+                drumTrack.play()
         if self.crowdTrack:
             assert start == 0.0
             self.crowdTrack.play()
+        if self.vocalTrack:
+            assert start == 0.0
+            self.vocalTrack.play()
         self._playing = True
 
     def pause(self):
@@ -2267,16 +2281,17 @@ class Song(object):
                 self.rhythmTrack.setVolume(volume)
 
     def setDrumVolume(self, volume):
-        if self.drumTrack:
-            if volume == 0:
-                self.drumTrack.setVolume(self.missVolume)
-            elif volume == 1:
-                if DRUM_TRACK in self.activeAudioTracks:
-                    self.drumTrack.setVolume(self.activeVolume)
+        if self.drumTracks:
+            for drumTrack in self.drumTracks:
+                if volume == 0:
+                    drumTrack.setVolume(self.missVolume)
+                elif volume == 1:
+                    if DRUM_TRACK in self.activeAudioTracks:
+                        drumTrack.setVolume(self.activeVolume)
+                    else:
+                        drumTrack.setVolume(self.backVolume)
                 else:
-                    self.drumTrack.setVolume(self.backVolume)
-            else:
-                self.drumTrack.setVolume(volume)
+                    drumTrack.setVolume(volume)
 
     def setInstrumentPitch(self, semitones, part):
         if part == parts[GUITAR_PART]:
@@ -2330,8 +2345,9 @@ class Song(object):
             self.guitarTrack.stop()
         if self.rhythmTrack:
             self.rhythmTrack.stop()
-        if self.drumTrack:
-            self.drumTrack.stop()
+        if self.drumTracks:
+            for drumTrack in self.drumTracks:
+                drumTrack.stop()
         if self.crowdTrack:
             self.crowdTrack.stop()
         self._playing = False
@@ -2343,8 +2359,9 @@ class Song(object):
             self.guitarTrack.setSpeed(speed)
         if self.rhythmTrack:
             self.rhythmTrack.setSpeed(speed)
-        if self.drumTrack:
-            self.drumTrack.setSpeed(speed)
+        if self.drumTracks:
+            for drumTrack in self.drumTracks:
+                drumTrack.setSpeed(speed)
         if self.crowdTrack:
             self.crowdTrack.setSpeed(speed)
 
@@ -2359,8 +2376,9 @@ class Song(object):
             self.guitarTrack.fadeout(time)
         if self.rhythmTrack:
             self.rhythmTrack.fadeout(time)
-        if self.drumTrack:
-            self.drumTrack.fadeout(time)
+        if self.drumTracks:
+            for drumTrack in self.drumTracks:
+                drumTrack.fadeout(time)
         if self.crowdTrack:
             self.crowdTrack.fadeout(time)
         self._playing = False
@@ -3197,6 +3215,7 @@ def loadSong(engine, name, library = DEFAULT_LIBRARY, seekable = False, playback
     songFile   = engine.resource.fileName(library, name, "song.ogg")
     rhythmFile = engine.resource.fileName(library, name, "rhythm.ogg")
     crowdFile  = engine.resource.fileName(library, name, "crowd.ogg")
+    vocalFile  = engine.resource.fileName(library, name, "vocals.ogg")
 
     logUneditedMidis = engine.config.get("log",   "log_unedited_midis")
 
@@ -3219,8 +3238,19 @@ def loadSong(engine, name, library = DEFAULT_LIBRARY, seekable = False, playback
     scriptFile = engine.resource.fileName(library, name, "script.txt")
     previewFile = engine.resource.fileName(library, name, "preview.ogg")
     #myfingershurt:
-    drumFile = engine.resource.fileName(library, name, "drums.ogg")
-
+    drumFiles=[]
+    if os.path.isfile(engine.resource.fileName(library, name, "drums.ogg")):
+        drumFiles.append(engine.resource.fileName(library, name, "drums.ogg"))
+    if os.path.isfile(engine.resource.fileName(library, name, "drums_1.ogg")):
+        drumFiles.append(engine.resource.fileName(library, name, "drums_1.ogg"))
+    if os.path.isfile(engine.resource.fileName(library, name, "drums_2.ogg")):
+        drumFiles.append(engine.resource.fileName(library, name, "drums_2.ogg"))
+    if os.path.isfile(engine.resource.fileName(library, name, "drums_3.ogg")):
+        drumFiles.append(engine.resource.fileName(library, name, "drums_3.ogg"))
+    if os.path.isfile(engine.resource.fileName(library, name, "drums_4.ogg")):
+        drumFiles.append(engine.resource.fileName(library, name, "drums_4.ogg"))
+    if os.path.isfile(engine.resource.fileName(library, name, "drums_5.ogg")):
+        drumFiles.append(engine.resource.fileName(library, name, "drums_5.ogg"))
 
     if seekable:
         if os.path.isfile(guitarFile) and os.path.isfile(songFile):
@@ -3237,8 +3267,10 @@ def loadSong(engine, name, library = DEFAULT_LIBRARY, seekable = False, playback
         guitarFile = None
     if not os.path.isfile(rhythmFile):
         rhythmFile = None
-    if not os.path.isfile(drumFile):
-        drumFile = None
+    if not os.path.isfile(drumFiles[0]):
+        drumFiles = None
+    if not os.path.isfile(vocalFile):
+        vocalFile = None
     if not os.path.isfile(crowdFile):
         crowdFile = None
     if crowdsEnabled == 0:
@@ -3257,12 +3289,13 @@ def loadSong(engine, name, library = DEFAULT_LIBRARY, seekable = False, playback
             songFile = guitarFile
         elif part[0] == parts[BASS_PART] and rhythmFile != None:
             songFile = rhythmFile
-        elif (part[0] == parts[DRUM_PART] or part[0] == parts[PRO_DRUM_PART]) and drumFile != None:
-            songFile = drumFile
+        elif (part[0] == parts[DRUM_PART] or part[0] == parts[PRO_DRUM_PART]) and drumFiles != None:
+            songFile = drumFiles
         guitarFile = None
         rhythmFile = None
-        drumFile = None
+        drumFiles = None
         crowdFile = None
+        vocalFile = None
         slowDownFactor = practiceSpeed
     else:
         slowDownFactor = engine.config.get("audio", "speed_factor")
@@ -3276,17 +3309,19 @@ def loadSong(engine, name, library = DEFAULT_LIBRARY, seekable = False, playback
             songFile = previewFile
             guitarFile = None
             rhythmFile = None
-            drumFile = None
+            drumFiles = None
+            vocalFile = None
 
     if notesOnly:
         songFile = None
         crowdFile = None
+        vocalFile = None
         guitarFile = None
         rhythmFile = None
         previewFile = None
-        drumFile = None
-
-    song       = Song(engine, infoFile, songFile, guitarFile, rhythmFile, noteFile, scriptFile, part, drumFile, crowdFile)
+        drumFiles = None
+    print drumFiles
+    song       = Song(engine, infoFile, songFile, guitarFile, rhythmFile, noteFile, scriptFile, part, drumFiles, crowdFile, vocalFile)
     return song
 
 def loadSongInfo(engine, name, library = DEFAULT_LIBRARY):
