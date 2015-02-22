@@ -891,6 +891,7 @@ class Note(Event):
     def __init__(self, number, length, special = False, tappable = 0, star = False, finalStar = False):
         Event.__init__(self, length)
         self.number   = number      #keeps track of fret number
+        self.prodrum  = True
         self.played   = False
         self.special  = special
         self.tappable = tappable

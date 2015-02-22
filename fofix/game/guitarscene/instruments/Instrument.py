@@ -771,7 +771,6 @@ class Instrument(object):
         else:
             track   = song.track[self.player]
             notes = [(time, event) for time, event in track.getEvents(pos - self.currentPeriod * 2, pos + self.currentPeriod * self.beatsPerBoard)]
-
         if self.battleStatus[7]:
             notes = self.getDoubleNotes(notes)
         return notes
@@ -1125,7 +1124,7 @@ class Instrument(object):
             glColor3f(self.meshColor[0], self.meshColor[1], self.meshColor[2])
             model.render("Mesh")
 
-    def renderNote(self, length, sustain, color, tailOnly = False, isTappable = False, fret = 0, spNote = False, isOpen = False, spAct = False):
+    def renderNote(self, length, sustain, color, tailOnly = False, isTappable = False, fret = 0, spNote = False, isOpen = False, spAct = False, proDrum = False):
 
         if tailOnly:
             return
@@ -1181,7 +1180,10 @@ class Instrument(object):
             if spNote == True and self.starMesh is not None:
                 meshObj = self.starMesh
             else:
-                meshObj = self.noteMesh
+                if proDrum == True:
+                    meshObj = self.noteMesh
+                else:
+                    meshObj = self.noteMesh
 
             glPushMatrix()
             glEnable(GL_DEPTH_TEST)
@@ -1235,7 +1237,6 @@ class Instrument(object):
 
         renderedNotes = reversed(self.getRequiredNotesForRender(song,pos))
         for time, event in renderedNotes:
-
             if isinstance(event, Tempo):
 
                 self.tempoBpm = event.bpm
@@ -1384,7 +1385,7 @@ class Instrument(object):
 
                 glPushMatrix()
                 glTranslatef(x, 0, z)
-                self.renderNote(length, sustain = sustain, color = color, tailOnly = tailOnly, isTappable = isTappable, fret = event.number, spNote = self.spNote, isOpen = isOpen)
+                self.renderNote(length, sustain = sustain, color = color, tailOnly = tailOnly, isTappable = isTappable, fret = event.number, spNote = self.spNote, isOpen = isOpen, proDrum = event.prodrum)
                 glPopMatrix()
             else:
                 if z + length < -1.0:
