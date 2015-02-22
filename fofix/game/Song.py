@@ -2122,7 +2122,6 @@ class Song(object):
 
         try:
             if vocalTrackName:
-                print "vocal track added"
                 self.vocalTrack = Audio.StreamingSound(self.engine.audio.getChannel(i), vocalTrackName)
         except Exception, e:
             Log.warn("Unable to load vocal track: %s" % e)
@@ -2241,6 +2240,8 @@ class Song(object):
             self.setGuitarVolume(volume)
         elif part == parts[DRUM_PART] or part == parts[PRO_DRUM_PART]:
             self.setDrumVolume(volume)
+        elif part == parts[VOCAL_PART]:
+            self.setVocalVolume(volume)
         else:
             self.setRhythmVolume(volume)
 
@@ -2304,6 +2305,18 @@ class Song(object):
         else:
             if self.rhythmTrack:
                 self.rhythmTrack.setPitchBendSemitones(semitones)
+
+    def setVocalVolume(self, volume):
+        if self.vocalTrack:
+            if volume == 0:
+                self.vocalTrack.setVolume(self.missVolume)
+            elif volume == 1:
+                if VOCAL_TRACK in self.activeAudioTracks:
+                    self.vocalTrack.setVolume(self.activeVolume)
+                else:
+                    self.vocalTrack.setVolume(self.backVolume)
+            else:
+                self.vocalTrack.setVolume(volume)
 
     def resetInstrumentPitch(self, part):
         self.setInstrumentPitch(0.0, part)
@@ -3241,16 +3254,9 @@ def loadSong(engine, name, library = DEFAULT_LIBRARY, seekable = False, playback
     drumFiles=[]
     if os.path.isfile(engine.resource.fileName(library, name, "drums.ogg")):
         drumFiles.append(engine.resource.fileName(library, name, "drums.ogg"))
-    if os.path.isfile(engine.resource.fileName(library, name, "drums_1.ogg")):
-        drumFiles.append(engine.resource.fileName(library, name, "drums_1.ogg"))
-    if os.path.isfile(engine.resource.fileName(library, name, "drums_2.ogg")):
-        drumFiles.append(engine.resource.fileName(library, name, "drums_2.ogg"))
-    if os.path.isfile(engine.resource.fileName(library, name, "drums_3.ogg")):
-        drumFiles.append(engine.resource.fileName(library, name, "drums_3.ogg"))
-    if os.path.isfile(engine.resource.fileName(library, name, "drums_4.ogg")):
-        drumFiles.append(engine.resource.fileName(library, name, "drums_4.ogg"))
-    if os.path.isfile(engine.resource.fileName(library, name, "drums_5.ogg")):
-        drumFiles.append(engine.resource.fileName(library, name, "drums_5.ogg"))
+    for i in range(1,10):
+        if os.path.isfile(engine.resource.fileName(library, name, "drums_" + str(i) + ".ogg")):
+            drumFiles.append(engine.resource.fileName(library, name, "drums_" + str(i) + ".ogg"))
 
     if seekable:
         if os.path.isfile(guitarFile) and os.path.isfile(songFile):
@@ -3320,7 +3326,7 @@ def loadSong(engine, name, library = DEFAULT_LIBRARY, seekable = False, playback
         rhythmFile = None
         previewFile = None
         drumFiles = None
-    print drumFiles
+
     song       = Song(engine, infoFile, songFile, guitarFile, rhythmFile, noteFile, scriptFile, part, drumFiles, crowdFile, vocalFile)
     return song
 
