@@ -730,16 +730,17 @@ class Drum(Instrument):
                         self.engine.data.HiHatDrumSound.play()
                     self.playedSound[i] = True
                     drumsJustHit[i] = True
-                if i == 8:
-                    if not playBassDrumOnly and self.playedSound[i] == False:
-                        self.engine.data.CDrumSound.play()
-                    self.playedSound[i] = True
-                    drumsJustHit[i] = True
-                if i == 9:   #MFH - must actually activate starpower!
+                if i == 8:   #MFH - must actually activate starpower!
                     if not playBassDrumOnly and self.playedSound[i] == False:
                         self.engine.data.RideDrumSound.play()
                     self.playedSound[i] = True
                     drumsJustHit[i] = True
+                if i == 9:
+                    if not playBassDrumOnly and self.playedSound[i] == False:
+                        self.engine.data.CDrumSound.play()
+                    self.playedSound[i] = True
+                    drumsJustHit[i] = True
+                
 
         return drumsJustHit
 
