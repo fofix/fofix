@@ -854,7 +854,7 @@ class GuitarScene(Scene):
         for i, drum in enumerate(self.instruments):
             if not drum.isDrum:
                 continue
-            if drum.drumFlip:
+            if drum.drumFlip == 1:
                 for d in range(len(Song.difficulties)):
                     self.song.tracks[i][d].flipDrums()
 
@@ -1943,10 +1943,13 @@ class GuitarScene(Scene):
             self.instruments[i].leftyMode   = False
             self.instruments[i].twoChordMax = False
             self.instruments[i].drumFlip    = False
+            self.instruments[i].proDrums    = False
             if player.lefty > 0:
                 self.instruments[i].leftyMode = True
             if player.drumflip > 0:
                 self.instruments[i].drumFlip = True
+            if player.prodrums > 0:
+                self.instruments[i].proDrums = True
             if player.twoChordMax > 0:
                 self.instruments[i].twoChordMax  = True
 
@@ -4797,14 +4800,19 @@ class GuitarScene(Scene):
             if self.instruments[i].isDrum and control in (self.instruments[i].keys):
                 if control in Player.bassdrums:
                     self.instruments[i].drumsHeldDown[0] = 100
+                    self.instruments[i].drumsHeldDown[5] = 100
                 elif control in Player.drum1s:
                     self.instruments[i].drumsHeldDown[1] = 100
+                    self.instruments[i].drumsHeldDown[6] = 100
                 elif control in Player.drum2s:
                     self.instruments[i].drumsHeldDown[2] = 100
+                    self.instruments[i].drumsHeldDown[7] = 100
                 elif control in Player.drum3s:
                     self.instruments[i].drumsHeldDown[3] = 100
+                    self.instruments[i].drumsHeldDown[8] = 100
                 elif control in Player.drum5s:
                     self.instruments[i].drumsHeldDown[4] = 100
+                    self.instruments[i].drumsHeldDown[9] = 100
                 self.handlePick(i)
                 return True
 
@@ -4825,18 +4833,28 @@ class GuitarScene(Scene):
                 if control in Player.bassdrums:
                     self.instruments[num].drumsHeldDown[0] = 100
                     self.instruments[num].playedSound[0] = False
+                    self.instruments[num].drumsHeldDown[5] = 100
+                    self.instruments[num].playedSound[5] = False
                 elif control in Player.drum1s:
                     self.instruments[num].drumsHeldDown[1] = 100
                     self.instruments[num].playedSound[1] = False
+                    self.instruments[num].drumsHeldDown[6] = 100
+                    self.instruments[num].playedSound[6] = False
                 elif control in Player.drum2s:
                     self.instruments[num].drumsHeldDown[2] = 100
                     self.instruments[num].playedSound[2] = False
+                    self.instruments[num].drumsHeldDown[7] = 100
+                    self.instruments[num].playedSound[7] = False
                 elif control in Player.drum3s:
                     self.instruments[num].drumsHeldDown[3] = 100
                     self.instruments[num].playedSound[3] = False
+                    self.instruments[num].drumsHeldDown[8] = 100
+                    self.instruments[num].playedSound[8] = False
                 elif control in Player.drum5s:
                     self.instruments[num].drumsHeldDown[4] = 100
                     self.instruments[num].playedSound[4] = False
+                    self.instruments[num].drumsHeldDown[9] = 100
+                    self.instruments[num].playedSound[9] = False
         if self.battleGH:
             if self.instruments[num].battleStatus[3]:
                 if control == self.instruments[num].keys[self.instruments[num].battleBreakString]:
@@ -4989,18 +5007,28 @@ class GuitarScene(Scene):
                 if control in Player.bassdrums:
                     self.instruments[num].drumsHeldDown[0] = 100
                     self.instruments[num].playedSound[0] = False
+                    self.instruments[num].drumsHeldDown[5] = 100
+                    self.instruments[num].playedSound[5] = False
                 elif control in Player.drum1s:
                     self.instruments[num].drumsHeldDown[1] = 100
                     self.instruments[num].playedSound[1] = False
+                    self.instruments[num].drumsHeldDown[6] = 100
+                    self.instruments[num].playedSound[6] = False
                 elif control in Player.drum2s:
                     self.instruments[num].drumsHeldDown[2] = 100
                     self.instruments[num].playedSound[2] = False
+                    self.instruments[num].drumsHeldDown[7] = 100
+                    self.instruments[num].playedSound[7] = False
                 elif control in Player.drum3s:
                     self.instruments[num].drumsHeldDown[3] = 100
                     self.instruments[num].playedSound[3] = False
+                    self.instruments[num].drumsHeldDown[8] = 100
+                    self.instruments[num].playedSound[8] = False
                 elif control in Player.drum5s:
                     self.instruments[num].drumsHeldDown[4] = 100
                     self.instruments[num].playedSound[4] = False
+                    self.instruments[num].drumsHeldDown[9] = 100
+                    self.instruments[num].playedSound[9] = False
             if control in (self.instruments[i].actions):
                 hopo = False
                 pressed = i

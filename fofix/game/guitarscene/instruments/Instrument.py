@@ -51,6 +51,7 @@ class Instrument(object):
         self.pickStartPos   = 0
         self.leftyMode      = False
         self.drumFlip       = False
+        self.proDrums       = False
 
         self.freestyleActive = False
         self.drumFillsActive = False

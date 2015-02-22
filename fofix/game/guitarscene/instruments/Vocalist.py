@@ -69,6 +69,7 @@ class Vocalist:
         self.twoChord = False
         self.leftyMode = False
         self.drumFlip = False
+        self.proDrums = False
         self.keys = []
         self.actions = []
         self.neckSpeed = 0.0
