@@ -888,10 +888,10 @@ class MarkerNote(Event): #MFH
 
 
 class Note(Event):
-    def __init__(self, number, length, special = False, tappable = 0, star = False, finalStar = False):
+    def __init__(self, number, length, special = False, tappable = 0, star = False, finalStar = False, prodrum = False):
         Event.__init__(self, length)
         self.number   = number      #keeps track of fret number
-        self.prodrum  = True
+        self.prodrum  = prodrum
         self.played   = False
         self.special  = special
         self.tappable = tappable
@@ -2053,6 +2053,7 @@ class Song(object):
 
         self.hasStarpowerPaths = False
         self.hasFreestyleMarkings = False
+        self.hasTomMarkings = False
 
         #MFH - add a separate variable to house the special text event tracks:
         #MFH - special text-event tracks for the separated text-event list variable
@@ -2485,6 +2486,9 @@ realNoteMap = {       # difficulty, note
 #MFH - special note numbers
 starPowerMarkingNote = 103     #note 103 = G 8
 overDriveMarkingNote = 116     #note 116 = G#9
+yellowTomMarkingNote = 110
+blueTomMarkingNote = 111
+greenTomMarkingNote = 112
 hopoMarkingNotes = []
 proHopoMarkingNotes = [0x1e, 0x36, 0x4e, 0x66]
 
@@ -2774,6 +2778,30 @@ class MidiReader(midi.MidiOutStream):
                     self.addSpecialMidiEvent(diff, MarkerNote(note, endTime - startTime), time = startTime)
                     if self.logMarkerNotes == 1:
                         Log.debug("RB freestyle section (drum fill or BRE) at %f added to part: %s and difficulty: %s" % ( startTime, self.partnumber, difficulties[diff] ) )
+            
+            elif note == yellowTomMarkingNote:    
+                self.song.hasTomMarkings = True
+                for diff in difficulties:
+                    self.addSpecialMidiEvent(diff, MarkerNote(note, endTime - startTime), time = startTime)
+                    self.addSpecialMidiEvent(diff, MarkerNote(note, 1, endMarker = True), time = endTime+1)   #ending marker note
+                    if self.logMarkerNotes == 1:
+                        Log.debug("Yellow Tom MarkerNote at %f added to part: %s and difficulty: %s" % ( startTime, self.partnumber, difficulties[diff] ) )
+
+            elif note == blueTomMarkingNote:    
+                self.song.hasTomMarkings = True
+                for diff in difficulties:
+                    self.addSpecialMidiEvent(diff, MarkerNote(note, endTime - startTime), time = startTime)
+                    self.addSpecialMidiEvent(diff, MarkerNote(note, 1, endMarker = True), time = endTime+1)   #ending marker note
+                    if self.logMarkerNotes == 1:
+                        Log.debug("Blue Tom MarkerNote at %f added to part: %s and difficulty: %s" % ( startTime, self.partnumber, difficulties[diff] ) )
+
+            elif note == greenTomMarkingNote:    
+                self.song.hasTomMarkings = True
+                for diff in difficulties:
+                    self.addSpecialMidiEvent(diff, MarkerNote(note, endTime - startTime), time = startTime)
+                    self.addSpecialMidiEvent(diff, MarkerNote(note, 1, endMarker = True), time = endTime+1)   #ending marker note
+                    if self.logMarkerNotes == 1:
+                        Log.debug("Green Tom MarkerNote at %f added to part: %s and difficulty: %s" % ( startTime, self.partnumber, difficulties[diff] ) )
             else:
                 pass
         except KeyError:
@@ -3127,6 +3155,7 @@ class MidiPartsDiffReader(midi.MidiOutStream):
         self._drumFound   = False
         self._ODNoteFound = False
         self._SPNoteFound = False
+        self._TomNoteFound = False
 
         self.logClassInits = Config.get("game", "log_class_inits")
         if self.logClassInits == 1:
@@ -3202,6 +3231,13 @@ class MidiPartsDiffReader(midi.MidiOutStream):
             self._ODNoteFound = True
         elif note == starPowerMarkingNote:
             self._SPNoteFound = True
+        if note == yellowTomMarkingNote:
+            Log.debug(note)
+            self._TomNoteFound = True
+        elif note == blueTomMarkingNote:
+            self._TomNoteFound = True
+        elif note == greenTomMarkingNote:
+            self._TomNoteFound = True
         try:
             try:
                 if len(self.difficulties[self.currentPart]) == len(difficulties):

@@ -1125,7 +1125,8 @@ class Instrument(object):
             model.render("Mesh")
 
     def renderNote(self, length, sustain, color, tailOnly = False, isTappable = False, fret = 0, spNote = False, isOpen = False, spAct = False, proDrum = False):
-
+        if proDrum:
+            print "Convert Tom Note"
         if tailOnly:
             return
 
@@ -1180,10 +1181,7 @@ class Instrument(object):
             if spNote == True and self.starMesh is not None:
                 meshObj = self.starMesh
             else:
-                if proDrum == True:
-                    meshObj = self.noteMesh
-                else:
-                    meshObj = self.noteMesh
+                meshObj = self.noteMesh
 
             glPushMatrix()
             glEnable(GL_DEPTH_TEST)

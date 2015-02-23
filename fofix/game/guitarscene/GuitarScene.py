@@ -1148,7 +1148,21 @@ class GuitarScene(Scene):
                                     Log.debug("Removed %d streak notes from player %d" % (numBreStreakNotes, i) )
                                     totalBreNotes += numBreStreakNotes
 
-
+                #mark all tom drum notes
+                j = 0
+                if self.song.hasTomMarkings:
+                    if instrument.isDrum:
+                        for time, event in self.song.midiEventTrack[i].getAllEvents():
+                            if isinstance(event, Song.MarkerNote) and not event.endMarker:
+                                if (event.number == Song.yellowTomMarkingNote or event.number == Song.blueTomMarkingNote or event.number == Song.greenTomMarkingNote):
+                                    startTime = time
+                                    endTime = startTime + event.length
+                                    for Dtime, Devent in self.song.track[i].getEvents(startTime, endTime):
+                                        if isinstance(Devent, Note):
+                                            print str(Devent.number) + " " + str(Dtime)
+                                            Devent.prodrum = True
+                                            j += 1
+                print j
 
                 if instrument.useMidiSoloMarkers:   #mark using the new MIDI solo marking system
                     for time, event in self.song.midiEventTrack[i].getAllEvents():

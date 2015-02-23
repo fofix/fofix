@@ -225,7 +225,7 @@ class Drum(Instrument):
             else:
                 engine.loadImgDrawing(self, "keytexopen", get("keytex_open.png"))
 
-    def renderNote(self, length, sustain, color, tailOnly = False, isTappable = False, fret = 0, spNote = False, isOpen = False, spAct = False):
+    def renderNote(self, length, sustain, color, tailOnly = False, isTappable = False, fret = 0, spNote = False, isOpen = False, spAct = False, proDrum = False):
 
         if tailOnly:
             return
