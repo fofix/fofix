@@ -492,8 +492,8 @@ class Instrument(object):
             else: #default to files in data folder
                 self.engine.resource.load(self,  "noteMesh",  lambda: Mesh(engine.resource.fileName("note.dae")))
                 defaultNote = True
-
             if self.engine.fileExists(get("star.dae")): #look in the notes folder for files
+                print "star found"
                 self.engine.resource.load(self,  "starMesh",  lambda: Mesh(self.engine.resource.fileName(get("star.dae"))))
             else: #No mesh for star notes
                 self.starMesh = None
@@ -1124,9 +1124,8 @@ class Instrument(object):
             glColor3f(self.meshColor[0], self.meshColor[1], self.meshColor[2])
             model.render("Mesh")
 
-    def renderNote(self, length, sustain, color, tailOnly = False, isTappable = False, fret = 0, spNote = False, isOpen = False, spAct = False, proDrum = False):
-        if proDrum:
-            print "Convert Tom Note"
+    def renderNote(self, length, sustain, color, tailOnly = False, isTappable = False, fret = 0, spNote = False, isOpen = False, spAct = False):
+
         if tailOnly:
             return
 

@@ -1157,11 +1157,11 @@ class GuitarScene(Scene):
                                 if (event.number == Song.yellowTomMarkingNote or event.number == Song.blueTomMarkingNote or event.number == Song.greenTomMarkingNote):
                                     startTime = time
                                     endTime = startTime + event.length
-                                    for Dtime, Devent in self.song.track[i].getEvents(startTime, endTime):
-                                        if isinstance(Devent, Note):
-                                            print str(Devent.number) + " " + str(Dtime)
-                                            Devent.prodrum = True
+                                    for time, event in self.song.track[i].getEvents(startTime, endTime):
+                                        if isinstance(event, Note):
+                                            event.prodrum = True
                                             j += 1
+                                            break
                 print j
 
                 if instrument.useMidiSoloMarkers:   #mark using the new MIDI solo marking system

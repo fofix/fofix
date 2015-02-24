@@ -226,7 +226,6 @@ class Drum(Instrument):
                 engine.loadImgDrawing(self, "keytexopen", get("keytex_open.png"))
 
     def renderNote(self, length, sustain, color, tailOnly = False, isTappable = False, fret = 0, spNote = False, isOpen = False, spAct = False, proDrum = False):
-
         if tailOnly:
             return
 
@@ -334,8 +333,10 @@ class Drum(Instrument):
 
                 else:
                     texture = getattr(self,"notetex"+chr(97+fret))
-
-            self.render3DNote(texture, meshObj, color, isTappable)
+            if(proDrum):
+                self.render3DNote(texture, self.starMesh, color, isTappable)
+            else:
+                self.render3DNote(texture, meshObj, color, isTappable)
 
             glDepthMask(0)
             glPopMatrix()
