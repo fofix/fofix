@@ -293,7 +293,10 @@ class Drum(Instrument):
             elif spNote and self.starMesh is not None:
                 meshObj = self.starMesh
             else:
-                meshObj = self.noteMesh
+                if(proDrum or fret == 1):
+                    meshObj = self.tomMesh
+                else:
+                    meshObj = self.noteMesh
 
             glPushMatrix()
             glEnable(GL_DEPTH_TEST)
@@ -332,11 +335,12 @@ class Drum(Instrument):
                     texture = getattr(self,"staratex"+chr(97+fret))
 
                 else:
-                    texture = getattr(self,"notetex"+chr(97+fret))
-            if(proDrum):
-                self.render3DNote(texture, self.starMesh, color, isTappable)
-            else:
-                self.render3DNote(texture, meshObj, color, isTappable)
+                    if(proDrum or fret == 1):
+                        texture = getattr(self,"tomtex"+chr(97+fret))
+                    else:
+                        texture = getattr(self,"notetex"+chr(97+fret))
+
+            self.render3DNote(texture, meshObj, color, isTappable)
 
             glDepthMask(0)
             glPopMatrix()
