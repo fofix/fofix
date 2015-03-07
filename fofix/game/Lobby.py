@@ -170,13 +170,14 @@ class Lobby(Layer, KeyListener):
         self.tsChooseChar = _("Choose Your Character")
         self.tsPlayerStr  = _("Player %d")
         self.playerNum  = 0
+        self.tsSnareFlip = (_("Snare/HiHat"), _("HiHat/Snare"))
         self.tsDrumFlip = (_("Regular Drums"), _("Flipped Drums"))
         self.tsProDrums = (_("Standard Drums"), _("Pro Drums"))
         self.tsAutoKick = (_("Pedal-Using"), _("Footless"))
         self.tsAssist   = (_("Assist Mode Off"), _("Easy Assist"), _("Medium Assist"))
         self.tsTwoChord = (_("Chordmaster"), _("Two Notes Max"))
         self.tsInfo     = _("Information:")
-        self.tsList     = [("0","1"), self.tsDrumFlip, self.tsProDrums, self.tsAutoKick, self.tsAssist, self.tsTwoChord]
+        self.tsList     = [("0","1"), self.tsSnareFlip, self.tsDrumFlip, self.tsProDrums, self.tsAutoKick, self.tsAssist, self.tsTwoChord]
 
         self.controlDict = Player.controlDict
         self.selected = [0,0,0,0]
@@ -492,9 +493,10 @@ class CreateCharacter(Layer, KeyListener):
         self.dictEnDisable = {0: _("Disabled"), 1: _("Enabled")}
         self.lefty     = {0: 1, 1: -1}
         neckDict       = {0: _("Default Neck"), 1: _("Theme Neck"), 2: _("Select a Neck")}
-        self.values    = (self.dictEnDisable, self.dictEnDisable, self.dictEnDisable, self.dictEnDisable, {0: _("Disabled"), 1: _("Easy Assist"), 2: _("Medium Assist")}, self.dictEnDisable, neckDict)
+        self.values    = (self.dictEnDisable, self.dictEnDisable, self.dictEnDisable, self.dictEnDisable, self.dictEnDisable, {0: _("Disabled"), 1: _("Easy Assist"), 2: _("Medium Assist")}, self.dictEnDisable, neckDict)
         self.options   = [(_("Name"),             _("Name your character!")), \
                           (_("Lefty Mode"),       _("Flip the guitar frets for left-handed playing!")), \
+                          (_("Snare Flip"),       _("Flip the snare and hihat lanes")), \
                           (_("Drum Flip"),        _("Flip the drum sounds - snare becomes crash, and so on")), \
                           (_("Pro Drums"),        _("Enable Pro Drums")), \
                           (_("Auto-Kick Bass"),   _("Feet uncooperative? Broke your pedal? Not to worry!")), \
@@ -515,18 +517,18 @@ class CreateCharacter(Layer, KeyListener):
             try:
                 #stump: Temporary use of private stuff in Player until the SQLite-vs.-inis issue for players is decided.
                 pref = Player._playerDB.execute('SELECT * FROM `players` WHERE `name` = ?', [player]).fetchone()
-                pref = [pref[0], pref[1], pref[2], pref[3], pref[4], pref[5], pref[6], pref[7], pref[11]]
-                self.neck = pref[7]
+                pref = [pref[0], pref[1], pref[2], pref[3], pref[4], pref[5], pref[6], pref[7], pref[8], pref[12]]
+                self.neck = pref[8]
                 self.newChar = False
                 self.player = player
                 self.oldName = pref[0]
             except: #not found
-                pref = ['', 0, 0, 0, 0, 0, 0, 0, '']
+                pref = ['', 0, 0, 0, 0, 0, 0, 0, 0, '']
                 self.neck = ''
                 self.newChar = True
                 self.player = None
         else:
-            pref = ['', 0, 0, 0, 0, 0, 0, 0, '']
+            pref = ['', 0, 0, 0, 0, 0, 0, 0, 0, '']
             self.neck = ''
             self.newChar = True
             self.player = None
@@ -542,8 +544,8 @@ class CreateCharacter(Layer, KeyListener):
             self.engine.view.popLayer(self)
             self.engine.input.removeKeyListener(self)
     def saveCharacter(self):
-        pref = self.choices[0:9]
-        pref.insert(7, self.neck)
+        pref = self.choices[0:10]
+        pref.insert(8, self.neck)
         if len(self.choices[0]) > 0:
             if self.choices[0].lower() == "default":
                 Dialogs.showMessage(self.engine, _("That is a terrible name. Choose something not 'default'"))
@@ -573,7 +575,7 @@ class CreateCharacter(Layer, KeyListener):
         if key == pygame.K_BACKSPACE and self.active:
             self.choices[self.selected] = self.choices[self.selected][:-1]
         elif unicode and ord(unicode) > 31 and self.active:
-            if self.selected == 0 or self.selected == 8:
+            if self.selected == 0 or self.selected == 9:
                 if self.selected == 0 and (ord(unicode) in (34, 42, 47, 58, 60, 62, 63, 92, 124) or ord(unicode) > 126): #ascii only
                     self.engine.data.cancelSound.play()
                     return True
@@ -587,22 +589,22 @@ class CreateCharacter(Layer, KeyListener):
         if c in Player.key1s or key == pygame.K_RETURN:
             self.scrolling = 0
             self.engine.data.acceptSound.play()
-            if self.selected in (0, 8):
+            if self.selected in (0, 9):
                 if self.active:
                     self.active = False
                 else:
                     self.blink  = 0
                     self.active = True
                     self.oldValue = self.choices[self.selected]
-            elif self.selected == 7:
-                if self.choices[7] == 2:
+            elif self.selected == 8:
+                if self.choices[8] == 1:
                     self.engine.view.pushLayer(Dialogs.NeckChooser(self.engine, player = self.player, owner = self))
                     self.keyActive = False
-            elif self.selected == 9:
-                self.avatar = Dialogs.chooseAvatar(self.engine)
             elif self.selected == 10:
-                self.deleteCharacter()
+                self.avatar = Dialogs.chooseAvatar(self.engine)
             elif self.selected == 11:
+                self.deleteCharacter()
+            elif self.selected == 12:
                 self.saveCharacter()
         elif c in Player.key2s + Player.cancels or key == pygame.K_ESCAPE:
             self.engine.data.cancelSound.play()
@@ -632,18 +634,18 @@ class CreateCharacter(Layer, KeyListener):
             if c in Player.key4s:
                 self.engine.data.cancelSound.play()
         elif c in Player.rights or key == pygame.K_RIGHT:
-            if self.selected in (0, 8, 9, 10, 11):
+            if self.selected in (0, 9, 10, 11, 12):
                 pass
-            elif self.selected in [5, 7]:
+            elif self.selected in [6, 8]:
                 self.choices[self.selected]+=1
                 if self.choices[self.selected] > 2:
                     self.choices[self.selected] = 0
             else:
                 self.choices[self.selected] = 1 and (self.choices[self.selected] == 0) or 0
         elif c in Player.lefts or key == pygame.K_LEFT:
-            if self.selected in (0, 8, 9, 10, 11):
+            if self.selected in (0, 9, 10, 11, 12):
                 pass
-            elif self.selected in [5, 7]:
+            elif self.selected in [6, 8]:
                 self.choices[self.selected]-=1
                 if self.choices[self.selected] < 0:
                     self.choices[self.selected] = 2
@@ -753,7 +755,7 @@ class CreateCharacter(Layer, KeyListener):
                 font.render(option[0], (self.engine.theme.characterCreateX, self.engine.theme.characterCreateY+self.engine.theme.characterCreateSpace*i), scale = self.engine.theme.characterCreateScale)
                 if self.active and self.selected == i:
                     self.engine.theme.setSelectedColor(1-v)
-                if i == 0 or i > 7:
+                if i == 0 or i > 8:
                     wText, hText = font.getStringSize(self.choices[i], scale = self.engine.theme.characterCreateScale)
                     font.render(self.choices[i]+cursor, (self.engine.theme.characterCreateOptionX-wText, self.engine.theme.characterCreateY+self.engine.theme.characterCreateSpace*i), scale = self.engine.theme.characterCreateScale)
                 else:

@@ -50,8 +50,14 @@ class Instrument(object):
         self.time           = 0.0
         self.pickStartPos   = 0
         self.leftyMode      = False
+        self.snareFlip       = False
         self.drumFlip       = False
         self.proDrums       = False
+
+        self.snareNum = 1
+        self.yellowTomNum = 2
+        self.greenTomNum = 3
+        self.blueTomNum = 4
 
         self.freestyleActive = False
         self.drumFillsActive = False

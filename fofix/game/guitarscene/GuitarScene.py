@@ -854,7 +854,20 @@ class GuitarScene(Scene):
         for i, drum in enumerate(self.instruments):
             if not drum.isDrum:
                 continue
+            if drum.snareFlip == 1:
+                drum.snareNum = 2
+                drum.yellowTomNum = 1
+                for d in range(len(Song.difficulties)):
+                    self.song.tracks[i][d].flipSnareHiHat()
             if drum.drumFlip == 1:
+                if drum.snareFlip == 1:
+                    drum.yellowTomNum = 4
+                    drum.snareNum = 3
+                else:
+                    drum.yellowTomNum = 3
+                    drum.snareNum = 4
+                drum.greenTomNum = 2
+                drum.blueTomNum = 1
                 for d in range(len(Song.difficulties)):
                     self.song.tracks[i][d].flipDrums()
 
@@ -1159,11 +1172,11 @@ class GuitarScene(Scene):
                                     startTime = time
                                     endTime = startTime + event.length
                                     if (event.number == Song.yellowTomMarkingNote):
-                                        eventNumber = 2
+                                        eventNumber = instrument.yellowTomNum
                                     elif (event.number == Song.blueTomMarkingNote):
-                                        eventNumber = 4
+                                        eventNumber = instrument.blueTomNum
                                     elif (event.number == Song.greenTomMarkingNote):
-                                        eventNumber = 3
+                                        eventNumber = instrument.greenTomNum
                                     for time, event in self.song.track[i].getEvents(startTime, endTime):
                                         if isinstance(event, Note) and event.number == eventNumber:
                                             event.prodrum = True
@@ -1963,10 +1976,13 @@ class GuitarScene(Scene):
                 continue
             self.instruments[i].leftyMode   = False
             self.instruments[i].twoChordMax = False
+            self.instruments[i].snareFlip    = False
             self.instruments[i].drumFlip    = False
             self.instruments[i].proDrums    = False
             if player.lefty > 0:
                 self.instruments[i].leftyMode = True
+            if player.snareflip > 0:
+                self.instruments[i].snareFlip = True
             if player.drumflip > 0:
                 self.instruments[i].drumFlip = True
             if player.prodrums > 0:

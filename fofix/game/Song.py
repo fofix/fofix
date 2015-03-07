@@ -1228,6 +1228,14 @@ class NoteTrack(Track):   #MFH - special Track type for note events, with markin
                 if self.logTempoEvents == 1:
                     Log.debug("Tempo event removed from NoteTrack during cleanup: " + str(event.bpm) + "bpm")
 
+    def flipSnareHiHat(self):
+        for time, event in self.allEvents:
+            if isinstance(event, Note):
+                if(event.number == 1):
+                    event.number = 2
+                elif(event.number == 2):
+                    event.number = 1
+
     def flipDrums(self):
         for time, event in self.allEvents:
             if isinstance(event, Note):

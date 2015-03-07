@@ -68,6 +68,7 @@ class Vocalist:
         self.freestyleLastFretHitTime = [0 for i in range(5)]
         self.twoChord = False
         self.leftyMode = False
+        self.snareFlip = False
         self.drumFlip = False
         self.proDrums = False
         self.keys = []

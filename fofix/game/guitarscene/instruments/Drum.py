@@ -74,7 +74,6 @@ class Drum(Instrument):
         self.lastFretWasT3 = False
         self.lastFretWasC = False
 
-
         self.matchingNotes = None
 
         #MFH - I do not understand fully how the handicap scorecard works at the moment, nor do I have the time to figure it out.
@@ -293,7 +292,7 @@ class Drum(Instrument):
             elif spNote and self.starMesh is not None:
                 meshObj = self.starMesh
             else:
-                if(proDrum or fret == 1):
+                if(proDrum or fret == self.snareNum):
                     meshObj = self.tomMesh
                 else:
                     meshObj = self.noteMesh
@@ -335,7 +334,7 @@ class Drum(Instrument):
                     texture = getattr(self,"staratex"+chr(97+fret))
 
                 else:
-                    if(proDrum or fret == 1):
+                    if(proDrum or fret == self.snareNum):
                         texture = getattr(self,"tomtex"+chr(97+fret))
                     else:
                         texture = getattr(self,"notetex"+chr(97+fret))
