@@ -1151,7 +1151,8 @@ class GuitarScene(Scene):
                 #mark all tom drum notes
                 j = 0
                 if self.song.hasTomMarkings:
-                    if instrument.isDrum:
+                    Log.debug("ProDrums found.")
+                    if instrument.isDrum and instrument.proDrums:
                         for time, event in self.song.midiEventTrack[i].getAllEvents():
                             if isinstance(event, Song.MarkerNote) and not event.endMarker:
                                 if (event.number == Song.yellowTomMarkingNote or event.number == Song.blueTomMarkingNote or event.number == Song.greenTomMarkingNote):
@@ -1167,7 +1168,8 @@ class GuitarScene(Scene):
                                         if isinstance(event, Note) and event.number == eventNumber:
                                             event.prodrum = True
                                             j += 1
-                print j
+                if j > 0:
+                    Log.debug("ProDrums enabled for track.")
 
                 if instrument.useMidiSoloMarkers:   #mark using the new MIDI solo marking system
                     for time, event in self.song.midiEventTrack[i].getAllEvents():
