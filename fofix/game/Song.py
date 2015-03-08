@@ -2119,7 +2119,8 @@ class Song(object):
         i = 3
         try:
             if drumTrackNames:
-                for drumTrackName in drumTrackNames:
+                for j, drumTrackName in enumerate(drumTrackNames):
+                    i = j + 3
                     self.drumTracks.append(Audio.StreamingSound(self.engine.audio.getChannel(i), drumTrackName))
                     i += 1
         except Exception, e:
