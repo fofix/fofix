@@ -209,6 +209,8 @@ Config.define("player", "neck",          str,  "")
 Config.define("player", "necktype",      str,  2, text = _("Neck Type"),     options = {0: _("Default Neck"), 1: _("Theme Neck"), 2: _("Specific Neck")})
 Config.define("player", "leftymode",     int,  0, text = _("Lefty Mode"),    options = {0: _("Off"), 1: _("On")})
 Config.define("player", "drumflip",      int,  0, text = _("Drum Flip"),     options = {0: _("Off"), 1: _("On")})
+Config.define("player", "snareflip",     int,  0, text = _("Snare/HiHat Flip"),     options = {0: _("Off"), 1: _("On")})
+Config.define("player", "prodrums",      int,  0, text = _("Pro Drums"),     options = {0: _("Off"), 1: _("On")})
 Config.define("player", "two_chord_max", int,  0, text = _("Two-Chord Max"), options = {0: _("Off"), 1: _("On")})
 Config.define("player", "assist_mode",   int,  0, text = _("Assist Mode"),   options = {0: _("Off"), 1: _("Easy Assist"), 2: _("Medium Assist")})
 Config.define("player", "auto_kick",     int,  0, text = _("Auto Kick"),     options = {0: _("Off"), 1: _("On")})
@@ -240,7 +242,7 @@ playerpref = []
 playerstat = []
 
 # Load the player database and check that it is fully initialized.
-_SCHEMA_VERSION = 3
+_SCHEMA_VERSION = 5
 _playerDB = VFS.openSqlite3('%s/%s' % (playerpath, 'FoFiX-players.cache'))
 _updateTables = 0
 try:
@@ -249,13 +251,14 @@ try:
         _updateTables = 2 #an old version. We don't want to just burn old tables.
 except:
     _updateTables = 1 #no good table
+
 if _updateTables > 0: #needs to handle old versions eventually.
     for tbl in _playerDB.execute("SELECT `name` FROM `sqlite_master` WHERE `type` = 'table'").fetchall():
         _playerDB.execute('DROP TABLE `%s`' % tbl)
     _playerDB.commit()
     _playerDB.execute('VACUUM')
     _playerDB.execute('CREATE TABLE `config` (`key` STRING UNIQUE, `value` STRING)')
-    _playerDB.execute('CREATE TABLE `players` (`name` STRING UNIQUE, `lefty` INT, `drumflip` INT, `autokick` INT, `assist` INT, `twochord` INT, `necktype` INT, `neck` STRING, \
+    _playerDB.execute('CREATE TABLE `players` (`name` STRING UNIQUE, `lefty` INT, `snareflip` INT, `drumflip` INT, `prodrums` INT, `autokick` INT, `assist` INT, `twochord` INT, `necktype` INT, `neck` STRING, \
                    `part` INT, `difficulty` INT, `upname` STRING, `control` INT, `changed` INT, `loaded` INT)')
     _playerDB.execute('CREATE TABLE `stats` (`song` STRING, `hash` STRING, `player` STRING)')
     _playerDB.execute("INSERT INTO `config` (`key`, `value`) VALUES (?, ?)", ('version', _SCHEMA_VERSION))
@@ -282,12 +285,14 @@ def loadPlayers():
             pref = _playerDB.execute('SELECT * FROM `players` WHERE `name` = ?', [playername[-1]]).fetchone()
             try:
                 if len(pref) == 14:
-                    playerpref.append((pref[1], pref[2], pref[3], pref[4], pref[5], pref[6], pref[7], pref[8], pref[9], pref[10]))
+                    playerpref.append((pref[1], pref[2], pref[3], pref[4], pref[5], pref[6], pref[7], pref[8], pref[9], pref[10], pref[11], pref[12]))
             except TypeError:
                 try:
                     c = Config.load(VFS.resolveRead(_makePlayerIniName(name[:-4])), type = 2)
                     lefty  = c.get("player","leftymode")
+                    snaref  = c.get("player","snareflip")
                     drumf  = c.get("player","drumflip")
+                    pdrums  = c.get("player","prodrums")
                     autok  = c.get("player","auto_kick")
                     assist = c.get("player","assist_mode")
                     twoch  = c.get("player","two_chord_max")
@@ -298,11 +303,11 @@ def loadPlayers():
                     upname = c.get("player","name")
                     control= c.get("player","controller")
                     del c
-                    _playerDB.execute('INSERT INTO `players` VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, 1)', [playername[-1], lefty, drumf, autok, assist, twoch, neckt, neck, part, diff, upname, control])
-                    playerpref.append((lefty, drumf, autok, assist, twoch, neckt, neck, part, diff, upname))
+                    _playerDB.execute('INSERT INTO `players` VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, 1)', [playername[-1], lefty, snaref, drumf, pdrums, autok, assist, twoch, neckt, neck, part, diff, upname, control])
+                    playerpref.append((lefty, snaref, drumf, pdrums, autok, assist, twoch, neckt, neck, part, diff, upname))
                 except IOError:
-                    _playerDB.execute('INSERT INTO `players` VALUES (?, 0, 0, 0, 0, 0, 0, ``, 0, 2, ``, 0, 0, 1)', [playername[-1]])
-                    playerpref.append((0, 0, 0, 0, 0, 0, '', 0, 2, '', 0))
+                    _playerDB.execute('INSERT INTO `players` VALUES (?, 0, 0, 0, 0, 0, 0, 0, 0, ``, 0, 2, ``, 0, 0, 1)', [playername[-1]])
+                    playerpref.append((0, 0, 0, 0, 0, 0, 0, '', 0, 2, '', 0))
             _playerDB.execute('UPDATE `players` SET `loaded` = 1 WHERE `name` = ?', [playername[-1]])
             _playerDB.commit()
     return 1
@@ -312,16 +317,18 @@ def savePlayers():
         try:
             c = Config.load(VFS.resolveWrite(_makePlayerIniName(str(pref[0]))), type = 2)
             c.set("player","leftymode",int(pref[1]))
-            c.set("player","drumflip",int(pref[2]))
-            c.set("player","auto_kick",int(pref[3]))
-            c.set("player","assist_mode",int(pref[4]))
-            c.set("player","two_chord_max",int(pref[5]))
-            c.set("player","necktype",int(pref[6]))
-            c.set("player","neck",str(pref[7]))
-            c.set("player","part",int(pref[8]))
-            c.set("player","difficulty",int(pref[9]))
-            c.set("player","name",str(pref[10]))
-            c.set("player","controller",int(pref[11]))
+            c.set("player","snareflip",int(pref[2]))
+            c.set("player","drumflip",int(pref[3]))
+            c.set("player","prodrums",int(pref[4]))
+            c.set("player","auto_kick",int(pref[5]))
+            c.set("player","assist_mode",int(pref[6]))
+            c.set("player","two_chord_max",int(pref[7]))
+            c.set("player","necktype",int(pref[8]))
+            c.set("player","neck",str(pref[9]))
+            c.set("player","part",int(pref[10]))
+            c.set("player","difficulty",int(pref[11]))
+            c.set("player","name",str(pref[12]))
+            c.set("player","controller",int(pref[13]))
             del c
             _playerDB.execute('UPDATE `players` SET `changed` = 0 WHERE `name` = ?', [pref[0]])
         except:
@@ -329,16 +336,18 @@ def savePlayers():
             c.close()
             c = Config.load(VFS.resolveWrite(_makePlayerIniName(str(pref[0]))), type = 2)
             c.set("player","leftymode",int(pref[1]))
-            c.set("player","drumflip",int(pref[2]))
-            c.set("player","auto_kick",int(pref[3]))
-            c.set("player","assist_mode",int(pref[4]))
-            c.set("player","two_chord_max",int(pref[5]))
-            c.set("player","necktype",int(pref[6]))
-            c.set("player","neck",str(pref[7]))
-            c.set("player","part",int(pref[8]))
-            c.set("player","difficulty",int(pref[9]))
-            c.set("player","name",str(pref[10]))
-            c.set("player","controller",int(pref[11]))
+            c.set("player","snareflip",int(pref[2]))
+            c.set("player","drumflip",int(pref[3]))
+            c.set("player","prodrums",int(pref[4]))
+            c.set("player","auto_kick",int(pref[5]))
+            c.set("player","assist_mode",int(pref[6]))
+            c.set("player","two_chord_max",int(pref[7]))
+            c.set("player","necktype",int(pref[8]))
+            c.set("player","neck",str(pref[9]))
+            c.set("player","part",int(pref[10]))
+            c.set("player","difficulty",int(pref[11]))
+            c.set("player","name",str(pref[12]))
+            c.set("player","controller",int(pref[13]))
             del c
             _playerDB.execute('UPDATE `players` SET `changed` = 0 WHERE `name` = ?', [pref[0]])
     _playerDB.execute('UPDATE `players` SET `loaded` = 0')
@@ -351,12 +360,12 @@ def updatePlayer(player, pref):
     except:
         a = None
     if a is not None:
-        _playerDB.execute('UPDATE `players` SET `name` = ?, `lefty` = ?, `drumflip` = ?, `autokick` = ?, `assist` = ?, `twochord` = ?, `necktype` = ?, `neck` = ?, \
+        _playerDB.execute('UPDATE `players` SET `name` = ?, `lefty` = ?, `snareflip` = ?, `drumflip` = ?, `prodrums` = ?, `autokick` = ?, `assist` = ?, `twochord` = ?, `necktype` = ?, `neck` = ?, \
                        `part` = 0, `difficulty` = 2, `upname` = ?, `control` = 0, `changed` = 1, `loaded` = 1 WHERE `name` = ?', pref + [player])
         if player != pref[0]:
             VFS.rename(_makePlayerIniName(player), _makePlayerIniName(pref[0]))
     else:
-        _playerDB.execute('INSERT INTO `players` VALUES (?, ?, ?, ?, ?, ?, ?, ?, 0, 2, ?, 0, 1, 1)', pref)
+        _playerDB.execute('INSERT INTO `players` VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, 2, ?, 0, 1, 1)', pref)
     _playerDB.commit()
     savePlayers()
     loadPlayers()
@@ -879,7 +888,9 @@ class Player(object):
 
         self.lefty       = _playerDB.execute('SELECT `lefty` FROM `players` WHERE `name` = ?', [self.name]).fetchone()[0]
         self.twoChordMax = _playerDB.execute('SELECT `twochord` FROM `players` WHERE `name` = ?', [self.name]).fetchone()[0]
+        self.snareflip    = _playerDB.execute('SELECT `snareflip` FROM `players` WHERE `name` = ?', [self.name]).fetchone()[0]
         self.drumflip    = _playerDB.execute('SELECT `drumflip` FROM `players` WHERE `name` = ?', [self.name]).fetchone()[0]
+        self.prodrums    = _playerDB.execute('SELECT `prodrums` FROM `players` WHERE `name` = ?', [self.name]).fetchone()[0]
         self.assistMode  = _playerDB.execute('SELECT `assist` FROM `players` WHERE `name` = ?', [self.name]).fetchone()[0]
         self.autoKick    = _playerDB.execute('SELECT `autokick` FROM `players` WHERE `name` = ?', [self.name]).fetchone()[0]
         self.neck        = _playerDB.execute('SELECT `neck` FROM `players` WHERE `name` = ?', [self.name]).fetchone()[0]

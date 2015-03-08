@@ -878,6 +878,7 @@ class SettingsMenu(Menu.Menu):
            ConfigChoice(engine, engine.config, "audio",  "buffersize"),
            ConfigChoice(engine, engine.config, "game", "result_cheer_loop", autoApply = True), #MFH
            ConfigChoice(engine, engine.config, "game", "cheer_loop_delay", autoApply = True), #MFH
+           ConfigChoice(engine, engine.config, "game", "congrats", autoApply = True), #JNM
         ]
         self.advancedAudioSettingsMenu = Menu.Menu(engine, self.advancedAudioSettings, pos = (self.opt_text_x, self.opt_text_y), textColor = self.opt_text_color, selectedColor = self.opt_selected_color)
 

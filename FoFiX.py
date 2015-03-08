@@ -108,7 +108,7 @@ class Main():
         self.config = self.load_config(self.configFile)
 
         #Lysdestic - Allow support for manipulating fullscreen via CLI
-        if self.fullscreen is not None:
+        if self.fullscreen:
             Config.set("video", "fullscreen", self.fullscreen)
 
         #Lysdestic - Change resolution from CLI

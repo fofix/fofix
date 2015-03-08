@@ -126,7 +126,7 @@ VERSION = "0.5"
 
 import logging
 logger = logging.getLogger("cerealizer")
-#logging.basicConfig(level=logging.INFO)
+#logging.basicConfig(level=logging.DEBUG)
 
 from cStringIO import StringIO
 from new       import instance

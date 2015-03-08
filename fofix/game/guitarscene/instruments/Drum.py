@@ -64,7 +64,7 @@ class Drum(Instrument):
         self.isBassGuitar = False
         self.isVocal = False
 
-        self.drumsHeldDown = [0, 0, 0, 0, 0]
+        self.drumsHeldDown = [0, 0, 0, 0, 0, 0, 0, 0 ,0 ,0]
 
         self.gameMode2p = self.engine.world.multiMode
 
@@ -73,7 +73,6 @@ class Drum(Instrument):
         self.lastFretWasT2 = False
         self.lastFretWasT3 = False
         self.lastFretWasC = False
-
 
         self.matchingNotes = None
 
@@ -94,7 +93,7 @@ class Drum(Instrument):
 
         self.strings        = 4
         self.strings2       = 5
-        self.playedSound  = [True, True, True, True, True]
+        self.playedSound  = [True, True, True, True, True, True, True, True, True, True]
 
         self.openFretActivity = 0.0
         self.openFretColor  = self.fretColors[5]
@@ -225,8 +224,7 @@ class Drum(Instrument):
             else:
                 engine.loadImgDrawing(self, "keytexopen", get("keytex_open.png"))
 
-    def renderNote(self, length, sustain, color, tailOnly = False, isTappable = False, fret = 0, spNote = False, isOpen = False, spAct = False):
-
+    def renderNote(self, length, sustain, color, tailOnly = False, isTappable = False, fret = 0, spNote = False, isOpen = False, spAct = False, proDrum = False):
         if tailOnly:
             return
 
@@ -294,7 +292,10 @@ class Drum(Instrument):
             elif spNote and self.starMesh is not None:
                 meshObj = self.starMesh
             else:
-                meshObj = self.noteMesh
+                if(proDrum or fret == self.snareNum):
+                    meshObj = self.tomMesh
+                else:
+                    meshObj = self.noteMesh
 
             glPushMatrix()
             glEnable(GL_DEPTH_TEST)
@@ -333,7 +334,10 @@ class Drum(Instrument):
                     texture = getattr(self,"staratex"+chr(97+fret))
 
                 else:
-                    texture = getattr(self,"notetex"+chr(97+fret))
+                    if(proDrum or fret == self.snareNum):
+                        texture = getattr(self,"tomtex"+chr(97+fret))
+                    else:
+                        texture = getattr(self,"notetex"+chr(97+fret))
 
             self.render3DNote(texture, meshObj, color, isTappable)
 
@@ -682,37 +686,65 @@ class Drum(Instrument):
         #Returns list of drums that were just hit (including logic for detecting a held bass pedal)
         #pass playBassDrumOnly = True (optional paramater) to only play the bass drum sound, but still
         #  return a list of drums just hit (intelligently play the bass drum if it's held down during gameplay)
-        drumsJustHit = [False, False, False, False, False]
+        drumsJustHit = [False, False, False, False, False, False, False, False, False, False]
 
-        for i in range (5):
-            if controls.getState(self.keys[i]) or controls.getState(self.keys[5+i]):
+        for i in range (10):
+            if controls.getState(self.keys[i]):
                 if i == 0:
                     if self.playedSound[i] == False:  #MFH - gotta check if bass drum pedal is just held down!
                         self.engine.data.bassDrumSound.play()
                         self.playedSound[i] = True
-                        drumsJustHit[0] = True
+                        drumsJustHit[i] = True
                         if self.fretboardHop < 0.04:
                             self.fretboardHop = 0.04  #stump
                 if i == 1:
                     if not playBassDrumOnly and self.playedSound[i] == False:
-                        self.engine.data.T1DrumSound.play()
+                        self.engine.data.SnareDrumSound.play()
                     self.playedSound[i] = True
                     drumsJustHit[i] = True
                 if i == 2:
                     if not playBassDrumOnly and self.playedSound[i] == False:
-                        self.engine.data.T2DrumSound.play()
+                        self.engine.data.T1DrumSound.play()
                     self.playedSound[i] = True
                     drumsJustHit[i] = True
                 if i == 3:
                     if not playBassDrumOnly and self.playedSound[i] == False:
-                        self.engine.data.T3DrumSound.play()
+                        self.engine.data.T2DrumSound.play()
                     self.playedSound[i] = True
                     drumsJustHit[i] = True
                 if i == 4:   #MFH - must actually activate starpower!
                     if not playBassDrumOnly and self.playedSound[i] == False:
+                        self.engine.data.T3DrumSound.play()
+                    self.playedSound[i] = True
+                    drumsJustHit[i] = True
+                if i == 5:
+                    if self.playedSound[i] == False:  #MFH - gotta check if bass drum pedal is just held down!
+                        self.engine.data.bassDrumSound.play()
+                        self.playedSound[i] = True
+                        drumsJustHit[i] = True
+                        if self.fretboardHop < 0.04:
+                            self.fretboardHop = 0.04  #stump
+                if i == 6:
+                    if not playBassDrumOnly and self.playedSound[i] == False:
+                        self.engine.data.SnareDrumSound.play()
+                    self.playedSound[i] = True
+                    drumsJustHit[i] = True
+                if i == 7:
+                    if not playBassDrumOnly and self.playedSound[i] == False:
+                        self.engine.data.HiHatDrumSound.play()
+                    self.playedSound[i] = True
+                    drumsJustHit[i] = True
+                if i == 8:   #MFH - must actually activate starpower!
+                    if not playBassDrumOnly and self.playedSound[i] == False:
+                        self.engine.data.RideDrumSound.play()
+                    self.playedSound[i] = True
+                    drumsJustHit[i] = True
+                if i == 9:
+                    if not playBassDrumOnly and self.playedSound[i] == False:
                         self.engine.data.CDrumSound.play()
                     self.playedSound[i] = True
                     drumsJustHit[i] = True
+                
 
         return drumsJustHit
 

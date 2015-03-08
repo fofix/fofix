@@ -1546,10 +1546,10 @@ class KeyTester(Layer, KeyListener):
         self.controls.keyPressed(key)
         if self.type > 1 and self.type not in (4, 5):
             if c == self.keyList[Player.DRUM1]:
-                self.engine.data.T1DrumSound.play()
+                self.engine.data.SnareDrumSound.play()
             elif c == self.keyList[Player.DRUM2]:
                 if self.type == 2:
-                    self.engine.data.T2DrumSound.play()
+                    self.engine.data.T1DrumSound.play()
                 else:
                     self.engine.data.CDrumSound.play()
             elif c == self.keyList[Player.DRUM3]:

@@ -231,9 +231,12 @@ class Data(object):
           ["starReadySound","starpowerready.ogg"],
           ["starSound","starpower.ogg"],
           ["startSound","start.ogg"],
+          ["HiHatDrumSound","hihatclosed.ogg"],
+          ["SnareDrumSound","snare.ogg"],
           ["T1DrumSound","tom01.ogg"],
           ["T2DrumSound","tom02.ogg"],
-          ["T3DrumSound","tom03.ogg"]
+          ["T3DrumSound","tom03.ogg"],
+          ["RideDrumSound","ride.ogg"]
         ]
         for self.sounds in self.syncSounds:
             if self.fileExists(os.path.join("themes",themename,"sounds",self.sounds[1])):
@@ -283,6 +286,9 @@ class Data(object):
             volume = self.sfxVolume
         self.starDingSound.setVolume(volume)
         self.bassDrumSound.setVolume(volume)
+        self.SnareDrumSound.setVolume(volume)
+        self.HiHatDrumSound.setVolume(volume)
+        self.RideDrumSound.setVolume(volume)
         self.T1DrumSound.setVolume(volume)
         self.T2DrumSound.setVolume(volume)
         self.T3DrumSound.setVolume(volume)

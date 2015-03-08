@@ -50,7 +50,14 @@ class Instrument(object):
         self.time           = 0.0
         self.pickStartPos   = 0
         self.leftyMode      = False
+        self.snareFlip       = False
         self.drumFlip       = False
+        self.proDrums       = False
+
+        self.snareNum = 1
+        self.yellowTomNum = 2
+        self.greenTomNum = 3
+        self.blueTomNum = 4
 
         self.freestyleActive = False
         self.drumFillsActive = False
@@ -497,12 +504,23 @@ class Instrument(object):
             else: #No mesh for star notes
                 self.starMesh = None
 
+            # tom notes should be rectangular for prodrums
+            if self.engine.fileExists(get("tom.dae")): #look in the notes folder for files
+                self.engine.resource.load(self,  "tomMesh",  lambda: Mesh(self.engine.resource.fileName(get("tom.dae"))))
+            else: #No mesh for star notes
+                self.tomMesh = None
+
             if defaultNote:
                 self.notetex = False
             else:
                 self.notetex = True
                 self.startex = True
                 self.staratex = True
+
+                for i in range(5):
+                    if not engine.loadImgDrawing(self,  "tomtex"+chr(97+i),  get("tomtex_"+chr(97+i)+".png")):
+                        self.notetex = False
+                        break
 
                 for i in range(5):
                     if not engine.loadImgDrawing(self,  "notetex"+chr(97+i),  get("notetex_"+chr(97+i)+".png")):
@@ -770,7 +788,6 @@ class Instrument(object):
         else:
             track   = song.track[self.player]
             notes = [(time, event) for time, event in track.getEvents(pos - self.currentPeriod * 2, pos + self.currentPeriod * self.beatsPerBoard)]
-
         if self.battleStatus[7]:
             notes = self.getDoubleNotes(notes)
         return notes
@@ -1234,7 +1251,6 @@ class Instrument(object):
 
         renderedNotes = reversed(self.getRequiredNotesForRender(song,pos))
         for time, event in renderedNotes:
-
             if isinstance(event, Tempo):
 
                 self.tempoBpm = event.bpm
@@ -1383,7 +1399,7 @@ class Instrument(object):
 
                 glPushMatrix()
                 glTranslatef(x, 0, z)
-                self.renderNote(length, sustain = sustain, color = color, tailOnly = tailOnly, isTappable = isTappable, fret = event.number, spNote = self.spNote, isOpen = isOpen)
+                self.renderNote(length, sustain = sustain, color = color, tailOnly = tailOnly, isTappable = isTappable, fret = event.number, spNote = self.spNote, isOpen = isOpen, proDrum = event.prodrum)
                 glPopMatrix()
             else:
                 if z + length < -1.0:

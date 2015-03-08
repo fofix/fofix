@@ -557,11 +557,12 @@ class SongInfo(object):
     def lyrics(self):
         return self._get("lyrics")
 
-    @property
-    #because of how RB3 pro drums are formatted, this tag
-    #detects a way to properly read the cymbals notes in the midi
-    def prodrum(self):
-        return self._get("pro_drum")
+    # Moved this to a Player preference called prodrums
+    # @property
+    # #because of how RB3 pro drums are formatted, this tag
+    # #detects a way to properly read the cymbals notes in the midi
+    # def prodrum(self):
+    #     return self._get("pro_drum")
 
     def getHighscoresWithPartString(self, difficulty, part = str(parts[GUITAR_PART])):
         return self.getHighscores(difficulty, part)
@@ -888,9 +889,10 @@ class MarkerNote(Event): #MFH
 
 
 class Note(Event):
-    def __init__(self, number, length, special = False, tappable = 0, star = False, finalStar = False):
+    def __init__(self, number, length, special = False, tappable = 0, star = False, finalStar = False, prodrum = False):
         Event.__init__(self, length)
         self.number   = number      #keeps track of fret number
+        self.prodrum  = prodrum
         self.played   = False
         self.special  = special
         self.tappable = tappable
@@ -1225,6 +1227,14 @@ class NoteTrack(Track):   #MFH - special Track type for note events, with markin
                 self.allEvents.remove((time, event))
                 if self.logTempoEvents == 1:
                     Log.debug("Tempo event removed from NoteTrack during cleanup: " + str(event.bpm) + "bpm")
+
+    def flipSnareHiHat(self):
+        for time, event in self.allEvents:
+            if isinstance(event, Note):
+                if(event.number == 1):
+                    event.number = 2
+                elif(event.number == 2):
+                    event.number = 1
 
     def flipDrums(self):
         for time, event in self.allEvents:
@@ -2010,7 +2020,7 @@ class NoteTrack(Track):   #MFH - special Track type for note events, with markin
 
 
 class Song(object):
-    def __init__(self, engine, infoFileName, songTrackName, guitarTrackName, rhythmTrackName, noteFileName, scriptFileName = None, partlist = [parts[GUITAR_PART]], drumTrackName = None, crowdTrackName = None):
+    def __init__(self, engine, infoFileName, songTrackName, guitarTrackName, rhythmTrackName, noteFileName, scriptFileName = None, partlist = [parts[GUITAR_PART]], drumTrackNames = [], crowdTrackName = None, vocalTrackName = None):
         self.engine        = engine
 
         self.logClassInits = self.engine.config.get("game", "log_class_inits")
@@ -2052,6 +2062,7 @@ class Song(object):
 
         self.hasStarpowerPaths = False
         self.hasFreestyleMarkings = False
+        self.hasTomMarkings = False
 
         #MFH - add a separate variable to house the special text event tracks:
         #MFH - special text-event tracks for the separated text-event list variable
@@ -2082,9 +2093,10 @@ class Song(object):
         self.rhythmTrack = None
 
         #myfingershurt:
-        self.drumTrack = None
+        self.drumTracks = []
         #akedrou
         self.crowdTrack = None
+        self.vocalTrack = None
 
         try:
             if songTrackName:
@@ -2104,23 +2116,32 @@ class Song(object):
         except Exception, e:
             Log.warn("Unable to load rhythm track: %s" % e)
 
-
+        i = 3
         try:
-            if drumTrackName:
-                self.drumTrack = Audio.StreamingSound(self.engine.audio.getChannel(3), drumTrackName)
+            if drumTrackNames:
+                for j, drumTrackName in enumerate(drumTrackNames):
+                    i = j + 3
+                    self.drumTracks.append(Audio.StreamingSound(self.engine.audio.getChannel(i), drumTrackName))
+                    i += 1
         except Exception, e:
             Log.warn("Unable to load drum track: %s" % e)
 
         try:
             if crowdTrackName:
-                self.crowdTrack = Audio.StreamingSound(self.engine.audio.getChannel(4), crowdTrackName)
+                self.crowdTrack = Audio.StreamingSound(self.engine.audio.getChannel(i), crowdTrackName)
         except Exception, e:
             Log.warn("Unable to load crowd track: %s" % e)
 
+        try:
+            if vocalTrackName:
+                self.vocalTrack = Audio.StreamingSound(self.engine.audio.getChannel(i), vocalTrackName)
+        except Exception, e:
+            Log.warn("Unable to load vocal track: %s" % e)
+
         #MFH - single audio track song detection
         self.singleTrackSong = False
-        if (self.songTrack == None) or (self.guitarTrack == None and self.rhythmTrack == None and self.drumTrack == None):
-            if not (self.songTrack == None and self.guitarTrack == None and self.rhythmTrack == None and self.drumTrack == None):
+        if (self.songTrack == None) or (self.guitarTrack == None and self.rhythmTrack == None and self.drumTracks == None and self.vocalTrack == None):
+            if not (self.songTrack == None and self.guitarTrack == None and self.rhythmTrack == None and self.drumTracks == None and self.vocalTrack == None):
                 self.singleTrackSong = True
                 self.missVolume = self.engine.config.get("audio", "single_track_miss_volume")   #MFH - force single-track miss volume setting instead
                 Log.debug("Song with only a single audio track identified - single-track miss volume applied: " + str(self.missVolume))
@@ -2206,12 +2227,16 @@ class Song(object):
             assert start == 0.0
             self.rhythmTrack.play()
         #myfingershurt
-        if self.drumTrack:
-            assert start == 0.0
-            self.drumTrack.play()
+        if self.drumTracks:
+            for drumTrack in self.drumTracks:
+                assert start == 0.0
+                drumTrack.play()
         if self.crowdTrack:
             assert start == 0.0
             self.crowdTrack.play()
+        if self.vocalTrack:
+            assert start == 0.0
+            self.vocalTrack.play()
         self._playing = True
 
     def pause(self):
@@ -2227,6 +2252,8 @@ class Song(object):
             self.setGuitarVolume(volume)
         elif part == parts[DRUM_PART] or part == parts[PRO_DRUM_PART]:
             self.setDrumVolume(volume)
+        elif part == parts[VOCAL_PART]:
+            self.setVocalVolume(volume)
         else:
             self.setRhythmVolume(volume)
 
@@ -2267,16 +2294,17 @@ class Song(object):
                 self.rhythmTrack.setVolume(volume)
 
     def setDrumVolume(self, volume):
-        if self.drumTrack:
-            if volume == 0:
-                self.drumTrack.setVolume(self.missVolume)
-            elif volume == 1:
-                if DRUM_TRACK in self.activeAudioTracks:
-                    self.drumTrack.setVolume(self.activeVolume)
+        if self.drumTracks:
+            for drumTrack in self.drumTracks:
+                if volume == 0:
+                    drumTrack.setVolume(self.missVolume)
+                elif volume == 1:
+                    if DRUM_TRACK in self.activeAudioTracks:
+                        drumTrack.setVolume(self.activeVolume)
+                    else:
+                        drumTrack.setVolume(self.backVolume)
                 else:
-                    self.drumTrack.setVolume(self.backVolume)
-            else:
-                self.drumTrack.setVolume(volume)
+                    drumTrack.setVolume(volume)
 
     def setInstrumentPitch(self, semitones, part):
         if part == parts[GUITAR_PART]:
@@ -2289,6 +2317,18 @@ class Song(object):
         else:
             if self.rhythmTrack:
                 self.rhythmTrack.setPitchBendSemitones(semitones)
+
+    def setVocalVolume(self, volume):
+        if self.vocalTrack:
+            if volume == 0:
+                self.vocalTrack.setVolume(self.missVolume)
+            elif volume == 1:
+                if VOCAL_TRACK in self.activeAudioTracks:
+                    self.vocalTrack.setVolume(self.activeVolume)
+                else:
+                    self.vocalTrack.setVolume(self.backVolume)
+            else:
+                self.vocalTrack.setVolume(volume)
 
     def resetInstrumentPitch(self, part):
         self.setInstrumentPitch(0.0, part)
@@ -2330,8 +2370,9 @@ class Song(object):
             self.guitarTrack.stop()
         if self.rhythmTrack:
             self.rhythmTrack.stop()
-        if self.drumTrack:
-            self.drumTrack.stop()
+        if self.drumTracks:
+            for drumTrack in self.drumTracks:
+                drumTrack.stop()
         if self.crowdTrack:
             self.crowdTrack.stop()
         self._playing = False
@@ -2343,8 +2384,9 @@ class Song(object):
             self.guitarTrack.setSpeed(speed)
         if self.rhythmTrack:
             self.rhythmTrack.setSpeed(speed)
-        if self.drumTrack:
-            self.drumTrack.setSpeed(speed)
+        if self.drumTracks:
+            for drumTrack in self.drumTracks:
+                drumTrack.setSpeed(speed)
         if self.crowdTrack:
             self.crowdTrack.setSpeed(speed)
 
@@ -2359,8 +2401,9 @@ class Song(object):
             self.guitarTrack.fadeout(time)
         if self.rhythmTrack:
             self.rhythmTrack.fadeout(time)
-        if self.drumTrack:
-            self.drumTrack.fadeout(time)
+        if self.drumTracks:
+            for drumTrack in self.drumTracks:
+                drumTrack.fadeout(time)
         if self.crowdTrack:
             self.crowdTrack.fadeout(time)
         self._playing = False
@@ -2453,6 +2496,9 @@ realNoteMap = {       # difficulty, note
 #MFH - special note numbers
 starPowerMarkingNote = 103     #note 103 = G 8
 overDriveMarkingNote = 116     #note 116 = G#9
+yellowTomMarkingNote = 110
+blueTomMarkingNote = 111
+greenTomMarkingNote = 112
 hopoMarkingNotes = []
 proHopoMarkingNotes = [0x1e, 0x36, 0x4e, 0x66]
 
@@ -2742,6 +2788,30 @@ class MidiReader(midi.MidiOutStream):
                     self.addSpecialMidiEvent(diff, MarkerNote(note, endTime - startTime), time = startTime)
                     if self.logMarkerNotes == 1:
                         Log.debug("RB freestyle section (drum fill or BRE) at %f added to part: %s and difficulty: %s" % ( startTime, self.partnumber, difficulties[diff] ) )
+            
+            elif note == yellowTomMarkingNote:    
+                self.song.hasTomMarkings = True
+                for diff in difficulties:
+                    self.addSpecialMidiEvent(diff, MarkerNote(note, endTime - startTime), time = startTime)
+                    self.addSpecialMidiEvent(diff, MarkerNote(note, 1, endMarker = True), time = endTime+1)   #ending marker note
+                    if self.logMarkerNotes == 1:
+                        Log.debug("Yellow Tom MarkerNote at %f added to part: %s and difficulty: %s" % ( startTime, self.partnumber, difficulties[diff] ) )
+
+            elif note == blueTomMarkingNote:    
+                self.song.hasTomMarkings = True
+                for diff in difficulties:
+                    self.addSpecialMidiEvent(diff, MarkerNote(note, endTime - startTime), time = startTime)
+                    self.addSpecialMidiEvent(diff, MarkerNote(note, 1, endMarker = True), time = endTime+1)   #ending marker note
+                    if self.logMarkerNotes == 1:
+                        Log.debug("Blue Tom MarkerNote at %f added to part: %s and difficulty: %s" % ( startTime, self.partnumber, difficulties[diff] ) )
+
+            elif note == greenTomMarkingNote:    
+                self.song.hasTomMarkings = True
+                for diff in difficulties:
+                    self.addSpecialMidiEvent(diff, MarkerNote(note, endTime - startTime), time = startTime)
+                    self.addSpecialMidiEvent(diff, MarkerNote(note, 1, endMarker = True), time = endTime+1)   #ending marker note
+                    if self.logMarkerNotes == 1:
+                        Log.debug("Green Tom MarkerNote at %f added to part: %s and difficulty: %s" % ( startTime, self.partnumber, difficulties[diff] ) )
             else:
                 pass
         except KeyError:
@@ -3095,6 +3165,7 @@ class MidiPartsDiffReader(midi.MidiOutStream):
         self._drumFound   = False
         self._ODNoteFound = False
         self._SPNoteFound = False
+        self._TomNoteFound = False
 
         self.logClassInits = Config.get("game", "log_class_inits")
         if self.logClassInits == 1:
@@ -3170,6 +3241,13 @@ class MidiPartsDiffReader(midi.MidiOutStream):
             self._ODNoteFound = True
         elif note == starPowerMarkingNote:
             self._SPNoteFound = True
+        if note == yellowTomMarkingNote:
+            Log.debug(note)
+            self._TomNoteFound = True
+        elif note == blueTomMarkingNote:
+            self._TomNoteFound = True
+        elif note == greenTomMarkingNote:
+            self._TomNoteFound = True
         try:
             try:
                 if len(self.difficulties[self.currentPart]) == len(difficulties):
@@ -3197,6 +3275,7 @@ def loadSong(engine, name, library = DEFAULT_LIBRARY, seekable = False, playback
     songFile   = engine.resource.fileName(library, name, "song.ogg")
     rhythmFile = engine.resource.fileName(library, name, "rhythm.ogg")
     crowdFile  = engine.resource.fileName(library, name, "crowd.ogg")
+    vocalFile  = engine.resource.fileName(library, name, "vocals.ogg")
 
     logUneditedMidis = engine.config.get("log",   "log_unedited_midis")
 
@@ -3219,8 +3298,12 @@ def loadSong(engine, name, library = DEFAULT_LIBRARY, seekable = False, playback
     scriptFile = engine.resource.fileName(library, name, "script.txt")
     previewFile = engine.resource.fileName(library, name, "preview.ogg")
     #myfingershurt:
-    drumFile = engine.resource.fileName(library, name, "drums.ogg")
-
+    drumFiles=[]
+    if os.path.isfile(engine.resource.fileName(library, name, "drums.ogg")):
+        drumFiles.append(engine.resource.fileName(library, name, "drums.ogg"))
+    for i in range(1,10):
+        if os.path.isfile(engine.resource.fileName(library, name, "drums_" + str(i) + ".ogg")):
+            drumFiles.append(engine.resource.fileName(library, name, "drums_" + str(i) + ".ogg"))
 
     if seekable:
         if os.path.isfile(guitarFile) and os.path.isfile(songFile):
@@ -3237,8 +3320,10 @@ def loadSong(engine, name, library = DEFAULT_LIBRARY, seekable = False, playback
         guitarFile = None
     if not os.path.isfile(rhythmFile):
         rhythmFile = None
-    if not os.path.isfile(drumFile):
-        drumFile = None
+    if not os.path.isfile(drumFiles[0]):
+        drumFiles = None
+    if not os.path.isfile(vocalFile):
+        vocalFile = None
     if not os.path.isfile(crowdFile):
         crowdFile = None
     if crowdsEnabled == 0:
@@ -3257,12 +3342,13 @@ def loadSong(engine, name, library = DEFAULT_LIBRARY, seekable = False, playback
             songFile = guitarFile
         elif part[0] == parts[BASS_PART] and rhythmFile != None:
             songFile = rhythmFile
-        elif (part[0] == parts[DRUM_PART] or part[0] == parts[PRO_DRUM_PART]) and drumFile != None:
-            songFile = drumFile
+        elif (part[0] == parts[DRUM_PART] or part[0] == parts[PRO_DRUM_PART]) and drumFiles != None:
+            songFile = drumFiles
         guitarFile = None
         rhythmFile = None
-        drumFile = None
+        drumFiles = None
         crowdFile = None
+        vocalFile = None
         slowDownFactor = practiceSpeed
     else:
         slowDownFactor = engine.config.get("audio", "speed_factor")
@@ -3276,17 +3362,19 @@ def loadSong(engine, name, library = DEFAULT_LIBRARY, seekable = False, playback
             songFile = previewFile
             guitarFile = None
             rhythmFile = None
-            drumFile = None
+            drumFiles = None
+            vocalFile = None
 
     if notesOnly:
         songFile = None
         crowdFile = None
+        vocalFile = None
         guitarFile = None
         rhythmFile = None
         previewFile = None
-        drumFile = None
+        drumFiles = None
 
-    song       = Song(engine, infoFile, songFile, guitarFile, rhythmFile, noteFile, scriptFile, part, drumFile, crowdFile)
+    song       = Song(engine, infoFile, songFile, guitarFile, rhythmFile, noteFile, scriptFile, part, drumFiles, crowdFile, vocalFile)
     return song
 
 def loadSongInfo(engine, name, library = DEFAULT_LIBRARY):
