@@ -175,19 +175,19 @@ class Main():
 
             # Set up one-shot mode
             Log.debug('Entering one-shot mode.')
-            Config.set("setlist", "selected_song", playing)
+            Config.set("setlist", "selected_song", self.playing)
 
             self.engine.cmdPlay = 1
 
-            if diff is not None:
-                self.engine.cmdDiff = int(diff)
-            if part is not None:
-                self.engine.cmdPart = int(part)
+            if self.diff is not None:
+                self.engine.cmdDiff = int(self.diff)
+            if self.part is not None:
+                self.engine.cmdPart = int(self.part)
 
-            if players == 1:
-                self.engine.cmdMode = players, mode, 0
+            if self.players == 1:
+                self.engine.cmdMode = self.players, self.mode, 0
             else:
-                self.engine.cmdMode = players, 0, mode
+                self.engine.cmdMode = self.players, 0, self.mode
 
     def restart(self):
         Log.notice("Restarting.")
