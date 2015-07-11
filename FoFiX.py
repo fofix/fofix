@@ -38,7 +38,7 @@ if os.name == 'nt' and not hasattr(sys, 'frozen'):
 
 def disable_gl_checks():
     assert 'OpenGL' not in sys.modules
-    
+
     import OpenGL
     if OpenGL.__version__ >= '3':
         OpenGL.ERROR_CHECKING = False
@@ -51,7 +51,7 @@ def disable_gl_checks():
 def cmd_args():
     parser = argparse.ArgumentParser(description='Frets On Fire X (FoFiX)')
     # Where the name automatically assigned to the metavar option is to long i used x in its place.
-    # Might go back and 
+    # Might go back and
     options = parser.add_argument_group('Options')
     options.add_argument('-r', '--resolution', type=str,  metavar='x',    help='Force a specific resolution to be used.')
     options.add_argument('-f', '--fullscreen',  action='store_true',       help='Force usage of full-screen mode.')
