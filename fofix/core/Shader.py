@@ -78,7 +78,7 @@ class ShaderList:
         self.getVars(vertname, program, sArray)
         self.getVars(fragname, program, sArray)
         self.shaders[name] = sArray
-        if self.shaders[name].has_key("Noise3D"):
+        if "Noise3D" in self.shaders[name]:
             self.setTexture("Noise3D",self.noise3D,name)
 
 
@@ -156,7 +156,7 @@ class ShaderList:
 
     #simplified texture binding function
     def setTexture(self,name,texture,program = None):
-        if self.assigned.has_key(program):
+        if program in self.assigned:
             program = self.assigned[program]
         if program is None:  program = self.active
         else: program = self[program]
@@ -175,7 +175,7 @@ class ShaderList:
 
            Returns the value.  If the variable does not exist, KeyError is raised."""
 
-        if self.assigned.has_key(program):
+        if program in self.assigned:
             program = self.assigned[program]
 
         if program is None:
@@ -183,7 +183,7 @@ class ShaderList:
         else:
             program = self[program]
 
-        if program is None or not program.has_key(var):
+        if program is None or var not in program:
             return False
         else:
             return program[var][1]
@@ -198,7 +198,7 @@ class ShaderList:
 
            Returns nothing.  If the variable does not exist, KeyError is raised."""
 
-        if self.assigned.has_key(program):
+        if program in self.assigned:
             program = self.assigned[program]
         if program is None:
             program = self.active
@@ -207,11 +207,11 @@ class ShaderList:
 
 
 
-        if program is None or not program.has_key(var):
+        if program is None or var not in program:
             return
 
         if type(value) == str:
-            if self.var.has_key(value):
+            if value in self.var:
                 value = self.var[value]
             else:
                 return
@@ -263,7 +263,7 @@ class ShaderList:
         if not self.turnon:
             return False
 
-        if self.assigned.has_key(shader):
+        if shader in self.assigned:
             shader = self.assigned[shader]
 
         if self[shader] is None:
@@ -320,7 +320,7 @@ class ShaderList:
 
     # update and bind all textures
     def setTextures(self, program = None):
-        if self.assigned.has_key(program):
+        if program in self.assigned:
             program = self.assigned[program]
         if program is None:
             program = self.active
@@ -440,7 +440,7 @@ class ShaderList:
                     noise[i][j][k] = (1-1/float(c))*col1+1/float(c)*col2
 
     def __getitem__(self, name):
-        if self.shaders.has_key(name):
+        if name in self.shaders:
             return self.shaders[name]
         else:
             return None

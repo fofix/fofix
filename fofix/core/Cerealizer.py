@@ -511,9 +511,9 @@ def register(Class, handler = None, classname = ""):
         elif hasattr(Class, "__getinitargs__"): handler = InitArgsObjHandler(Class, classname)
         elif hasattr(Class, "__slots__"      ): handler = SlotedObjHandler  (Class, classname)
         else:                                   handler = ObjHandler        (Class, classname)
-    if _HANDLERS_.has_key(Class): raise ValueError("Class %s has already been registred!" % Class)
+    if Class in _HANDLERS_: raise ValueError("Class %s has already been registred!" % Class)
     if not isinstance(handler, RefHandler):
-        if _HANDLERS .has_key(handler.classname): raise ValueError("A class has already been registred under the name %s!" % handler.classname[:-1])
+        if handler.classname in _HANDLERS: raise ValueError("A class has already been registred under the name %s!" % handler.classname[:-1])
         _HANDLERS [handler.classname] = handler
         if handler.__class__ is ObjHandler:
             logger.info("Registring class %s as '%s'" % (Class, handler.classname[:-1]))
@@ -539,7 +539,7 @@ def register_alias(Class, alias):
     handler = _HANDLERS_.get(Class)
     if not handler:
         raise ValueError("Cannot register alias '%s' to Class %s: the class is not yet registred!" % (alias, Class))
-    if _HANDLERS.has_key(alias):
+    if alias in _HANDLERS:
         raise ValueError("Cannot register alias '%s' to Class %s: another class is already registred under the alias name!" % (alias, Class))
     logger.info("Registring alias '%s' for %s" % (alias, Class))
     _HANDLERS[alias + "\n"] = handler
