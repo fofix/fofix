@@ -131,11 +131,11 @@ drum4s    = []
 drum5s    = []
 bassdrums = []
 
-guitarkeynames = ["Left", "Right", "Up", "Down", "Cancel", "Select", "Fret 1", "Solo Fret 1", "Fret 2", "Solo Fret 2", "Fret 3", \
+guitarkeynames = ["Left", "Right", "Up", "Down", "Cancel", "Select", "Fret 1", "Solo Fret 1", "Fret 2", "Solo Fret 2", "Fret 3",
                   "Solo Fret 3", "Fret 4", "Solo Fret 4", "Fret 5", "Solo Fret 5", "Action 1", "Action 2", "Star Key", "Effects Key"]
-drumkey4names  = ["Left", "Right", "Up", "Down", "Cancel", "Select", "Drum 4", "Drum 4 B", "Drum 1", "Drum 1 B", "Drum 2", "Drum 2 B", \
+drumkey4names  = ["Left", "Right", "Up", "Down", "Cancel", "Select", "Drum 4", "Drum 4 B", "Drum 1", "Drum 1 B", "Drum 2", "Drum 2 B",
                   "Drum 3", "Drum 3 B", "None", "None", "Bass Drum", "Bass Drum B", "Star Key", "None"]
-drumkey5names  = ["Left", "Right", "Up", "Down", "Cancel", "Select", "Drum 5", "Drum 5 B", "Drum 1", "Drum 1 B", "Cymbal 2", "Cymbal 2 B", \
+drumkey5names  = ["Left", "Right", "Up", "Down", "Cancel", "Select", "Drum 5", "Drum 5 B", "Drum 1", "Drum 1 B", "Cymbal 2", "Cymbal 2 B",
                   "Drum 3", "Drum 3 B", "Cymbal 4", "Cymbal 4 B", "Bass Drum", "Bass Drum B", "Star Key", "None"]
 
 menuUp    = []
@@ -902,22 +902,22 @@ class Player(object):
     def configController(self):
         if self.keyList:
             if self.controlType == 1:
-                self.keys      = [self.keyList[KEY1], self.keyList[KEY2], self.keyList[KEY3], self.keyList[KEY4], self.keyList[KEY5], \
+                self.keys      = [self.keyList[KEY1], self.keyList[KEY2], self.keyList[KEY3], self.keyList[KEY4], self.keyList[KEY5],
                                   self.keyList[KEY1], self.keyList[KEY2], self.keyList[KEY3], self.keyList[KEY4], self.keyList[KEY5]]
                 self.soloKeys  = [self.keyList[KEY1], self.keyList[KEY2], self.keyList[KEY3], self.keyList[KEY4], self.keyList[KEY5]]
             else:
-                self.keys   = [self.keyList[KEY1], self.keyList[KEY2], self.keyList[KEY3], self.keyList[KEY4], self.keyList[KEY5], \
+                self.keys   = [self.keyList[KEY1], self.keyList[KEY2], self.keyList[KEY3], self.keyList[KEY4], self.keyList[KEY5],
                                self.keyList[KEY1A], self.keyList[KEY2A], self.keyList[KEY3A], self.keyList[KEY4A], self.keyList[KEY5A]]
                 self.soloKeys = [self.keyList[KEY1A], self.keyList[KEY2A], self.keyList[KEY3A], self.keyList[KEY4A], self.keyList[KEY5A]]
             self.soloShift = self.keyList[KEY1A]
             self.drumSolo = []
             self.actions  = [self.keyList[ACTION1], self.keyList[ACTION2]]
-            self.drums    = [self.keyList[DRUMBASS], self.keyList[DRUM1], self.keyList[DRUM2], self.keyList[DRUM3], self.keyList[DRUM5], \
+            self.drums    = [self.keyList[DRUMBASS], self.keyList[DRUM1], self.keyList[DRUM2], self.keyList[DRUM3], self.keyList[DRUM5],
                              self.keyList[DRUMBASSA], self.keyList[DRUM1A], self.keyList[DRUM2A], self.keyList[DRUM3A], self.keyList[DRUM5A]]
             if self.controlType == 1:
                 self.progressKeys = [self.keyList[KEY1], self.keyList[CANCEL], self.keyList[START], self.keyList[KEY2]]
             else:
-                self.progressKeys = [self.keyList[KEY1], self.keyList[KEY1A], self.keyList[CANCEL], self.keyList[START], self.keyList[KEY2], \
+                self.progressKeys = [self.keyList[KEY1], self.keyList[KEY1A], self.keyList[CANCEL], self.keyList[START], self.keyList[KEY2],
                                      self.keyList[KEY2A]]
             if self.controlType == 4:
                 self.soloSlide = True

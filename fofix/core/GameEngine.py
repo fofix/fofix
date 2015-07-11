@@ -82,8 +82,8 @@ for name in allthemes:
 i = len(themes)
 if i == 0:
     if os.name == 'posix':
-        Log.error("No valid theme found!\n"+\
-                  "Make sure theme files are properly cased "+\
+        Log.error("No valid theme found!\n" +
+                  "Make sure theme files are properly cased " +
                   "e.g. notes.png works, Notes.png doesn't\n")
     else:
         Log.error("No valid theme found!")

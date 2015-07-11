@@ -169,7 +169,7 @@ class Credits(Layer, KeyListener):
         self.videoLayer = False
         self.background = None
 
-        vidSource = os.path.join(Version.dataPath(), 'themes', self.themename, \
+        vidSource = os.path.join(Version.dataPath(), 'themes', self.themename,
                                  'menu', 'credits.ogv')
         if os.path.isfile(vidSource):
             try:

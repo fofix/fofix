@@ -197,8 +197,8 @@ class Data(object):
                 resource.load(self,f[1],f[0], synch = True)
 
 
-        self.fontDict = {"font": self.font, "bigFont": self.bigFont, "pauseFont": self.pauseFont, "scoreFont": self.scoreFont, \
-                         "streakFont": self.streakFont, "songFont": self.songFont, "streakFont2": self.streakFont2, \
+        self.fontDict = {"font": self.font, "bigFont": self.bigFont, "pauseFont": self.pauseFont, "scoreFont": self.scoreFont,
+                         "streakFont": self.streakFont, "songFont": self.songFont, "streakFont2": self.streakFont2,
                          "songListFont": self.songListFont, "shadowFont": self.shadowFont, "loadingFont": self.loadingFont}
 
         assert self.fontDict['font'] == self.font

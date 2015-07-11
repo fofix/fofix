@@ -492,16 +492,16 @@ class CreateCharacter(Layer, KeyListener):
         self.lefty     = {0: 1, 1: -1}
         neckDict       = {0: _("Default Neck"), 1: _("Theme Neck"), 2: _("Select a Neck")}
         self.values    = (self.dictEnDisable, self.dictEnDisable, self.dictEnDisable, {0: _("Disabled"), 1: _("Easy Assist"), 2: _("Medium Assist")}, self.dictEnDisable, neckDict)
-        self.options   = [(_("Name"),             _("Name your character!")), \
-                          (_("Lefty Mode"),       _("Flip the guitar frets for left-handed playing!")), \
-                          (_("Drum Flip"),        _("Flip the drum sounds - snare becomes crash, and so on")), \
-                          (_("Auto-Kick Bass"),   _("Feet uncooperative? Broke your pedal? Not to worry!")), \
-                          (_("Assist Mode"),      _("Play hard and expert, even when you're not that good!")), \
-                          (_("Two-Chord Max"),    _("For those still playing with uncooperative keyboards.")), \
-                          (_("Neck"),             _("Give the endless procession of notes a bit of flair!")), \
-                          (_("Upload Name"),      _("To the internet, you are GUITARGOD23047124!")), \
-                          (_("Choose Avatar"),    _("A 256x256 window into your soul.")), \
-                          (_("Delete Character"), _("Quitter.")), \
+        self.options   = [(_("Name"),             _("Name your character!")),
+                          (_("Lefty Mode"),       _("Flip the guitar frets for left-handed playing!")),
+                          (_("Drum Flip"),        _("Flip the drum sounds - snare becomes crash, and so on")),
+                          (_("Auto-Kick Bass"),   _("Feet uncooperative? Broke your pedal? Not to worry!")),
+                          (_("Assist Mode"),      _("Play hard and expert, even when you're not that good!")),
+                          (_("Two-Chord Max"),    _("For those still playing with uncooperative keyboards.")),
+                          (_("Neck"),             _("Give the endless procession of notes a bit of flair!")),
+                          (_("Upload Name"),      _("To the internet, you are GUITARGOD23047124!")),
+                          (_("Choose Avatar"),    _("A 256x256 window into your soul.")),
+                          (_("Delete Character"), _("Quitter.")),
                           (_("Done"),             _("All finished? Let's do this thing!"))]
         themename = self.engine.data.themeLabel
         self.engine.data.loadAllImages(self, os.path.join("themes",themename,"lobby","creator"))

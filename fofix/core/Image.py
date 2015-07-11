@@ -59,8 +59,8 @@ class SvgContext(object):
         glClearColor(r, g, b, a)
         glClear(GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
 
-def drawImage(image, scale = (1.0, -1.0), coord = (0, 0), rot = 0, \
-                  color = (1,1,1,1), rect = (0,1,0,1), stretched = 0, fit = CENTER, \
+def drawImage(image, scale = (1.0, -1.0), coord = (0, 0), rot = 0,
+                  color = (1,1,1,1), rect = (0,1,0,1), stretched = 0, fit = CENTER,
                   alignment = CENTER, valignment = CENTER):
         """
         Draws the image/surface to screen

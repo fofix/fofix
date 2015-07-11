@@ -1445,30 +1445,30 @@ class KeyTester(Layer, KeyListener):
 
         if self.type < 2 or self.type == 4:
             self.fretColors     = self.engine.theme.noteColors
-            self.names          = [_("Left"), _("Right"), _("Up"), _("Down"), _("Start"), \
-                                   _("Select"), _("Fret #1"), _("Solo #1"), _("Fret #2"), _("Solo #2"), \
-                                   _("Fret #3"), _("Solo #3"), _("Fret #4"), _("Solo #4"), _("Fret #5"), \
+            self.names          = [_("Left"), _("Right"), _("Up"), _("Down"), _("Start"),
+                                   _("Select"), _("Fret #1"), _("Solo #1"), _("Fret #2"), _("Solo #2"),
+                                   _("Fret #3"), _("Solo #3"), _("Fret #4"), _("Solo #4"), _("Fret #5"),
                                    _("Solo #5"), _("Pick!"), _("Pick!"), _("Starpower!"), _("Whammy")]
         elif self.type == 2:
             colors              = self.engine.theme.noteColors
             self.fretColors     = [colors[1], colors[2], colors[3], colors[0]]
             self.bassColor      = colors[4]
-            self.names          = [_("Left"), _("Right"), _("Up"), _("Down"), _("Start"), \
-                                   _("Select"), _("Drum #1"), None, _("Drum #2"), None, \
-                                   _("Drum #3"), None, None, None, _("Drum #4"), \
+            self.names          = [_("Left"), _("Right"), _("Up"), _("Down"), _("Start"),
+                                   _("Select"), _("Drum #1"), None, _("Drum #2"), None,
+                                   _("Drum #3"), None, None, None, _("Drum #4"),
                                    None, _("Bass Drum"), None, _("Starpower!"), _("None")]
         elif self.type == 5:
-            self.names          = [_("Left"), _("Right"), _("Up"), _("Down"), _("Start"), \
-                                   _("Select"), None, None, None, None, \
-                                   None, None, None, None, None, \
+            self.names          = [_("Left"), _("Right"), _("Up"), _("Down"), _("Start"),
+                                   _("Select"), None, None, None, None,
+                                   None, None, None, None, None,
                                    None, None, None, _("Starpower!"), None]
         else:
             colors              = self.engine.theme.noteColors
             self.fretColors     = [colors[1], colors[2], colors[3], colors[4], colors[0]]
             self.bassColor      = self.engine.theme.colors[5]
-            self.names          = [_("Left"), _("Right"), _("Up"), _("Down"), _("Start"), \
-                                   _("Select"), _("Drum #1"), None, _("Cymbal #2"), None, \
-                                   _("Drum #3"), None, _("Cymbal #4"), None, _("Drum #5"), \
+            self.names          = [_("Left"), _("Right"), _("Up"), _("Down"), _("Start"),
+                                   _("Select"), _("Drum #1"), None, _("Cymbal #2"), None,
+                                   _("Drum #3"), None, _("Cymbal #4"), None, _("Drum #5"),
                                    None, _("Bass Drum"), None, _("Starpower!"), _("None")]
 
         self.tsFret  = _("Fret")
@@ -1817,7 +1817,7 @@ class KeyTester(Layer, KeyListener):
 
             elif self.type > 1:
                 if self.type == 2:
-                    drumList = [self.keyList[Player.DRUM1], self.keyList[Player.DRUM1A], self.keyList[Player.DRUM2], self.keyList[Player.DRUM2A], \
+                    drumList = [self.keyList[Player.DRUM1], self.keyList[Player.DRUM1A], self.keyList[Player.DRUM2], self.keyList[Player.DRUM2A],
                                 self.keyList[Player.DRUM3], self.keyList[Player.DRUM3A], self.keyList[Player.DRUM5], self.keyList[Player.DRUM5A]]
                     for i in range(4):
                         if self.controls.getState(drumList[(2*i)]) or self.controls.getState(drumList[(2*i)+1]):
@@ -1829,8 +1829,8 @@ class KeyTester(Layer, KeyListener):
                         wText, hText = font.getStringSize(text)
                         font.render(text, ((.2 + .2 * i)-wText/2, .4 + v))
                 else:
-                    drumList = [self.keyList[Player.DRUM1], self.keyList[Player.DRUM1A], self.keyList[Player.DRUM2], self.keyList[Player.DRUM2A], \
-                                self.keyList[Player.DRUM3], self.keyList[Player.DRUM3A], self.keyList[Player.DRUM4], self.keyList[Player.DRUM4A], \
+                    drumList = [self.keyList[Player.DRUM1], self.keyList[Player.DRUM1A], self.keyList[Player.DRUM2], self.keyList[Player.DRUM2A],
+                                self.keyList[Player.DRUM3], self.keyList[Player.DRUM3A], self.keyList[Player.DRUM4], self.keyList[Player.DRUM4A],
                                 self.keyList[Player.DRUM5], self.keyList[Player.DRUM5A]]
                     for i in range(5):
                         if self.controls.getState(drumList[(2*i)]) or self.controls.getState(drumList[(2*i)+1]):
