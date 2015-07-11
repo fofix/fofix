@@ -208,13 +208,13 @@ class View(Task):
         if normalize:
             if yIsDown:
                 glOrtho(self.geometryNormalized[0], self.geometryNormalized[2] - self.geometryNormalized[0],
-                        self.geometryNormalized[3] - self.geometryNormalized[1], self.geometryNormalized[1], -100, 100);
+                        self.geometryNormalized[3] - self.geometryNormalized[1], self.geometryNormalized[1], -100, 100)
             else:
                 glOrtho(self.geometryNormalized[0], self.geometryNormalized[2] - self.geometryNormalized[0],
-                        self.geometryNormalized[1], self.geometryNormalized[3] - self.geometryNormalized[1], -100, 100);
+                        self.geometryNormalized[1], self.geometryNormalized[3] - self.geometryNormalized[1], -100, 100)
         else:
             glOrtho(self.geometry[0], self.geometry[2] - self.geometry[0],
-                  self.geometry[1], self.geometry[3] - self.geometry[1], -100, 100);
+                  self.geometry[1], self.geometry[3] - self.geometry[1], -100, 100)
 
         glMatrixMode(GL_MODELVIEW)
         glPushMatrix()

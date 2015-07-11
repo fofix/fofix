@@ -64,8 +64,8 @@ class Video:
         pygame.display.gl_set_attribute(pygame.GL_ALPHA_SIZE, 8)
 
         if multisamples:
-            pygame.display.gl_set_attribute(pygame.GL_MULTISAMPLEBUFFERS, 1);
-            pygame.display.gl_set_attribute(pygame.GL_MULTISAMPLESAMPLES, multisamples);
+            pygame.display.gl_set_attribute(pygame.GL_MULTISAMPLEBUFFERS, 1)
+            pygame.display.gl_set_attribute(pygame.GL_MULTISAMPLESAMPLES, multisamples)
 
         # evilynux - Setting window icon for platforms other than MS Windows.
         #            pygame claims that some window manager requires this to be

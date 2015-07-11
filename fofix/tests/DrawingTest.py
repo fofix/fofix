@@ -57,12 +57,12 @@ def init():
     spiralVtx = np.zeros((nbSteps, 3), dtype=np.float32)
     spiralCol = np.zeros((nbSteps, 3), dtype=np.float32)
     for i in range(0, int(nbSteps), 2):
-        ratio = i/nbSteps;
+        ratio = i/nbSteps
         angle = 21*ratio
         c = cos(angle)
-        s = sin(angle);
-        r1 = 1.0 - 0.8*ratio;
-        r2 = 0.8 - 0.8*ratio;
+        s = sin(angle)
+        r1 = 1.0 - 0.8*ratio
+        r2 = 0.8 - 0.8*ratio
         alt = ratio - 0.5
         nor = 0.5
         up = sqrt(1.0-nor*nor)
@@ -125,7 +125,7 @@ def drawDirect():
     glEnd()
 
     # Draw spiral
-    glBegin(GL_TRIANGLE_STRIP);
+    glBegin(GL_TRIANGLE_STRIP)
     for i in range(spiralVtx.shape[0]):
         #glColor(spiralCol[i])
         #glVertex3fv(spiralVtx[i])
@@ -154,18 +154,18 @@ def drawArray():
 def drawVBO():
     # Draw triangle
     triangVbo.bind()
-    glEnableClientState(GL_VERTEX_ARRAY);
-    glEnableClientState(GL_COLOR_ARRAY);
+    glEnableClientState(GL_VERTEX_ARRAY)
+    glEnableClientState(GL_COLOR_ARRAY)
     glVertexPointer(3, GL_FLOAT, 24, triangVbo )
     glColorPointer(3, GL_FLOAT, 24, triangVbo+12 )
     glDrawArrays(GL_TRIANGLES, 0, triangVtx.shape[0])
-    glDisableClientState(GL_VERTEX_ARRAY);
-    glDisableClientState(GL_COLOR_ARRAY);
+    glDisableClientState(GL_VERTEX_ARRAY)
+    glDisableClientState(GL_COLOR_ARRAY)
     triangVbo.unbind()
     # Draw spiral
     # evilynux - FIXME: The following doesn't work... why?
     spiralVbo.bind()
-    glEnableClientState(GL_VERTEX_ARRAY);
+    glEnableClientState(GL_VERTEX_ARRAY)
     glEnableClientState(GL_COLOR_ARRAY)
     glVertexPointer(3, GL_FLOAT, 24, spiralVbo )
     glColorPointer(3, GL_FLOAT, 24, spiralVbo+12 )

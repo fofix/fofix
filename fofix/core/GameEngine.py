@@ -87,7 +87,7 @@ if i == 0:
                   "e.g. notes.png works, Notes.png doesn't\n")
     else:
         Log.error("No valid theme found!")
-    sys.exit(1);
+    sys.exit(1)
 
 if defaultTheme is None:
     defaultTheme = themes[0]    #myfingershurt
