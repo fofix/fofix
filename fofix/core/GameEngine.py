@@ -82,12 +82,12 @@ for name in allthemes:
 i = len(themes)
 if i == 0:
     if os.name == 'posix':
-        Log.error("No valid theme found!\n"+\
-                  "Make sure theme files are properly cased "+\
+        Log.error("No valid theme found!\n" +
+                  "Make sure theme files are properly cased " +
                   "e.g. notes.png works, Notes.png doesn't\n")
     else:
         Log.error("No valid theme found!")
-    sys.exit(1);
+    sys.exit(1)
 
 if defaultTheme is None:
     defaultTheme = themes[0]    #myfingershurt
@@ -322,7 +322,8 @@ class GameEngine(object):
                 except Exception:
                     thisIsAnAnimatedStageFolder = False
                 for aniFile in aniStageFolderListing:
-                    if os.path.splitext(aniFile)[1] == ".png" or os.path.splitext(aniFile)[1] ==  ".jpg" or os.path.splitext(aniFile)[1] == ".jpeg":  #we've found at least one .png file here, chances are this is a valid animated stage folder
+                    if os.path.splitext(aniFile)[1] in [".png", ".jpg", ".jpeg"]:
+                        # we've found at least one .png file here, chances are this is a valid animated stage folder
                         thisIsAnAnimatedStageFolder = True
                 if thisIsAnAnimatedStageFolder:
                     self.stageFolders.append(name)

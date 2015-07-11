@@ -197,8 +197,8 @@ class Data(object):
                 resource.load(self,f[1],f[0], synch = True)
 
 
-        self.fontDict = {"font": self.font, "bigFont": self.bigFont, "pauseFont": self.pauseFont, "scoreFont": self.scoreFont, \
-                         "streakFont": self.streakFont, "songFont": self.songFont, "streakFont2": self.streakFont2, \
+        self.fontDict = {"font": self.font, "bigFont": self.bigFont, "pauseFont": self.pauseFont, "scoreFont": self.scoreFont,
+                         "streakFont": self.streakFont, "songFont": self.songFont, "streakFont2": self.streakFont2,
                          "songListFont": self.songListFont, "shadowFont": self.shadowFont, "loadingFont": self.loadingFont}
 
         assert self.fontDict['font'] == self.font
@@ -406,7 +406,7 @@ class Data(object):
                     Log.notice("Checking image: %s" % fileName1)
             #check if fileName1 exists (has extension)
             if os.path.exists(fileName1):
-                if openImage == True:
+                if openImage:
                     try:
                         imgDrawing = ImgDrawing(self.svg, fileName1)
                         return imgDrawing
@@ -420,7 +420,7 @@ class Data(object):
                 #find extension
                 fileName1 = os.path.splitext(fileName1)[0]
                 files = glob.glob('%s.*' % fileName1)
-                if openImage == True:
+                if openImage:
                     for i in range(len(files)):
                         try:
                             imgDrawing = ImgDrawing(self.svg, files[i])
@@ -539,4 +539,4 @@ class Data(object):
 
     def resourcesLoaded(self):
         """return: True if all the resources have been loaded."""
-        return not None in self.__dict__.values()
+        return None not in self.__dict__.values()

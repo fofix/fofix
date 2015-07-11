@@ -45,7 +45,7 @@ class MidiFileParser:
 
         # check if it is a proper midi file
         if header_chunk_type != 'MThd':
-            raise TypeError, "It is not a valid midi file!"
+            raise TypeError("It is not a valid midi file!")
 
         # Header values are at fixed locations, so no reason to be clever
         self.format = raw_in.readBew(2)

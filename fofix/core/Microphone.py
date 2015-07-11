@@ -111,7 +111,7 @@ if supported:
             while self.mic.get_read_available() > 1024:
                 try:
                     chunk = self.mic.read(1024)
-                except IOError, e:
+                except IOError as e:
                     if e.args[1] == pyaudio.paInputOverflowed:
                         Log.notice('Microphone: ignoring input buffer overflow')
                         chunk = '\x00' * 4096
@@ -183,7 +183,7 @@ else:
 
     class Microphone(object):
         def __new__(self, *args, **kw):
-            raise RuntimeError, 'Tried to instantiate Microphone when it is unsupported!'
+            raise RuntimeError('Tried to instantiate Microphone when it is unsupported!')
 
 # Turn a number of semitones above A into a human-readable note name.
 def getNoteName(semitones):

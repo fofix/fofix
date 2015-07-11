@@ -248,7 +248,7 @@ def grab_stdout(*args, **kw):
     proc = subprocess.Popen(*args, **kw)
     stdout = proc.communicate()[0]
     if proc.returncode != 0:
-        raise RuntimeError, 'subprocess %r returned %d' % (args[0], proc.returncode)
+        raise RuntimeError('subprocess %r returned %d' % (args[0], proc.returncode))
     return stdout
 
 

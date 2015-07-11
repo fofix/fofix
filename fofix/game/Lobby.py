@@ -125,7 +125,7 @@ class Lobby(Layer, KeyListener):
             if control == "None":
                 self.controls[i] = _("No Controller")
                 self.blockedPlayers.append(i)
-            elif self.allowed[i] == False:
+            elif not self.allowed[i]:
                 self.controls[i] = _("Disabled Controller")
                 self.blockedPlayers.append(i)
             elif control == "defaultg":
@@ -492,16 +492,16 @@ class CreateCharacter(Layer, KeyListener):
         self.lefty     = {0: 1, 1: -1}
         neckDict       = {0: _("Default Neck"), 1: _("Theme Neck"), 2: _("Select a Neck")}
         self.values    = (self.dictEnDisable, self.dictEnDisable, self.dictEnDisable, {0: _("Disabled"), 1: _("Easy Assist"), 2: _("Medium Assist")}, self.dictEnDisable, neckDict)
-        self.options   = [(_("Name"),             _("Name your character!")), \
-                          (_("Lefty Mode"),       _("Flip the guitar frets for left-handed playing!")), \
-                          (_("Drum Flip"),        _("Flip the drum sounds - snare becomes crash, and so on")), \
-                          (_("Auto-Kick Bass"),   _("Feet uncooperative? Broke your pedal? Not to worry!")), \
-                          (_("Assist Mode"),      _("Play hard and expert, even when you're not that good!")), \
-                          (_("Two-Chord Max"),    _("For those still playing with uncooperative keyboards.")), \
-                          (_("Neck"),             _("Give the endless procession of notes a bit of flair!")), \
-                          (_("Upload Name"),      _("To the internet, you are GUITARGOD23047124!")), \
-                          (_("Choose Avatar"),    _("A 256x256 window into your soul.")), \
-                          (_("Delete Character"), _("Quitter.")), \
+        self.options   = [(_("Name"),             _("Name your character!")),
+                          (_("Lefty Mode"),       _("Flip the guitar frets for left-handed playing!")),
+                          (_("Drum Flip"),        _("Flip the drum sounds - snare becomes crash, and so on")),
+                          (_("Auto-Kick Bass"),   _("Feet uncooperative? Broke your pedal? Not to worry!")),
+                          (_("Assist Mode"),      _("Play hard and expert, even when you're not that good!")),
+                          (_("Two-Chord Max"),    _("For those still playing with uncooperative keyboards.")),
+                          (_("Neck"),             _("Give the endless procession of notes a bit of flair!")),
+                          (_("Upload Name"),      _("To the internet, you are GUITARGOD23047124!")),
+                          (_("Choose Avatar"),    _("A 256x256 window into your soul.")),
+                          (_("Delete Character"), _("Quitter.")),
                           (_("Done"),             _("All finished? Let's do this thing!"))]
         themename = self.engine.data.themeLabel
         self.engine.data.loadAllImages(self, os.path.join("themes",themename,"lobby","creator"))
@@ -562,16 +562,19 @@ class CreateCharacter(Layer, KeyListener):
                 Dialogs.showMessage(self.engine, _("That name already exists!"))
         else:
             Dialogs.showMessage(self.engine, _("Please enter a name!"))
+
     def shown(self):
         self.engine.input.addKeyListener(self)
+
     def hidden(self):
         self.engine.input.removeKeyListener(self)
+
     def keyPressed(self, key, unicode):
         c = self.engine.input.controls.getMapping(key)
         if key == pygame.K_BACKSPACE and self.active:
             self.choices[self.selected] = self.choices[self.selected][:-1]
         elif unicode and ord(unicode) > 31 and self.active:
-            if self.selected == 0 or self.selected == 7:
+            if self.selected in (0, 7):
                 if self.selected == 0 and (ord(unicode) in (34, 42, 47, 58, 60, 62, 63, 92, 124) or ord(unicode) > 126): #ascii only
                     self.engine.data.cancelSound.play()
                     return True
@@ -612,11 +615,11 @@ class CreateCharacter(Layer, KeyListener):
             else:
                 self.choices[self.selected] = self.oldValue
                 self.active = False
-        elif (c in Player.action1s + Player.ups or key == pygame.K_UP):
+        elif c in Player.action1s + Player.ups or key == pygame.K_UP:
             self.scrolling = 1
             self.delay = self.scrollDelay
             self.scrollUp()
-        elif (c in Player.action2s + Player.downs or key == pygame.K_DOWN):
+        elif c in Player.action2s + Player.downs or key == pygame.K_DOWN:
             self.scrolling = 2
             self.delay = self.scrollDelay
             self.scrollDown()

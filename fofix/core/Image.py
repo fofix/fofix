@@ -59,8 +59,8 @@ class SvgContext(object):
         glClearColor(r, g, b, a)
         glClear(GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
 
-def drawImage(image, scale = (1.0, -1.0), coord = (0, 0), rot = 0, \
-                  color = (1,1,1,1), rect = (0,1,0,1), stretched = 0, fit = CENTER, \
+def drawImage(image, scale = (1.0, -1.0), coord = (0, 0), rot = 0,
+                  color = (1,1,1,1), rect = (0,1,0,1), stretched = 0, fit = CENTER,
                   alignment = CENTER, valignment = CENTER):
         """
         Draws the image/surface to screen
@@ -130,7 +130,7 @@ def draw3Dtex(image, vertex, texcoord, coord = None, scale = None, rot = None, c
     if not isinstance(image, ImgDrawing):
         return
 
-    if alpha == True:
+    if alpha:
         glBlendFunc(GL_SRC_ALPHA, GL_ONE)
 
     if len(color) == 4:
@@ -147,17 +147,17 @@ def draw3Dtex(image, vertex, texcoord, coord = None, scale = None, rot = None, c
     glEnable(GL_TEXTURE_2D)
     image.texture.bind()
 
-    if multiples == True:
+    if multiples:
         glPushMatrix()
 
-    if coord != None:
+    if coord is not None:
         glTranslate(coord[0], coord[1], coord[2])
-    if rot != None:
+    if rot is not None:
         glRotate(rot[0], rot[1], rot[2], rot[3])
-    if scale != None:
+    if scale is not None:
         glScalef(scale[0], scale[1], scale[2])
 
-    if depth == True:
+    if depth:
         glDepthMask(1)
 
     if not isinstance(vertex, np.ndarray):
@@ -176,15 +176,15 @@ def draw3Dtex(image, vertex, texcoord, coord = None, scale = None, rot = None, c
 
     cmgl.drawArrays(GL_TRIANGLE_STRIP, vertices=vertex, colors=col_array, texcoords=texcoord)
 
-    if depth == True:
+    if depth:
         glDepthMask(0)
 
-    if multiples == True:
+    if multiples:
         glPopMatrix()
 
     glDisable(GL_TEXTURE_2D)
 
-    if alpha == True:
+    if alpha:
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
 
 class ImgDrawing(object):

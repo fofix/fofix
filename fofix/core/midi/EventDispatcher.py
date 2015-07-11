@@ -132,7 +132,7 @@ class EventDispatcher:
 
         else:
 
-            raise ValueError, 'Illegal channel message!'
+            raise ValueError('Illegal channel message!')
 
 
 

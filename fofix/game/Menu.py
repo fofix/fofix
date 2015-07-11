@@ -170,25 +170,25 @@ class Menu(Layer, KeyListener):
             self.sub_menu_y = self.engine.theme.sub_menu_yVar
 
             if engine.data.theme == 0:
-                if self.sub_menu_x == None:
+                if self.sub_menu_x is None:
                     self.sub_menu_x = .44
-                if self.sub_menu_y == None:
+                if self.sub_menu_y is None:
                     self.sub_menu_y = .14
             elif engine.data.theme == 1:
-                if self.sub_menu_x == None:
+                if self.sub_menu_x is None:
                     self.sub_menu_x = .38
-                if self.sub_menu_y == None:
+                if self.sub_menu_y is None:
                     self.sub_menu_y = .15
             elif engine.data.theme == 2:
-                if self.sub_menu_x == None:
+                if self.sub_menu_x is None:
                     self.sub_menu_x = .25
-                if self.sub_menu_y == None:
+                if self.sub_menu_y is None:
                     self.sub_menu_y = .14
 
             pos = (self.sub_menu_x, self.sub_menu_y)
 
         if viewSize == 6:   #MFH - default viewsize
-            if self.theme == 0 or self.theme == 1 or self.theme == 2:#8bit
+            if self.theme in [0, 1, 2]:#8bit
                 viewSize = 10
 
         self.pos          = pos

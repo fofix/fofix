@@ -636,28 +636,28 @@ class SettingsMenu(Menu.Menu):
         self.opt_text_y = self.engine.theme.opt_text_yPos
 
         if engine.data.theme == 0:
-            if self.opt_text_x == None:
+            if self.opt_text_x is None:
                 self.opt_text_x = .44
-            if self.opt_text_y == None:
+            if self.opt_text_y is None:
                 self.opt_text_y = .14
         elif engine.data.theme == 1:
-            if self.opt_text_x == None:
+            if self.opt_text_x is None:
                 self.opt_text_x = .38
-            if self.opt_text_y == None:
+            if self.opt_text_y is None:
                 self.opt_text_y = .15
         elif engine.data.theme == 2:
-            if self.opt_text_x == None:
+            if self.opt_text_x is None:
                 self.opt_text_x = .25
-            if self.opt_text_y == None:
+            if self.opt_text_y is None:
                 self.opt_text_y = .14
 
 
         self.opt_text_color = self.engine.theme.opt_text_colorVar
         self.opt_selected_color = self.engine.theme.opt_selected_colorVar
 
-        if self.opt_text_color == None:
+        if self.opt_text_color is None:
             self.opt_text_color = (1,1,1)
-        if self.opt_selected_color == None:
+        if self.opt_selected_color is None:
             self.opt_selected_color = (1,0.75,0)
 
         self.modSettings = [
@@ -1095,7 +1095,7 @@ class SettingsMenu(Menu.Menu):
     def baseLibrarySelect(self):
         Log.debug("settings.baseLibrarySelect function call...")
         newPath = Dialogs.chooseFile(self.engine, masks = ["*/*"], prompt = _("Choose a new songs directory."), dirSelect = True)
-        if newPath != None:
+        if newPath is not None:
             Config.set("setlist", "base_library", os.path.dirname(newPath))
             Config.set("setlist", "selected_library", os.path.basename(newPath))
             Config.set("setlist", "selected_song", "")
@@ -1117,28 +1117,28 @@ class BasicSettingsMenu(Menu.Menu):
         self.opt_text_y = self.engine.theme.opt_text_yPos
 
         if engine.data.theme == 0:
-            if self.opt_text_x == None:
+            if self.opt_text_x is None:
                 self.opt_text_x = .44
-            if self.opt_text_y == None:
+            if self.opt_text_y is None:
                 self.opt_text_y = .14
         elif engine.data.theme == 1:
-            if self.opt_text_x == None:
+            if self.opt_text_x is None:
                 self.opt_text_x = .38
-            if self.opt_text_y == None:
+            if self.opt_text_y is None:
                 self.opt_text_y = .15
         elif engine.data.theme == 2:
-            if self.opt_text_x == None:
+            if self.opt_text_x is None:
                 self.opt_text_x = .25
-            if self.opt_text_y == None:
+            if self.opt_text_y is None:
                 self.opt_text_y = .14
 
 
         self.opt_text_color = self.engine.theme.opt_text_colorVar
         self.opt_selected_color = self.engine.theme.opt_selected_colorVar
 
-        if self.opt_text_color == None:
+        if self.opt_text_color is None:
             self.opt_text_color = (1,1,1)
-        if self.opt_selected_color == None:
+        if self.opt_selected_color is None:
             self.opt_selected_color = (1,0.75,0)
 
         self.modSettings = [
@@ -1353,7 +1353,7 @@ class BasicSettingsMenu(Menu.Menu):
     def baseLibrarySelect(self):
         Log.debug("settings.baseLibrarySelect function call...")
         newPath = Dialogs.chooseFile(self.engine, masks = ["*/*"], prompt = _("Choose a new songs directory."), dirSelect = True)
-        if newPath != None:
+        if newPath is not None:
             Config.set("setlist", "base_library", os.path.dirname(newPath))
             Config.set("setlist", "selected_library", os.path.basename(newPath))
             Config.set("setlist", "selected_song", "")

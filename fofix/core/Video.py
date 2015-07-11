@@ -64,19 +64,19 @@ class Video:
         pygame.display.gl_set_attribute(pygame.GL_ALPHA_SIZE, 8)
 
         if multisamples:
-            pygame.display.gl_set_attribute(pygame.GL_MULTISAMPLEBUFFERS, 1);
-            pygame.display.gl_set_attribute(pygame.GL_MULTISAMPLESAMPLES, multisamples);
+            pygame.display.gl_set_attribute(pygame.GL_MULTISAMPLEBUFFERS, 1)
+            pygame.display.gl_set_attribute(pygame.GL_MULTISAMPLESAMPLES, multisamples)
 
         # evilynux - Setting window icon for platforms other than MS Windows.
         #            pygame claims that some window manager requires this to be
         #            before display.set_mode(), so there it is!
         #            Note: For the MS Windows icon, see below.
-        if not os.name == "nt" and self.icon != None:
+        if not os.name == "nt" and self.icon is not None:
             pygame.display.set_icon(pygame.image.load(self.icon))
 
         try:
             self.screen = pygame.display.set_mode(resolution, flags)
-        except Exception, e:
+        except Exception as e:
             errortype = str(e)
             if "video mode" in errortype:
                 self.resolutionReset()
@@ -170,7 +170,7 @@ class Video:
         self.multisamples = 0
         try:
             self.screen = pygame.display.set_mode(resolution, self.flags)
-        except Exception, e:
+        except Exception as e:
             if "video mode" in str(e):
                 self.resolutionReset()
             else:
