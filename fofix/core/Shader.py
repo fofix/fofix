@@ -187,7 +187,6 @@ class ShaderList:
             return False
         else:
             return program[var][1]
-            return True
 
 
     def setVar(self, var, value, program = None):
