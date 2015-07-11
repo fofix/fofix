@@ -209,7 +209,7 @@ def ListToString(lst, nDigits = 5):
 # Returns the first child of the specified type in node
 def FindElementByTagName(parentNode, type):
     child = parentNode.firstChild
-    while child != None:
+    while child is not None:
         if child.localName == type:
             return child
         child = child.nextSibling
@@ -221,27 +221,27 @@ def FindElementByTagName(parentNode, type):
 def FindElementsByTagName(parentNode, type):
     result = []
     child = parentNode.firstChild
-    while child != None:
+    while child is not None:
         if child.localName == type:
             result.append(child)
         child = child.nextSibling
     return result
 
 def ReadAttribute(node,attributeName):
-    if node != None and attributeName != None:
+    if node is not None and attributeName is not None:
         attribute = node.getAttribute(attributeName)
         return attribute
     return None
 
 def ReadContents(node):
-    if node != None:
+    if node is not None:
         child = node.firstChild
-        if child != None and child.nodeType == child.TEXT_NODE:
+        if child is not None and child.nodeType == child.TEXT_NODE:
             return child.nodeValue
     return None
 
 def ReadDateTime(node):
-    if node == None:
+    if node is None:
         return None
     return GetDateTime(ReadContents(node))
 
@@ -283,7 +283,7 @@ def ToDateTime(val):
 
 def GetStringArrayFromNodes(xmlNodes):
     vals = []
-    if xmlNodes == None:
+    if xmlNodes is None:
         return vals
     for xmlNode in xmlNodes:
         stringvals = ReadContents(xmlNode).split( )
@@ -316,7 +316,7 @@ def __ToXml(xmlNode, indent='\t',newl='\n',totalIndent=''):
     if len(childs) > 0:
         attrs = ''
         attributes = xmlNode.attributes
-        if attributes != None:
+        if attributes is not None:
             for attr in attributes.keys():
                 val = attributes[attr].nodeValue
                 attrs += ' %s="%s"'%(attr,val)
@@ -430,7 +430,7 @@ class DaeDocument(object):
 
         # Get the scene
         sceneNode = FindElementByTagName(colladaNode, DaeSyntax.SCENE)
-        if sceneNode != None:
+        if sceneNode is not None:
             scene = DaeScene()
             scene.LoadFromXml(self, sceneNode)
             self.scene = scene
@@ -659,7 +659,7 @@ class DaeScene(DaeEntity):
         return node
 
     def GetVisualScene(self):
-        if not self.iVisualScene is None:
+        if self.iVisualScene is not None:
             return self.iVisualScene.object
         return None
 
@@ -1098,13 +1098,13 @@ class DaeMesh(DaeEntity):
         triangles = CreateObjectsFromXml(daeDocument, xmlNode, DaeSyntax.TRIANGLES, DaeTriangles)
         trifans = CreateObjectsFromXml(daeDocument, xmlNode, DaeSyntax.TRIFANS, DaeTriFans)
         tristrips = CreateObjectsFromXml(daeDocument, xmlNode, DaeSyntax.TRISTRIPS, DaeTriStrips)
-        if lines != None: self.primitives += lines
-        if linestrips != None: self.primitives += linestrips
-        if polygons != None: self.primitives += polygons
-        if polylist != None: self.primitives += polylist
-        if triangles != None: self.primitives += triangles
-        if trifans != None: self.primitives += trifans
-        if tristrips != None: self.primitives += tristrips
+        if lines is not None: self.primitives += lines
+        if linestrips is not None: self.primitives += linestrips
+        if polygons is not None: self.primitives += polygons
+        if polylist is not None: self.primitives += polylist
+        if triangles is not None: self.primitives += triangles
+        if trifans is not None: self.primitives += trifans
+        if tristrips is not None: self.primitives += tristrips
 
         self.extras = CreateObjectsFromXml(daeDocument, xmlNode, DaeSyntax.EXTRA, DaeExtra)
 
@@ -1198,15 +1198,15 @@ class DaeSource(DaeElement):
         ints = CreateObjectFromXml(daeDocument, xmlNode, DaeSyntax.INT_ARRAY, DaeIntArray)
         names = CreateObjectFromXml(daeDocument, xmlNode, DaeSyntax.NAME_ARRAY, DaeNameArray)
         ids = CreateObjectFromXml(daeDocument, xmlNode, DaeSyntax.IDREF_ARRAY, DaeIDREFArray)
-        if bools != None:
+        if bools is not None:
             self.source = bools
-        elif floats != None:
+        elif floats is not None:
             self.source = floats
-        elif ints != None:
+        elif ints is not None:
             self.source = ints
-        elif names != None:
+        elif names is not None:
             self.source = names
-        elif ids != None:
+        elif ids is not None:
             self.source = ids
 
         self.techniqueCommon = CreateObjectFromXml(daeDocument, xmlNode, DaeSyntax.TECHNIQUE_COMMON, DaeSource.DaeTechniqueCommon)
@@ -1483,7 +1483,7 @@ class DaeNode(DaeElement):
         # Get transforms
         RemoveWhiteSpaceNode(xmlNode)
         child = xmlNode.firstChild
-        while child != None:
+        while child is not None:
             name = child.localName
             sid = ReadAttribute(child, DaeSyntax.SID)
             if name == DaeSyntax.TRANSLATE:
@@ -1555,7 +1555,7 @@ class DaeNode(DaeElement):
                     elif orgval[0] == 0 and orgval[1] == 0 and orgval[2] == 1:
                         axis = "Z"
                     no = AppendTextChild(node,i[0],val,None)
-                    if axis != None:
+                    if axis is not None:
                         SetAttribute(no, DaeSyntax.SID, DaeSyntax.ROTATE+axis)
 
                 elif i[0] == DaeSyntax.SKEW:
@@ -2699,9 +2699,9 @@ class DaeFxNewParam(DaeEntity):
     def SaveToXml(self, daeDocument):
         node = super(DaeFxNewParam,self).SaveToXml(daeDocument)
         SetAttribute(node, DaeSyntax.SID, StripString(self.sid))
-        if ( not self.sampler is None ):
+        if self.sampler is not None:
             AppendChild(daeDocument, node, self.sampler)
-        if ( not self.surface is None ):
+        if self.surface is not None:
             AppendChild(daeDocument, node, self.surface)
 
         return node
@@ -3674,7 +3674,7 @@ def CreateObjectFromXml(colladaDocument, xmlNode, nodeType, objectType, setSynta
         object = objectType(nodeType)
     else:
         object = objectType()
-    if node != None:
+    if node is not None:
         object.LoadFromXml(colladaDocument, node)
         return object
     return None
@@ -3683,7 +3683,7 @@ def CastFromXml(colladaDocument, xmlNode, nodeType, cast, default=None):
     if xmlNode is None:
         return default
     node = FindElementByTagName(xmlNode, nodeType)
-    if node != None:
+    if node is not None:
         textValue = ReadContents(node)
         if cast == bool:
             if textValue.lower() == 'false':
@@ -3697,7 +3697,7 @@ def CastAttributeFromXml(xmlNode, nodeType, cast, default=None):
     if xmlNode is None:
         return default
     val = ReadAttribute(xmlNode, nodeType)
-    if val != None and val != '':
+    if val is not None and val != '':
         return cast(val)
     return default
 
@@ -3722,7 +3722,7 @@ def AppendChilds(daeDocument, xmlNode, daeEntities):
 def AppendTextChild(xmlNode,syntax, object, default = None):
     if object is None:
         return
-    if default != None and object == default:
+    if default is not None and object == default:
         return
     node = Element(syntax)
     xmlNode.appendChild(node)
@@ -3735,7 +3735,8 @@ def AppendTextInChild(xmlNode, object):
     if type(object) == datetime:
         text.data = object.isoformat()##ToDateTime(object)
     elif type(object) == list:
-        if len(object) == 0: return
+        if len(object) == 0:
+            return
 ##              if object[0] is not None and type(object[0]) == float:
 ##                      object = RoundList(object, ROUND)
         text.data = ListToString(object,ROUND)
@@ -3755,8 +3756,9 @@ def SetAttribute(xmlNode,syntax, object):
 
 def ReadNodeUrl(node):
     attribute = ReadAttribute(node,DaeSyntax.URL)
-    if attribute == None: return None
-    else :
+    if attribute is None:
+        return None
+    else:
         attribute = str(attribute)
         if attribute.startswith('#'):
             return attribute[1:]
@@ -3782,7 +3784,7 @@ def IsVersionOk(version, curVersion):
     return True
 
 def StripString(text):
-    if text != None:
+    if text is not None:
         return text.replace(' ','_').replace('.','_')
     else:
         return text;
@@ -3801,7 +3803,7 @@ def CreateExtra(colladaInstance):
 
 def GetExtra(colladaInstance):
     if isinstance(colladaInstance, DaeEntity):
-        if not colladaInstance.extras is None:
+        if colladaInstance.extras is not None:
             for daeExtra in colladaInstance.extras:
                 for daeTechnique in daeExtra.techniques:
                     if daeTechnique.profile == 'Blender':

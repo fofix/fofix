@@ -208,7 +208,8 @@ class Dumper(object):
         depth = 0
         for i in t:
             i2 = self.obj2newargs.get(id(i))
-            if not i2 is None: i = i2
+            if i2 is not None:
+                i = i2
             if isinstance(i, tuple) or isinstance(i, frozenset):
                 x = self.immutable_depth(i)
                 if x > depth: depth = x
@@ -230,7 +231,7 @@ class Handler(object):
     Returns false if OBJ is already referenced (and thus no collection should occur); else returns true.
     """
         i = id(obj)
-        if not i in dumper.objs_id:
+        if i not in dumper.objs_id:
             dumper.objs.append(obj)
             dumper.objs_id.add(i)
             return 1
@@ -383,7 +384,7 @@ class ObjHandler(Handler):
 
     def collect(self, obj, dumper):
         i = id(obj)
-        if not i in dumper.objs_id:
+        if i not in dumper.objs_id:
             dumper.priorities_objs.append((-1, obj))
             dumper.objs_id.add(i)
 
@@ -413,7 +414,7 @@ class SlotedObjHandler(ObjHandler):
 
     def collect(self, obj, dumper):
         i = id(obj)
-        if not i in dumper.objs_id:
+        if i not in dumper.objs_id:
             dumper.priorities_objs.append((-1, obj))
             dumper.objs_id.add(i)
 
@@ -440,7 +441,7 @@ class InitArgsObjHandler(ObjHandler):
 
     def collect(self, obj, dumper):
         i = id(obj)
-        if not i in dumper.objs_id:
+        if i not in dumper.objs_id:
             dumper.priorities_objs.append((-1, obj))
             dumper.objs_id.add(i)
 
@@ -460,7 +461,7 @@ class NewArgsObjHandler(ObjHandler):
 
     def collect(self, obj, dumper):
         i = id(obj)
-        if not i in dumper.objs_id:
+        if i not in dumper.objs_id:
             dumper.obj2newargs[i] = newargs = self.Class_getnewargs(obj)
             dumper.collect(newargs)
 

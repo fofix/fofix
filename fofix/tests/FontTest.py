@@ -21,8 +21,8 @@ rtri = rquad = 0.0
 triOn = quadOn = True
 
 def resize((width, height)):
-    if height==0:
-        height=1
+    if height == 0:
+        height = 1
     glViewport(0, 0, width, height)
     glMatrixMode(GL_PROJECTION)
     glLoadIdentity()
@@ -89,20 +89,20 @@ def draw():
     # Lamina font rendering
     glLoadIdentity()
     s = str('Mode: %d, FPS: %.2f' % (mode, fps))
-    if( mode == 0):
+    if mode == 0:
         global gui_screen, font
         txt = font.render(s, 1, (0,0,0), (200,0,0))
         gui_screen.surf.blit(txt, (640 - txt.get_size()[0], 0))
         gui_screen.display()
     # FoFiX font rendering
-    if( mode == 1):
+    if mode == 1:
         global fofixFont
         size = fofixFont.getStringSize(s)
         # Text invisible unless i put a negative Z position, wtf?!
         glTranslatef(-size[0], .0, -1.0)
         fofixFont.render(s, (0, 0), (1,0))
     # Nelson Rush method for font rendering
-    if( mode == 2):
+    if mode == 2:
         global pygameFont, pygameChar
         i = 0
         lx = 0
@@ -194,7 +194,7 @@ def main():
         # make changes visible
         pygame.display.flip()
         frames = frames+1
-        if( ticksDiff > 200 ):
+        if ticksDiff > 200:
             fps = ((frames*1000)/(ticksDiff))
             ticks = pygame.time.get_ticks()
             frames = 0

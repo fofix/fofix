@@ -164,7 +164,7 @@ class CustomSetlist(Setlist):
                     label = scene.itemLabels[i]
                     if label == "Random":
                         label = scene.img_random_label
-                    if label == False:
+                    if not label:
                         label = scene.img_empty_label
                     if isinstance(item, Song.SongInfo):
                         glRotate(scene.itemRenderAngles[i], 0, 0, 1)

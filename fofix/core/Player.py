@@ -262,7 +262,7 @@ if _updateTables > 0: #needs to handle old versions eventually.
     _playerDB.commit()
 
 def resetStats(player = None):
-    if player == None:
+    if player is None:
         _playerDB.execute('UPDATE `stats` SET `hit` = 0, `notes` = 0, `sc1` = 0, `sc2` = 0, `sc3` = 0, `sc4` = 0, `sc5` = 0, `ha1` = 0, `ha2` = 0, `ha3` = 0, `ha4` = 0, `ha5` = 0')
     else:
         _playerDB.execute('UPDATE `stats` SET `hit` = 0, `notes` = 0, `sc1` = 0, `sc2` = 0, `sc3` = 0, `sc4` = 0, `sc5` = 0, `ha1` = 0, `ha2` = 0, `ha3` = 0, `ha4` = 0, `ha5` = 0 WHERE `name` = ?', [player])
@@ -766,7 +766,7 @@ class Controls:
         c = self.getMapping(key)
         if c:
             self.toggle(c, True)
-            if c in self.heldKeys and not key in self.heldKeys[c]:
+            if c in self.heldKeys and key not in self.heldKeys[c]:
                 self.heldKeys[c].append(key)
             return c
         return None

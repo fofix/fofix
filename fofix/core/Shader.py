@@ -158,7 +158,7 @@ class ShaderList:
     def setTexture(self,name,texture,program = None):
         if self.assigned.has_key(program):
             program = self.assigned[program]
-        if program == None:  program = self.active
+        if program is None:  program = self.active
         else: program = self[program]
 
         for i in range(len(program["textures"])):

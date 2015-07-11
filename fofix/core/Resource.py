@@ -165,10 +165,8 @@ class Resource(Task):
         if self.baseLibrary and os.path.isdir(self.baseLibrary):
             self.songPath = [self.baseLibrary]
 
-
-
     def addDataPath(self, path):
-        if not path in self.dataPaths:
+        if path not in self.dataPaths:
             self.dataPaths = [path] + self.dataPaths
 
     def removeDataPath(self, path):

@@ -111,7 +111,7 @@ class MainMenu(BackgroundLayer):
         self.engine.loadImgDrawing(self, "optionsPanel", os.path.join("themes",self.themename,"menu","optionspanel.png"))
 
         #racer: added version tag
-        if self.gfxVersionTag or self.engine.theme.versiontag == True:
+        if self.gfxVersionTag or self.engine.theme.versiontag:
             if not self.engine.loadImgDrawing(self, "version", os.path.join("themes",self.themename,"menu","versiontag.png")):
                 if not self.engine.loadImgDrawing(self, "version", "versiontag.png"): #falls back on default versiontag.png in data\ folder
                     self.version = None
@@ -371,7 +371,7 @@ class MainMenu(BackgroundLayer):
                 drawImage(self.engine.data.loadingImage, (1.0,-1.0), (w/2, h/2), stretched = FULL_SCREEN)
 
         if self.menu.active and self.engine.cmdPlay == 0:
-            if self.background != None:
+            if self.background is not None:
                 #MFH - auto-scaling
                 drawImage(self.background, (1.0,-1.0), (w/2, h/2), stretched = FULL_SCREEN)
 
@@ -397,6 +397,6 @@ class MainMenu(BackgroundLayer):
                                         rect  = (xpos[0],xpos[1],ypos[0],ypos[1]), stretched = KEEP_ASPECT | FIT_WIDTH)
 
         #racer: added version tag to main menu:
-        if self.version != None:
+        if self.version is not None:
             wfactor = (w * self.engine.theme.versiontagScale) / self.version.width1()
             drawImage(self.version,( wfactor, -wfactor ),(w*self.engine.theme.versiontagposX, h*self.engine.theme.versiontagposY)) #worldrave - Added theme settings to control X+Y positions of versiontag.

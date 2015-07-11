@@ -224,7 +224,7 @@ def main():
         pygame.display.flip()
 
         frames = frames+1
-        if( ticksDiff > 2000 ):
+        if ticksDiff > 2000:
             fps = ((frames*1000)/(ticksDiff))
             ticks = pygame.time.get_ticks()
             frames = 0

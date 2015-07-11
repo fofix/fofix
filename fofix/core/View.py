@@ -137,7 +137,7 @@ class View(Task):
     def pushLayer(self, layer):
         Log.debug("View: Push: %s" % layer.__class__.__name__)
 
-        if not layer in self.layers:
+        if layer not in self.layers:
             self.layers.append(layer)
             self.incoming.append(layer)
             self.visibility[layer] = 0.0
@@ -157,7 +157,7 @@ class View(Task):
 
         if layer in self.incoming:
             self.incoming.remove(layer)
-        if layer in self.layers and not layer in self.outgoing:
+        if layer in self.layers and layer not in self.outgoing:
             self.outgoing.append(layer)
 
     def popAllLayers(self):

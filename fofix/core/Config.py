@@ -88,7 +88,7 @@ def define(section, option, type, default = None, text = None, options = None, p
     @param prototype:  Configuration prototype mapping
     @param tipText:    Helpful tip text to display in option menus.
     """
-    if not section in prototype:
+    if section not in prototype:
         prototype[section] = {}
 
     if type == bool and not options:
@@ -197,7 +197,7 @@ class Config:
 
         optionList = []
 
-        if type != None:
+        if type is not None:
             for i in range(len(options)):
                 value = _convertValue(keys[i], type)
                 optionList.append(value)

@@ -73,7 +73,7 @@ def wrapCenteredText(font, pos, text, rightMargin = 1.0, scale = 0.002, visibili
             w, h = font.getStringSize(sentence, scale = scale)
             glPushMatrix()
             glRotate(visibility * (n + 1) * -45, 0, 0, 1)
-            if allowshadowoffset == True:
+            if allowshadowoffset:
                 font.render(sentence, (x - (w/2), y + visibility * n), scale = scale, shadowoffset = shadowoffset)
             else:
                 font.render(sentence, (x - (w/2), y + visibility * n), scale = scale)
@@ -89,7 +89,7 @@ def wrapCenteredText(font, pos, text, rightMargin = 1.0, scale = 0.002, visibili
         w, h = font.getStringSize(sentence, scale = scale)
         glPushMatrix()
         glRotate(visibility * (n + 1) * -45, 0, 0, 1)
-        if allowshadowoffset == True:
+        if allowshadowoffset:
             font.render(sentence, (x - (w/2), y + visibility * n), scale = scale, shadowoffset = shadowoffset)
         else:
             font.render(sentence, (x - (w/2), y + visibility * n), scale = scale)
@@ -407,14 +407,14 @@ class LoadingScreen(Layer, KeyListener):
             self.engine.theme.setBaseColor(1 - v)
             w, h = font.getStringSize(self.text)
 
-            if self.loadingx != None:
-                if self.loadingy != None:
+            if self.loadingx is not None:
+                if self.loadingy is not None:
                     x = self.loadingx - w / 2
                     y = self.loadingy - h / 2 + v * .5
                 else:
                     x = self.loadingx - w / 2
                     y = .6 - h / 2 + v * .5
-            elif self.loadingy != None:
+            elif self.loadingy is not None:
                 x = .5 - w / 2
                 y = .6 - h / 2 + v * .5
             else:
@@ -511,7 +511,7 @@ class FileChooser(BackgroundLayer, KeyListener):
         f = os.path.join(self.path, fileName)
         if fileName == "..":
             return _("[Parent Folder]")
-        if self.dirSelect == True:
+        if self.dirSelect:
             for mask in self.masks:
                 if fnmatch.fnmatch(fileName, mask):
                     return _("[Accept Folder]")
@@ -532,7 +532,7 @@ class FileChooser(BackgroundLayer, KeyListener):
                     continue
             files.append(fn)
         files.sort()
-        if self.dirSelect == True and (fnmatch.fnmatch(self.path, self.masks[0])):
+        if self.dirSelect and fnmatch.fnmatch(self.path, self.masks[0]):
             files.insert(0, self.path)
         return files
 
@@ -558,7 +558,7 @@ class FileChooser(BackgroundLayer, KeyListener):
         self.engine.view.pushLayer(self.menu)
 
     def chooseFile(self, fileName):
-        if self.dirSelect == True:
+        if self.dirSelect:
             for mask in self.masks:
                 if fnmatch.fnmatch(fileName, mask):
                     self.selectedFile = fileName
@@ -611,7 +611,7 @@ class FileChooser(BackgroundLayer, KeyListener):
         w, h, = self.engine.view.geometry[2:4]
 
         #MFH - draw neck black BG in for transparent areas (covers options BG):
-        if self.neckBlackBack != None:
+        if self.neckBlackBack is not None:
             #MFH - auto background scaling
             drawImage(self.neckBlackBack, scale = (1.0,-1.0), coord = (w/2,h/2), stretched = FULL_SCREEN)
 
@@ -689,7 +689,7 @@ class NeckChooser(Layer, KeyListener):
 
         for i in neckfiles:
             # evilynux - Special cases, ignore these...
-            if( os.path.splitext(i)[0] == "randomneck" or os.path.splitext(i)[0] == "overdriveneck" ):    #MFH
+            if os.path.splitext(i)[0] == "randomneck" or os.path.splitext(i)[0] == "overdriveneck":    #MFH
                 exists = 0
                 continue
 
@@ -795,7 +795,7 @@ class NeckChooser(Layer, KeyListener):
 
 
         #MFH - draw neck black BG in for transparent necks (covers options BG):
-        if self.neckBlackBack != None:
+        if self.neckBlackBack is not None:
             #MFH - auto background scaling
             drawImage(self.neckBlackBack, scale = (1.0,-1.0), coord = (w/2,h/2), stretched = FULL_SCREEN)
 

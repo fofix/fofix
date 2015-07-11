@@ -1208,12 +1208,12 @@ class Setlist:
             scale = font.scaleText(text, maxwidth = 0.45)
             font.render(text, (self.song_listcd_list_xpos, .09*(n+1)), scale = scale)
             if isinstance(item, Song.SongInfo) and not item.getLocked():
-                if not item.frets == "":
+                if item.frets != "":
                     suffix = ", ("+item.frets+")"
                 else:
                     suffix = ""
 
-                if not item.year == "":
+                if item.year != "":
                     yeartag = ", "+item.year
                 else:
                     yeartag = ""
@@ -1411,12 +1411,12 @@ class Setlist:
                 c1,c2,c3 = self.songlist_score_color
                 glColor3f(c1,c2,c3)
                 lfont.render(text, (self.song_listscore_xpos, .0925*(n+1)-.034), scale=scale, align = 2)
-                if not item.frets == "":
+                if item.frets != "":
                     suffix = ", ("+item.frets+")"
                 else:
                     suffix = ""
 
-                if not item.year == "":
+                if item.year != "":
                     yeartag = ", "+item.year
                 else:
                     yeartag = ""
@@ -1566,12 +1566,12 @@ class Setlist:
             font.render(text, (self.song_listcd_list_xpos, .09*(n+1)), scale = scale)
 
             if isinstance(item, Song.SongInfo) and not item.getLocked():
-                if not item.frets == "":
+                if item.frets != "":
                     suffix = ", ("+item.frets+")"
                 else:
                     suffix = ""
 
-                if not item.year == "":
+                if item.year != "":
                     yeartag = ", "+item.year
                 else:
                     yeartag = ""
@@ -1923,7 +1923,7 @@ class Setlist:
                         label = scene.itemLabels[i]
                         if label == "Random":
                             label = scene.img_random_label
-                        if label == False:
+                        if not label:
                             label = scene.img_empty_label
                         if isinstance(item, Song.SongInfo):
                             glRotate(scene.itemRenderAngles[i], 0, 0, 1)
@@ -2052,7 +2052,7 @@ class Setlist:
                     imgwidth = img.width1()
                     wfactor = 155.000/imgwidth
             elif not scene.itemLabels[i]:
-                if scene.img_empty_label != None:
+                if scene.img_empty_label is not None:
                     imgwidth = scene.img_empty_label.width1()
                     wfactor = 155.000/imgwidth
                     img = scene.img_empty_label
@@ -2196,7 +2196,7 @@ class Setlist:
                 c1,c2,c3 = self.artist_selected_color
                 glColor3f(c1,c2,c3)
 
-                if not item.year == "":
+                if item.year != "":
                     yeartag = ", "+item.year
                 else:
                     yeartag = ""
@@ -2396,7 +2396,7 @@ class Setlist:
                 text = string.upper(text)
                 font.render(text, (.095, .44), scale = scale)
 
-                if scene.img_diff3 != None:
+                if scene.img_diff3 is not None:
                     imgwidth = scene.img_diff3.width1()
                     wfactor1 = 13.0/imgwidth
 
@@ -2432,7 +2432,7 @@ class Setlist:
                         diff = item.diffBass
                     elif i == 4:
                         diff = item.diffVocals
-                    if scene.img_diff1 == None or scene.img_diff2 == None or scene.img_diff3 == None:
+                    if scene.img_diff1 is None or scene.img_diff2 is None or scene.img_diff3 is None:
                         if diff == -1:
                             font.render("N/A", (.18, .5585 + i*.025), scale = 0.0014)
                         elif diff == 6:

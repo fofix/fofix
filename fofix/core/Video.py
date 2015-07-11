@@ -71,7 +71,7 @@ class Video:
         #            pygame claims that some window manager requires this to be
         #            before display.set_mode(), so there it is!
         #            Note: For the MS Windows icon, see below.
-        if not os.name == "nt" and self.icon != None:
+        if not os.name == "nt" and self.icon is not None:
             pygame.display.set_icon(pygame.image.load(self.icon))
 
         try:

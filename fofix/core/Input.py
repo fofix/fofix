@@ -194,7 +194,7 @@ class Input(Task):
         pygame.key.set_repeat(300, 30)
 
     def addMouseListener(self, listener):
-        if not listener in self.mouseListeners:
+        if listener not in self.mouseListeners:
             self.mouseListeners.append(listener)
 
     def removeMouseListener(self, listener):
@@ -203,10 +203,10 @@ class Input(Task):
 
     def addKeyListener(self, listener, priority = False):
         if priority:
-            if not listener in self.priorityKeyListeners:
+            if listener not in self.priorityKeyListeners:
                 self.priorityKeyListeners.append(listener)
         else:
-            if not listener in self.keyListeners:
+            if listener not in self.keyListeners:
                 self.keyListeners.append(listener)
 
     def removeKeyListener(self, listener):
@@ -216,7 +216,7 @@ class Input(Task):
             self.priorityKeyListeners.remove(listener)
 
     def addSystemEventListener(self, listener):
-        if not listener in self.systemListeners:
+        if listener not in self.systemListeners:
             self.systemListeners.append(listener)
 
     def removeSystemEventListener(self, listener):
@@ -427,7 +427,7 @@ class Input(Task):
 
     # glorandwarf: check that there are no control conflicts #FIXME
     def checkControls(self):
-        if self.controls.isKeyMappingOK() == False:
+        if self.controls.isKeyMappingOK() is False:
             Log.warn("Conflicting player controls, resetting to defaults")
             self.controls.restoreDefaultKeyMappings()
             self.reloadControls()
