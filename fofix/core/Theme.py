@@ -764,7 +764,7 @@ class Theme(Task):
         # TODO - Go through GameResultsScene and remove the usage of this.
         try:
             return hexToColor(color)
-        except ValueError, TypeError:
+        except (ValueError, TypeError):
             return self.baseColor
 
     def packTupleKey(self, key, type = str):

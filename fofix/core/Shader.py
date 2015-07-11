@@ -95,7 +95,7 @@ class ShaderList:
         glCompileShaderARB( shader )
         status = glGetObjectParameterivARB(shader, GL_OBJECT_COMPILE_STATUS_ARB)
         if not status:
-            raise ShaderCompilationError, self.log(shader)
+            raise ShaderCompilationError(self.log(shader))
         else:
             return shader
 
@@ -240,7 +240,7 @@ class ShaderList:
             elif type(value) == long:
                 glUniform1iARB(pos[0],pos[1])
             else:
-                raise TypeError, 'Unsupported value type (must be bool, float, int, long, or tuple or list of float or int).'
+                raise TypeError('Unsupported value type (must be bool, float, int, long, or tuple or list of float or int).')
 
 
     # slightly changes uniform variable

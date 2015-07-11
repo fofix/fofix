@@ -215,7 +215,7 @@ if os.path.isfile('fofix.ini'):
 shutil.copy(os.path.join('pkg', 'fofix.fresh.ini'), 'fofix.ini')
 try:
     if os.spawnl(os.P_WAIT, makensis, 'makensis.exe', 'Setup.nsi') != 0:
-        raise RuntimeError, 'Installer generation failed.'
+        raise RuntimeError('Installer generation failed.')
 
 finally:
     if os.getcwd() == oldcwd:

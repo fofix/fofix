@@ -40,12 +40,12 @@ The .def files are named [whatever goes after -l to link to the lib].def
 def make_def(file):
     f = open(file, 'rb')
     if f.read(2) != 'MZ':
-        raise ValueError, 'Incorrect magic number in file.'
+        raise ValueError('Incorrect magic number in file.')
     f.seek(60)
     pe_header_offset = struct.unpack('<L', f.read(4))[0]
     f.seek(pe_header_offset)
     if f.read(4) != 'PE\0\0':
-        raise ValueError, 'Incorrect magic number in file.'
+        raise ValueError('Incorrect magic number in file.')
 
     # Get sizes of tables we need.
     f.seek(pe_header_offset + 6)
@@ -71,7 +71,7 @@ def make_def(file):
             if s['min'] <= rva and rva < s['max']:
                 f.seek(rva - s['min'] + s['offset'])
                 return
-        raise ValueError, 'Could not find section for RVA.'
+        raise ValueError('Could not find section for RVA.')
 
     # Read the relevant fields of the export directory.
     seek_to_rva(rva_of_export_table + 12)

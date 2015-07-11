@@ -589,11 +589,10 @@ class SongInfo(object):
             data = urllib.urlopen(url + "?" + urllib.urlencode(d)).read()
             Log.debug("Score upload result: %s" % data)
             return data   #MFH - want to return the actual result data.
-        except Exception, e:
+        except Exception as e:
             Log.error("Score upload error: %s" % e)
             return False
         return True
-
 
     @property
     def tutorial(self):
@@ -640,7 +639,7 @@ class SongInfo(object):
                 if self.logSections == 1:
                     Log.debug("Practice sections: " + str(self._sections))
 
-        except Exception, e:
+        except Exception as e:
             Log.warn("Song.py: Unable to retrieve section names for practice mode selection: %s" % e)
             self._sections = None
         return self._sections
@@ -2088,32 +2087,32 @@ class Song(object):
         try:
             if songTrackName:
                 self.songTrack = Audio.StreamingSound(self.engine.audio.getChannel(0), songTrackName)
-        except Exception, e:
+        except Exception as e:
             Log.warn("Unable to load song track: %s" % e)
 
         try:
             if guitarTrackName:
                 self.guitarTrack = Audio.StreamingSound(self.engine.audio.getChannel(1), guitarTrackName)
-        except Exception, e:
+        except Exception as e:
             Log.warn("Unable to load guitar track: %s" % e)
 
         try:
             if rhythmTrackName:
                 self.rhythmTrack = Audio.StreamingSound(self.engine.audio.getChannel(2), rhythmTrackName)
-        except Exception, e:
+        except Exception as e:
             Log.warn("Unable to load rhythm track: %s" % e)
 
 
         try:
             if drumTrackName:
                 self.drumTrack = Audio.StreamingSound(self.engine.audio.getChannel(3), drumTrackName)
-        except Exception, e:
+        except Exception as e:
             Log.warn("Unable to load drum track: %s" % e)
 
         try:
             if crowdTrackName:
                 self.crowdTrack = Audio.StreamingSound(self.engine.audio.getChannel(4), crowdTrackName)
-        except Exception, e:
+        except Exception as e:
             Log.warn("Unable to load crowd track: %s" % e)
 
         #MFH - single audio track song detection

@@ -95,7 +95,7 @@ class Mount(object):
 
         try:
             rpath = self.resolveRead(path)
-        except OSError, e:
+        except OSError as e:
             if e.errno != errno.ENOENT:
                 raise
             rpath = None

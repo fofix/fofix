@@ -76,7 +76,7 @@ class Video:
 
         try:
             self.screen = pygame.display.set_mode(resolution, flags)
-        except Exception, e:
+        except Exception as e:
             errortype = str(e)
             if "video mode" in errortype:
                 self.resolutionReset()
@@ -170,7 +170,7 @@ class Video:
         self.multisamples = 0
         try:
             self.screen = pygame.display.set_mode(resolution, self.flags)
-        except Exception, e:
+        except Exception as e:
             if "video mode" in str(e):
                 self.resolutionReset()
             else:
