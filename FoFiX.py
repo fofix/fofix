@@ -157,8 +157,13 @@ class Main():
         if self.playing is not None:
             Log.debug('Validating song directory for one-shot mode.')
 
+            # get paths
             library = Config.get("setlist","base_library")
             basefolder = os.path.join(Version.dataPath(),library,"songs",self.playing)
+            self.songName = os.path.basename(os.path.normpath(self.playing))
+            self.songFolder = self.playing.split(self.songName)[0]
+            self.libraryName = os.path.join(Version.dataPath(), library,
+                    "songs", self.songFolder)
 
 
             if not os.path.exists(os.path.join(basefolder, "song.ini")):
@@ -175,7 +180,8 @@ class Main():
 
             # Set up one-shot mode
             Log.debug('Entering one-shot mode.')
-            Config.set("setlist", "selected_song", self.playing)
+            Config.set("setlist", "selected_song", self.songName)
+            Config.set("setlist", "selected_library", self.libraryName)
 
             self.engine.cmdPlay = 1
 
