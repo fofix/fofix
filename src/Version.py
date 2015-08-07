@@ -2,7 +2,7 @@
 # -*- coding: iso-8859-1 -*-                                        #
 #                                                                   #
 # Frets on Fire                                                     #
-# Copyright (C) 2006 Sami Kyöstilä                                  #
+# Copyright (C) 2006 Sami Kyï¿½stilï¿½                                  #
 #                                                                   #
 # This program is free software; you can redistribute it and/or     #
 # modify it under the terms of the GNU General Public License       #
@@ -21,9 +21,46 @@
 #####################################################################
 
 import sys
+import re
 import os
-VERSION = '3.121'
+VERSION = '3.122'
+RELEASE_ID = 'Final'
 URL = 'http://fofix.googlecode.com'
+
+def _getTagLine():
+    # Look for a git repository.
+    gameRoot = os.path.dirname(__file__).rsplit(os.path.sep, 1)[0] # game root dir
+    gitDir = '{0}{1}.git'.format(gameRoot, os.path.sep)
+    if os.path.isdir(gitDir):
+        shortref = None
+        headhash = None
+
+        # HEAD is in the form "ref: refs/heads/master\n" if a branch is
+        # checked out, or just the hash if HEAD is detached.
+        refline = open('{0}{1}HEAD'.format(gitDir, os.path.sep)).read().strip()
+
+        if refline[0:5] == "ref: ":
+            headref = refline[5:]
+            if os.path.isfile('{0}{1}.git{1}{2}'.format(gameRoot, os.path.sep, headref)):
+                # The ref is in the form "sha1-hash\n"
+                headRefPath = gitDir + os.path.sep + headref
+                headhash = open(headRefPath).read().strip()
+            else:
+                # It's a packed ref.
+                for line in open('{0}{1}}packed-refs'.format(gitDir, os.path.sep)):
+                    if line.strip().endswith(headref):
+                        headhash = line[:40]
+                        break
+            shortref = re.sub('^refs/(heads/)?', '', headref)
+        else:
+            shortref = "(detached)"
+            headhash = refline
+
+        return 'development (git %s %s)' % (shortref or "(unknown)",
+                                            headhash and headhash[:7] or "(unknown)")
+
+    else:
+        return None
 
 def appName():
   return "fofix"
@@ -32,11 +69,9 @@ def appNameSexy():
   return "FoFiX"
 
 def revision():
-  import svntag
-  try:
-    revision = " Maintenance (r%d)" % int(svntag.get_svn_info(os.path.dirname(__file__))['revnum'])
-  except:
-    revision = " Final"
+  revision = _getTagLine()
+  if revision is None:
+      revision = RELEASE_ID
   return revision
 
 # evilynux: Returns version number w.r.t. frozen state
@@ -48,9 +83,9 @@ def version():
       us = os.path.abspath(unicode(sys.executable, sys.getfilesystemencoding()))
       version = win32api.GetFileVersionInfo(us, r'\StringFileInfo\%04x%04x\ProductVersion' % win32api.GetFileVersionInfo(us, r'\VarFileInfo\Translation')[0])
     else:
-      version = "%s%s" % ( VERSION, revision() )
+      version = "%s %s" % ( VERSION, revision() )
   else:
-    version = "%s%s" % ( VERSION, revision() )
+    version = "%s %s" % ( VERSION, revision() )
   return version
 
 def dataPath():
@@ -65,4 +100,3 @@ def dataPath():
   else:
     dataPath = os.path.join("..", "data")
   return dataPath
-  
