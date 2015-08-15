@@ -53,8 +53,8 @@ class DebugLayer(Layer):
             h = font.getHeight() * scale
 
             font.render("Tasks:", (x, y), scale = scale)
-            for task in self.engine.tasks + self.engine.frameTasks:
-                font.render(self.className(task), (x + .1, y), scale = scale)
+            for task in self.engine.task.tasks:
+                font.render(self.className(task['task']), (x + .1, y), scale = scale)
                 y += h
 
             x, y = (.5, .05)
