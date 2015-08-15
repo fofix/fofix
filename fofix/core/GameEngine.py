@@ -593,17 +593,6 @@ class GameEngine(object):
                 print("%.2f fps" % self.fpsEstimate)
         return done
 
-    def doRun(self):
-        """Run one cycle of the task scheduler engine."""
-        if not self.frameTasks and not self.tasks:
-            return False
-
-        for task in self.frameTasks:
-            self._runTask(task)
-        for task in self.tasks:
-            self._runTask(task, self.tickDelta)
-        return True
-
     def run(self):
         # Move tick and fps limiting here, the old location did not work well.
         self.tickDelta = self.clock.tick()
