@@ -35,7 +35,7 @@ def loader():
 class ResourceTest(unittest.TestCase):
     def testAsynchLoad(self):
         self.r = Resource()
-        self.e.addTask(self.r, synchronized = False)
+        self.e.addTask(self.r)
 
         self.r.load(self, "result", lambda: loader())
 
@@ -46,14 +46,14 @@ class ResourceTest(unittest.TestCase):
 
     def testSynchLoad(self):
         self.r = Resource()
-        self.e.addTask(self.r, synchronized = False)
+        self.e.addTask(self.r)
 
         assert self.r.load(self, "result2", loader, synch = True) == 0xdada
         assert self.result2 == 0xdada
 
     def testAsynchLoadSeries(self):
         self.r = Resource()
-        self.e.addTask(self.r, synchronized = False)
+        self.e.addTask(self.r)
 
         for i in range(10):
             self.r.load(self, "result%d" % i, loader)
@@ -65,7 +65,7 @@ class ResourceTest(unittest.TestCase):
 
     def testCallback(self):
         self.r = Resource()
-        self.e.addTask(self.r, synchronized = False)
+        self.e.addTask(self.r)
 
         self.quux = None
         def loaded(r):

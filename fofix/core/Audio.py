@@ -171,7 +171,7 @@ class MicrophonePassthroughStream(Sound, Task):
         self.stop()
     def play(self):
         if not self.playing:
-            self.engine.addTask(self, synchronized=False)
+            self.engine.addTask(self)
             self.playing = True
     def stop(self):
         if self.playing:

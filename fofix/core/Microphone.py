@@ -90,7 +90,7 @@ if supported:
             if not self.mic_started:
                 self.mic_started = True
                 self.mic.start_stream()
-                self.engine.addTask(self, synchronized=False)
+                self.engine.addTask(self)
                 Log.debug('Microphone: started %s' % self.devname)
                 if self.passthroughStream is not None:
                     Log.debug('Microphone: starting passthrough stream')
