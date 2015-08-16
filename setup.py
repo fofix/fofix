@@ -47,7 +47,7 @@ if os.name == 'nt':
         import py2exe
     except ImportError:
         if 'py2exe' in sys.argv:
-            print >>sys.stderr, 'py2exe must be installed to create .exe files.'
+            sys.stderr.write('py2exe must be installed to create .exe files.\n')
             sys.exit(1)
     else:
         from py2exe.resources.VersionInfo import RT_VERSION
@@ -88,7 +88,7 @@ elif sys.platform == 'darwin':
         import py2app
     except ImportError:
         if 'py2app' in sys.argv:
-            print >>sys.stderr, 'py2app must be installed to create .app bundles.'
+            sys.stderr.write('py2app must be installed to create .app bundles.\n')
             sys.exit(1)
 
     setup_args.update({
@@ -203,7 +203,7 @@ options['py2app'].update({
 def find_command(cmd):
     '''Find a program on the PATH, or, on win32, in the dependency pack.'''
 
-    print 'checking for program %s...' % cmd,
+    sys.stdout.write('checking for program %s... ' % cmd)
 
     if os.name == 'nt':
         # Only accept something from the dependency pack.
@@ -217,13 +217,13 @@ def find_command(cmd):
                 break
 
     if path is None or not os.path.isfile(path):
-        print 'not found'
-        print >>sys.stderr, 'Could not find required program "%s".' % cmd
+        print('not found')
+        sys.stderr.write('Could not find required program "%s".\n' % cmd)
         if os.name == 'nt':
-            print >>sys.stderr, '(Check that you have the latest version of the dependency pack installed.)'
+            sys.stderr.write('(Check that you have the latest version of the dependency pack installed.)\n')
         sys.exit(1)
 
-    print path
+    print(path)
     return path
 
 
@@ -264,21 +264,21 @@ def pc_info(pkg, altnames=[]):
     return a dict that can be expanded into the argument list for
     L{distutils.core.Extension}.'''
 
-    print 'checking for library %s...' % pkg,
+    sys.stdout.write('checking for library %s... ' % pkg)
     if not pc_exists(pkg):
         for name in altnames:
             if pc_exists(name):
                 pkg = name
-                print '(using alternative name %s)' % pkg,
+                sys.stdout.write('(using alternative name %s) ' % pkg)
                 break
         else:
-            print 'not found'
-            print >>sys.stderr, 'Could not find required library "%s".' % pkg
-            print >>sys.stderr, '(Also tried the following alternative names: %s)' % ', '.join(altnames)
+            print('not found')
+            sys.stderr.write('Could not find required library "%s".\n' % pkg)
+            sys.stderr.write('(Also tried the following alternative names: %s)\n' % ', '.join(altnames))
             if os.name == 'nt':
-                print >>sys.stderr, '(Check that you have the latest version of the dependency pack installed.)'
+                sys.stderr.write('(Check that you have the latest version of the dependency pack installed.)\n')
             else:
-                print >>sys.stderr, '(Check that you have the appropriate development package installed.)'
+                sys.stderr.write('(Check that you have the appropriate development package installed.)\n')
             sys.exit(1)
 
     cflags = shlex.split(grab_stdout([pkg_config, '--cflags', pkg]))
@@ -298,7 +298,7 @@ def pc_info(pkg, altnames=[]):
       'library_dirs': [x[2:] for x in libs if x[:2] == '-L'],
     }
 
-    print 'ok'
+    print('ok')
     return info
 
 
@@ -377,7 +377,7 @@ class build_ext(_build_ext):
 # Make "setup.py install" do nothing until we configure something more sensible.
 class install(_install):
     def run(self, *args, **kw):
-        print >>sys.stderr, 'This is not the correct way to install FoFiX.'
+        sys.stderr.write('This is not the correct way to install FoFiX.\n')
         sys.exit(1)
 
 
