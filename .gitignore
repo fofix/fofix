@@ -18,7 +18,13 @@ fofix/core/cmgl/cmgl.c
 fofix/core/MixStream/_MixStream.c
 fofix/core/VideoPlayer/_VideoPlayer.c
 fofix/core/pypitch/_pypitch.cpp
+bin
 build
+include
+lib
+lib64
+local
+pyvenv.cfg
 gstreamer/*
 data/library.zip
 data/users/players/*
