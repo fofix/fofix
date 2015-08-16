@@ -1,5 +1,5 @@
 # pypitch - analyze audio streams for pitch
-# Copyright (C) 2008-2009 John Stumpo
+# Copyright (C) 2008-2009, 2015 John Stumpo
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -16,28 +16,23 @@
 
 __version__ = '$Id$'
 
-cdef extern from "vector":
-    ctypedef struct _DoubleVector 'std::vector<double>':
-        double (*get 'operator[]' )(int) nogil
-        int (*size)() nogil
+from libcpp.vector cimport vector
 
-cdef extern from "pitch.hpp":
-    ctypedef struct _Tone 'const Tone':
+cdef extern from "pitch.hpp" nogil:
+    cdef cppclass _Tone 'Tone':
         double freq
         double db
         double stabledb
         double* harmonics
         int age
-    ctypedef struct _Analyzer 'Analyzer':
-        void (*process)() nogil
-        double (*getPeak)() nogil
-        _DoubleVector (*getFormants)() nogil
-        _Tone* (*findTone)(double, double) nogil
-    _Analyzer* new_Analyzer 'new Analyzer' (double) nogil
-    void delete_Analyzer 'delete' (_Analyzer*) nogil
+    cdef cppclass _Analyzer 'Analyzer':
+        _Analyzer(double)
+        void input[T](T, T)
+        void process()
+        double getPeak()
+        vector[double] getFormants()
+        const _Tone* findTone(double, double)
 
-cdef extern from "AnalyzerInput.hpp":
-    object feedAnalyzer(_Analyzer*, object)
 
 class Tone:
     def __init__(self, freq, db, stabledb, harmonics, age):
@@ -47,7 +42,7 @@ class Tone:
         self.harmonics = harmonics
         self.age = age
 
-cdef object PyTone_FromTone(_Tone* t):
+cdef object PyTone_FromTone(const _Tone* t):
     cdef int i
     if t == NULL:
         return None
@@ -59,25 +54,27 @@ cdef object PyTone_FromTone(_Tone* t):
 cdef class Analyzer:
     cdef _Analyzer* _this
     def __cinit__(self, double rate):
-        self._this = new_Analyzer(rate)
+        self._this = new _Analyzer(rate)
     def __dealloc__(self):
-        delete_Analyzer(self._this)
+        del self._this
     def input(self, instr):
+        cdef float* begin
         if not isinstance(instr, str):
             instr = instr.tostring()  # assume it was a numpy array
-        return feedAnalyzer(self._this, instr)
+        begin = <float*><char*>instr
+        self._this.input(begin, begin + (len(instr) / sizeof(float)))
     def process(self):
         self._this.process()
     def getPeak(self):
         return self._this.getPeak()
     def getFormants(self):
-        cdef _DoubleVector v
-        cdef int i
+        cdef vector[double] v
+        cdef unsigned int i
         cdef double cur
         v = self._this.getFormants()
         formants = []
         for 0 <= i < v.size():
-            cur = v.get(i)
+            cur = v[i]
             if cur == 0.0:
                 formants.append(None)
             else:
