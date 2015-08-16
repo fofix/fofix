@@ -74,6 +74,10 @@ def revision():
       revision = RELEASE_ID
   return revision
 
+def versionNum():
+    return version
+
+
 # evilynux: Returns version number w.r.t. frozen state
 def version():
   if hasattr(sys, 'frozen'):
