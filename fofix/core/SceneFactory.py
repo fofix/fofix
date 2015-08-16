@@ -29,7 +29,7 @@ sceneInfo = {
    "GuitarScene": "fofix.game.guitarscene",
    "GameResultsScene": "fofix.game.GameResultsScene",
 }
-scenes = sceneInfo.values()
+scenes = list(sceneInfo.values())
 
 def create(engine, name, **args):
     scene_name = importlib.import_module(sceneInfo[name])
