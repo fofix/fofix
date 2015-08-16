@@ -35,6 +35,7 @@ import pygame
 import random
 import urllib
 import os
+import cerealizer
 
 from OpenGL.GL import *
 
@@ -47,7 +48,6 @@ from fofix.game.Menu import Menu
 from fofix.game import Scorekeeper
 from fofix.game import Dialogs
 from fofix.game import Song
-from fofix.core import Cerealizer
 from fofix.core import Log
 from fofix.core import VFS
 
@@ -540,8 +540,8 @@ class GameResultsScene(Scene):
             scoreHash = hashlib.sha1("%d%d%d%s" % (player.getDifficultyInt(), self.finalScore[i], self.scoring[i].stars, str(upname))).hexdigest()
             scores[player.getDifficultyInt()]     = [(self.finalScore[i], self.scoring[i].stars, str(upname), scoreHash)]
             scores_ext[player.getDifficultyInt()] = [(scoreHash, self.scoring[i].stars) + scoreExt]
-            d["scores"] = binascii.hexlify(Cerealizer.dumps(scores))
-            d["scores_ext"] = binascii.hexlify(Cerealizer.dumps(scores_ext))
+            d["scores"] = binascii.hexlify(cerealizer.dumps(scores))
+            d["scores_ext"] = binascii.hexlify(cerealizer.dumps(scores_ext))
             url = self.engine.config.get("network", "uploadurl_w67_starpower")
             data = urllib.urlopen(url + "?" + urllib.urlencode(d)).read()
             Log.debug("Score upload result: %s" % data)

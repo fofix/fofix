@@ -22,7 +22,7 @@
 
 import unittest
 import hashlib
-import Cerealizer
+import cerealizer
 import binascii
 import urllib
 
@@ -39,8 +39,8 @@ class CerealizerTest(unittest.TestCase):
 
     def testIntegrity(self):
         expected = self.scores
-        scoresSerial = binascii.hexlify(Cerealizer.dumps(self.scores))
-        result = Cerealizer.loads(binascii.unhexlify(scoresSerial))
+        scoresSerial = binascii.hexlify(cerealizer.dumps(self.scores))
+        result = cerealizer.loads(binascii.unhexlify(scoresSerial))
         self.assertEqual(result, expected)
 
     def testHash(self):
@@ -50,7 +50,7 @@ class CerealizerTest(unittest.TestCase):
                      "6936333834360a69350a7531310a50617363616c4769617264733430"\
                      "0a343839666538656632343239646564373637363835373930303936"\
                      "31323531633136303662373863310a72310a69310a310a72320a72300a"
-        scores = Cerealizer.loads(binascii.unhexlify(scoresHash))
+        scores = cerealizer.loads(binascii.unhexlify(scoresHash))
         #print scores[1][0][2]
         self.assertEqual(scores[1][0][2], "PascalGiard")
         #scoreExtHash = "63657265616c310a330a646963740a6c6973740a7475706c650a"\
@@ -66,7 +66,7 @@ class CerealizerTest(unittest.TestCase):
                      "693234323032320a69350a73350a417a7a636f7334300a3233336431"\
                      "37373139653539323066366461373034633432343864646632313930"\
                      "32323939656438310a72310a69300a310a72320a72300a"
-        scores = Cerealizer.loads(binascii.unhexlify(scoresHash))
+        scores = cerealizer.loads(binascii.unhexlify(scoresHash))
         self.assertEqual(scores[0][0][2], "Azzco")
         #print scores[0][0] # Shows that name string IS NOT UTF8 encoded
 
@@ -75,7 +75,7 @@ class CerealizerTest(unittest.TestCase):
                      "693135313632390a69340a75350a417a7a636f7334300a3661306562"\
                      "35346438343962613065376464363836396430373966386631316366"\
                      "61333133633264310a72310a69300a310a72320a72300a"
-        scores = Cerealizer.loads(binascii.unhexlify(scoresHash))
+        scores = cerealizer.loads(binascii.unhexlify(scoresHash))
         self.assertEqual(scores[0][0][2], "Azzco")
         print scores[0][0] # Shows that name string IS UTF8 encoded
         print scores[0][0][2]

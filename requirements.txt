@@ -8,5 +8,6 @@ hg+http://bitbucket.org/pygame/pygame#egg=pygame
 PyOpenGL
 PyOpenGL-accelerate
 Pillow
+Cerealizer
 
 PyAudio

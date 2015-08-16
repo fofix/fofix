@@ -31,6 +31,7 @@ import urllib
 import cPickle  #stump: Cerealizer and sqlite3 don't seem to like each other that much...
 import hashlib
 import binascii
+import cerealizer
 
 from fofix.core.Theme import hexToColor, colorToHex
 from fofix.core.Unicode import utf8
@@ -40,7 +41,6 @@ from fofix.core import midi
 from fofix.core import Log
 from fofix.core import Audio
 from fofix.core import Config
-from fofix.core import Cerealizer
 from fofix.core import Version
 from fofix.core import VFS
 
@@ -319,9 +319,9 @@ class SongInfo(object):
         if not scores:
             return
 
-        scores = Cerealizer.loads(binascii.unhexlify(scores))
+        scores = cerealizer.loads(binascii.unhexlify(scores))
         if scores_ext:
-            scores_ext = Cerealizer.loads(binascii.unhexlify(scores_ext))
+            scores_ext = cerealizer.loads(binascii.unhexlify(scores_ext))
         for difficulty in scores.keys():
             try:
                 difficulty = difficulties[difficulty]
@@ -366,7 +366,7 @@ class SongInfo(object):
             else:
                 diff = difficulty
             s[diff] = [(score, stars, name, self.getScoreHash(difficulty, score, stars, name)) for score, stars, name, scores_ext in highScores[difficulty]]
-        return binascii.hexlify(Cerealizer.dumps(s))
+        return binascii.hexlify(cerealizer.dumps(s))
 
     def getObfuscatedScoresExt(self, part = parts[GUITAR_PART]):
         s = {}
@@ -378,7 +378,7 @@ class SongInfo(object):
             else:
                 diff = difficulty
             s[diff] = [(self.getScoreHash(difficulty, score, stars, name), stars) + scores_ext for score, stars, name, scores_ext in highScores[difficulty]]
-        return binascii.hexlify(Cerealizer.dumps(s))
+        return binascii.hexlify(cerealizer.dumps(s))
 
     def save(self):
         if self.highScores:
