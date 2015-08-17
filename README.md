@@ -157,7 +157,7 @@ The following packages are required:
   * pygame ([direct link to 1.9.1](http://pygame.org/ftp/pygame-1.9.1.win32-py2.6.msi))
   * PyOpenGL ([direct link to 3.0.1](https://pypi.python.org/packages/any/P/PyOpenGL/PyOpenGL-3.1.0.win32.exe#md5=f175505f4f9e21c8c5c6adc794296d81))
   * Pillow ([direct link to 2.9.0](https://pypi.python.org/packages/2.7/P/Pillow/Pillow-2.9.0.win32-py2.7.exe#md5=2a2d5d447e03d1231cfb7700b6806912))
-  * Cython ([link to 0.23.](http://www.lfd.uci.edu/~gohlke/pythonlibs/#cython))
+  * Cython ([link to 0.23](http://www.lfd.uci.edu/~gohlke/pythonlibs/#cython))
 
     This is a Python Wheel, after downloading install it using pip:
     ```pip install Cython‑0.23‑cp27‑none‑win32.whl```
