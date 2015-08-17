@@ -106,26 +106,32 @@ Setting up Python and third-party dependencies
 
 Follow the instructions for your operating system.
 
+*Note* We are in the process of switching to using virtualenv, so these
+instructions will change.
+
 ### Windows
 
 #### Getting Python
-We recommend that Windows users use **32-bit Python 2.6**.  The
-instructions below are written in terms of 32-bit Python 2.6.  (It can
-be difficult to find or build packages for Python 2.7 and 64-bit Python
-under Windows.)
+We recommend that Windows users use **32-bit Python 2.7**.  The
+instructions below are written in terms of 32-bit Python 2.7.
 
 First, you will need Python itself.  Go to [the Python download page][]
-and select the most recent 2.6.x release.  The most recent 2.6.x at the
-time of this writing is 2.6.6 ([direct link][py2.6.6-win32]).  Again,
+and select the most recent 2.7.x release.  The most recent 2.7.x at the
+time of this writing is 2.7.10 ([direct link][py2.7.10-win32]).  Again,
 _32-bit is recommended, even if you have a 64-bit system._  Install
 by double-clicking the .msi file, and be sure to remember which folder
 you install Python to, as you will need to know for the next step.
 (If you use default settings, Python should end up in: `C:\Python26`)
 
-  [the Python download page]: http://www.python.org/download/
-  [py2.6.6-win32]: http://python.org/ftp/python/2.6.6/python-2.6.6.msi
+  [the Python download page]: https://www.python.org/downloads/
+  [py2.7.10-win32]: https://www.python.org/ftp/python/2.7.10/python-2.7.10.msi
 
 #### Adding Python to the PATH
+
+The python installer can automatically add python to the PATH variable,
+if the "Add python.exe to Path" option is selected in the install. If
+this was not selected during installation, follow the following guide.
+
 You will need to add the Python installation folder to the PATH.
 Open the Start menu, right-click on "Computer" ("My Computer" before
 Windows Vista), and choose Properties.  Go to the Advanced tab, then
@@ -146,26 +152,29 @@ Python installation.
 
 The following packages are required:
 
-  * PyWin32 ([direct link to build 216](http://sourceforge.net/projects/pywin32/files/pywin32/Build216/pywin32-216.win32-py2.6.exe))
-  * numpy ([direct link to 1.5.0](http://download.sourceforge.net/numpy/numpy-1.5.0-win32-superpack-python2.6.exe))
+  * PyWin32 ([direct link to build 219](http://sourceforge.net/projects/pywin32/files/pywin32/Build%20219/pywin32-219.win32-py2.7.exe))
+  * numpy ([direct link to 1.9.2](http://sourceforge.net/projects/numpy/files/NumPy/1.9.2/numpy-1.9.2-win32-superpack-python2.7.exe))
   * pygame ([direct link to 1.9.1](http://pygame.org/ftp/pygame-1.9.1.win32-py2.6.msi))
-  * PyOpenGL ([direct link to 3.0.1](http://pypi.python.org/packages/any/P/PyOpenGL/PyOpenGL-3.0.1.win32.exe))
-  * Python Imaging Library ([direct link to 1.1.7+](http://github.com/downloads/fuzion/pil-2009-raclette/PIL-1.1.7-2009-raclette-r358.win32-py2.6.exe))
-  * Cython ([link to 0.14.1](http://www.lfd.uci.edu/~gohlke/pythonlibs/#cython))
+  * PyOpenGL ([direct link to 3.0.1](https://pypi.python.org/packages/any/P/PyOpenGL/PyOpenGL-3.1.0.win32.exe#md5=f175505f4f9e21c8c5c6adc794296d81))
+  * Pillow ([direct link to 2.9.0](https://pypi.python.org/packages/2.7/P/Pillow/Pillow-2.9.0.win32-py2.7.exe#md5=2a2d5d447e03d1231cfb7700b6806912))
+  * Cython ([link to 0.23.](http://www.lfd.uci.edu/~gohlke/pythonlibs/#cython))
+
+    This is a Python Wheel, after downloading install it using pip:
+    ```pip install Cython‑0.23‑cp27‑none‑win32.whl```
 
 The following packages are optional:
 
-  * pyopengl-accelerate ([direct link to 3.0.1-r365](http://github.com/downloads/fuzion/pil-2009-raclette/PyOpenGL-accelerate-3.0.1-r365.win32-py2.6.exe))
+  * pyopengl-accelerate ([direct link to 3.1.0](https://pypi.python.org/packages/2.7/P/PyOpenGL-accelerate/PyOpenGL-accelerate-3.1.0.win32-py2.7.exe#md5=911efd7965928ec9168e7f8a6cf35537))
 
     This will make PyOpenGL go a good bit faster. _Highly recommended!_
 
-  * py2exe ([direct link to 0.6.9](http://downloads.sourceforge.net/py2exe/py2exe-0.6.9.win32-py2.6.exe))
+  * py2exe ([direct link to 0.9.2.2](https://pypi.python.org/packages/any/p/py2exe/py2exe-0.9.2.2.win32.exe#md5=f1684d39de2ed8287a0a36eb241f81e5))
 
     This allows you to freeze the code into standalone EXEs for
     distribution.  There's no advantage at all to doing so unless you're
     going to be distributing binaries.
 
-  * pyaudio ([direct link to 0.2.4](http://people.csail.mit.edu/hubert/pyaudio/packages/pyaudio-0.2.4.py26.exe))
+  * pyaudio ([direct link to 0.2.8](https://people.csail.mit.edu/hubert/pyaudio/packages/pyaudio-0.2.8.py27.exe))
 
     This provides support for microphone input, which is required for
     vocal play.
@@ -218,7 +227,7 @@ The following are required:
   * pygame (at least version 1.9 is required if you want MIDI instrument input or you're on x86_64)
   * PyOpenGL (3.x)
   * numpy
-  * Python Imaging Library (PIL)
+  * Python Imaging Library (PIL) or Pillow
   * Python's development headers
   * A C++ compiler
   * Cython
