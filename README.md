@@ -316,12 +316,10 @@ operating system.
 
 ### Windows
 
-Install Microsoft Visual C++ 2008 Express Edition
-by going [here](http://go.microsoft.com/?linkid=7729279).
-(If you happen to have one of the paid versions of MSVC 2008, that
-will work just fine too.)  You don't have to bother registering it, as
-you won't be using the GUI, which is the only place where registration
-is enforced.
+Install Microsoft Visual C++ Compiler for Python 2.7
+by going [here](http://www.microsoft.com/en-us/download/details.aspx?id=44266).
+(If you happen to have any version of MSVC 2008, that
+will work just fine too.)
 
 Versions other than 2008 _will not work_.  Native modules for Python
 programs must be compiled with the same version of Visual C++ that was
