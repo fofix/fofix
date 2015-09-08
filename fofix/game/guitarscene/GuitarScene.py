@@ -59,11 +59,10 @@ import random
 
 class GuitarScene(Scene):
     def __init__(self, engine, libraryName, songName):
-        Scene.__init__(self, engine)
+        superClass = super(GuitarScene, self)
+        superClass.__init__(engine)
 
         self.engine.world.sceneName = "GuitarScene"
-
-        self.playerList   = self.players
 
         self.partyMode = False
         self.battle = False #QQstarS:new2 Bettle
@@ -172,14 +171,14 @@ class GuitarScene(Scene):
         self.soloKeysList = []
         self.soloShifts   = []
         self.playingVocals  = False
-        self.numberOfGuitars = len(self.playerList)
-        self.numOfPlayers    = len(self.playerList)
+        self.numberOfGuitars = len(self.players)
+        self.numOfPlayers    = len(self.players)
         self.numOfSingers    = 0
         self.firstGuitar     = None
         self.neckrender = []
 
         gNum = 0
-        for j,player in enumerate(self.playerList):
+        for j,player in enumerate(self.players):
             guitar = True
             if player.part.id == Song.VOCAL_PART:
                 inst = Vocalist(self.engine, player, False, j)
@@ -239,28 +238,28 @@ class GuitarScene(Scene):
         self.songName         = songName
         self.done             = False
 
-        self.lastMultTime     = [None for i in self.playerList]
+        self.lastMultTime     = [None for i in self.players]
         self.cheatCodes       = [
           ([102, 97, 115, 116, 102, 111, 114, 119, 97, 114, 100],   self.goToResults)
         ]
         self.enteredCode      = []
         self.song             = None
 
-        self.numOfPlayers = len(self.playerList)
+        self.numOfPlayers = len(self.players)
 
-        self.jurgenLogic             = [0 for i in self.playerList]
-        for i in range(len(self.playerList)):
+        self.jurgenLogic             = [0 for i in self.players]
+        for i in range(len(self.players)):
             self.jurgenLogic[i] = self.engine.config.get("game", "jurg_logic_p%d" % i)
 
-        self.aiSkill                 = [0 for i in self.playerList]
-        self.aiHitPercentage         = [0 for i in self.playerList]
-        self.aiPlayNote              = [True for i in self.playerList]
-        self.jurgBattleWhammyTime    = [0 for i in self.playerList]
-        self.jurgBattleUseTime       = [0 for i in self.playerList]
-        self.aiUseSP                 = [0 for i in self.playerList]
-        self.battleItemsHolding      = [0 for i in self.playerList]
-        self.battleTarget            = [0 for i in self.playerList]
-        for i, player in enumerate(self.playerList):
+        self.aiSkill                 = [0 for i in self.players]
+        self.aiHitPercentage         = [0 for i in self.players]
+        self.aiPlayNote              = [True for i in self.players]
+        self.jurgBattleWhammyTime    = [0 for i in self.players]
+        self.jurgBattleUseTime       = [0 for i in self.players]
+        self.aiUseSP                 = [0 for i in self.players]
+        self.battleItemsHolding      = [0 for i in self.players]
+        self.battleTarget            = [0 for i in self.players]
+        for i, player in enumerate(self.players):
             self.battleTarget[i] = i-1
             if self.battleTarget[i] == -1:
                 self.battleTarget[i] = self.numOfPlayers - 1
@@ -300,7 +299,7 @@ class GuitarScene(Scene):
         if float(self.jurgenText[1]) < 0:
             self.jurgenText[1] = 0
 
-        self.battleJurgMissTime = [0 for i in self.playerList]
+        self.battleJurgMissTime = [0 for i in self.players]
 
         self.whammySavesSP = self.engine.config.get("game", "whammy_saves_starpower") #MFH
         self.failingEnabled = self.engine.config.get("coffee", "failingEnabled")
@@ -308,8 +307,8 @@ class GuitarScene(Scene):
         self.timeLeft = None
         self.processedFirstNoteYet = False
 
-        self.playerAssist = [0 for i in self.playerList]
-        for i, player in enumerate(self.playerList):
+        self.playerAssist = [0 for i in self.players]
+        for i, player in enumerate(self.players):
             if self.instruments[i].isDrum:
                 if player.autoKick:
                     self.playerAssist[i] = 3
@@ -327,9 +326,9 @@ class GuitarScene(Scene):
             self.assisting = False
 
         self.autoPlay         = False
-        self.jurgPlayer       = [False for i in self.playerList]
-        self.jurg             = [False for i in self.playerList]
-        self.customBot        = [None for i in self.playerList]
+        self.jurgPlayer       = [False for i in self.players]
+        self.jurg             = [False for i in self.players]
+        self.customBot        = [None for i in self.players]
         for i in range(self.numOfPlayers):
             if self.instruments[i].isVocal:
                 continue
@@ -337,9 +336,9 @@ class GuitarScene(Scene):
                 self.jurg[i] = True
                 self.autoPlay = True
 
-        self.lastPickPos      = [None for i in self.playerList]
+        self.lastPickPos      = [None for i in self.players]
         self.lastSongPos      = 0.0
-        self.keyBurstTimeout  = [None for i in self.playerList]
+        self.keyBurstTimeout  = [None for i in self.players]
         self.keyBurstPeriod   = 30
 
         self.camera.target    = (0.0, 1.0, 8.0)
@@ -368,19 +367,19 @@ class GuitarScene(Scene):
         self.finalFailed = False
         self.failEnd = False
         self.crowdsCheering = False #akedrou
-        self.inUnison = [False for i in self.playerList]
-        self.haveUnison = [False for i in self.playerList]
+        self.inUnison = [False for i in self.players]
+        self.haveUnison = [False for i in self.players]
         self.firstUnison = False
         self.firstUnisonDone = False
         self.unisonActive = False
         self.unisonNum = 0
-        self.unisonEarn = [False for i in self.playerList]
+        self.unisonEarn = [False for i in self.players]
         self.starPowersActive = 0
         self.playersInGreen = 0
         self.crowdFaderVolume = 0.0
         self.coOpStarPower = 0
         self.coOpStarPowerTimer = 0
-        self.coOpStarPowerActive = [0 for i in self.playerList]
+        self.coOpStarPowerActive = [0 for i in self.players]
         self.battleSuddenDeath = False
         self.failTimer = 0
         self.rockTimer = 0  #myfingershurt
@@ -390,13 +389,13 @@ class GuitarScene(Scene):
         self.baseScore = 50
         self.baseSustainScore = .1
         self.rockFinished = False
-        self.spTimes = [[] for i in self.playerList]
+        self.spTimes = [[] for i in self.players]
         self.midiSP = False
         self.oBarScale = 0.0 #volshebnyi - overdrive bar scale factor
         self.firstClap = True
 
 
-        self.multi = [1 for i in self.playerList]
+        self.multi = [1 for i in self.players]
 
         #Get theme
         themename = self.engine.data.themeLabel
@@ -423,28 +422,28 @@ class GuitarScene(Scene):
         self.rockMax = 30000.0
         self.rockMedThreshold = self.rockMax/3.0    #MFH
         self.rockHiThreshold = self.rockMax/3.0*2   #MFH
-        self.rock = [self.rockMax/2 for i in self.playerList]
-        self.arrowRotation    = [.5 for i in self.playerList]
-        self.starNotesMissed = [False for i in self.playerList]  #MFH
-        self.notesMissed = [False for i in self.playerList]
-        self.lessMissed = [False for i in self.playerList]
-        self.notesHit = [False for i in self.playerList]
+        self.rock = [self.rockMax/2 for i in self.players]
+        self.arrowRotation    = [.5 for i in self.players]
+        self.starNotesMissed = [False for i in self.players]  #MFH
+        self.notesMissed = [False for i in self.players]
+        self.lessMissed = [False for i in self.players]
+        self.notesHit = [False for i in self.players]
         self.lessHit = False
         self.minBase = 400
         self.pluBase = 15
         self.minGain = 2
         self.pluGain = 7
         self.battleMax = 300 #QQstarS:new2  the max adding when battle
-        self.minusRock = [self.minBase for i in self.playerList]
-        self.plusRock = [self.pluBase for i in self.playerList]
+        self.minusRock = [self.minBase for i in self.players]
+        self.plusRock = [self.pluBase for i in self.players]
         self.coOpMulti = 1
-        self.coOpFailDone = [False for i in self.playerList]
+        self.coOpFailDone = [False for i in self.players]
         if self.coOpRB: #akedrou
             self.coOpPlayerMeter = len(self.rock)
             self.rock.append(self.rockMax/2)
             self.minusRock.append(0.0)
             self.plusRock.append(0.0)
-            self.timesFailed  = [0 for i in self.playerList]
+            self.timesFailed  = [0 for i in self.players]
         if self.coOp or self.coOpGH:
             self.coOpPlayerMeter = len(self.rock)-1 #make sure it's the last one
 
@@ -507,7 +506,7 @@ class GuitarScene(Scene):
         self.tsBy               = _("by ")
         self.tsFrettedBy        = _(" fretted by ")
 
-        for player in self.playerList:
+        for player in self.players:
             player.currentTheme = self.theme
 
         #MFH - precalculate full and player viewports
@@ -522,7 +521,7 @@ class GuitarScene(Scene):
         self.fontScreenBottom = self.engine.data.fontScreenBottom
         self.oBarScaleCoef = (0.6 + 0.4 * self.numberOfGuitars) * 1.256 * self.hFull / self.wFull #volshebnyi - depends on resolution and number of players
 
-        for i, player in enumerate(self.playerList):
+        for i, player in enumerate(self.players):
             if not self.instruments[i].isVocal:
                 self.engine.view.setViewportHalf(self.numberOfGuitars,player.guitarNum)
                 w = self.engine.view.geometryAllHalf[self.numberOfGuitars-1,player.guitarNum,2]
@@ -572,12 +571,12 @@ class GuitarScene(Scene):
         self.scriptLyricPos = self.engine.config.get("game", "script_lyric_pos")
         self.starClaps = self.engine.config.get("game", "star_claps")
         self.rb_sp_neck_glow = self.engine.config.get("game", "rb_sp_neck_glow")
-        self.accuracy = [0 for i in self.playerList]
+        self.accuracy = [0 for i in self.players]
         self.resumeCountdownEnabled = self.engine.config.get("game", "resume_countdown")
         self.resumeCountdown = 0
         self.resumeCountdownSeconds = 0
         self.pausePos = 0
-        self.dispAccuracy = [False for i in self.playerList]
+        self.dispAccuracy = [False for i in self.players]
         self.showAccuracy = self.engine.config.get("game", "accuracy_mode")
         self.hitAccuracyPos = self.engine.config.get("game", "accuracy_pos")
         self.showUnusedTextEvents = self.engine.config.get("game", "show_unused_text_events")
@@ -642,21 +641,21 @@ class GuitarScene(Scene):
         #myfingershurt: for checking if killswitch key is analog for whammy
         self.whammyVolAdjStep = 0.1
         self.analogKillMode = [self.engine.input.getAnalogKill(i) for i in range(self.numOfPlayers)]
-        self.isKillAnalog = [False for i in self.playerList]
-        self.isSPAnalog   = [False for i in self.playerList]
-        self.isSlideAnalog = [False for i in self.playerList]
-        self.whichJoyKill  = [0 for i in self.playerList]
-        self.whichAxisKill = [0 for i in self.playerList]
-        self.whichJoyStar  = [0 for i in self.playerList]
-        self.whichAxisStar = [0 for i in self.playerList]
-        self.whichJoySlide = [0 for i in self.playerList]
-        self.whichAxisSlide = [0 for i in self.playerList]
-        self.whammyVol = [0.0 for i in self.playerList]
-        self.starAxisVal = [0.0 for i in self.playerList]
-        self.starDelay   = [0.0 for i in self.playerList]
-        self.starActive  = [False for i in self.playerList]
-        self.slideValue  = [-1 for i in self.playerList]
-        self.targetWhammyVol = [0.0 for i in self.playerList]
+        self.isKillAnalog = [False for i in self.players]
+        self.isSPAnalog   = [False for i in self.players]
+        self.isSlideAnalog = [False for i in self.players]
+        self.whichJoyKill  = [0 for i in self.players]
+        self.whichAxisKill = [0 for i in self.players]
+        self.whichJoyStar  = [0 for i in self.players]
+        self.whichAxisStar = [0 for i in self.players]
+        self.whichJoySlide = [0 for i in self.players]
+        self.whichAxisSlide = [0 for i in self.players]
+        self.whammyVol = [0.0 for i in self.players]
+        self.starAxisVal = [0.0 for i in self.players]
+        self.starDelay   = [0.0 for i in self.players]
+        self.starActive  = [False for i in self.players]
+        self.slideValue  = [-1 for i in self.players]
+        self.targetWhammyVol = [0.0 for i in self.players]
 
         self.defaultWhammyVol = [self.analogKillMode[i]-1.0 for i in range(self.numOfPlayers)]   #makes xbox defaults 1.0, PS2 defaults 0.0
         for i in range(self.numOfPlayers):
@@ -667,9 +666,9 @@ class GuitarScene(Scene):
 
         self.lastWhammyVol = [self.defaultWhammyVol[i] for i in range(self.numOfPlayers)]
 
-        KillKeyCode = [0 for i in self.playerList]
-        StarKeyCode = [0 for i in self.playerList]
-        SlideKeyCode = [0 for i in self.playerList]
+        KillKeyCode = [0 for i in self.players]
+        StarKeyCode = [0 for i in self.players]
+        SlideKeyCode = [0 for i in self.players]
 
         self.lastTapText = "tapp: -"
 
@@ -685,7 +684,7 @@ class GuitarScene(Scene):
         self.numDrumFills = 0   #MFH - count drum fills to see whether or not we should use auto SP
 
         #MFH - TODO - rewrite in an expandable fashion; requires creation of some new Player object constants that will link to the appropriate player's control based on which player the object is set to
-        for i, player in enumerate(self.playerList):
+        for i, player in enumerate(self.players):
             if self.analogKillMode[i] > 0:
                 KillKeyCode[i] = self.controls.getReverseMapping(player.keyList[KILL])
                 self.isKillAnalog[i], self.whichJoyKill[i], self.whichAxisKill[i] = self.engine.input.getWhammyAxis(KillKeyCode[i])
@@ -720,7 +719,7 @@ class GuitarScene(Scene):
 
         #need a new flag for each player, showing whether or not they've missed a note during a solo section.
         #this way we have a backup detection of Perfect Solo in case a note got left out, picks up the other side of the solo slop
-        self.guitarSoloBroken = [False for i in self.playerList]
+        self.guitarSoloBroken = [False for i in self.players]
 
 
         self.deadPlayerList = [] #akedrou - keep the order failed.
@@ -746,14 +745,14 @@ class GuitarScene(Scene):
         else:
             self.coOpScoreCard = None
 
-        self.partialStar = [0 for i in self.playerList]
-        self.starRatio = [0.0 for i in self.playerList]
-        self.dispSoloReview = [False for i in self.playerList]
-        self.soloReviewText = [[] for i in self.playerList]
-        self.soloReviewCountdown = [0 for i in self.playerList]
-        self.guitarSoloAccuracy = [0.0 for i in self.playerList]
-        self.guitarSoloActive = [False for i in self.playerList]
-        self.currentGuitarSolo = [0 for i in self.playerList]
+        self.partialStar = [0 for i in self.players]
+        self.starRatio = [0.0 for i in self.players]
+        self.dispSoloReview = [False for i in self.players]
+        self.soloReviewText = [[] for i in self.players]
+        self.soloReviewCountdown = [0 for i in self.players]
+        self.guitarSoloAccuracy = [0.0 for i in self.players]
+        self.guitarSoloActive = [False for i in self.players]
+        self.currentGuitarSolo = [0 for i in self.players]
 
         #guitar solo display initializations
         if self.theme == 2:
@@ -761,18 +760,18 @@ class GuitarScene(Scene):
         else:
             self.solo_soloFont = self.engine.data.font
 
-        self.guitarSoloShown = [False for i in self.playerList]
-        self.currentGuitarSoloLastHitNotes = [1 for i in self.playerList]
-        self.solo_xOffset = [0.0 for i in self.playerList]
-        self.solo_yOffset = [0.0 for i in self.playerList]
-        self.solo_boxXOffset = [0.0 for i in self.playerList]
-        self.solo_boxYOffset = [0.0 for i in self.playerList]
-        self.solo_Tw = [0.0 for i in self.playerList]
-        self.solo_Th = [0.0 for i in self.playerList]
-        self.solo_soloText = ["solo" for i in self.playerList]
-        self.soloAcc_Rect = [None for i in self.playerList]
+        self.guitarSoloShown = [False for i in self.players]
+        self.currentGuitarSoloLastHitNotes = [1 for i in self.players]
+        self.solo_xOffset = [0.0 for i in self.players]
+        self.solo_yOffset = [0.0 for i in self.players]
+        self.solo_boxXOffset = [0.0 for i in self.players]
+        self.solo_boxYOffset = [0.0 for i in self.players]
+        self.solo_Tw = [0.0 for i in self.players]
+        self.solo_Th = [0.0 for i in self.players]
+        self.solo_soloText = ["solo" for i in self.players]
+        self.soloAcc_Rect = [None for i in self.players]
         self.solo_txtSize = 0.00250
-        for i, playa in enumerate(self.playerList):
+        for i, playa in enumerate(self.players):
             if self.guitarSoloAccuracyDisplayPos == 0:    #right
                 if self.guitarSoloAccuracyDisplayMode == 1:   #percentage only
                     self.solo_xOffset[i] = 0.890
@@ -782,8 +781,8 @@ class GuitarScene(Scene):
                 self.solo_xOffset[i] = 0.150
             self.solo_yOffset[i] = 0.320   #last change -.040
 
-        self.currentGuitarSoloTotalNotes = [0 for i in self.playerList]
-        self.guitarSolos = [ [] for i in self.playerList]
+        self.currentGuitarSoloTotalNotes = [0 for i in self.players]
+        self.guitarSolos = [ [] for i in self.players]
         guitarSoloStartTime = 0
         isGuitarSoloNow = False
         guitarSoloNoteCount = 0
@@ -798,17 +797,17 @@ class GuitarScene(Scene):
 
 
         #MFH - no Jurgen in Career mode or tutorial mode or practice mode:
-        if self.careerMode or self.tut or self.playerList[0].practiceMode:
+        if self.careerMode or self.tut or self.players[0].practiceMode:
             self.autoPlay = False
         #force jurgen player 2 (and only player 2) for boss battles
         if self.bossBattle:
             self.autoPlay = True
-            self.jurg = [False for i in self.playerList]
+            self.jurg = [False for i in self.players]
             self.jurg[1] = True
 
         self.rockFailUp  = True #akedrou - fading mech
         self.rockFailViz = 0.0
-        self.failViz = [0.0 for i in self.playerList]
+        self.failViz = [0.0 for i in self.players]
 
         self.phrases = self.engine.config.get("coffee", "game_phrases")#blazingamer
 
@@ -830,16 +829,16 @@ class GuitarScene(Scene):
 
         #MFH - this is where song loading originally took place, and the loading screen was spawned.
 
-        self.engine.resource.load(self, "song", lambda: loadSong(self.engine, songName, library = libraryName, part = [player.part for player in self.playerList], practiceMode = self.playerList[0].practiceMode, practiceSpeed = self.playerList[0].practiceSpeed), synch = True, onLoad = self.songLoaded)
+        self.engine.resource.load(self, "song", lambda: loadSong(self.engine, songName, library = libraryName, part = [player.part for player in self.players], practiceMode = self.players[0].practiceMode, practiceSpeed = self.players[0].practiceSpeed), synch = True, onLoad = self.songLoaded)
 
         Dialogs.changeLoadingSplashScreenText(self.engine, splash, phrase + " \n " + _("Preparing Note Phrases..."))
 
 
 
-        if self.playerList[0].practiceMode or self.song.info.tutorial or self.tut:
+        if self.players[0].practiceMode or self.song.info.tutorial or self.tut:
             self.failingEnabled = False
 
-        self.playerList[0].hopoFreq = self.song.info.hopofreq
+        self.players[0].hopoFreq = self.song.info.hopofreq
 
         bassGrooveEnableSet = self.engine.config.get("game", "bass_groove_enable")
         if bassGrooveEnableSet == 1 and self.theme == 2:
@@ -961,8 +960,8 @@ class GuitarScene(Scene):
                     if numMidiSoloMarkerNotes > 0 and self.markSolos > 0:  #if at least 1 solo marked in this fashion, tell that guitar to ignore text solo events
                         self.useMidiSoloMarkers = True
                         guitar.useMidiSoloMarkers = True
-                        if self.neckrender[self.playerList[i].guitarNum] is not None:
-                            self.neckrender[self.playerList[i].guitarNum].useMidiSoloMarkers = True
+                        if self.neckrender[self.players[i].guitarNum] is not None:
+                            self.neckrender[self.players[i].guitarNum].useMidiSoloMarkers = True
 
                 if numOfSpMarkerNotes > 1:
 
@@ -1002,7 +1001,7 @@ class GuitarScene(Scene):
                     unisonCheck.extend(self.spTimes[i])
 
                 elif self.starpowerMode == 2: #this particular instrument only has one starpower path marked!  Force auto-generation of SP paths.
-                    Log.warn("Instrument %s only has one starpower path marked!  ...falling back on auto-generated paths for this instrument." % self.playerList[i].part.text)
+                    Log.warn("Instrument %s only has one starpower path marked!  ...falling back on auto-generated paths for this instrument." % self.players[i].part.text)
                     guitar.starNotesSet = False     #fallback on auto generation.
 
         elif self.starpowerMode == 2:
@@ -1015,14 +1014,14 @@ class GuitarScene(Scene):
 
         if self.useMidiSoloMarkers or self.song.midiStyle == Song.MIDI_TYPE_RB or self.markSolos == 3: #assume RB Midi-types with no solos don't want any, dammit!
             self.markSolos = 0
-        for i, player in enumerate(self.playerList):
+        for i, player in enumerate(self.players):
             if player.guitarNum is not None:
                 self.instruments[i].markSolos = self.markSolos
                 if self.neckrender[player.guitarNum] is not None:
                     self.neckrender[player.guitarNum].markSolos = self.markSolos
 
         self.lastDrumNoteTime = 0.0
-        self.lastNoteTimes = [0.0 for i in self.playerList]
+        self.lastNoteTimes = [0.0 for i in self.players]
         self.drumScoringEnabled = True
 
         #akedrou - moved this to the part where it loads notes...
@@ -1107,11 +1106,11 @@ class GuitarScene(Scene):
             if instrument.isDrum:
                 self.lastDrumNoteTime = lastDrumNoteTime
                 Log.debug("Last drum note located at time = " + str(self.lastDrumNoteTime) )
-                self.scoring[i].totalStreakNotes = len([1 for time, event in self.song.track[i].getEvents(self.playerList[i].startPos,self.lastEvent) if isinstance(event, Note)])
+                self.scoring[i].totalStreakNotes = len([1 for time, event in self.song.track[i].getEvents(self.players[i].startPos,self.lastEvent) if isinstance(event, Note)])
             elif instrument.isVocal:
-                self.scoring[i].totalStreakNotes = len([1 for time, event in self.song.track[i].getEvents(self.playerList[i].startPos,self.lastEvent) if isinstance(event, VocalPhrase)])
+                self.scoring[i].totalStreakNotes = len([1 for time, event in self.song.track[i].getEvents(self.players[i].startPos,self.lastEvent) if isinstance(event, VocalPhrase)])
             else:
-                self.scoring[i].totalStreakNotes = len(set(time for time, event in self.song.track[i].getEvents(self.playerList[i].startPos,self.lastEvent) if isinstance(event, Note)))
+                self.scoring[i].totalStreakNotes = len(set(time for time, event in self.song.track[i].getEvents(self.players[i].startPos,self.lastEvent) if isinstance(event, Note)))
             self.scoring[i].lastNoteEvent = lastDrumNoteEvent
             self.scoring[i].lastNoteTime  = lastDrumNoteTime
             self.lastNoteTimes[i] = lastDrumNoteTime
@@ -1158,7 +1157,7 @@ class GuitarScene(Scene):
                                 endTime = time + event.length
                                 guitarSoloNoteCount = len([1 for Gtime, Gevent in self.song.track[i].getEvents(startTime, endTime) if isinstance(Gevent, Note)])
                                 self.guitarSolos[i].append(guitarSoloNoteCount - 1)
-                                Log.debug("P" + str(i+1) + " MIDI " + self.playerList[i].part.text + " Solo found from: " + str(startTime) + " to: " + str(endTime) + ", containing " + str(guitarSoloNoteCount) + " notes." )
+                                Log.debug("P" + str(i+1) + " MIDI " + self.players[i].part.text + " Solo found from: " + str(startTime) + " to: " + str(endTime) + ", containing " + str(guitarSoloNoteCount) + " notes." )
 
                 elif instrument.markSolos == 1:   #mark using the old text-based system
 
@@ -1290,7 +1289,7 @@ class GuitarScene(Scene):
         if self.stage.mode == 3:
             self.stage.loadVideo(self.libraryName, self.songName)
 
-        self.stage.load(self.libraryName, self.songName, self.playerList[0].practiceMode)
+        self.stage.load(self.libraryName, self.songName, self.players[0].practiceMode)
 
         #MFH - this determination logic should happen once, globally -- not repeatedly.
         self.showScriptLyrics = False
@@ -1353,7 +1352,7 @@ class GuitarScene(Scene):
             self.soloFrameWFactor = None
 
         self.partImage = True
-        self.part = [None for i in self.playerList]
+        self.part = [None for i in self.players]
         self.partLoad = None
         if self.counting or self.coOpType:
             for i in range(self.numOfPlayers):
@@ -1402,18 +1401,18 @@ class GuitarScene(Scene):
         self.counterY = -0.1
         self.coOpPhrase = 0
 
-        self.scaleText = [0.0 for i in self.playerList]
-        self.displayText = [None for i in self.playerList]
-        self.displayTextScale = [0.0 for i in self.playerList]
-        self.textTimer = [0.0 for i in self.playerList]
-        self.textY = [.3 for i in self.playerList]
-        self.scaleText2 = [0.0 for i in self.playerList]
-        self.goingUP = [False for i in self.playerList]
+        self.scaleText = [0.0 for i in self.players]
+        self.displayText = [None for i in self.players]
+        self.displayTextScale = [0.0 for i in self.players]
+        self.textTimer = [0.0 for i in self.players]
+        self.textY = [.3 for i in self.players]
+        self.scaleText2 = [0.0 for i in self.players]
+        self.goingUP = [False for i in self.players]
         if self.battleGH:
-            self.battleJustUsed = [0 for i in self.playerList]
-            self.battleText = [None for i in self.playerList]
-            self.battleTextTimer = [0.0 for i in self.playerList]
-        self.lastStreak = [0 for i in self.playerList]
+            self.battleJustUsed = [0 for i in self.players]
+            self.battleText = [None for i in self.players]
+            self.battleTextTimer = [0.0 for i in self.players]
+        self.lastStreak = [0 for i in self.players]
         if self.coOpType:
             self.coOpPhrase = len(self.scaleText)
             self.scaleText.append(0.0)
@@ -1425,7 +1424,7 @@ class GuitarScene(Scene):
             self.goingUP.append(False)
             self.lastStreak.append(0)
 
-        self.killswitchEngaged = [None for i in self.playerList]
+        self.killswitchEngaged = [None for i in self.players]
 
 
         #MFH - retrieve theme.ini pause background & text positions
@@ -1449,8 +1448,8 @@ class GuitarScene(Scene):
         self.fail_selected_color = self.engine.theme.fail_selected_colorVar
         self.fail_completed_color = self.engine.theme.fail_completed_colorVar
 
-        settingsMenu = Settings.GameSettingsMenu(self.engine, self.pause_text_color, self.pause_selected_color, players = self.playerList)
-        careerSettingsMenu = Settings.GameCareerSettingsMenu(self.engine, self.pause_text_color, self.pause_selected_color, players = self.playerList)
+        settingsMenu = Settings.GameSettingsMenu(self.engine, self.pause_text_color, self.pause_selected_color, players = self.players)
+        careerSettingsMenu = Settings.GameCareerSettingsMenu(self.engine, self.pause_text_color, self.pause_selected_color, players = self.players)
         settingsMenu.fadeScreen = False
         careerSettingsMenu.fadeScreen = False
 
@@ -1731,7 +1730,7 @@ class GuitarScene(Scene):
         self.starGrey5 = None
         self.starGrey6 = None
         self.starGrey7 = None
-        self.part = [None for i in self.playerList]
+        self.part = [None for i in self.players]
         for scoreCard in self.scoring:
             scoreCard.lastNoteEvent = None
         if self.coOpType:
@@ -1900,11 +1899,11 @@ class GuitarScene(Scene):
 
         #Re-apply Jurgen Settings -- Spikehead777
         self.autoPlay         = False
-        self.jurg             = [False for i in self.playerList]
-        self.jurgenLogic             = [0 for i in self.playerList]
-        self.aiSkill             = [0 for i in self.playerList]
+        self.jurg             = [False for i in self.players]
+        self.jurgenLogic             = [0 for i in self.players]
+        self.aiSkill             = [0 for i in self.players]
 
-        for i, player in enumerate(self.playerList):
+        for i, player in enumerate(self.players):
             jurgen = self.engine.config.get("game", "jurg_p%d" % i)
             if jurgen == True:
                 self.jurg[i] = True
@@ -1921,13 +1920,13 @@ class GuitarScene(Scene):
             self.autoPlay = False
         if self.bossBattle:
             self.autoPlay = True
-            self.jurg = [False for i in self.playerList]
+            self.jurg = [False for i in self.players]
             self.jurg[1] = True
 
         self.hopoStyle        = self.engine.config.get("game", "hopo_system")
         self.gh2sloppy        = self.engine.config.get("game", "gh2_sloppy")
         self.allTaps          = 0
-        self.autoKickBass     = [0 for i in self.playerList]
+        self.autoKickBass     = [0 for i in self.players]
         if self.gh2sloppy == 1:
             self.hopoStyle = 4
         self.hopoAfterChord = self.engine.config.get("game", "hopo_after_chord")
@@ -1937,7 +1936,7 @@ class GuitarScene(Scene):
 
         self.activeGameControls = self.engine.input.activeGameControls
 
-        for i,player in enumerate(self.playerList):
+        for i,player in enumerate(self.players):
             if player.part.id == Song.VOCAL_PART:
                 continue
             self.instruments[i].leftyMode   = False
@@ -1951,7 +1950,7 @@ class GuitarScene(Scene):
                 self.instruments[i].twoChordMax  = True
 
         self.keysList = []
-        for i, player in enumerate(self.playerList):
+        for i, player in enumerate(self.players):
             if self.instruments[i].isDrum:
                 self.keysList.append(player.drums)
             elif self.instruments[i].isVocal:
@@ -1976,7 +1975,7 @@ class GuitarScene(Scene):
                 self.song.setCrowdVolume(0.0)
 
     def songLoaded(self, song):
-        for i, player in enumerate(self.playerList):
+        for i, player in enumerate(self.players):
             if self.instruments[i].isVocal:
                 song.difficulty[i] = Song.difficulties[Song.EXP_DIF] #for track-finding purposes! Don't change this, ok?
                 continue
@@ -2065,14 +2064,14 @@ class GuitarScene(Scene):
         self.countdownSeconds = 3   #MFH - This needs to be reset for song restarts, too!
         self.countdown = float(self.countdownSeconds) * self.songBPS
         self.countdownOK = False
-        self.scaleText = [0.0 for i in self.playerList]
-        self.displayText = [None for i in self.playerList]
-        self.displayTextScale = [0.0 for i in self.playerList]
-        self.textTimer = [0.0 for i in self.playerList]
-        self.textY = [.3 for i in self.playerList]
-        self.scaleText2 = [0.0 for i in self.playerList]
-        self.goingUP = [False for i in self.playerList]
-        self.lastStreak = [0 for i in self.playerList]
+        self.scaleText = [0.0 for i in self.players]
+        self.displayText = [None for i in self.players]
+        self.displayTextScale = [0.0 for i in self.players]
+        self.textTimer = [0.0 for i in self.players]
+        self.textY = [.3 for i in self.players]
+        self.scaleText2 = [0.0 for i in self.players]
+        self.goingUP = [False for i in self.players]
+        self.lastStreak = [0 for i in self.players]
         if self.coOpType:
             self.coOpPhrase = len(self.scaleText)
             self.scaleText.append(0.0)
@@ -2085,7 +2084,7 @@ class GuitarScene(Scene):
             self.lastStreak.append(0)
         self.midiLyricLineIndex = 0
         self.drumStart = False  #faaa's drum sound mod restart
-        self.dispAccuracy = [False for i in self.playerList]
+        self.dispAccuracy = [False for i in self.players]
         for instrument in self.instruments:
             instrument.spEnabled = True
             instrument.bigRockEndingMarkerSeen = False
@@ -2096,22 +2095,22 @@ class GuitarScene(Scene):
             self.coOpScoreCard.reset()
             self.coOpStarPower = 0
             self.coOpStarPowerTimer = 0
-            self.coOpStarPowerActive = [0 for i in self.playerList]
+            self.coOpStarPowerActive = [0 for i in self.players]
         self.mutedLastSecondYet = False
-        self.dispSoloReview = [False for i in self.playerList]
-        self.soloReviewCountdown = [0 for i in self.playerList]
-        self.guitarSoloAccuracy = [0.0 for i in self.playerList]
-        self.guitarSoloActive = [False for i in self.playerList]
-        self.currentGuitarSolo = [0 for i in self.playerList]
-        self.guitarSoloBroken = [False for i in self.playerList]
-        self.inUnison = [False for i in self.playerList]
-        self.haveUnison = [False for i in self.playerList]
+        self.dispSoloReview = [False for i in self.players]
+        self.soloReviewCountdown = [0 for i in self.players]
+        self.guitarSoloAccuracy = [0.0 for i in self.players]
+        self.guitarSoloActive = [False for i in self.players]
+        self.currentGuitarSolo = [0 for i in self.players]
+        self.guitarSoloBroken = [False for i in self.players]
+        self.inUnison = [False for i in self.players]
+        self.haveUnison = [False for i in self.players]
         self.firstUnison = False
         self.firstUnisonDone = False
         self.unisonNum = 0
         self.unisonIndex = 0
         self.unisonActive = False
-        self.unisonEarn   = [False for i in self.playerList]
+        self.unisonEarn   = [False for i in self.players]
         self.resumeCountdown = 0
         self.resumeCountdownSeconds = 0
         self.pausePos = 0
@@ -2121,25 +2120,25 @@ class GuitarScene(Scene):
         self.rockFinished = False    #myfingershurt
         if self.battleGH:
             if not self.battleSuddenDeath:
-                self.rock = [self.rockMax/2 for i in self.playerList]
+                self.rock = [self.rockMax/2 for i in self.players]
         else:
-            self.rock = [self.rockMax/2 for i in self.playerList]
-        self.minusRock = [0.0 for i in self.playerList]
-        self.plusRock = [0.0 for i in self.playerList]
+            self.rock = [self.rockMax/2 for i in self.players]
+        self.minusRock = [0.0 for i in self.players]
+        self.plusRock = [0.0 for i in self.players]
         self.coOpMulti = 1
         self.deadPlayerList = []
         self.numDeadPlayers  = 0
-        self.coOpFailDone = [False for i in self.playerList]
+        self.coOpFailDone = [False for i in self.players]
         self.rockFailUp = True
         self.rockFailViz  = 0.0
-        self.failViz = [0.0 for i in self.playerList]
+        self.failViz = [0.0 for i in self.players]
         if self.coOpRB:
             self.rock.append(self.rockMax/2)
             self.minusRock.append(0.0)
             self.plusRock.append(0.0)
-            self.timesFailed = [0 for i in self.playerList]
+            self.timesFailed = [0 for i in self.players]
         if self.battleGH:
-            self.battleJustUsed = [0 for i in self.playerList]
+            self.battleJustUsed = [0 for i in self.players]
         for instrument in self.instruments:
             if self.battleGH:
                 if not self.battleSuddenDeath:
@@ -2169,7 +2168,7 @@ class GuitarScene(Scene):
         #volshebnyi - shaders reset
         shaders.reset()
         if shaders.turnon:
-            for i, player in enumerate(self.playerList):
+            for i, player in enumerate(self.players):
                 shaders.var["fret"][i]=[-10.0]*5
                 shaders.var["fretpos"][i]=[-10.0]*5
                 shaders.var["color"][i]=(.0,)*4
@@ -2224,12 +2223,12 @@ class GuitarScene(Scene):
                 if self.numMidiLyricLines > self.activeMidiLyricLineIndex+2:  #is there a second line of lyrics?
                     tempTime, self.currentSimpleMidiLyricLine = self.midiLyricLines[self.activeMidiLyricLineIndex+1]
 
-        for player in self.playerList:
+        for player in self.players:
             player.reset()
         self.stage.reset()
         self.stage.rockmeter.reset()
         self.enteredCode     = []
-        self.jurgPlayer       = [False for i in self.playerList] #Jurgen hasn't played the restarted song =P
+        self.jurgPlayer       = [False for i in self.players] #Jurgen hasn't played the restarted song =P
 
         for instrument in self.instruments:
             instrument.scoreMultiplier = 1
@@ -2251,12 +2250,12 @@ class GuitarScene(Scene):
             instrument.currentGuitarSoloHitNotes = 0
 
         if self.partyMode == True:
-            self.instruments[0].keys = self.playerList[0].keys
-            self.instruments[0].actions = self.playerList[0].actions
-            self.keysList   = self.playerList[0].keys
+            self.instruments[0].keys = self.players[0].keys
+            self.instruments[0].actions = self.players[0].actions
+            self.keysList   = self.players[0].keys
         if self.battle == True:
             for i in range(self.numOfPlayers):
-                self.instruments[i].actions = self.playerList[i].actions
+                self.instruments[i].actions = self.players[i].actions
 
         self.engine.collectGarbage()
         #weirdpeople - sets the default distances the neck has to move in the animation
@@ -2333,9 +2332,9 @@ class GuitarScene(Scene):
         self.instruments[i].guitarSolo = True
         if not self.instruments[i].isVocal:
             self.instruments[i].neck.guitarSolo = True
-        instrumentSoloString = "%s %s" % (self.playerList[i].part.text, self.tsSolo)
+        instrumentSoloString = "%s %s" % (self.players[i].part.text, self.tsSolo)
         if self.phrases > 1:
-            self.newScalingText(self.playerList[i].number, instrumentSoloString )
+            self.newScalingText(self.players[i].number, instrumentSoloString )
         if self.engine.data.cheerSoundFound > 0:
             self.engine.data.crowdSound.play()
 
@@ -2800,14 +2799,14 @@ class GuitarScene(Scene):
                     if guitar.isDrum:
                         guitar.drumFillsHits += 1
                     for fret in range (5):
-                        if self.controls.getState(guitar.keys[fret]) or (self.playerList[i].controlType == 0 and self.controls.getState(guitar.keys[fret+5])):
+                        if self.controls.getState(guitar.keys[fret]) or (self.players[i].controlType == 0 and self.controls.getState(guitar.keys[fret+5])):
                             hitspeed = min((pos - guitar.freestyleLastFretHitTime[fret]) / guitar.freestylePeriod, 1.0)
                             score += guitar.freestyleBaseScore * hitspeed
                     if numFreestyleHits > 0:    #MFH - to prevent a float division!
                         score = int ( score / numFreestyleHits )
 
                     for fret in range (5):
-                        if self.controls.getState(guitar.keys[fret]) or (self.playerList[i].controlType == 0 and self.controls.getState(guitar.keys[fret+5])):
+                        if self.controls.getState(guitar.keys[fret]) or (self.players[i].controlType == 0 and self.controls.getState(guitar.keys[fret+5])):
                             guitar.freestyleLastFretHitTime[fret] = pos
 
                     #MFH - Add all BRE score to a temporary score accumulator with a separate display box
@@ -3285,7 +3284,7 @@ class GuitarScene(Scene):
                         self.failed = True
                     else:
                         if self.coOpRB:
-                            for i, player in enumerate(self.playerList):
+                            for i, player in enumerate(self.players):
                                 if self.rock[i] <= 0 and not self.coOpFailDone[i]:
                                     self.instruments[i].coOpFailed = True
                                     self.instruments[i].starPower  = 0.0
@@ -3299,12 +3298,12 @@ class GuitarScene(Scene):
                                         self.song.resetInstrumentPitch(self.players[i].part)
                                     self.coOpFailDone[i] = True
                 elif self.numOfPlayers > 1 and self.battleGH:
-                    for i, player in enumerate(self.playerList):
+                    for i, player in enumerate(self.players):
                         if self.rock[i] <= 0:
                             self.failed = True
                 else:
                     somebodyStillAlive = False
-                    for i, player in enumerate(self.playerList):
+                    for i, player in enumerate(self.players):
                         if self.rock[i] > 0:
                             somebodyStillAlive = True
                     if not somebodyStillAlive:    #only if everybody has failed
@@ -3507,7 +3506,7 @@ class GuitarScene(Scene):
 
                 if guitar.drumFillsActive:
                     if self.muteDrumFill > 0 and not self.jurg[i]:
-                        self.song.setInstrumentVolume(0.0, self.playerList[i].part)
+                        self.song.setInstrumentVolume(0.0, self.players[i].part)
 
                 #MFH - ensure this missed notes check doesn't fail you during a freestyle section
                 if guitar.freestyleActive or guitar.drumFillsActive:
@@ -3546,9 +3545,9 @@ class GuitarScene(Scene):
                         self.currentlyAnimating = False
                         guitar.setMultiplier(1)
                         guitar.hopoLast = -1
-                        self.song.setInstrumentVolume(0.0, self.playerList[playerNum].part)
+                        self.song.setInstrumentVolume(0.0, self.players[playerNum].part)
                         if self.whammyEffect == 1:    #pitchbend
-                            self.song.resetInstrumentPitch(self.playerList[playerNum].part)
+                            self.song.resetInstrumentPitch(self.players[playerNum].part)
                         self.guitarSoloBroken[i] = True
                         if self.coOpType:
                             self.coOpScoreCard.streak = 0
@@ -3569,10 +3568,10 @@ class GuitarScene(Scene):
             if (self.starClaps or self.beatClaps) and len(self.beatTime) > 0:
                 #Play a sound on each beat on starpower
                 clap = False
-                if self.playerList[0].practiceMode and self.beatClaps:
+                if self.players[0].practiceMode and self.beatClaps:
                     clap = True
                 else:
-                    for i,player in enumerate(self.playerList):
+                    for i,player in enumerate(self.players):
                         if self.instruments[i].starPowerActive == True:
                             clap = True
                             break
@@ -3602,7 +3601,7 @@ class GuitarScene(Scene):
                 self.handlePhrases(playerNum, self.scoring[playerNum].streak)   #MFH - streak #1 for player #1...
                 self.handleAnalogSP(playerNum, ticks)
                 self.handleWhammy(playerNum)
-                if self.playerList[playerNum].controlType == 4:
+                if self.players[playerNum].controlType == 4:
                     self.handleAnalogSlider(playerNum)
                 self.updateGuitarSolo(playerNum)
             if self.coOpType:
@@ -3714,9 +3713,9 @@ class GuitarScene(Scene):
                 if pos - self.unisonConfirm[self.unisonIndex][1] > self.song.period * 2:
                     self.unisonIndex+=1
                     self.unisonActive = False
-                    self.unisonEarn  = [False for i in self.playerList]
-                    self.haveUnison = [False for i in self.playerList]
-                    self.inUnison = [False for i in self.playerList]
+                    self.unisonEarn  = [False for i in self.players]
+                    self.haveUnison = [False for i in self.players]
+                    self.inUnison = [False for i in self.players]
             #akedrou Song/Crowd logic
             if self.numDeadPlayers == 0:
                 if self.crowdsEnabled == 3 and self.crowdsCheering == False and not self.countdown: #prevents cheer-cut-cheer
@@ -3767,11 +3766,11 @@ class GuitarScene(Scene):
                     for instrument in self.instruments:
                         if instrument.isVocal:
                             instrument.mic.start()
-                    if self.playerList[0].practiceMode and self.engine.audioSpeedFactor == 1:
-                        self.playerList[0].startPos -= self.song.period*4
-                        if self.playerList[0].startPos < 0.0:
-                            self.playerList[0].startPos = 0.0
-                        self.song.play(start = self.playerList[0].startPos)
+                    if self.players[0].practiceMode and self.engine.audioSpeedFactor == 1:
+                        self.players[0].startPos -= self.song.period*4
+                        if self.players[0].startPos < 0.0:
+                            self.players[0].startPos = 0.0
+                        self.song.play(start = self.players[0].startPos)
                     else:
                         self.song.play()
 
@@ -3909,7 +3908,7 @@ class GuitarScene(Scene):
         for i, guitar in enumerate(self.instruments):
             if guitar.isVocal:
                 continue
-            self.engine.view.setViewport(self.numberOfGuitars,self.playerList[i].guitarNum)
+            self.engine.view.setViewport(self.numberOfGuitars,self.players[i].guitarNum)
             if self.theme not in (0, 1, 2) or (not self.pause and not self.failed):
                 glPushMatrix()
                 if guitar.fretboardHop > 0.0:
@@ -3998,7 +3997,7 @@ class GuitarScene(Scene):
 
             if self.instruments[num].isDrum:
                 self.drumStart = True
-            self.song.setInstrumentVolume(1.0, self.playerList[num].part)
+            self.song.setInstrumentVolume(1.0, self.players[num].part)
             self.currentlyAnimating = True
 
             self.notesHit[num] = True #QQstarS:Set [0] to [i]
@@ -4063,9 +4062,9 @@ class GuitarScene(Scene):
                     self.instruments[num].drumFillWasJustActive = False
 
             if ApplyPenalty:
-                self.song.setInstrumentVolume(0.0, self.playerList[num].part)
+                self.song.setInstrumentVolume(0.0, self.players[num].part)
                 if self.whammyEffect == 1:    #pitchbend
-                    self.song.resetInstrumentPitch(self.playerList[num].part)
+                    self.song.resetInstrumentPitch(self.players[num].part)
                 scoreCard.streak = 0
                 if self.coOpType:
                     self.scoring[num].streak = 0
@@ -4138,7 +4137,7 @@ class GuitarScene(Scene):
 
         self.killswitchEngaged[num] = False   #always reset killswitch status when picking / tapping
         if self.instruments[num].startPick2(self.song, pos, self.controls, hopo):
-            self.song.setInstrumentVolume(1.0, self.playerList[num].part)
+            self.song.setInstrumentVolume(1.0, self.players[num].part)
             if self.instruments[num].playedNotes:
                 scoreCard.streak += 1
                 self.currentlyAnimating = True
@@ -4195,9 +4194,9 @@ class GuitarScene(Scene):
             self.instruments[num].wasLastNoteHopod = False
             self.currentlyAnimating = False
             self.instruments[num].hopoLast = -1
-            self.song.setInstrumentVolume(0.0, self.playerList[num].part)
+            self.song.setInstrumentVolume(0.0, self.players[num].part)
             if self.whammyEffect == 1:    #pitchbend
-                self.song.resetInstrumentPitch(self.playerList[num].part)
+                self.song.resetInstrumentPitch(self.players[num].part)
             scoreCard.streak = 0
             if self.coOpType:
                 self.scoring[num].streak = 0
@@ -4265,7 +4264,7 @@ class GuitarScene(Scene):
         self.killswitchEngaged[num] = False   #always reset killswitch status when picking / tapping
         if self.instruments[num].startPick3(self.song, pos, self.controls, hopo):
             self.processedFirstNoteYet = True
-            self.song.setInstrumentVolume(1.0, self.playerList[num].part)
+            self.song.setInstrumentVolume(1.0, self.players[num].part)
             #Any previous notes missed, but new ones hit, reset streak counter
             if len(self.instruments[num].missedNotes) != 0:
                 scoreCard.streak = 0
@@ -4344,9 +4343,9 @@ class GuitarScene(Scene):
             self.instruments[num].hopoActive = 0
             self.instruments[num].wasLastNoteHopod = False
             self.instruments[num].hopoLast = 0
-            self.song.setInstrumentVolume(0.0, self.playerList[num].part)
+            self.song.setInstrumentVolume(0.0, self.players[num].part)
             if self.whammyEffect == 1:    #pitchbend
-                self.song.resetInstrumentPitch(self.playerList[num].part)
+                self.song.resetInstrumentPitch(self.players[num].part)
             scoreCard.streak = 0
             if self.coOpType:
                 self.scoring[num].streak = 0
@@ -4462,7 +4461,7 @@ class GuitarScene(Scene):
         self.killswitchEngaged[num] = False   #always reset killswitch status when picking / tapping
         if self.instruments[num].startPick3(self.song, pos, self.controls, hopo):
             self.processedFirstNoteYet = True
-            self.song.setInstrumentVolume(1.0, self.playerList[num].part)
+            self.song.setInstrumentVolume(1.0, self.players[num].part)
             #Any previous notes missed, but new ones hit, reset streak counter
             if len(self.instruments[num].missedNotes) > 0:
 
@@ -4585,9 +4584,9 @@ class GuitarScene(Scene):
                 self.instruments[num].sameNoteHopoString = False
                 self.instruments[num].hopoProblemNoteNum = -1
                 self.instruments[num].hopoLast = -1
-                self.song.setInstrumentVolume(0.0, self.playerList[num].part)
+                self.song.setInstrumentVolume(0.0, self.players[num].part)
                 if self.whammyEffect == 1:    #pitchbend
-                    self.song.resetInstrumentPitch(self.playerList[num].part)
+                    self.song.resetInstrumentPitch(self.players[num].part)
                 scoreCard.streak = 0
                 if self.coOpType:
                     self.scoring[num].streak = 0
@@ -4742,10 +4741,10 @@ class GuitarScene(Scene):
             self.song.stop()
             self.done  = True
             noScore = False
-            for i, player in enumerate(self.playerList):
+            for i, player in enumerate(self.players):
                 player.twoChord = self.instruments[i].twoChord
 
-                if self.playerList[0].practiceMode:
+                if self.players[0].practiceMode:
                     self.scoring[i].score = 0
                 if self.scoring[i].score > 0:
                     noScore = False
@@ -4884,7 +4883,7 @@ class GuitarScene(Scene):
                 self.enteredCode = []
 
         #myfingershurt: Adding starpower and killswitch for "no HOPOs" mode
-        for i, player in enumerate(self.playerList):
+        for i, player in enumerate(self.players):
             if (control == player.keyList[STAR] and not self.isSPAnalog[i]) or control == player.keyList[CANCEL]:
                 self.activateSP(i)
             if control == player.keyList[KILL] and not self.isKillAnalog[i]:  #MFH - only use this logic if digital killswitch
@@ -4954,14 +4953,14 @@ class GuitarScene(Scene):
                         self.enteredCode.append(key)
                         if self.enteredCode == code:
                             self.enteredCode     = []
-                            for player in self.playerList:
+                            for player in self.players:
                                 player.cheating = True
                             func()
                         break
             else:
                 self.enteredCode = []
 
-        for i, player in enumerate(self.playerList):
+        for i, player in enumerate(self.players):
             if (control == player.keyList[STAR] and not self.isSPAnalog[i]) or control == player.keyList[CANCEL]:
                 self.activateSP(i)
             if control == player.keyList[KILL] and not self.isKillAnalog[i]:  #MFH - only use this logic if digital killswitch
@@ -5058,14 +5057,14 @@ class GuitarScene(Scene):
                         self.enteredCode.append(key)
                         if self.enteredCode == code:
                             self.enteredCode     = []
-                            for player in self.playerList:
+                            for player in self.players:
                                 player.cheating = True
                             func()
                         break
             else:
                 self.enteredCode = []
 
-        for i, player in enumerate(self.playerList):
+        for i, player in enumerate(self.players):
             if (control == player.keyList[STAR] and not self.isSPAnalog[i]) or control == player.keyList[CANCEL]:
                 self.activateSP(i)
             if control == player.keyList[KILL] and not self.isKillAnalog[i]:  #MFH - only use this logic if digital killswitch
@@ -5138,7 +5137,7 @@ class GuitarScene(Scene):
                 self.endPick(num)
 
         #Digital killswitch disengage:
-        for i, player in enumerate(self.playerList):
+        for i, player in enumerate(self.players):
             if control == player.keyList[KILL] and not self.isKillAnalog[i]:  #MFH - only use this logic if digital killswitch
                 self.killswitchEngaged[i] = False
 
@@ -5152,7 +5151,7 @@ class GuitarScene(Scene):
                         self.endPick(i)
 
         #Digital killswitch disengage:
-        for i, player in enumerate(self.playerList):
+        for i, player in enumerate(self.players):
             if control == player.keyList[KILL] and not self.isKillAnalog[i]:  #MFH - only use this logic if digital killswitch
                 self.killswitchEngaged[i] = False
 
@@ -5175,7 +5174,7 @@ class GuitarScene(Scene):
                         self.endPick(i)
 
         #Digital killswitch disengage:
-        for i, player in enumerate(self.playerList):
+        for i, player in enumerate(self.players):
             if control == player.keyList[KILL] and not self.isKillAnalog[i]:  #MFH - only use this logic if digital killswitch
                 self.killswitchEngaged[i] = False
 
@@ -5194,7 +5193,7 @@ class GuitarScene(Scene):
                     self.keyPressed3(None, 0, activeList[0], pullOff = True)
 
     def getPlayerNum(self, control):
-        for i, player in enumerate(self.playerList):
+        for i, player in enumerate(self.players):
             if control and control in player.keyList:
                 return i
         else:
@@ -5415,7 +5414,7 @@ class GuitarScene(Scene):
                 now = self.getSongPosition()
                 countdownPos = self.lastEvent - now
 
-                for i,player in enumerate(self.playerList): #QQstarS: This part has big fix. I add the code into it,So he can shown corect
+                for i,player in enumerate(self.players): #QQstarS: This part has big fix. I add the code into it,So he can shown corect
                     p = player.guitarNum
                     if p is not None:
                         self.engine.view.setViewportHalf(self.numberOfGuitars,p)
@@ -5469,7 +5468,7 @@ class GuitarScene(Scene):
                                 size = font.getStringSize(text, scale = scale)
                                 font.render(text, (.5-size[0]/2.0,.37-size[1]), scale = scale)
 
-                                diff = str(self.playerList[0].difficulty)
+                                diff = str(self.players[0].difficulty)
                                 # compute initial position
                                 pctComplete = min(100, int(now/self.lastEvent*100))
 
@@ -5525,8 +5524,8 @@ class GuitarScene(Scene):
                     if self.song and self.song.readyToGo:
 
                         if not self.coOpRB and not self.coOpGH:
-                            if self.playerList[i].guitarNum is not None:
-                                self.engine.view.setViewportHalf(self.numberOfGuitars,self.playerList[i].guitarNum)
+                            if self.players[i].guitarNum is not None:
+                                self.engine.view.setViewportHalf(self.numberOfGuitars,self.players[i].guitarNum)
                             else:
                                 self.engine.view.setViewportHalf(1,0)
 
@@ -5583,7 +5582,7 @@ class GuitarScene(Scene):
 
                         if self.coOpRB or self.coOpGH:
                             if not self.instruments[i].isVocal:
-                                self.engine.view.setViewportHalf(self.numberOfGuitars,self.playerList[i].guitarNum)
+                                self.engine.view.setViewportHalf(self.numberOfGuitars,self.players[i].guitarNum)
 
                         if not self.instruments[i].isVocal:
                             if self.dispSoloReview[i] and not self.pause and not self.failed:
@@ -6193,7 +6192,7 @@ class GuitarScene(Scene):
                         font.render(text,  (.5 - w / 2, .3))
                         if self.countdownSeconds < 6:
                             if self.counting:
-                                for i,player in enumerate(self.playerList):
+                                for i,player in enumerate(self.players):
                                     if not self.instruments[i].isVocal:
                                         w = self.wPlayer[i]
                                         h = self.hPlayer[i]

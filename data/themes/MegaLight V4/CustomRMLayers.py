@@ -26,7 +26,7 @@ class CoOpMeter(Group):
 
         self.engine.view.setViewportHalf(1,0)
         i = playerNum
-        scale = (.75*(len(self.stage.scene.playerList)/2))
+        scale = (.75*(len(self.stage.scene.players)/2))
 
         for layer in self.layers.values():
             layer.updateLayer(playerNum)
@@ -47,5 +47,5 @@ class CoOpMeter(Group):
                 layer.scale[0] *= -1
                 layer.angle *= -1
 
-            #layer.scale = [s/(2.0*(len(self.stage.scene.playerList)/2)) for s in layer.scale]
+            #layer.scale = [s/(2.0*(len(self.stage.scene.players)/2)) for s in layer.scale]
             layer.render(visibility, playerNum)

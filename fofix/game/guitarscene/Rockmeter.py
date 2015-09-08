@@ -1093,7 +1093,7 @@ class Rockmeter(ConfigGetMixin):
         scene = self.scene
         playerNum = p
         player = scene.instruments[playerNum]
-        playerName = self.scene.playerList[p].name
+        playerName = self.scene.players[p].name
         part = player.__class__.__name__
 
         #this is here for when I finally get coOp worked in
@@ -1150,7 +1150,7 @@ class Rockmeter(ConfigGetMixin):
         self.updateTime()
 
         with self.engine.view.orthogonalProjection(normalize = True):
-            for i,player in enumerate(self.scene.playerList):
+            for i,player in enumerate(self.scene.players):
                 p = player.number
                 self.updateVars(p)
                 if p is not None:
