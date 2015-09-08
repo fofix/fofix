@@ -57,12 +57,602 @@ from fofix.core import Log
 
 import random
 
-class GuitarScene(Scene):
+# The plan with this is to move gamemodes to being subclasses of this
+class BandPlayBaseScene(Scene):
     def __init__(self, engine, libraryName, songName):
-        superClass = super(GuitarScene, self)
+        superClass = super(BandPlayBaseScene, self)
         superClass.__init__(engine)
 
+
+        Log.debug("BandPlayBaseScene init...")
+
         self.engine.world.sceneName = "GuitarScene"
+        self.ready = False
+
+        self.countdownSeconds = 3   #MFH - don't change this initialization value unless you alter the other related variables to match
+        self.countdown = 100   #MFH - arbitrary value to prevent song from starting right away
+        self.countdownOK = False
+
+        #myfingershurt: new loading place for "loading" screen for song preparation:
+        #blazingamer new loading phrases
+        self.sinfo = Song.loadSongInfo(self.engine, songName, library = libraryName)
+        self.phrase = self.sinfo.loadingPhrase
+        if self.phrase == "":
+            self.phrase = random.choice(self.engine.theme.loadingPhrase)
+        self.splash = Dialogs.showSongLoadingSplashScreen(self.engine, songName, libraryName, self.phrase + " \n " + _("Initializing..."))
+        Dialogs.changeLoadingSplashScreenText(self.engine, self.splash, self.phrase + " \n " + _("Initializing..."))
+
+
+        self.lostFocusPause = self.engine.config.get("game", "lost_focus_pause")
+
+        self.instruments = [] # akedrou - this combines Guitars, Drums, and Vocalists
+        self.keysList = []
+        self.soloKeysList = []
+        self.soloShifts   = []
+        self.playingVocals  = False
+        self.numberOfGuitars = len(self.players)
+        self.numOfPlayers    = len(self.players)
+        self.numOfSingers    = 0
+        self.firstGuitar     = None
+        self.neckrender = []
+
+        #for number formatting with commas for Rock Band:
+        locale.setlocale(locale.LC_ALL, '')   #more compatible
+
+        self.visibility       = 1.0
+        self.libraryName      = libraryName
+        self.songName         = songName
+        self.done             = False
+        self.pause            = False
+
+        self.lastMultTime     = [None for i in self.players]
+        self.cheatCodes       = [
+          ([102, 97, 115, 116, 102, 111, 114, 119, 97, 114, 100],   self.goToResults)
+        ]
+        self.enteredCode      = []
+        self.song             = None
+
+
+        self.lastPickPos      = [None for i in self.players]
+        self.lastSongPos      = 0.0
+        self.keyBurstTimeout  = [None for i in self.players]
+        self.keyBurstPeriod   = 30
+
+        self.camera.target    = (0.0, 1.0, 8.0)
+        self.camera.origin    = (0.0, 2.0, -3.4)
+
+        self.targetX          = self.engine.theme.povTarget[0]
+        self.targetY          = self.engine.theme.povTarget[1]
+        self.targetZ          = self.engine.theme.povTarget[2]
+        self.originX          = self.engine.theme.povOrigin[0]
+        self.originY          = self.engine.theme.povOrigin[1]
+        self.originZ          = self.engine.theme.povOrigin[2]
+        self.customPOV        = False
+        self.ending           = False
+
+        self.countdownPosX = self.engine.theme.countdownPosX
+        self.countdownPosY = self.engine.theme.countdownPosY
+
+        self.fpsRenderPos = self.engine.theme.fpsRenderPos
+
+        self.povTheme         = self.engine.theme.povPreset
+
+        self.neckintroAnimationType = self.engine.config.get("fretboard", "neck_intro_animation")#weirdpeople
+        self.neckintroThemeType = self.engine.theme.povIntroAnimation
+
+        if None not in [self.targetX, self.targetY, self.targetZ, self.originX, self.originY, self.originZ]:
+            self.customPOV = True
+            Log.debug("All theme POV set. Using custom camera POV.")
+
+        #weirdpeople - sets the distances the neck has to move in the animation
+        if self.neckintroAnimationType == 0: #Original
+            self.boardY = 2
+        elif self.neckintroAnimationType == 1: #Guitar Hero
+            self.boardY = 10
+        elif self.neckintroAnimationType == 2: #Rock Band
+            self.boardZ = 5
+        elif self.neckintroAnimationType == 4: #By Theme
+            if self.neckintroThemeType == "fofix":#Original
+                self.boardY = 2
+            elif self.neckintroThemeType == "guitar hero":#Guitar Hero
+                self.boardY = 10
+            elif self.neckintroThemeType == "rockband":#Rock Band
+                self.boardZ = 5
+
+        self.counting = self.engine.config.get("video", "counting")
+
+        self.phrases = self.engine.config.get("coffee", "game_phrases")#blazingamer
+
+
+        # Song related init
+
+        #MFH - TODO - single, global BPM here instead of in instrument objects:
+        #self.tempoBpm = Song.DEFAULT_BPM
+        #self.actualBpm = 0.0
+        #self.targetPeriod   = 60000.0 / self.targetBpm
+        self.disableVBPM  = self.engine.config.get("game", "disable_vbpm")
+        self.currentBpm     = Song.DEFAULT_BPM
+        self.currentPeriod  = 60000.0 / self.currentBpm
+        self.targetBpm      = self.currentBpm
+        self.lastBpmChange  = -1.0
+        self.baseBeat       = 0.0
+
+
+    def loadmages(self, w, h):
+
+        #lyric sheet!
+        if not self.playingVocals:
+            if self.song.hasMidiLyrics and self.midiLyricsEnabled > 0:
+                if self.midiLyricMode == 0:
+                    if not self.engine.loadImgDrawing(self, "lyricSheet", os.path.join("themes",self.themeName,"lyricsheet.png")):
+                        self.lyricSheet = None
+                else:
+                    if not self.engine.loadImgDrawing(self, "lyricSheet", os.path.join("themes",self.themeName,"lyricsheet2.png")):
+                        if not self.engine.loadImgDrawing(self, "lyricSheet", os.path.join("themes",self.themeName,"lyricsheet.png")):
+                            self.lyricSheet = None
+            else:
+                self.lyricSheet = None
+        else:
+            self.lyricSheet = None
+
+
+        #brescorebackground.png
+        self.breScoreBackground = None
+        if self.engine.loadImgDrawing(self, "breScoreBackground", os.path.join("themes",self.themeName,"brescorebackground.png")):
+            self.breScoreBackgroundWFactor = (w * self.engine.theme.breScoreBackgroundScale) / self.breScoreBackground.width1()
+        else:
+            Log.debug("BRE score background image loading problem!")
+            self.breScoreBackground = None
+            self.breScoreBackgroundWFactor = None
+
+        #brescoreframe.png
+        self.breScoreFrame = None
+        if self.engine.loadImgDrawing(self, "breScoreFrame", os.path.join("themes",self.themeName,"brescoreframe.png")):
+            self.breScoreFrameWFactor = (w * self.engine.theme.breScoreFrameScale) / self.breScoreFrame.width1()
+        else:
+            #MFH - fallback on using soloframe.png if no brescoreframe.png is found
+            if self.engine.loadImgDrawing(self, "breScoreFrame", os.path.join("themes",self.themeName,"soloframe.png")):
+                self.breScoreFrameWFactor = (w * self.engine.theme.breScoreFrameScale) / self.breScoreFrame.width1()
+            else:
+                self.breScoreFrame = None
+                self.breScoreFrameWFactor = None
+
+        if self.soloFrameMode != 0 and self.engine.loadImgDrawing(self, "soloFrame", os.path.join("themes",self.themeName,"soloframe.png")):
+            self.soloFrameWFactor = (w * self.engine.theme.soloFrameScale) / self.soloFrame.width1()
+        else:
+            self.soloFrame = None
+            self.soloFrameWFactor = None
+
+        self.partImage = True
+        self.part = [None for i in self.players]
+        self.partLoad = None
+        if self.counting or self.coOpType:
+            for i in range(self.numOfPlayers):
+                if not self.partImage:
+                    break
+                if self.instruments[i].isDrum:
+                    if not self.engine.loadImgDrawing(self, "partLoad", os.path.join("themes",self.themeName,"drum.png")):
+                        if not self.engine.loadImgDrawing(self, "partLoad", os.path.join("drum.png")):
+                            self.counting = False
+                            self.partImage = False
+                elif self.instruments[i].isBassGuitar:
+                    if not self.engine.loadImgDrawing(self, "partLoad", os.path.join("themes",self.themeName,"bass.png")):
+                        if not self.engine.loadImgDrawing(self, "partLoad", os.path.join("bass.png")):
+                            self.counting = False
+                            self.partImage = False
+                elif self.instruments[i].isVocal:
+                    if not self.engine.loadImgDrawing(self, "partLoad", os.path.join("themes",self.themeName,"mic.png")):
+                        if not self.engine.loadImgDrawing(self, "partLoad", os.path.join("mic.png")):
+                            self.counting = False
+                            self.partImage = False
+                else:
+                    if not self.engine.loadImgDrawing(self, "partLoad", os.path.join("themes",self.themeName,"guitar.png")):
+                        if not self.engine.loadImgDrawing(self, "partLoad", os.path.join("guitar.png")):
+                            self.counting = False
+                            self.partImage = False
+                if self.partLoad:
+                    self.part[i] = self.partLoad
+
+        self.partLoad = None
+
+        #Pause Screen
+        self.engine.loadImgDrawing(self, "pauseScreen", os.path.join("themes",self.themeName,"pause.png"))
+        if not self.engine.loadImgDrawing(self, "failScreen", os.path.join("themes",self.themeName,"fail.png")):
+            self.engine.loadImgDrawing(self, "failScreen", os.path.join("themes",self.themeName,"pause.png"))
+
+        #failMessage
+        self.engine.loadImgDrawing(self, "failMsg", os.path.join("themes",self.themeName,"youfailed.png"))
+        #myfingershurt: youRockMessage
+        self.engine.loadImgDrawing(self, "rockMsg", os.path.join("themes",self.themeName,"yourock.png"))
+
+
+
+    def loadSettings(self):
+        self.stage.updateDelays()
+
+        self.activeVolume     = self.engine.config.get("audio", "guitarvol")
+        self.screwUpVolume    = self.engine.config.get("audio", "screwupvol")
+        self.killVolume       = self.engine.config.get("audio", "kill_volume")
+        self.crowdVolume      = self.engine.config.get("audio", "crowd_volume") #akedrou
+        self.crowdsEnabled    = self.engine.config.get("audio", "enable_crowd_tracks")
+        self.engine.data.crowdVolume = self.crowdVolume
+
+        #MFH - now update volume of all screwup sounds and other SFX:
+        self.engine.data.SetAllScrewUpSoundFxObjectVolumes(self.screwUpVolume)
+
+        #Re-apply Jurgen Settings -- Spikehead777
+        self.autoPlay         = False
+        self.jurg             = [False for i in self.players]
+        self.jurgenLogic             = [0 for i in self.players]
+        self.aiSkill             = [0 for i in self.players]
+
+        for i, player in enumerate(self.players):
+            jurgen = self.engine.config.get("game", "jurg_p%d" % i)
+            if jurgen == True:
+                self.jurg[i] = True
+                self.autoPlay = True
+            self.aiSkill[i] = self.engine.config.get("game", "jurg_skill_p%d" % i)
+            if player.part.id == Song.VOCAL_PART:
+                self.instruments[i].jurgenEnabled = jurgen
+                self.instruments[i].jurgenSkill   = self.aiSkill[i]
+            self.jurgenLogic[i] = self.engine.config.get("game", "jurg_logic_p%d" % i)
+
+
+        #MFH - no Jurgen in Career mode.
+        if self.careerMode:
+            self.autoPlay = False
+        if self.bossBattle:
+            self.autoPlay = True
+            self.jurg = [False for i in self.players]
+            self.jurg[1] = True
+
+        self.hopoStyle        = self.engine.config.get("game", "hopo_system")
+        self.gh2sloppy        = self.engine.config.get("game", "gh2_sloppy")
+        self.allTaps          = 0
+        self.autoKickBass     = [0 for i in self.players]
+        if self.gh2sloppy == 1:
+            self.hopoStyle = 4
+        self.hopoAfterChord = self.engine.config.get("game", "hopo_after_chord")
+
+        self.pov              = self.engine.config.get("fretboard", "point_of_view")
+        #CoffeeMod
+
+        self.activeGameControls = self.engine.input.activeGameControls
+
+        for i,player in enumerate(self.players):
+            if player.part.id == Song.VOCAL_PART:
+                continue
+            self.instruments[i].leftyMode   = False
+            self.instruments[i].twoChordMax = False
+            self.instruments[i].drumFlip    = False
+            if player.lefty > 0:
+                self.instruments[i].leftyMode = True
+            if player.drumflip > 0:
+                self.instruments[i].drumFlip = True
+            if player.twoChordMax > 0:
+                self.instruments[i].twoChordMax  = True
+
+        self.keysList = []
+        for i, player in enumerate(self.players):
+            if self.instruments[i].isDrum:
+                self.keysList.append(player.drums)
+            elif self.instruments[i].isVocal:
+                self.keysList.append([])
+                continue
+            else:
+                self.keysList.append(player.keys)
+            if not self.instruments[i].twoChordMax:
+                if self.controls.twoChord[self.activeGameControls[i]] > 0:
+                    self.instruments[i].twoChordMax = True
+
+        if self.song and self.song.readyToGo:
+            self.getHandicap() #akedrou - to be sure scoring objects are created.
+            #myfingershurt: ensure that after a pause or restart, the a/v sync delay is refreshed:
+            self.song.refreshAudioDelay()
+            #myfingershurt: ensuring the miss volume gets refreshed:
+            self.song.refreshVolumes()
+            self.song.setAllTrackVolumes(1)
+            if self.crowdsCheering == True:
+                self.song.setCrowdVolume(1)
+            else:
+                self.song.setCrowdVolume(0.0)
+
+
+    def quit(self):
+        if self.song:
+            self.song.stop()
+        self.resetVariablesToDefaults()
+        self.done = True
+
+        self.engine.view.setViewport(1,0)
+        self.engine.view.popLayer(self.menu)
+        self.engine.view.popLayer(self.failMenu)
+        self.freeResources()
+        self.engine.world.finishGame()
+
+
+    def restartSong(self, firstTime = False):  #QQstarS: Fix this function
+        self.resetVariablesToDefaults()
+        self.engine.data.startSound.play()
+        self.engine.view.popLayer(self.menu)
+
+        if not self.song:
+            return
+
+        # glorandwarf: the countdown is now the number of beats to run
+        # before the song begins
+
+
+        self.partySwitch = 0
+        for instrument in self.instruments:
+            if instrument.isVocal:
+                instrument.stopMic()
+            else:
+                instrument.endPick(0) #akedrou: this is the position of the song, not a player number!
+        self.song.stop()
+
+        self.initBeatAndSpClaps()
+
+        if self.stage.mode == 3:
+            self.stage.restartVideo()
+
+
+    def restartAfterFail(self):  #QQstarS: Fix this function
+        self.resetVariablesToDefaults()
+        self.engine.data.startSound.play()
+        self.engine.view.popLayer(self.failMenu)
+
+        if not self.song:
+            return
+
+        self.partySwitch = 0
+        for i,instrument in enumerate(self.instruments):
+            if instrument.isVocal:
+                instrument.stopMic()
+            else:
+                instrument.endPick(0)
+        self.song.stop()
+
+        if self.stage.mode == 3:
+            self.stage.restartVideo()
+
+
+    def pauseGame(self):
+        if self.song and self.song.readyToGo:
+            self.song.pause()
+            self.pausePos = self.getSongPosition()
+            self.pause = True
+            for instrument in self.instruments:
+                instrument.paused = True
+                if instrument.isVocal:
+                    instrument.stopMic()
+                else:
+                    instrument.neck.paused = True
+
+
+    def failGame(self):
+        self.engine.view.pushLayer(self.failMenu)
+        if self.song and self.song.readyToGo and self.pause: #akedrou - don't let the pause menu overlap the fail menu.
+            self.engine.view.popLayer(self.menu)
+            self.pause = False
+            for instrument in self.instruments:
+                instrument.paused = False
+                if instrument.isVocal:
+                    instrument.stopMic()
+                else:
+                    instrument.neck.paused = False
+        self.failEnd = True
+
+
+    def resumeGame(self):
+        self.loadSettings()
+        self.setCamera()
+        if self.resumeCountdownEnabled and not self.failed and not self.countdown:
+            self.resumeCountdownSeconds = 3
+            self.resumeCountdown = float(self.resumeCountdownSeconds) * self.songBPS
+            self.pause = False
+        else:
+            if self.song and self.song.readyToGo:
+                if not self.failed: #akedrou - don't resume the song if you have already failed.
+                    self.song.unpause()
+                self.pause = False
+                for instrument in self.instruments:
+                    instrument.paused = False
+                    if instrument.isVocal:
+                        instrument.startMic()
+                    else:
+                        instrument.neck.paused = False
+
+
+    def songLoaded(self, song):
+        for i, player in enumerate(self.players):
+            if self.instruments[i].isVocal:
+                song.difficulty[i] = Song.difficulties[Song.EXP_DIF] #for track-finding purposes! Don't change this, ok?
+                continue
+            song.difficulty[i] = player.difficulty
+        if self.bossBattle == True:
+            song.difficulty[1] = song.difficulty[0]
+
+        self.song.readyToGo = False
+
+
+    def endSong(self):
+        self.engine.view.popLayer(self.menu)
+        validScoreFound = False
+        for scoreCard in self.scoring:  #MFH - what if 2p (human) battles 1p (Jurgen / CPU)?  He needs a valid score too!
+            if scoreCard.score > 0:
+                validScoreFound = True
+                break
+        if self.coOpType:
+            if self.coOpScoreCard.score > 0:
+                validScoreFound = True
+        if validScoreFound:
+            self.goToResults()
+        else:
+            self.changeSong()
+
+
+    def changeSong(self):
+        prevMode = self.engine.world.gameMode
+        if self.song:
+            self.song.stop()
+            self.song  = None
+        self.resetVariablesToDefaults()
+        self.engine.view.setViewport(1,0)
+        self.engine.view.popLayer(self.menu)
+        self.engine.view.popLayer(self.failMenu)
+        self.freeResources()
+        self.engine.world.gameMode = prevMode
+        self.engine.world.createScene("SongChoosingScene")
+
+
+    def changeAfterFail(self):
+        if self.song:
+            self.song.stop()
+            self.song  = None
+        self.resetVariablesToDefaults()
+
+        self.engine.view.setViewport(1,0)
+        self.engine.view.popLayer(self.failMenu)
+        self.freeResources()
+        self.engine.world.createScene("SongChoosingScene")
+
+
+    def resumeSong(self):
+        self.engine.view.popLayer(self.menu)
+        self.resumeGame()
+
+
+    def lostFocus(self): #akedrou - catch to pause on lostFocus
+        if self.song and self.song.readyToGo:
+            if not self.failed and not self.pause and self.lostFocusPause == True:
+                self.engine.view.pushLayer(self.menu)
+                self.pauseGame()
+
+
+    def setCamera(self):
+        #x=0 middle
+        #x=1 rotate left
+        #x=-1 rotate right
+        #y=3 middle
+        #y=4 rotate back
+        #y=2 rotate front
+        #z=-3
+
+        if self.customPOV:
+            self.camera.target    = (self.targetX, self.targetY, self.targetZ)
+            self.camera.origin    = (self.originX, self.originY, self.originZ)
+        else:
+            if self.pov == 1: #GH3
+                self.camera.target    = (0.0, 0.6, 4.4)
+                self.camera.origin    = (0.0, 3.5, -3.8)
+            elif self.pov == 2: #RB
+                self.camera.target    = (0.0, 0.0, 3.7)
+                self.camera.origin    = (0.0, 2.9, -2.9)
+            elif self.pov == 3: #GH2
+                self.camera.target    = (0.0, 1.6, 2.0)
+                self.camera.origin    = (0.0, 2.6, -3.6)
+            elif self.pov == 4: #Rock Rev
+                self.camera.target    = (0.0, -6.0, 2.6666666666)
+                self.camera.origin    = (0.0, 6.0, 2.6666666665)
+            elif self.pov == 5: #Theme
+                if self.povTheme == "gh2":
+                    self.camera.target    = (0.0, 1.6, 2.0)
+                    self.camera.origin    = (0.0, 2.6, -3.6)
+                elif self.povTheme == "gh3":
+                    self.camera.target    = (0.0, 0.6, 4.4) #Worldrave - Perfected the proper GH3 POV
+                    self.camera.origin    = (0.0, 3.5, -3.8)
+                elif self.povTheme == "rb":
+                    self.camera.target    = (0.0, 0.0, 3.7)
+                    self.camera.origin    = (0.0, 2.9, -2.9)
+                elif self.povTheme == "fof":
+                    self.camera.target    = (0.0, 0.0, 4.0)
+                    self.camera.origin    = (0.0, 3.0, -3.0)
+            else: # FoF
+                self.camera.target    = (0.0, 0.0, 4.0)
+                self.camera.origin    = (0.0, 3.0, -3.0)
+
+        #weirdpeople - differant types of fretbord into animations
+        if self.neckintroAnimationType == 0: #Original FoFiX rotate down into place
+            self.camera.origin = (self.camera.origin[0], self.camera.origin[1]*self.boardY, self.camera.origin[2])
+        elif self.neckintroAnimationType == 1: #Guitar Hero type (from bottom of screen)
+            self.camera.target    = (self.camera.target[0], self.camera.target[1]+self.boardY-1, self.camera.target[2])
+            self.camera.origin    = (self.camera.origin[0], self.camera.origin[1]+self.boardY-1, self.camera.origin[2])
+        elif self.neckintroAnimationType == 2: #Rock Band type (goes into screen)
+            self.camera.target    = (self.camera.target[0], self.camera.target[1], self.camera.target[2]+self.boardZ-1)
+            self.camera.origin    = (self.camera.origin[0], self.camera.origin[1], self.camera.origin[2]+self.boardZ-1)
+        elif self.neckintroAnimationType == 3: #Off game starts with the pov as is
+            self.camera.origin    = self.camera.origin
+        elif self.neckintroAnimationType == 4: #By Theme
+            if self.neckintroThemeType == "fofix":
+                self.camera.origin = (self.camera.origin[0], self.camera.origin[1]*self.boardY, self.camera.origin[2])
+            elif self.neckintroThemeType == "guitar hero":
+                self.camera.target    = (self.camera.target[0], self.camera.target[1]+self.boardY-1, self.camera.target[2])
+                self.camera.origin    = (self.camera.origin[0], self.camera.origin[1]+self.boardY-1, self.camera.origin[2])
+            elif self.neckintroThemeType == "rockband":
+                self.camera.target    = (self.camera.target[0], self.camera.target[1], self.camera.target[2]+self.boardZ-1)
+                self.camera.origin    = (self.camera.origin[0], self.camera.origin[1], self.camera.origin[2]+self.boardZ-1)
+
+
+    def handleTempo(self, song, pos):
+        if not song:
+            return
+        if self.lastBpmChange > 0 and self.disableVBPM == True:   #MFH - only handle tempo once if the VBPM feature is off.
+            return
+        tempEventHolder = song.tempoEventTrack.getNextTempoChange(pos)
+        if tempEventHolder:
+            time, event = tempEventHolder
+            if ( (time < pos or self.lastBpmChange < 0) or (pos - time < self.currentPeriod or self.lastBpmChange < 0) ) and time > self.lastBpmChange:
+                self.baseBeat         += (time - self.lastBpmChange) / self.currentPeriod
+                self.targetBpm = event.bpm
+                song.tempoEventTrack.currentIndex += 1  #MFH = manually increase current event
+                self.lastBpmChange     = time
+
+        #adjust tempo gradually to meet new target:
+        if self.targetBpm != self.currentBpm:
+            diff = self.targetBpm - self.currentBpm
+            tempDiff = round( (diff * .03), 4)    #MFH - better to calculate this once and reuse the variable instead of recalculating every use
+            if tempDiff != 0:
+                self.currentBpm = self.currentBpm + tempDiff
+            else:
+                self.currentBpm = self.targetBpm
+
+            #recalculate all variables dependent on the tempo, apply to instrument objects - only if currentBpm has changed:
+            self.currentPeriod  = 60000.0 / self.currentBpm
+            for instrument in self.instruments:
+                instrument.setBPM(self.currentBpm)
+                instrument.lastBpmChange = self.lastBpmChange
+                instrument.baseBeat = self.baseBeat
+
+
+    def getSongPosition(self):
+        if self.song and self.song.readyToGo:
+            if not self.done:
+                self.lastSongPos = self.song.getPosition()
+                return self.lastSongPos - self.countdown * self.song.period
+            else:
+                # Nice speeding up animation at the end of the song
+                return self.lastSongPos + 4.0 * (1 - self.visibility) * self.song.period
+        return 0.0
+
+    #stump: hop a fretboard
+    def hopFretboard(self, num, height):
+        if self.instruments[num].fretboardHop < height:
+            self.instruments[num].fretboardHop = height
+
+
+    def getPlayerNum(self, control):
+        for i, player in enumerate(self.players):
+            if control and control in player.keyList:
+                return i
+        else:
+            return -1
+
+
+class GuitarScene(BandPlayBaseScene):
+    def __init__(self, engine, libraryName, songName):
+        superClass = super(GuitarScene, self)
+        superClass.__init__(engine, libraryName, songName)
 
         self.partyMode = False
         self.battle = False #QQstarS:new2 Bettle
@@ -73,30 +663,16 @@ class GuitarScene(Scene):
         self.coOpType = False
         self.practiceMode = False
         self.bossBattle = False
-        self.ready = False
+
         Log.debug("GuitarScene init...")
 
         self.coOpPlayerMeter = 0
 
-        #myfingershurt: new loading place for "loading" screen for song preparation:
-        #blazingamer new loading phrases
-        self.sinfo = Song.loadSongInfo(self.engine, songName, library = libraryName)
-        phrase = self.sinfo.loadingPhrase
-        if phrase == "":
-            phrase = random.choice(self.engine.theme.loadingPhrase)
-        splash = Dialogs.showSongLoadingSplashScreen(self.engine, songName, libraryName, phrase + " \n " + _("Initializing..."))
-        Dialogs.changeLoadingSplashScreenText(self.engine, splash, phrase + " \n " + _("Initializing..."))
-
-
-        self.countdownSeconds = 3   #MFH - don't change this initialization value unless you alter the other related variables to match
-        self.countdown = 100   #MFH - arbitrary value to prevent song from starting right away
-        self.countdownOK = False
 
         #MFH - retrieve game parameters:
         self.gamePlayers = len(self.players)
         self.gameMode1p = self.engine.world.gameMode
         self.gameMode2p = self.engine.world.multiMode
-        self.lostFocusPause = self.engine.config.get("game", "lost_focus_pause")
 
         if self.sinfo.bossBattle == "True" and self.gameMode1p == 2 and self.gamePlayers == 1:
             self.bossBattle = True
@@ -162,20 +738,6 @@ class GuitarScene(Scene):
                 self.coOpGH   = False
                 self.coOpType = False
 
-        self.splayers = self.gamePlayers #Spikehead777
-
-        #myfingershurt: drums :)
-        self.instruments = [] # akedrou - this combines Guitars, Drums, and Vocalists
-        self.keysList = []
-        self.soloKeysList = []
-        self.soloShifts   = []
-        self.playingVocals  = False
-        self.numberOfGuitars = len(self.players)
-        self.numOfPlayers    = len(self.players)
-        self.numOfSingers    = 0
-        self.firstGuitar     = None
-        self.neckrender = []
-
         gNum = 0
         for j,player in enumerate(self.players):
             guitar = True
@@ -228,23 +790,6 @@ class GuitarScene(Scene):
                 self.soloShifts.append([])
 
         Log.debug("GuitarScene keysList: %s" % str(self.keysList))
-
-        #for number formatting with commas for Rock Band:
-        locale.setlocale(locale.LC_ALL, '')   #more compatible
-
-        self.visibility       = 1.0
-        self.libraryName      = libraryName
-        self.songName         = songName
-        self.done             = False
-
-        self.lastMultTime     = [None for i in self.players]
-        self.cheatCodes       = [
-          ([102, 97, 115, 116, 102, 111, 114, 119, 97, 114, 100],   self.goToResults)
-        ]
-        self.enteredCode      = []
-        self.song             = None
-
-        self.numOfPlayers = len(self.players)
 
         self.jurgenLogic             = [0 for i in self.players]
         for i in range(len(self.players)):
@@ -335,33 +880,7 @@ class GuitarScene(Scene):
                 self.jurg[i] = True
                 self.autoPlay = True
 
-        self.lastPickPos      = [None for i in self.players]
-        self.lastSongPos      = 0.0
-        self.keyBurstTimeout  = [None for i in self.players]
-        self.keyBurstPeriod   = 30
 
-        self.camera.target    = (0.0, 1.0, 8.0)
-        self.camera.origin    = (0.0, 2.0, -3.4)
-
-        self.targetX          = self.engine.theme.povTarget[0]
-        self.targetY          = self.engine.theme.povTarget[1]
-        self.targetZ          = self.engine.theme.povTarget[2]
-        self.originX          = self.engine.theme.povOrigin[0]
-        self.originY          = self.engine.theme.povOrigin[1]
-        self.originZ          = self.engine.theme.povOrigin[2]
-        self.customPOV        = False
-        self.ending           = False
-
-        self.povTheme         = self.engine.theme.povPreset
-
-        self.neckintroAnimationType = self.engine.config.get("fretboard", "neck_intro_animation")#weirdpeople
-        self.neckintroThemeType = self.engine.theme.povIntroAnimation
-
-        if None not in [self.targetX, self.targetY, self.targetZ, self.originX, self.originY, self.originZ]:
-            self.customPOV = True
-            Log.debug("All theme POV set. Using custom camera POV.")
-
-        self.pause = False
         self.failed = False
         self.finalFailed = False
         self.failEnd = False
@@ -397,7 +916,7 @@ class GuitarScene(Scene):
         self.multi = [1 for i in self.players]
 
         #Get theme
-        themename = self.engine.data.themeLabel
+        self.themeName = self.engine.data.themeLabel
         self.theme = self.engine.data.theme
 
         if self.engine.theme.hopoIndicatorX != None:
@@ -447,7 +966,7 @@ class GuitarScene(Scene):
             self.coOpPlayerMeter = len(self.rock)-1 #make sure it's the last one
 
 
-        stage = os.path.join("themes",themename,"stage.ini")
+        stage = os.path.join("themes",self.themeName,"stage.ini")
         self.stage = Stage.Stage(self, self.engine.resource.fileName(stage))
 
         self.loadSettings()
@@ -554,7 +1073,6 @@ class GuitarScene(Scene):
         self.analogKillswitchStarpowerChunkSize = 0.15 * self.engine.audioSpeedFactor
         self.analogKillswitchActiveStarpowerChunkSize = self.analogKillswitchStarpowerChunkSize / 3.0
         self.rbOverdriveBarGlowFadeInChunk = .07     #this amount added to visibility every run() cycle when fading in - original .2
-        self.rbOverdriveBarGlowFadeOutChunk = .03   #this amount subtracted from visibility every run() cycle when fading out - original .07
         self.crowdCheerFadeInChunk =  .02           #added to crowdVolume every run() when fading in
         self.crowdCheerFadeOutChunk = .03           #subtracted from crowdVolume every run() on fade out.
         self.maxDisplayTextScale = 0.0024       #orig 0.0024
@@ -620,18 +1138,9 @@ class GuitarScene(Scene):
         self.currentSimpleMidiLyricLine = ""
         self.noMoreMidiLineLyrics = False
 
-        self.screenCenterX = self.engine.video.screen.get_rect().centerx
-        self.screenCenterY = self.engine.video.screen.get_rect().centery
-
-        self.countdownPosX = self.engine.theme.countdownPosX
-        self.countdownPosY = self.engine.theme.countdownPosY
-
-        self.fpsRenderPos = self.engine.theme.fpsRenderPos
-
 
         #racer: practice beat claps:
         self.beatClaps = self.engine.config.get("game", "beat_claps")
-
 
         self.killDebugEnabled = self.engine.config.get("game", "kill_debug")
 
@@ -751,11 +1260,7 @@ class GuitarScene(Scene):
         self.guitarSoloActive = [False for i in self.players]
         self.currentGuitarSolo = [0 for i in self.players]
 
-        #guitar solo display initializations
-        if self.theme == 2:
-            self.solo_soloFont = self.engine.data.scoreFont
-        else:
-            self.solo_soloFont = self.engine.data.font
+        self.solo_soloFont = self.engine.data.scoreFont
 
         self.guitarSoloShown = [False for i in self.players]
         self.currentGuitarSoloLastHitNotes = [1 for i in self.players]
@@ -806,29 +1311,16 @@ class GuitarScene(Scene):
         self.rockFailViz = 0.0
         self.failViz = [0.0 for i in self.players]
 
-        self.phrases = self.engine.config.get("coffee", "game_phrases")#blazingamer
 
-        #weirdpeople - sets the distances the neck has to move in the animation
-        if self.neckintroAnimationType == 0: #Original
-            self.boardY = 2
-        elif self.neckintroAnimationType == 1: #Guitar Hero
-            self.boardY = 10
-        elif self.neckintroAnimationType == 2: #Rock Band
-            self.boardZ = 5
-        elif self.neckintroAnimationType == 4: #By Theme: will implememnt at later point
-            self.boardY = 1
-        self.rbOverdriveBarGlowVisibility = 0
-        self.rbOverdriveBarGlowFadeOut = False
-        self.counting = self.engine.config.get("video", "counting")
+        ### Begin song loading ###
 
-
-        Dialogs.changeLoadingSplashScreenText(self.engine, splash, phrase + " \n " + _("Loading Song..."))
+        Dialogs.changeLoadingSplashScreenText(self.engine, self.splash, self.phrase + " \n " + _("Loading Song..."))
 
         #MFH - this is where song loading originally took place, and the loading screen was spawned.
 
         self.engine.resource.load(self, "song", lambda: loadSong(self.engine, songName, library = libraryName, part = [player.part for player in self.players], practiceMode = self.players[0].practiceMode, practiceSpeed = self.players[0].practiceSpeed), synch = True, onLoad = self.songLoaded)
 
-        Dialogs.changeLoadingSplashScreenText(self.engine, splash, phrase + " \n " + _("Preparing Note Phrases..."))
+        Dialogs.changeLoadingSplashScreenText(self.engine, self.splash, self.phrase + " \n " + _("Preparing Note Phrases..."))
 
 
 
@@ -912,18 +1404,6 @@ class GuitarScene(Scene):
             tempEarlyHitWindowSizeFactor = 0.5
         else:                                     #any other value will be full
             tempEarlyHitWindowSizeFactor = 1.0
-
-
-        #MFH - TODO - single, global BPM here instead of in instrument objects:
-        #self.tempoBpm = Song.DEFAULT_BPM
-        #self.actualBpm = 0.0
-        #self.targetPeriod   = 60000.0 / self.targetBpm
-        self.disableVBPM  = self.engine.config.get("game", "disable_vbpm")
-        self.currentBpm     = Song.DEFAULT_BPM
-        self.currentPeriod  = 60000.0 / self.currentBpm
-        self.targetBpm      = self.currentBpm
-        self.lastBpmChange  = -1.0
-        self.baseBeat       = 0.0
 
         for instrument in self.instruments:    #MFH - force update of early hit window
             instrument.earlyHitWindowSizeFactor = tempEarlyHitWindowSizeFactor
@@ -1280,7 +1760,7 @@ class GuitarScene(Scene):
         #glorandwarf: need to store the song's beats per second (bps) for later
         self.songBPS = self.song.bpm / 60.0
 
-        Dialogs.changeLoadingSplashScreenText(self.engine, splash, phrase + " \n " + _("Loading Graphics..."))
+        Dialogs.changeLoadingSplashScreenText(self.engine, self.splash, self.phrase + " \n " + _("Loading Graphics..."))
 
         # evilynux - Load stage background(s)
         if self.stage.mode == 3:
@@ -1303,96 +1783,8 @@ class GuitarScene(Scene):
                 self.showScriptLyrics = True
 
         self.ready = True
-        #lyric sheet!
-        if not self.playingVocals:
-            if self.song.hasMidiLyrics and self.midiLyricsEnabled > 0:
-                if self.midiLyricMode == 0:
-                    if not self.engine.loadImgDrawing(self, "lyricSheet", os.path.join("themes",themename,"lyricsheet.png")):
-                        self.lyricSheet = None
-                else:
-                    if not self.engine.loadImgDrawing(self, "lyricSheet", os.path.join("themes",themename,"lyricsheet2.png")):
-                        if not self.engine.loadImgDrawing(self, "lyricSheet", os.path.join("themes",themename,"lyricsheet.png")):
-                            self.lyricSheet = None
-            else:
-                self.lyricSheet = None
-        else:
-            self.lyricSheet = None
 
-
-        #brescorebackground.png
-        self.breScoreBackground = None
-        if self.engine.loadImgDrawing(self, "breScoreBackground", os.path.join("themes",themename,"brescorebackground.png")):
-            self.breScoreBackgroundWFactor = (w * self.engine.theme.breScoreBackgroundScale) / self.breScoreBackground.width1()
-        else:
-            Log.debug("BRE score background image loading problem!")
-            self.breScoreBackground = None
-            self.breScoreBackgroundWFactor = None
-
-        #brescoreframe.png
-        self.breScoreFrame = None
-        if self.engine.loadImgDrawing(self, "breScoreFrame", os.path.join("themes",themename,"brescoreframe.png")):
-            self.breScoreFrameWFactor = (w * self.engine.theme.breScoreFrameScale) / self.breScoreFrame.width1()
-        else:
-            #MFH - fallback on using soloframe.png if no brescoreframe.png is found
-            if self.engine.loadImgDrawing(self, "breScoreFrame", os.path.join("themes",themename,"soloframe.png")):
-                self.breScoreFrameWFactor = (w * self.engine.theme.breScoreFrameScale) / self.breScoreFrame.width1()
-            else:
-                self.breScoreFrame = None
-                self.breScoreFrameWFactor = None
-
-
-
-        if self.engine.loadImgDrawing(self, "soloFrame", os.path.join("themes",themename,"soloframe.png")):
-            self.soloFrameWFactor = (w * self.engine.theme.soloFrameScale) / self.soloFrame.width1()
-        else:
-            self.soloFrame = None
-            self.soloFrameWFactor = None
-
-        self.partImage = True
-        self.part = [None for i in self.players]
-        self.partLoad = None
-        if self.counting or self.coOpType:
-            for i in range(self.numOfPlayers):
-                if not self.partImage:
-                    break
-                if self.instruments[i].isDrum:
-                    if not self.engine.loadImgDrawing(self, "partLoad", os.path.join("themes",themename,"drum.png")):
-                        if not self.engine.loadImgDrawing(self, "partLoad", os.path.join("drum.png")):
-                            self.counting = False
-                            self.partImage = False
-                elif self.instruments[i].isBassGuitar:
-                    if not self.engine.loadImgDrawing(self, "partLoad", os.path.join("themes",themename,"bass.png")):
-                        if not self.engine.loadImgDrawing(self, "partLoad", os.path.join("bass.png")):
-                            self.counting = False
-                            self.partImage = False
-                elif self.instruments[i].isVocal:
-                    if not self.engine.loadImgDrawing(self, "partLoad", os.path.join("themes",themename,"mic.png")):
-                        if not self.engine.loadImgDrawing(self, "partLoad", os.path.join("mic.png")):
-                            self.counting = False
-                            self.partImage = False
-                else:
-                    if not self.engine.loadImgDrawing(self, "partLoad", os.path.join("themes",themename,"guitar.png")):
-                        if not self.engine.loadImgDrawing(self, "partLoad", os.path.join("guitar.png")):
-                            self.counting = False
-                            self.partImage = False
-                if self.partLoad:
-                    self.part[i] = self.partLoad
-
-        self.partLoad = None
-
-        if self.soloFrameMode == 0:
-            self.soloFrame = None
-            self.soloFrameWFactor = None
-
-        #Pause Screen
-        self.engine.loadImgDrawing(self, "pauseScreen", os.path.join("themes",themename,"pause.png"))
-        if not self.engine.loadImgDrawing(self, "failScreen", os.path.join("themes",themename,"fail.png")):
-            self.engine.loadImgDrawing(self, "failScreen", os.path.join("themes",themename,"pause.png"))
-
-        #failMessage
-        self.engine.loadImgDrawing(self, "failMsg", os.path.join("themes",themename,"youfailed.png"))
-        #myfingershurt: youRockMessage
-        self.engine.loadImgDrawing(self, "rockMsg", os.path.join("themes",themename,"yourock.png"))
+        self.loadmages(w, h)
 
 
         self.counterY = -0.1
@@ -1571,128 +1963,11 @@ class GuitarScene(Scene):
         self.restartSong(firstTime = True)
 
         # hide the splash screen
-        Dialogs.hideLoadingSplashScreen(self.engine, splash)
-        splash = None
+        Dialogs.hideLoadingSplashScreen(self.engine, self.splash)
+        self.splash = None
 
         #MFH - end of GuitarScene client initialization routine
 
-
-    def pauseGame(self):
-        if self.song and self.song.readyToGo:
-            self.song.pause()
-            self.pausePos = self.getSongPosition()
-            self.pause = True
-            for instrument in self.instruments:
-                instrument.paused = True
-                if instrument.isVocal:
-                    instrument.stopMic()
-                else:
-                    instrument.neck.paused = True
-
-    def failGame(self):
-        self.engine.view.pushLayer(self.failMenu)
-        if self.song and self.song.readyToGo and self.pause: #akedrou - don't let the pause menu overlap the fail menu.
-            self.engine.view.popLayer(self.menu)
-            self.pause = False
-            for instrument in self.instruments:
-                instrument.paused = False
-                if instrument.isVocal:
-                    instrument.stopMic()
-                else:
-                    instrument.neck.paused = False
-        self.failEnd = True
-
-    def resumeGame(self):
-        self.loadSettings()
-        self.setCamera()
-        if self.resumeCountdownEnabled and not self.failed and not self.countdown:
-            self.resumeCountdownSeconds = 3
-            self.resumeCountdown = float(self.resumeCountdownSeconds) * self.songBPS
-            self.pause = False
-        else:
-            if self.song and self.song.readyToGo:
-                if not self.failed: #akedrou - don't resume the song if you have already failed.
-                    self.song.unpause()
-                self.pause = False
-                for instrument in self.instruments:
-                    instrument.paused = False
-                    if instrument.isVocal:
-                        instrument.startMic()
-                    else:
-                        instrument.neck.paused = False
-
-    def resumeSong(self):
-        self.engine.view.popLayer(self.menu)
-        self.resumeGame()
-
-    def lostFocus(self): #akedrou - catch to pause on lostFocus
-        if self.song and self.song.readyToGo:
-            if not self.failed and not self.pause and self.lostFocusPause == True:
-                self.engine.view.pushLayer(self.menu)
-                self.pauseGame()
-
-    def setCamera(self):
-        #x=0 middle
-        #x=1 rotate left
-        #x=-1 rotate right
-        #y=3 middle
-        #y=4 rotate back
-        #y=2 rotate front
-        #z=-3
-
-        if self.customPOV:
-            self.camera.target    = (self.targetX, self.targetY, self.targetZ)
-            self.camera.origin    = (self.originX, self.originY, self.originZ)
-        else:
-            if self.pov == 1: #GH3
-                self.camera.target    = (0.0, 0.6, 4.4)
-                self.camera.origin    = (0.0, 3.5, -3.8)
-            elif self.pov == 2: #RB
-                self.camera.target    = (0.0, 0.0, 3.7)
-                self.camera.origin    = (0.0, 2.9, -2.9)
-            elif self.pov == 3: #GH2
-                self.camera.target    = (0.0, 1.6, 2.0)
-                self.camera.origin    = (0.0, 2.6, -3.6)
-            elif self.pov == 4: #Rock Rev
-                self.camera.target    = (0.0, -6.0, 2.6666666666)
-                self.camera.origin    = (0.0, 6.0, 2.6666666665)
-            elif self.pov == 5: #Theme
-                if self.povTheme == "gh2":
-                    self.camera.target    = (0.0, 1.6, 2.0)
-                    self.camera.origin    = (0.0, 2.6, -3.6)
-                elif self.povTheme == "gh3":
-                    self.camera.target    = (0.0, 0.6, 4.4) #Worldrave - Perfected the proper GH3 POV
-                    self.camera.origin    = (0.0, 3.5, -3.8)
-                elif self.povTheme == "rb":
-                    self.camera.target    = (0.0, 0.0, 3.7)
-                    self.camera.origin    = (0.0, 2.9, -2.9)
-                elif self.povTheme == "fof":
-                    self.camera.target    = (0.0, 0.0, 4.0)
-                    self.camera.origin    = (0.0, 3.0, -3.0)
-            else: # FoF
-                self.camera.target    = (0.0, 0.0, 4.0)
-                self.camera.origin    = (0.0, 3.0, -3.0)
-
-        #weirdpeople - differant types of fretbord into animations
-        if self.neckintroAnimationType == 0: #Original FoFiX rotate down into place
-            self.camera.origin = (self.camera.origin[0], self.camera.origin[1]*self.boardY, self.camera.origin[2])
-        elif self.neckintroAnimationType == 1: #Guitar Hero type (from bottom of screen)
-            self.camera.target    = (self.camera.target[0], self.camera.target[1]+self.boardY-1, self.camera.target[2])
-            self.camera.origin    = (self.camera.origin[0], self.camera.origin[1]+self.boardY-1, self.camera.origin[2])
-        elif self.neckintroAnimationType == 2: #Rock Band type (goes into screen)
-            self.camera.target    = (self.camera.target[0], self.camera.target[1], self.camera.target[2]+self.boardZ-1)
-            self.camera.origin    = (self.camera.origin[0], self.camera.origin[1], self.camera.origin[2]+self.boardZ-1)
-        elif self.neckintroAnimationType == 3: #Off game starts with the pov as is
-            self.camera.origin    = self.camera.origin
-        elif self.neckintroAnimationType == 4: #By Theme
-            if self.neckintroThemeType == "fofix":
-                self.camera.origin = (self.camera.origin[0], self.camera.origin[1]*self.boardY, self.camera.origin[2])
-            elif self.neckintroThemeType == "guitar hero":
-                self.camera.target    = (self.camera.target[0], self.camera.target[1]+self.boardY-1, self.camera.target[2])
-                self.camera.origin    = (self.camera.origin[0], self.camera.origin[1]+self.boardY-1, self.camera.origin[2])
-            elif self.neckintroThemeType == "rockband":
-                self.camera.target    = (self.camera.target[0], self.camera.target[1], self.camera.target[2]+self.boardZ-1)
-                self.camera.origin    = (self.camera.origin[0], self.camera.origin[1], self.camera.origin[2]+self.boardZ-1)
 
     def freeResources(self):
         self.engine.view.setViewport(1,0)
@@ -1881,133 +2156,6 @@ class GuitarScene(Scene):
         if self.coOpType:
             self.coOpScoreCard.updateHandicapValue()
 
-    def loadSettings(self):
-        self.stage.updateDelays()
-
-        self.activeVolume     = self.engine.config.get("audio", "guitarvol")
-        self.screwUpVolume    = self.engine.config.get("audio", "screwupvol")
-        self.killVolume       = self.engine.config.get("audio", "kill_volume")
-        self.crowdVolume      = self.engine.config.get("audio", "crowd_volume") #akedrou
-        self.crowdsEnabled    = self.engine.config.get("audio", "enable_crowd_tracks")
-        self.engine.data.crowdVolume = self.crowdVolume
-
-        #MFH - now update volume of all screwup sounds and other SFX:
-        self.engine.data.SetAllScrewUpSoundFxObjectVolumes(self.screwUpVolume)
-
-        #Re-apply Jurgen Settings -- Spikehead777
-        self.autoPlay         = False
-        self.jurg             = [False for i in self.players]
-        self.jurgenLogic             = [0 for i in self.players]
-        self.aiSkill             = [0 for i in self.players]
-
-        for i, player in enumerate(self.players):
-            jurgen = self.engine.config.get("game", "jurg_p%d" % i)
-            if jurgen == True:
-                self.jurg[i] = True
-                self.autoPlay = True
-            self.aiSkill[i] = self.engine.config.get("game", "jurg_skill_p%d" % i)
-            if player.part.id == Song.VOCAL_PART:
-                self.instruments[i].jurgenEnabled = jurgen
-                self.instruments[i].jurgenSkill   = self.aiSkill[i]
-            self.jurgenLogic[i] = self.engine.config.get("game", "jurg_logic_p%d" % i)
-
-
-        #MFH - no Jurgen in Career mode.
-        if self.careerMode:
-            self.autoPlay = False
-        if self.bossBattle:
-            self.autoPlay = True
-            self.jurg = [False for i in self.players]
-            self.jurg[1] = True
-
-        self.hopoStyle        = self.engine.config.get("game", "hopo_system")
-        self.gh2sloppy        = self.engine.config.get("game", "gh2_sloppy")
-        self.allTaps          = 0
-        self.autoKickBass     = [0 for i in self.players]
-        if self.gh2sloppy == 1:
-            self.hopoStyle = 4
-        self.hopoAfterChord = self.engine.config.get("game", "hopo_after_chord")
-
-        self.pov              = self.engine.config.get("fretboard", "point_of_view")
-        #CoffeeMod
-
-        self.activeGameControls = self.engine.input.activeGameControls
-
-        for i,player in enumerate(self.players):
-            if player.part.id == Song.VOCAL_PART:
-                continue
-            self.instruments[i].leftyMode   = False
-            self.instruments[i].twoChordMax = False
-            self.instruments[i].drumFlip    = False
-            if player.lefty > 0:
-                self.instruments[i].leftyMode = True
-            if player.drumflip > 0:
-                self.instruments[i].drumFlip = True
-            if player.twoChordMax > 0:
-                self.instruments[i].twoChordMax  = True
-
-        self.keysList = []
-        for i, player in enumerate(self.players):
-            if self.instruments[i].isDrum:
-                self.keysList.append(player.drums)
-            elif self.instruments[i].isVocal:
-                self.keysList.append([])
-                continue
-            else:
-                self.keysList.append(player.keys)
-            if not self.instruments[i].twoChordMax:
-                if self.controls.twoChord[self.activeGameControls[i]] > 0:
-                    self.instruments[i].twoChordMax = True
-
-        if self.song and self.song.readyToGo:
-            self.getHandicap() #akedrou - to be sure scoring objects are created.
-            #myfingershurt: ensure that after a pause or restart, the a/v sync delay is refreshed:
-            self.song.refreshAudioDelay()
-            #myfingershurt: ensuring the miss volume gets refreshed:
-            self.song.refreshVolumes()
-            self.song.setAllTrackVolumes(1)
-            if self.crowdsCheering == True:
-                self.song.setCrowdVolume(1)
-            else:
-                self.song.setCrowdVolume(0.0)
-
-    def songLoaded(self, song):
-        for i, player in enumerate(self.players):
-            if self.instruments[i].isVocal:
-                song.difficulty[i] = Song.difficulties[Song.EXP_DIF] #for track-finding purposes! Don't change this, ok?
-                continue
-            song.difficulty[i] = player.difficulty
-        if self.bossBattle == True:
-            song.difficulty[1] = song.difficulty[0]
-
-        self.song.readyToGo = False
-
-    def endSong(self):
-        self.engine.view.popLayer(self.menu)
-        validScoreFound = False
-        for scoreCard in self.scoring:  #MFH - what if 2p (human) battles 1p (Jurgen / CPU)?  He needs a valid score too!
-            if scoreCard.score > 0:
-                validScoreFound = True
-                break
-        if self.coOpType:
-            if self.coOpScoreCard.score > 0:
-                validScoreFound = True
-        if validScoreFound:
-            self.goToResults()
-        else:
-            self.changeSong()
-
-    def quit(self):
-        if self.song:
-            self.song.stop()
-        self.resetVariablesToDefaults()
-        self.done = True
-
-        self.engine.view.setViewport(1,0)
-        self.engine.view.popLayer(self.menu)
-        self.engine.view.popLayer(self.failMenu)
-        self.freeResources()
-        self.engine.world.finishGame()
 
     # evilynux - Switch to Practice
     def practiceSong(self):
@@ -2020,30 +2168,6 @@ class GuitarScene(Scene):
         self.engine.view.popLayer(self.failMenu)
         self.freeResources()
         self.engine.world.gameMode = 1
-        self.engine.world.createScene("SongChoosingScene")
-
-    def changeSong(self):
-        prevMode = self.engine.world.gameMode
-        if self.song:
-            self.song.stop()
-            self.song  = None
-        self.resetVariablesToDefaults()
-        self.engine.view.setViewport(1,0)
-        self.engine.view.popLayer(self.menu)
-        self.engine.view.popLayer(self.failMenu)
-        self.freeResources()
-        self.engine.world.gameMode = prevMode
-        self.engine.world.createScene("SongChoosingScene")
-
-    def changeAfterFail(self):
-        if self.song:
-            self.song.stop()
-            self.song  = None
-        self.resetVariablesToDefaults()
-
-        self.engine.view.setViewport(1,0)
-        self.engine.view.popLayer(self.failMenu)
-        self.freeResources()
         self.engine.world.createScene("SongChoosingScene")
 
     def initBeatAndSpClaps(self):
@@ -2275,52 +2399,6 @@ class GuitarScene(Scene):
         if self.song:
             self.song.readyToGo = True
 
-
-    def restartSong(self, firstTime = False):  #QQstarS: Fix this function
-        self.resetVariablesToDefaults()
-        self.engine.data.startSound.play()
-        self.engine.view.popLayer(self.menu)
-
-        if not self.song:
-            return
-
-        # glorandwarf: the countdown is now the number of beats to run
-        # before the song begins
-
-
-        self.partySwitch = 0
-        for instrument in self.instruments:
-            if instrument.isVocal:
-                instrument.stopMic()
-            else:
-                instrument.endPick(0) #akedrou: this is the position of the song, not a player number!
-        self.song.stop()
-
-        self.initBeatAndSpClaps()
-
-        if self.stage.mode == 3:
-            self.stage.restartVideo()
-
-
-    def restartAfterFail(self):  #QQstarS: Fix this function
-        self.resetVariablesToDefaults()
-        self.engine.data.startSound.play()
-        self.engine.view.popLayer(self.failMenu)
-
-        if not self.song:
-            return
-
-        self.partySwitch = 0
-        for i,instrument in enumerate(self.instruments):
-            if instrument.isVocal:
-                instrument.stopMic()
-            else:
-                instrument.endPick(0)
-        self.song.stop()
-
-        if self.stage.mode == 3:
-            self.stage.restartVideo()
-
     def startSolo(self, playerNum):   #MFH - more modular and general handling of solos
         i = playerNum
          #Guitar Solo Start
@@ -2442,36 +2520,6 @@ class GuitarScene(Scene):
             if self.guitarSoloShown[i]:
                 self.guitarSoloShown[i] = False
                 self.currentGuitarSoloLastHitNotes[i] = 1
-
-    def handleTempo(self, song, pos):
-        if not song:
-            return
-        if self.lastBpmChange > 0 and self.disableVBPM == True:   #MFH - only handle tempo once if the VBPM feature is off.
-            return
-        tempEventHolder = song.tempoEventTrack.getNextTempoChange(pos)
-        if tempEventHolder:
-            time, event = tempEventHolder
-            if ( (time < pos or self.lastBpmChange < 0) or (pos - time < self.currentPeriod or self.lastBpmChange < 0) ) and time > self.lastBpmChange:
-                self.baseBeat         += (time - self.lastBpmChange) / self.currentPeriod
-                self.targetBpm = event.bpm
-                song.tempoEventTrack.currentIndex += 1  #MFH = manually increase current event
-                self.lastBpmChange     = time
-
-        #adjust tempo gradually to meet new target:
-        if self.targetBpm != self.currentBpm:
-            diff = self.targetBpm - self.currentBpm
-            tempDiff = round( (diff * .03), 4)    #MFH - better to calculate this once and reuse the variable instead of recalculating every use
-            if tempDiff != 0:
-                self.currentBpm = self.currentBpm + tempDiff
-            else:
-                self.currentBpm = self.targetBpm
-
-            #recalculate all variables dependent on the tempo, apply to instrument objects - only if currentBpm has changed:
-            self.currentPeriod  = 60000.0 / self.currentBpm
-            for instrument in self.instruments:
-                instrument.setBPM(self.currentBpm)
-                instrument.lastBpmChange = self.lastBpmChange
-                instrument.baseBeat = self.baseBeat
 
     def handleWhammy(self, playerNum):
         i = playerNum
@@ -3582,18 +3630,6 @@ class GuitarScene(Scene):
                     else:
                         self.firstClap = True
 
-            #MFH - new refugees from the render() function:
-            if self.theme == 2:
-                if self.rbOverdriveBarGlowFadeOut == False:
-                    self.rbOverdriveBarGlowVisibility = self.rbOverdriveBarGlowVisibility + self.rbOverdriveBarGlowFadeInChunk
-                elif self.rbOverdriveBarGlowFadeOut == True:
-                    self.rbOverdriveBarGlowVisibility = self.rbOverdriveBarGlowVisibility - self.rbOverdriveBarGlowFadeOutChunk
-
-                if self.rbOverdriveBarGlowVisibility >= 1 and self.rbOverdriveBarGlowFadeOut == False:
-                    self.rbOverdriveBarGlowFadeOut = True
-                elif self.rbOverdriveBarGlowVisibility <= 0 and self.rbOverdriveBarGlowFadeOut == True:
-                    self.rbOverdriveBarGlowFadeOut = False
-
             for playerNum in range(self.numOfPlayers):
                 self.handlePhrases(playerNum, self.scoring[playerNum].streak)   #MFH - streak #1 for player #1...
                 self.handleAnalogSP(playerNum, ticks)
@@ -3938,17 +3974,6 @@ class GuitarScene(Scene):
                     self.neckrender[i].isFailing = False
 
         self.engine.view.setViewport(1,0)
-
-
-    def getSongPosition(self):
-        if self.song and self.song.readyToGo:
-            if not self.done:
-                self.lastSongPos = self.song.getPosition()
-                return self.lastSongPos - self.countdown * self.song.period
-            else:
-                # Nice speeding up animation at the end of the song
-                return self.lastSongPos + 4.0 * (1 - self.visibility) * self.song.period
-        return 0.0
 
 
     def screwUp(self, num, controls):
@@ -4618,10 +4643,6 @@ class GuitarScene(Scene):
         if self.instruments[num].isDrum and self.bassKickSoundEnabled:
             self.instruments[num].playDrumSounds(self.controls, playBassDrumOnly = True)
 
-    #stump: hop a fretboard
-    def hopFretboard(self, num, height):
-        if self.instruments[num].fretboardHop < height:
-            self.instruments[num].fretboardHop = height
 
     def activateSP(self, num): #QQstarS: Fix this function, add a element "num"
         if self.battleGH: #from akedrou: this will die horribly if you allow vocal players in. Just sayin'. ... sorry?
@@ -5189,12 +5210,6 @@ class GuitarScene(Scene):
                 if len(activeList) != 0 and self.instruments[i].hopoActive > 0 and activeList[0] != self.keysList[i][self.instruments[i].hopoLast] and activeList[0] != self.keysList[i][self.instruments[i].hopoLast+5] and control in self.keysList[i]:
                     self.keyPressed3(None, 0, activeList[0], pullOff = True)
 
-    def getPlayerNum(self, control):
-        for i, player in enumerate(self.players):
-            if control and control in player.keyList:
-                return i
-        else:
-            return -1
 
     def render(self, visibility, topMost):  #QQstarS: Fix this function for mostly. And there are lots of change in this, I just show the main ones
 
