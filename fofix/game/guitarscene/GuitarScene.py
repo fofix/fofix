@@ -84,7 +84,6 @@ class GuitarScene(Scene):
         phrase = self.sinfo.loadingPhrase
         if phrase == "":
             phrase = random.choice(self.engine.theme.loadingPhrase)
-        #splash = Dialogs.showLoadingSplashScreen(self.engine, phrase + " \n " + _("Initializing..."))
         splash = Dialogs.showSongLoadingSplashScreen(self.engine, songName, libraryName, phrase + " \n " + _("Initializing..."))
         Dialogs.changeLoadingSplashScreenText(self.engine, splash, phrase + " \n " + _("Initializing..."))
 
@@ -448,11 +447,9 @@ class GuitarScene(Scene):
             self.coOpPlayerMeter = len(self.rock)-1 #make sure it's the last one
 
 
-        #Dialogs.changeLoadingSplashScreenText(self.engine, splash, phrase + " \n " + _("Loading Stage..."))
         stage = os.path.join("themes",themename,"stage.ini")
         self.stage = Stage.Stage(self, self.engine.resource.fileName(stage))
 
-        #Dialogs.changeLoadingSplashScreenText(self.engine, splash, phrase + " \n " + _("Loading Settings..."))
         self.loadSettings()
         self.tsBotNames = [_("KiD"), _("Stump"), _("AkedRobot"), _("Q"), _("MFH"), _("Jurgen")]
         #MFH pre-translate text strings:
