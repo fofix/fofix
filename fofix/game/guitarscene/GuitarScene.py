@@ -94,7 +94,7 @@ class GuitarScene(Scene):
         self.countdownOK = False
 
         #MFH - retrieve game parameters:
-        self.gamePlayers = len(self.engine.world.players)
+        self.gamePlayers = len(self.players)
         self.gameMode1p = self.engine.world.gameMode
         self.gameMode2p = self.engine.world.multiMode
         self.lostFocusPause = self.engine.config.get("game", "lost_focus_pause")
