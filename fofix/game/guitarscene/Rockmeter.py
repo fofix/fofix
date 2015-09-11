@@ -1074,7 +1074,7 @@ class Rockmeter(ConfigGetMixin):
         scene = self.scene
 
         songLength        = scene.lastEvent
-        position          = scene.getSongPosition()
+        position          = scene.songTime
         countdownPosition = songLength - position
         progress          = float(position)/float(songLength)
         if progress < 0:

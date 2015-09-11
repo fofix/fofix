@@ -114,7 +114,6 @@ class BandPlayBaseScene(Scene):
 
 
         self.lastPickPos      = [None for i in self.players]
-        self.lastSongPos      = 0.0
         self.keyBurstTimeout  = [None for i in self.players]
         self.keyBurstPeriod   = 30
 
@@ -420,8 +419,8 @@ class BandPlayBaseScene(Scene):
 
     def pauseGame(self):
         if self.song and self.song.readyToGo:
-            self.song.pause()
             self.pausePos = self.songTime
+            self.song.pause()
             self.pause = True
             for instrument in self.instruments:
                 instrument.paused = True
@@ -624,17 +623,6 @@ class BandPlayBaseScene(Scene):
                 instrument.setBPM(self.currentBpm)
                 instrument.lastBpmChange = self.lastBpmChange
                 instrument.baseBeat = self.baseBeat
-
-
-    def getSongPosition(self):
-        if self.song and self.song.readyToGo:
-            if not self.done:
-                self.lastSongPos = self.song.getPosition()
-                return self.lastSongPos - self.countdown * self.song.period
-            else:
-                # Nice speeding up animation at the end of the song
-                return self.lastSongPos + 4.0 * (1 - self.visibility) * self.song.period
-        return 0.0
 
     #stump: hop a fretboard
     def hopFretboard(self, num, height):
@@ -2336,6 +2324,7 @@ class GuitarScene(BandPlayBaseScene):
         self.targetBpm      = self.currentBpm
         self.lastBpmChange  = -1.0
         self.baseBeat       = 0.0
+        self.songTime       = 0.0
 
 
         if self.midiLyricMode == 2 and not self.playingVocals:
@@ -3308,8 +3297,18 @@ class GuitarScene(BandPlayBaseScene):
     def run(self, ticks): #QQstarS: Fix this funcion
         super(GuitarScene, self).run(ticks)
         if self.song and self.song.readyToGo and not self.pause and not self.failed:
+
+            # calculate song position during the song countdown
+            if self.songTime <= 0:
+                sngPos = self.song.getPosition()
+                if sngPos <= 0.0:
+                    self.songTime = sngPos - self.countdown * self.song.period
+            if self.songTime >= -.02 and self.songTime <= 0.02:
+                self.songTime = 0.0
+
             if not self.resumeCountdown and not self.pause:
-                self.songTime = self.getSongPosition()
+                # increment song position
+                self.songTime += ticks
                 self.song.update(ticks)
 
             if self.vbpmLogicType == 1:
