@@ -170,6 +170,7 @@ class BandPlayBaseScene(Scene):
         #self.tempoBpm = Song.DEFAULT_BPM
         #self.actualBpm = 0.0
         #self.targetPeriod   = 60000.0 / self.targetBpm
+        self.songTime = 0.0
         self.disableVBPM  = self.engine.config.get("game", "disable_vbpm")
         self.currentBpm     = Song.DEFAULT_BPM
         self.currentPeriod  = 60000.0 / self.currentBpm
@@ -420,7 +421,7 @@ class BandPlayBaseScene(Scene):
     def pauseGame(self):
         if self.song and self.song.readyToGo:
             self.song.pause()
-            self.pausePos = self.getSongPosition()
+            self.pausePos = self.songTime
             self.pause = True
             for instrument in self.instruments:
                 instrument.paused = True
@@ -648,6 +649,15 @@ class BandPlayBaseScene(Scene):
         else:
             return -1
 
+
+    def render(self, visibility, topMost):
+        super(BandPlayBaseScene, self).render(visibility, topMost)
+        pass
+
+
+    def run(self, ticks):
+        super(BandPlayBaseScene, self).run(ticks)
+        pass
 
 class GuitarScene(BandPlayBaseScene):
     def __init__(self, engine, libraryName, songName):
@@ -2825,34 +2835,33 @@ class GuitarScene(BandPlayBaseScene):
             if guitar.freestyleActive or (guitar.isDrum and guitar.drumFillsActive):
                 if guitar.freestyleActive:  #MFH - only for BREs, not drum fills.  Will depend on BRE sound option when implemented.
                     self.song.setInstrumentVolume(1.0, self.players[i].part)  #MFH - ensure that every freestyle pick, the volume for that track is set to 1.0
-                pos = self.getSongPosition()
                 score = 0
-                numFreestyleHits = guitar.freestylePick(self.song, pos, self.controls)
+                numFreestyleHits = guitar.freestylePick(self.song, self.songTime, self.controls)
                 if numFreestyleHits>0 or guitar.isDrum:
-                    if guitar.freestyleFirstHit + guitar.freestyleLength < pos :
+                    if guitar.freestyleFirstHit + guitar.freestyleLength < self.songTime :
 
-                        guitar.freestyleFirstHit = pos
+                        guitar.freestyleFirstHit = self.songTime
                         guitar.freestylePeriod = 1500
                         guitar.freestyleBaseScore = 150
                         score = 600 * numFreestyleHits
                         if guitar.isDrum:
                             guitar.drumFillsHits = 0
-                        guitar.freestyleLastHit = pos - guitar.freestylePeriod
+                        guitar.freestyleLastHit = self.songTime - guitar.freestylePeriod
                         for fret in range (0,5):
-                            guitar.freestyleLastFretHitTime[fret] = pos - guitar.freestylePeriod
+                            guitar.freestyleLastFretHitTime[fret] = self.songTime - guitar.freestylePeriod
 
                     if guitar.isDrum:
                         guitar.drumFillsHits += 1
                     for fret in range (5):
                         if self.controls.getState(guitar.keys[fret]) or (self.players[i].controlType == 0 and self.controls.getState(guitar.keys[fret+5])):
-                            hitspeed = min((pos - guitar.freestyleLastFretHitTime[fret]) / guitar.freestylePeriod, 1.0)
+                            hitspeed = min((self.songTime - guitar.freestyleLastFretHitTime[fret]) / guitar.freestylePeriod, 1.0)
                             score += guitar.freestyleBaseScore * hitspeed
                     if numFreestyleHits > 0:    #MFH - to prevent a float division!
                         score = int ( score / numFreestyleHits )
 
                     for fret in range (5):
                         if self.controls.getState(guitar.keys[fret]) or (self.players[i].controlType == 0 and self.controls.getState(guitar.keys[fret+5])):
-                            guitar.freestyleLastFretHitTime[fret] = pos
+                            guitar.freestyleLastFretHitTime[fret] = self.songTime
 
                     #MFH - Add all BRE score to a temporary score accumulator with a separate display box
                     #   and only reward if all notes after the BRE are hit without breaking streak!
@@ -2872,8 +2881,8 @@ class GuitarScene(BandPlayBaseScene):
                             self.scoring[num].freestyleWasJustActive = True
 
                 #MFH - also must ensure notes that pass during this time are marked as skipped without resetting the streak
-                #missedNotes = self.guitars[num].getMissedNotesMFH(self.song, pos, catchup = True)
-                missedNotes = guitar.getMissedNotesMFH(self.song, pos + guitar.earlyMargin, catchup = True)  #MFh - check slightly ahead here.
+                #missedNotes = self.guitars[num].getMissedNotesMFH(self.song, self.songTime, catchup = True)
+                missedNotes = guitar.getMissedNotesMFH(self.song, self.songTime + guitar.earlyMargin, catchup = True)  #MFh - check slightly ahead here.
                 for tym, theNote in missedNotes:   #MFH - also want to mark these notes as Played so they don't count against the note total!
                     theNote.skipped = True
                     if guitar.isDrum:
@@ -3297,18 +3306,14 @@ class GuitarScene(BandPlayBaseScene):
 
 
     def run(self, ticks): #QQstarS: Fix this funcion
+        super(GuitarScene, self).run(ticks)
         if self.song and self.song.readyToGo and not self.pause and not self.failed:
-            Scene.run(self, ticks)
             if not self.resumeCountdown and not self.pause:
-                pos = self.getSongPosition()
-
+                self.songTime = self.getSongPosition()
                 self.song.update(ticks)
-                # update stage
-            else:
-                pos = self.pausePos
 
             if self.vbpmLogicType == 1:
-                self.handleTempo(self.song, pos)  #MFH - new global tempo / BPM handling logic
+                self.handleTempo(self.song, self.songTime)  #MFH - new global tempo / BPM handling logic
 
             if self.bossBattle and self.rock[1] < 0:
                 if self.careerMode and not self.song.info.completed:
@@ -3354,13 +3359,13 @@ class GuitarScene(BandPlayBaseScene):
                     if not somebodyStillAlive:    #only if everybody has failed
                         self.failed = True
 
-            if pos > self.lastDrumNoteTime:   #MFH - disable drum scoring so that the drummer can get down with his bad self at the end of the song without penalty.
+            if self.songTime > self.lastDrumNoteTime:   #MFH - disable drum scoring so that the drummer can get down with his bad self at the end of the song without penalty.
                 self.drumScoringEnabled = False # ...is that what drummers do?
 
             for i,instrument in enumerate(self.instruments):
                 if instrument.isVocal:
-                    instrument.requiredNote = instrument.getRequiredNote(pos, self.song)
-                    instrument.run(ticks, pos)
+                    instrument.requiredNote = instrument.getRequiredNote(self.songTime, self.song)
+                    instrument.run(ticks, self.songTime)
                     scoreBack = instrument.getScoreChange()
                     if scoreBack is not None:
                         points, scoreThresh, taps = scoreBack
@@ -3391,7 +3396,7 @@ class GuitarScene(BandPlayBaseScene):
                         self.activateSP(i)
                         instrument.starPowerActivate = False
                     continue
-                self.stage.run(pos, instrument.currentPeriod)
+                self.stage.run(self.songTime, instrument.currentPeriod)
                 playerNum = i
                 guitar = instrument
 
@@ -3410,11 +3415,10 @@ class GuitarScene(BandPlayBaseScene):
                     if guitar.battleBeingUsed[0] == 0 and guitar.battleBeingUsed[1] != 0:
                         guitar.battleBeingUsed[0] = guitar.battleBeingUsed[1]
                         guitar.battleBeingUsed[1] = 0
-                    time = self.getSongPosition()
 
 
                     if guitar.battleStatus[1]:
-                        if time - guitar.battleDrainStart > guitar.battleDrainLength:
+                        if self.songTime - guitar.battleDrainStart > guitar.battleDrainLength:
                             Log.debug("Drain for Player %d disabled" % i)
                             guitar.battleStatus[1] = False
                             for k, nowUsed in enumerate(guitar.battleBeingUsed):
@@ -3428,7 +3432,7 @@ class GuitarScene(BandPlayBaseScene):
                             guitar.battleBeingUsed[k] = 0
 
                     if guitar.battleStatus[6]:
-                        if time - guitar.battleStartTimes[6] > guitar.battleLeftyLength:
+                        if self.songTime - guitar.battleStartTimes[6] > guitar.battleLeftyLength:
                             Log.debug("Lefty Mode for Player %d disabled" % i)
                             guitar.battleStatus[6] = False
                             for k, nowUsed in enumerate(guitar.battleBeingUsed):
@@ -3436,7 +3440,7 @@ class GuitarScene(BandPlayBaseScene):
                                     guitar.battleBeingUsed[k] = 0
 
                     if guitar.battleStatus[8]:
-                        if time - guitar.battleStartTimes[8] > guitar.battleAmpLength:
+                        if self.songTime - guitar.battleStartTimes[8] > guitar.battleAmpLength:
                             Log.debug("Diff Up Mode for Player %d disabled" % i)
                             guitar.battleStatus[8] = False
                             for k, nowUsed in enumerate(guitar.battleBeingUsed):
@@ -3445,7 +3449,7 @@ class GuitarScene(BandPlayBaseScene):
 
 
                     if guitar.battleStatus[7]:
-                        if time - guitar.battleStartTimes[7] > guitar.battleDoubleLength:
+                        if self.songTime - guitar.battleStartTimes[7] > guitar.battleDoubleLength:
                             Log.debug("Diff Up Mode for Player %d disabled" % i)
                             guitar.battleStatus[7] = False
                             for k, nowUsed in enumerate(guitar.battleBeingUsed):
@@ -3461,7 +3465,7 @@ class GuitarScene(BandPlayBaseScene):
                                     guitar.battleBeingUsed[k] = 0
 
                     if guitar.battleStatus[2]:
-                        if time - guitar.battleStartTimes[2] > guitar.battleDiffUpLength:
+                        if self.songTime - guitar.battleStartTimes[2] > guitar.battleDiffUpLength:
                             Log.debug("Diff Up Mode for Player %d disabled" % i)
                             guitar.battleStatus[2] = False
                             self.song.difficulty[i] = Song.difficulties[guitar.battleDiffUpValue]
@@ -3481,7 +3485,7 @@ class GuitarScene(BandPlayBaseScene):
                 if self.coOpType:
                     scoreCard = self.coOpScoreCard
                     if scoreCard.freestyleWasJustActive and not scoreCard.endingAwarded:
-                        if scoreCard.lastNoteTime < pos and not scoreCard.endingStreakBroken:
+                        if scoreCard.lastNoteTime < self.songTime and not scoreCard.endingStreakBroken:
                             Log.debug("Big Rock Ending bonus awarded for co-op players! %d points." % scoreCard.endingScore)
                             if scoreCard.endingScore > 0:
                                 scoreCard.addEndingScore()
@@ -3544,7 +3548,7 @@ class GuitarScene(BandPlayBaseScene):
                         theGuitar.starPower = self.coOpStarPower/self.numOfPlayers
 
 
-                if not guitar.run(ticks, pos, self.controls):
+                if not guitar.run(ticks, self.songTime, self.controls):
                     # done playing the current notes
                     self.endPick(i)
 
@@ -3555,7 +3559,7 @@ class GuitarScene(BandPlayBaseScene):
 
                 #MFH - ensure this missed notes check doesn't fail you during a freestyle section
                 if guitar.freestyleActive or guitar.drumFillsActive:
-                    missedNotes = guitar.getMissedNotesMFH(self.song, pos + guitar.lateMargin*2, catchup = True)  #MFH - get all notes in the freestyle section.
+                    missedNotes = guitar.getMissedNotesMFH(self.song, self.songTime + guitar.lateMargin*2, catchup = True)  #MFH - get all notes in the freestyle section.
                     for tym, theNote in missedNotes:   #MFH - also want to mark these notes as Played so they don't count against the note total!
                         theNote.skipped = True
                         if guitar.isDrum:
@@ -3564,7 +3568,7 @@ class GuitarScene(BandPlayBaseScene):
                             self.scoring[playerNum].totalStreakNotes -= 1
 
                 else:
-                    missedNotes = guitar.getMissedNotesMFH(self.song, pos)
+                    missedNotes = guitar.getMissedNotesMFH(self.song, self.songTime)
                     if guitar.paused:
                         missedNotes = []
                     if missedNotes:
@@ -3584,7 +3588,7 @@ class GuitarScene(BandPlayBaseScene):
 
                     if (self.scoring[i].streak != 0 or not self.processedFirstNoteYet) and not guitar.playedNotes and len(missedNotes) > 0:
                         if not self.processedFirstNoteYet:
-                            self.stage.triggerMiss(pos)
+                            self.stage.triggerMiss(self.songTime)
                             self.notesMissed[i] = True
                         self.processedFirstNoteYet = True
                         self.currentlyAnimating = False
@@ -3620,7 +3624,7 @@ class GuitarScene(BandPlayBaseScene):
                         if self.instruments[i].starPowerActive == True:
                             clap = True
                             break
-                if pos >= (self.beatTime[0] - 100):
+                if self.songTime >= (self.beatTime[0] - 100):
                     self.beatTime.pop(0)
                     if clap == True:
                         if self.firstClap == False:
@@ -3639,7 +3643,7 @@ class GuitarScene(BandPlayBaseScene):
                 self.updateGuitarSolo(playerNum)
             if self.coOpType:
                 self.handlePhrases(self.coOpPhrase, self.coOpScoreCard.streak)
-            self.handleJurgen(pos)
+            self.handleJurgen(self.songTime)
 
             #stage rotation
             #MFH - logic to prevent advancing rotation frames if you have screwed up, until you resume a streak
@@ -3660,12 +3664,12 @@ class GuitarScene(BandPlayBaseScene):
                     self.coOpStarPower += sp
             if self.coOpRB:
                 if self.unisonIndex < len(self.unisonConfirm) and not self.unisonActive: #akedrou - unison bonuses
-                    while self.unisonConfirm[self.unisonIndex][0] < pos:
+                    while self.unisonConfirm[self.unisonIndex][0] < self.songTime:
                         self.unisonIndex += 1
                         if len(self.unisonConfirm) == self.unisonIndex:
                             break
                     if len(self.unisonConfirm) > self.unisonIndex:
-                        if self.unisonConfirm[self.unisonIndex][0] - pos < self.song.period * 2:
+                        if self.unisonConfirm[self.unisonIndex][0] - self.songTime < self.song.period * 2:
                             self.unisonActive = True
                             self.firstUnison = True
                             self.unisonNum = len(self.unisonPlayers[self.unisonIndex])
@@ -3730,7 +3734,7 @@ class GuitarScene(BandPlayBaseScene):
                 if self.firstUnison:
                     self.firstUnison = False
                     self.firstUnisonDone = True
-                if pos - self.unisonConfirm[self.unisonIndex][1] > 0 and self.firstUnisonDone:
+                if self.songTime - self.unisonConfirm[self.unisonIndex][1] > 0 and self.firstUnisonDone:
                     for i in range(len(self.inUnison)):
                         if self.inUnison[i] != self.haveUnison[i]:
                             break
@@ -3743,7 +3747,7 @@ class GuitarScene(BandPlayBaseScene):
                                 if guitar.starPower > 100:
                                     guitar.starPower = 100
                     self.firstUnisonDone = False
-                if pos - self.unisonConfirm[self.unisonIndex][1] > self.song.period * 2:
+                if self.songTime - self.unisonConfirm[self.unisonIndex][1] > self.song.period * 2:
                     self.unisonIndex+=1
                     self.unisonActive = False
                     self.unisonEarn  = [False for i in self.players]
@@ -3841,7 +3845,7 @@ class GuitarScene(BandPlayBaseScene):
             #MFH
             if self.midiLyricMode == 1 and self.numMidiLyricLines > 0 and (not self.noMoreMidiLineLyrics) and not self.playingVocals:   #line-by-line lyrics mode:
 
-                if pos >= (self.nextMidiLyricStartTime-self.lineByLineStartSlopMs):
+                if self.songTime >= (self.nextMidiLyricStartTime-self.lineByLineStartSlopMs):
                     self.currentSimpleMidiLyricLine = self.nextMidiLyricLine
 
                     if ( self.numMidiLyricLines > self.midiLyricLineIndex+1 ):
@@ -3852,7 +3856,7 @@ class GuitarScene(BandPlayBaseScene):
 
             elif self.midiLyricMode == 2 and self.numMidiLyricLines > 0 and (not self.noMoreMidiLineLyrics) and not self.playingVocals:   #MFH - handle 2-line lyric mode with current-word highlighting advancement
                 #MFH - first, prepare / handle the active / top line (which will have highlighted words / syllables):
-                if pos >= self.nextLyricWordTime:      #time to switch to this word
+                if self.songTime >= self.nextLyricWordTime:      #time to switch to this word
                     if self.nextLyricIsOnNewLine:
                         self.activeMidiLyricLineIndex += 1
                         self.activeMidiLyricWordSubIndex = 0
@@ -3869,7 +3873,7 @@ class GuitarScene(BandPlayBaseScene):
                             self.nextLyricWordTime, self.nextLyricEvent = self.midiLyricLineEvents[self.activeMidiLyricLineIndex][self.activeMidiLyricWordSubIndex]
                             self.activeMidiLyricLine_WhiteWords = ""
                             for nextLyricTime, nextLyricEvent in self.midiLyricLineEvents[self.activeMidiLyricLineIndex]:
-                                if nextLyricTime > pos:
+                                if nextLyricTime > self.songTime:
                                     self.activeMidiLyricLine_WhiteWords = "%s %s" % (self.activeMidiLyricLine_WhiteWords, nextLyricEvent.text)
 
                     else:   #next lyric is on the same line
@@ -3882,7 +3886,7 @@ class GuitarScene(BandPlayBaseScene):
                             self.nextLyricWordTime, self.nextLyricEvent = self.midiLyricLineEvents[self.activeMidiLyricLineIndex][self.activeMidiLyricWordSubIndex]
                             self.activeMidiLyricLine_WhiteWords = ""
                             for nextLyricTime, nextLyricEvent in self.midiLyricLineEvents[self.activeMidiLyricLineIndex]:
-                                if nextLyricTime > pos:
+                                if nextLyricTime > self.songTime:
                                     self.activeMidiLyricLine_WhiteWords = "%s %s" % (self.activeMidiLyricLine_WhiteWords, nextLyricEvent.text)
 
                         else:   #no more words in this line
@@ -3935,7 +3939,7 @@ class GuitarScene(BandPlayBaseScene):
     def renderVocals(self):
         for i, vocalist in enumerate(self.instruments):
             if vocalist.isVocal:
-                vocalist.render(self.visibility, self.song, self.getSongPosition(), self.numOfPlayers)
+                vocalist.render(self.visibility, self.song, self.songTime, self.numOfPlayers)
 
     def renderGuitar(self):
         for i, guitar in enumerate(self.instruments):
@@ -3949,8 +3953,8 @@ class GuitarScene(BandPlayBaseScene):
                     guitar.fretboardHop -= 0.005
                     if guitar.fretboardHop < 0.0:
                         guitar.fretboardHop = 0.0
-                self.neckrender[i].render(self.visibility, self.song, self.getSongPosition())
-                guitar.render(self.visibility, self.song, self.getSongPosition(), self.controls, self.killswitchEngaged[i])  #QQstarS: new
+                self.neckrender[i].render(self.visibility, self.song, self.songTime)
+                guitar.render(self.visibility, self.song, self.songTime, self.controls, self.killswitchEngaged[i])  #QQstarS: new
                 glPopMatrix()
             if self.coOp or self.coOpGH:
                 guitar.rockLevel = self.rock[self.coOpPlayerMeter] / self.rockMax
@@ -3993,18 +3997,16 @@ class GuitarScene(BandPlayBaseScene):
         if not self.song:
             return
 
-        pos = self.getSongPosition()
-
         if self.instruments[num].playedNotes:
             # If all the played notes are tappable, there are no required notes and
             # the last note was played recently enough, ignore this pick
             if self.instruments[num].areNotesTappable(self.instruments[num].playedNotes) and \
-               not self.instruments[num].getRequiredNotesMFH(self.song, pos) and \
-               pos - self.lastPickPos[num] <= self.song.period / 2:
+               not self.instruments[num].getRequiredNotesMFH(self.song, self.songTime) and \
+               self.songTime - self.lastPickPos[num] <= self.song.period / 2:
                 return
             self.endPick(num)
 
-        self.lastPickPos[num] = pos
+        self.lastPickPos[num] = self.songTime
 
         if self.coOpType:
             scoreCard = self.coOpScoreCard
@@ -4015,7 +4017,7 @@ class GuitarScene(BandPlayBaseScene):
         self.killswitchEngaged[num] = False   #always reset killswitch status when picking / tapping
 
         #volshebnyi - disable failing if BRE is active
-        if self.instruments[num].startPick(self.song, pos, self.controls):
+        if self.instruments[num].startPick(self.song, self.songTime, self.controls):
 
             if self.instruments[num].isDrum:
                 self.drumStart = True
@@ -4053,19 +4055,19 @@ class GuitarScene(BandPlayBaseScene):
             if a > star and ((self.inGameStars == 1 and self.theme == 2) or self.inGameStars == 2):
                 self.engine.data.starDingSound.play()
 
-            self.stage.triggerPick(pos, [n[1].number for n in self.instruments[num].playedNotes])
+            self.stage.triggerPick(self.songTime, [n[1].number for n in self.instruments[num].playedNotes])
             if self.coOpGH:
                 if scoreCard.streak%10 == 0:
-                    self.lastMultTime[num] = pos
+                    self.lastMultTime[num] = self.songTime
                     self.instruments[num].setMultiplier(scoreCard.getScoreMultiplier())
             elif not self.battleGH:
                 if self.scoring[num].streak % 10 == 0:
-                    self.lastMultTime[num] = pos
+                    self.lastMultTime[num] = self.songTime
                     self.instruments[num].setMultiplier(self.scoring[num].getScoreMultiplier())
 
             #myfingershurt
             if self.showAccuracy:
-                self.accuracy[num] = self.instruments[num].playedNotes[0][0] - pos
+                self.accuracy[num] = self.instruments[num].playedNotes[0][0] - self.songTime
                 self.dispAccuracy[num] = True
 
             isFirst = True
@@ -4080,7 +4082,7 @@ class GuitarScene(BandPlayBaseScene):
             if self.instruments[num].isDrum:
                 if self.instruments[num].drumFillWasJustActive:
                     ApplyPenalty = False
-                    self.instruments[num].freestylePick(self.song, pos, self.controls)    #MFH - to allow late drum fill SP activation
+                    self.instruments[num].freestylePick(self.song, self.songTime, self.controls)    #MFH - to allow late drum fill SP activation
                     self.instruments[num].drumFillWasJustActive = False
 
             if ApplyPenalty:
@@ -4093,7 +4095,7 @@ class GuitarScene(BandPlayBaseScene):
                     self.scoring[num].endingStreakBroken = True
                 self.instruments[num].setMultiplier(1)
                 self.currentlyAnimating = False
-                self.stage.triggerMiss(pos)
+                self.stage.triggerMiss(self.songTime)
                 self.guitarSoloBroken[num] = True
                 scoreCard.endingStreakBroken = True   #MFH
                 self.notesMissed[num] = True #QQstarS:Set [0] to [i]
@@ -4119,9 +4121,8 @@ class GuitarScene(BandPlayBaseScene):
         if not self.song:
             return
 
-        pos = self.getSongPosition()
         #clear out any missed notes before this pick since they are already missed by virtue of the pick
-        missedNotes = self.instruments[num].getMissedNotes(self.song, pos, catchup = True)
+        missedNotes = self.instruments[num].getMissedNotes(self.song, self.songTime, catchup = True)
 
         if self.coOpType:
             scoreCard = self.coOpScoreCard
@@ -4150,7 +4151,7 @@ class GuitarScene(BandPlayBaseScene):
                 return
 
         #hopo fudge
-        hopoFudge = abs(abs(self.instruments[num].hopoActive) - pos)
+        hopoFudge = abs(abs(self.instruments[num].hopoActive) - self.songTime)
         activeList = [k for k in self.keysList[num] if self.controls.getState(k)]
 
         if len(activeList) == 1 and (self.instruments[num].keys[self.instruments[num].hopoLast] == activeList[0] or self.instruments[num].keys[self.instruments[num].hopoLast+5] == activeList[0]):
@@ -4158,7 +4159,7 @@ class GuitarScene(BandPlayBaseScene):
                 return
 
         self.killswitchEngaged[num] = False   #always reset killswitch status when picking / tapping
-        if self.instruments[num].startPick2(self.song, pos, self.controls, hopo):
+        if self.instruments[num].startPick2(self.song, self.songTime, self.controls, hopo):
             self.song.setInstrumentVolume(1.0, self.players[num].part)
             if self.instruments[num].playedNotes:
                 scoreCard.streak += 1
@@ -4193,14 +4194,14 @@ class GuitarScene(BandPlayBaseScene):
             a = scoreCard.getStarScores()
             if a > star and ((self.inGameStars == 1 and self.theme == 2) or self.inGameStars == 2):
                 self.engine.data.starDingSound.play()
-            self.stage.triggerPick(pos, [n[1].number for n in self.instruments[num].playedNotes])
+            self.stage.triggerPick(self.songTime, [n[1].number for n in self.instruments[num].playedNotes])
             if self.coOpGH:
                 if scoreCard.streak%10 == 0:
-                    self.lastMultTime[num] = pos
+                    self.lastMultTime[num] = self.songTime
                     self.instruments[num].setMultiplier(scoreCard.getScoreMultiplier())
             elif not self.battleGH:
                 if self.scoring[num].streak % 10 == 0:
-                    self.lastMultTime[num] = pos
+                    self.lastMultTime[num] = self.songTime
                     self.instruments[num].setMultiplier(self.scoring[num].getScoreMultiplier())
 
 
@@ -4224,7 +4225,7 @@ class GuitarScene(BandPlayBaseScene):
                 self.scoring[num].streak = 0
                 self.scoring[num].endingStreakBroken = True
             self.instruments[num].setMultiplier(1)
-            self.stage.triggerMiss(pos)
+            self.stage.triggerMiss(self.songTime)
             self.guitarSoloBroken[num] = True
             scoreCard.endingStreakBroken = True   #MFH
 
@@ -4245,9 +4246,8 @@ class GuitarScene(BandPlayBaseScene):
         if not self.song:
             return
 
-        pos = self.getSongPosition()
         #clear out any past the window missed notes before this pick since they are already missed by virtue of the pick
-        missedNotes = self.instruments[num].getMissedNotes(self.song, pos, catchup = True)
+        missedNotes = self.instruments[num].getMissedNotes(self.song, self.songTime, catchup = True)
 
         if self.coOpType:
             scoreCard = self.coOpScoreCard
@@ -4276,7 +4276,7 @@ class GuitarScene(BandPlayBaseScene):
                 return
 
         #hopo fudge
-        hopoFudge = abs(abs(self.instruments[num].hopoActive) - pos)
+        hopoFudge = abs(abs(self.instruments[num].hopoActive) - self.songTime)
         activeList = [k for k in self.keysList[num] if self.controls.getState(k)]
 
         if len(activeList) == 1 and (self.instruments[num].keys[self.instruments[num].hopoLast] == activeList[0] or self.instruments[num].keys[self.instruments[num].hopoLast+5] == activeList[0]):
@@ -4284,7 +4284,7 @@ class GuitarScene(BandPlayBaseScene):
                 return
 
         self.killswitchEngaged[num] = False   #always reset killswitch status when picking / tapping
-        if self.instruments[num].startPick3(self.song, pos, self.controls, hopo):
+        if self.instruments[num].startPick3(self.song, self.songTime, self.controls, hopo):
             self.processedFirstNoteYet = True
             self.song.setInstrumentVolume(1.0, self.players[num].part)
             #Any previous notes missed, but new ones hit, reset streak counter
@@ -4345,19 +4345,19 @@ class GuitarScene(BandPlayBaseScene):
             if a > star and ((self.inGameStars == 1 and self.theme == 2) or self.inGameStars == 2):
                 self.engine.data.starDingSound.play()
 
-            self.stage.triggerPick(pos, [n[1].number for n in self.instruments[num].playedNotes])
+            self.stage.triggerPick(self.songTime, [n[1].number for n in self.instruments[num].playedNotes])
             if self.coOpGH:
                 if scoreCard.streak%10 == 0:
-                    self.lastMultTime[num] = pos
+                    self.lastMultTime[num] = self.songTime
                     self.instruments[num].setMultiplier(scoreCard.getScoreMultiplier())
             else:
                 if self.scoring[num].streak % 10 == 0:
-                    self.lastMultTime[num] = pos
+                    self.lastMultTime[num] = self.songTime
                     self.instruments[num].setMultiplier(self.scoring[num].getScoreMultiplier())
 
             #myfingershurt
             if self.showAccuracy:
-                self.accuracy[num] = self.instruments[num].playedNotes[0][0] - pos
+                self.accuracy[num] = self.instruments[num].playedNotes[0][0] - self.songTime
                 self.dispAccuracy[num] = True
 
         else:
@@ -4375,7 +4375,7 @@ class GuitarScene(BandPlayBaseScene):
             self.guitarSoloBroken[num] = True
             scoreCard.endingStreakBroken = True   #MFH
             self.instruments[num].setMultiplier(1)
-            self.stage.triggerMiss(pos)
+            self.stage.triggerMiss(self.songTime)
 
             self.notesMissed[num] = True  #qqstars
 
@@ -4396,14 +4396,12 @@ class GuitarScene(BandPlayBaseScene):
         if not self.song:
             return
 
-        pos = self.getSongPosition()
-
         if self.coOpType:
             scoreCard = self.coOpScoreCard
         else:
             scoreCard = self.scoring[num]
 
-        missedNotes = self.instruments[num].getMissedNotesMFH(self.song, pos, catchup = True)
+        missedNotes = self.instruments[num].getMissedNotesMFH(self.song, self.songTime, catchup = True)
         if len(missedNotes) > 0:
             self.processedFirstNoteYet = True
             scoreCard.streak = 0
@@ -4436,7 +4434,7 @@ class GuitarScene(BandPlayBaseScene):
                 return
 
         #hopo fudge
-        hopoFudge = abs(abs(self.instruments[num].hopoActive) - pos)
+        hopoFudge = abs(abs(self.instruments[num].hopoActive) - self.songTime)
 
         #myfingershurt
         #Perhaps, if I were to just treat all tappable = 3's as problem notes, and just accept a potential overstrum, that would cover all the bases...
@@ -4481,7 +4479,7 @@ class GuitarScene(BandPlayBaseScene):
             self.instruments[num].hopoProblemNoteNum = -1
 
         self.killswitchEngaged[num] = False   #always reset killswitch status when picking / tapping
-        if self.instruments[num].startPick3(self.song, pos, self.controls, hopo):
+        if self.instruments[num].startPick3(self.song, self.songTime, self.controls, hopo):
             self.processedFirstNoteYet = True
             self.song.setInstrumentVolume(1.0, self.players[num].part)
             #Any previous notes missed, but new ones hit, reset streak counter
@@ -4551,13 +4549,13 @@ class GuitarScene(BandPlayBaseScene):
             if a > star and ((self.inGameStars == 1 and self.theme == 2) or self.inGameStars == 2):
                 self.engine.data.starDingSound.play()
 
-            self.stage.triggerPick(pos, [n[1].number for n in self.instruments[num].playedNotes])
+            self.stage.triggerPick(self.songTime, [n[1].number for n in self.instruments[num].playedNotes])
             if self.scoring[num].streak % 10 == 0:
-                self.lastMultTime[num] = self.getSongPosition()
+                self.lastMultTime[num] = self.songTime
                 self.instruments[num].setMultiplier(self.scoring[num].getScoreMultiplier())
 
             if self.showAccuracy:
-                self.accuracy[num] = self.instruments[num].playedNotes[0][0] - pos
+                self.accuracy[num] = self.instruments[num].playedNotes[0][0] - self.songTime
                 self.dispAccuracy[num] = True
 
         else:
@@ -4616,7 +4614,7 @@ class GuitarScene(BandPlayBaseScene):
                 self.guitarSoloBroken[num] = True
                 scoreCard.endingStreakBroken = True   #MFH
                 self.instruments[num].setMultiplier(1)
-                self.stage.triggerMiss(pos)
+                self.stage.triggerMiss(self.songTime)
                 if self.hopoDebugDisp == 1 and not self.instruments[num].isDrum:
                     problemNoteMatchingList = [(int(tym), noat.number, noat.played) for tym, noat in self.instruments[num].matchingNotes]
                     Log.debug("Miss: dopick3gh2(), fail-startpick3()...HigherFretsHeld: %(higherFrets)s, LastHopoFretHeld: %(lastHopoFret)s, lastStrumWasChord: %(lastStrumChord)s, sameNoteHopoStringFlag: %(sameNoteHopoFlag)s, notesToMatch: %(matchNotes)s, activeFrets: %(activeFrets)s, Song time=%(songTime)s" % \
@@ -4646,17 +4644,16 @@ class GuitarScene(BandPlayBaseScene):
 
     def activateSP(self, num): #QQstarS: Fix this function, add a element "num"
         if self.battleGH: #from akedrou: this will die horribly if you allow vocal players in. Just sayin'. ... sorry?
-            time = self.getSongPosition()
-            if time - self.battleJustUsed[num] > 1500: #must wait 1.5sec before next object use
+            if self.songTime - self.battleJustUsed[num] > 1500: #must wait 1.5sec before next object use
                 if self.instruments[num].battleObjects[0] != 0:
                     self.engine.data.battleUsedSound.play()
                     self.instruments[self.battleTarget[num]].battleStatus[self.instruments[num].battleObjects[0]] = True
                     #start object use on other player
 
-                    self.instruments[self.battleTarget[num]].battleStartTimes[self.instruments[num].battleObjects[0]] = time
+                    self.instruments[self.battleTarget[num]].battleStartTimes[self.instruments[num].battleObjects[0]] = self.songTime
 
                     if self.instruments[num].battleObjects[0] == 1:
-                        self.instruments[self.battleTarget[num]].battleDrainStart = time
+                        self.instruments[self.battleTarget[num]].battleDrainStart = self.songTime
                     elif self.instruments[num].battleObjects[0] == 3:
                         self.instruments[self.battleTarget[num]].battleBreakNow = self.instruments[self.battleTarget[num]].battleBreakLimit
                         self.instruments[self.battleTarget[num]].battleBreakString = random.randint(0,4)
@@ -4674,7 +4671,7 @@ class GuitarScene(BandPlayBaseScene):
                             self.battleText[num] = None
                             self.battleTextTimer[num] = 0
                             self.instruments[num].battleObjectGained = self.instruments[num].battleObjects[0]
-                            self.battleJustUsed[num] = time
+                            self.battleJustUsed[num] = self.songTime
                             return
 
                     #tells us which objects are currently running
@@ -4691,14 +4688,13 @@ class GuitarScene(BandPlayBaseScene):
                     self.instruments[num].battleObjects[2] = 0
                     self.battleText[num] = None
                     self.battleTextTimer[num] = 0
-                    self.battleJustUsed[num] = time
+                    self.battleJustUsed[num] = self.songTime
 
         elif self.coOpGH: #akedrou also says don't let vocal players in GH Co-Op.
             if self.coOpStarPower >= (50 * self.numOfPlayers) and self.instruments[num].starPowerActive == False:
-                time = self.getSongPosition()
-                Log.debug("Star Power Activated at: " + str(time))
-                self.coOpStarPowerActive[num] = time
-                if time - min(self.coOpStarPowerActive) < 300.0 and not self.instruments[num].starPowerActive:
+                Log.debug("Star Power Activated at: " + str(self.songTime))
+                self.coOpStarPowerActive[num] = self.songTime
+                if self.songTime - min(self.coOpStarPowerActive) < 300.0 and not self.instruments[num].starPowerActive:
                     self.engine.data.starActivateSound.play()
                     for i in range(self.numOfPlayers):
                         self.hopFretboard(i, 0.07)  #stump
@@ -4706,17 +4702,17 @@ class GuitarScene(BandPlayBaseScene):
                         self.instruments[i].neck.overdriveFlashCount = 0  #MFH - this triggers the oFlash strings & timer
                         self.instruments[i].neck.ocount = 0  #MFH - this triggers the oFlash strings & timer
                 else:
-                    if time - self.coOpStarPowerTimer > 1000.0:
+                    if self.songTime - self.coOpStarPowerTimer > 1000.0:
                         for i in range(self.numOfPlayers):
-                            Log.debug(str(time - self.coOpStarPowerActive[i]))
-                            if time - self.coOpStarPowerActive[i] < 300.0:
+                            Log.debug(str(self.songTime - self.coOpStarPowerActive[i]))
+                            if self.songTime - self.coOpStarPowerActive[i] < 300.0:
                                 continue
                             if self.instruments[i].isDrum and self.autoDrumStarpowerActivate == 0 and self.numDrumFills < 2:
                                 self.activateSP(i)
                                 break
                             if self.phrases > 1:
                                 self.newScalingText(i, self.tsCoOpStarPower )
-                        self.coOpStarPowerTimer = time
+                        self.coOpStarPowerTimer = self.songTime
 
         else:
             guitar = self.instruments[num]
@@ -4725,7 +4721,7 @@ class GuitarScene(BandPlayBaseScene):
                     while len(self.deadPlayerList) > 0:
                         i = self.deadPlayerList.pop(0) #keeps order intact (with >2 players)
                         if self.instruments[i].coOpFailed and self.timesFailed[i]<3:
-                            self.instruments[i].coOpRescue(self.getSongPosition())
+                            self.instruments[i].coOpRescue(self.songTime)
                             self.rock[i] = self.rockMax * 0.667
                             guitar.starPower -= 50
                             self.engine.data.rescueSound.play()
@@ -4872,8 +4868,7 @@ class GuitarScene(BandPlayBaseScene):
             self.doPick(num)
         elif control in self.keysList[num] and self.song:
             # Check whether we can tap the currently required notes
-            pos   = self.getSongPosition()
-            notes = self.instruments[num].getRequiredNotesMFH(self.song, pos)
+            notes = self.instruments[num].getRequiredNotesMFH(self.song, self.songTime)
 
             if ((self.scoring[num].streak > 0 and self.instruments[num].areNotesTappable(notes)) or \
                 (self.instruments[num].guitarSolo and control in self.soloKeysList[num])) and \
@@ -5095,7 +5090,7 @@ class GuitarScene(BandPlayBaseScene):
 
         noteCount  = len(self.instruments[num].playedNotes)
         if noteCount > 0:
-            pickLength = self.instruments[num].getPickLength(self.getSongPosition())
+            pickLength = self.instruments[num].getPickLength(self.songTime)
             if pickLength > 0.5 * (self.song.period / 4):
                 return True
             else:
@@ -5111,7 +5106,7 @@ class GuitarScene(BandPlayBaseScene):
         else:
             scoreCard = self.scoring[num]
         noteCount  = len(self.instruments[num].playedNotes)
-        pickLength = self.instruments[num].getPickLength(self.getSongPosition())
+        pickLength = self.instruments[num].getPickLength(self.songTime)
         if pickLength > 1.1 * self.song.period / 4:
             tempExtraScore = self.baseSustainScore * pickLength * noteCount
             if self.starScoreUpdates == 1:
@@ -5143,15 +5138,14 @@ class GuitarScene(BandPlayBaseScene):
 
         if control in self.keysList[num] and self.song:
             # Check whether we can tap the currently required notes
-            pos   = self.getSongPosition()
-            notes = self.instruments[num].getRequiredNotesMFH(self.song, pos)
+            notes = self.instruments[num].getRequiredNotesMFH(self.song, self.songTime)
 
             if ((self.scoring[num].streak > 0 and self.instruments[num].areNotesTappable(notes)) or \
                 (self.instruments[num].guitarSolo and control in self.soloKeysList[num])) and \
                self.instruments[num].controlsMatchNotes(self.controls, notes):
                 self.doPick(num)
             # Otherwise we end the pick if the notes have been playing long enough
-            elif self.lastPickPos[num] is not None and pos - self.lastPickPos[num] > self.song.period / 2:
+            elif self.lastPickPos[num] is not None and self.songTime - self.lastPickPos[num] > self.song.period / 2:
                 self.endPick(num)
 
         #Digital killswitch disengage:
@@ -5219,8 +5213,6 @@ class GuitarScene(BandPlayBaseScene):
         #myfingershurt: Alarian's auto-stage scaling update
         w = self.wFull
         h = self.hFull
-        wBak = w
-        hBak = h
 
         font    = self.engine.data.font
         lyricFont = self.engine.data.songFont
@@ -5229,7 +5221,6 @@ class GuitarScene(BandPlayBaseScene):
 
 
         if self.song and self.song.readyToGo:
-            pos = self.getSongPosition()
             #weirdpeople - differant styles for the start animation of the fretboard
             if self.neckintroAnimationType == 0 or (self.neckintroAnimationType == 4 and self.neckintroThemeType == "fofix"): #Original
                 if self.boardY <= 1:
@@ -5263,19 +5254,21 @@ class GuitarScene(BandPlayBaseScene):
                 if self.countdown > 0:
                     self.countdownOK = True
 
-            Scene.render(self, visibility, topMost) #MFH - I believe this eventually calls the renderGuitar function, which also involves two viewports... may not be easy to move this one...
+            super(GuitarScene, self).render(visibility, topMost)
 
             self.visibility = v = 1.0 - ((1 - visibility) ** 2)
 
             with self.engine.view.orthogonalProjection(normalize = True):
 
                 self.renderVocals()
+
                 #MFH: render the note sheet just on top of the background:
                 if self.lyricSheet != None and not self.playingVocals:
                     drawImage(self.lyricSheet, scale = (1.0,-1.0), coord = (w/2, h*0.935), stretched = FIT_WIDTH)
                     #the timing line on this lyric sheet image is approx. 1/4 over from the left
                 #MFH - also render the scrolling lyrics & sections before changing viewports:
 
+                # TODO - Lyrics rendering related code should be broken out into either its own class or function.
                 for instrument in self.instruments:
                     if instrument.isVocal == True:
                         minInst = instrument.currentPeriod * 2
@@ -5291,8 +5284,8 @@ class GuitarScene(BandPlayBaseScene):
                         minInst = 1000
                         maxInst = 3000
                         slopPer = 2000
-                minPos = pos - minInst
-                maxPos = pos + maxInst
+                minPos = self.songTime - minInst
+                maxPos = self.songTime + maxInst
                 eventWindow = (maxPos - minPos)
                 lyricSlop = ( slopPer / ((maxPos - minPos)/2) ) / 2
 
@@ -5312,7 +5305,7 @@ class GuitarScene(BandPlayBaseScene):
                                 #is event happening now?
                                 #this version will turn events green right as they hit the line and then grey shortly afterwards
                                 #instead of an equal margin on both sides.
-                                xOffset = (time - pos) / eventWindow
+                                xOffset = (time - self.songTime) / eventWindow
                                 EventHappeningNow = False
                                 if xOffset < (0.0 - lyricSlop * 2.0):   #past
                                     glColor3f(0.5, 0.5, 0.5)
@@ -5340,7 +5333,7 @@ class GuitarScene(BandPlayBaseScene):
                                         #gh3 or other standard mod
                                         yOffset = 0.69
                                         txtSize = 0.00175
-                                    xOffset = (time - pos) / eventWindow
+                                    xOffset = (time - self.songTime) / eventWindow
                                     EventHappeningNow = False
                                     if xOffset < (0.0 - lyricSlop * 2.0):   #past
                                         glColor3f(0.5, 0.5, 0.5)
@@ -5408,7 +5401,7 @@ class GuitarScene(BandPlayBaseScene):
                                 else:
                                     yOffset = 0.69
                                     txtSize = 0.00175
-                                xOffset = (time - pos) / eventWindow
+                                xOffset = (time - self.songTime) / eventWindow
                                 EventHappeningNow = False
                                 if xOffset < (0.0 - lyricSlop * 2.0):   #past
                                     glColor3f(0.5, 0.5, 0.5)
@@ -5423,8 +5416,7 @@ class GuitarScene(BandPlayBaseScene):
                                 txtSize = 0.00124
                                 lyricFont.render(event.text, (xOffset, yOffset),(1, 0, 0),txtSize)
 
-                now = self.getSongPosition()
-                countdownPos = self.lastEvent - now
+                countdownPos = self.lastEvent - self.songTime
 
                 for i,player in enumerate(self.players): #QQstarS: This part has big fix. I add the code into it,So he can shown corect
                     p = player.guitarNum
@@ -5468,6 +5460,7 @@ class GuitarScene(BandPlayBaseScene):
                                 if self.engine.graphicMenuShown == False:
                                     drawImage(self.pauseScreen, scale = (self.pause_bkg[2], -self.pause_bkg[3]), coord = (w*self.pause_bkg[0],h*self.pause_bkg[1]), stretched = FULL_SCREEN)
 
+                            # TODO - Break failscreen code out into a function/class
                             if self.finalFailed and self.song:
                                 self.engine.view.setViewport(1,0)
                                 if self.engine.graphicMenuShown == False:
@@ -5482,7 +5475,7 @@ class GuitarScene(BandPlayBaseScene):
 
                                 diff = str(self.players[0].difficulty)
                                 # compute initial position
-                                pctComplete = min(100, int(now/self.lastEvent*100))
+                                pctComplete = min(100, int(self.songTime/self.lastEvent*100))
 
                                 curxpos = font.getStringSize(_("COMPLETED")+" ", scale = 0.0015)[0]
                                 curxpos += font.getStringSize(str(pctComplete), scale = 0.003)[0]
@@ -5530,9 +5523,6 @@ class GuitarScene(BandPlayBaseScene):
                         if self.coOpType:
                             self.engine.view.setViewport(1,0)
 
-                        w = wBak
-                        h = hBak
-
                     if self.song and self.song.readyToGo:
 
                         if not self.coOpRB and not self.coOpGH:
@@ -5542,7 +5532,7 @@ class GuitarScene(BandPlayBaseScene):
                                 self.engine.view.setViewportHalf(1,0)
 
                         #MFH: Realtime hit accuracy display:
-
+                        # TODO - Maybe break degug overlays into a function.
                         if ((self.inGameStats == 2 or (self.inGameStats == 1 and self.theme == 2) or self.hopoDebugDisp == 1 ) and (not self.pause and not self.failed) and not (self.coOpType and not i==0 and not self.coOp) and not self.battleGH):
                             #will not show on pause screen, unless HOPO debug is on (for debugging)
                             if self.coOpRB or self.coOpGH:
@@ -5830,7 +5820,7 @@ class GuitarScene(BandPlayBaseScene):
                                         if isinstance(event, Song.MarkerNote):
                                             if (event.number == Song.starPowerMarkingNote) and (self.song.midiStyle == Song.MIDI_TYPE_RB):    #solo marker note.
                                                 soloChangeNow = False
-                                                xOffset = (time - pos) / eventWindow + .15
+                                                xOffset = (time - self.songTime) / eventWindow + .15
                                                 if xOffset < lyricSlop / 16.0:   #present
                                                     soloChangeNow = True
                                                 if soloChangeNow:
@@ -5847,7 +5837,7 @@ class GuitarScene(BandPlayBaseScene):
                                 elif self.markSolos == 1:   #fall back on old guitar solo marking system
                                     for time, event in self.song.eventTracks[Song.TK_GUITAR_SOLOS].getEvents(minPos, maxPos):
                                         #is event happening now?
-                                        xOffset = (time - pos) / eventWindow + .15
+                                        xOffset = (time - self.songTime) / eventWindow + .15
                                         EventHappeningNow = False
                                         if xOffset < (0.0 - lyricSlop * 2.0):   #past
                                             EventHappeningNow = False
@@ -6094,13 +6084,11 @@ class GuitarScene(BandPlayBaseScene):
                             w, h = font.getStringSize(text, scale = 0.00140)
                             font.render(text, (self.fpsRenderPos[0], self.fpsRenderPos[1] - h/2), (1,0,0), 0.00140)
 
-                        pos = self.getSongPosition()
-
                         if self.showScriptLyrics and not self.pause and not self.failed:
-                            for time, event in self.song.eventTracks[Song.TK_SCRIPT].getEvents(pos - self.song.period * 2, pos + self.song.period * 4): #MFH - script track
+                            for time, event in self.song.eventTracks[Song.TK_SCRIPT].getEvents(self.songTime - self.song.period * 2, self.songTime + self.song.period * 4): #MFH - script track
 
                                 if isinstance(event, PictureEvent):
-                                    if pos < time or pos > time + event.length:
+                                    if self.songTime < time or self.songTime > time + event.length:
                                         continue
 
                                     try:
@@ -6119,12 +6107,12 @@ class GuitarScene(BandPlayBaseScene):
                                         yOffset = 0.69
 
                                     fadePeriod = 500.0
-                                    f = (1.0 - min(1.0, abs(pos - time) / fadePeriod) * min(1.0, abs(pos - time - event.length) / fadePeriod)) ** 2
+                                    f = (1.0 - min(1.0, abs(self.songTime - time) / fadePeriod) * min(1.0, abs(self.songTime - time - event.length) / fadePeriod)) ** 2
 
                                     drawImage(picture, scale = (1, -1), coord = (w / 2, (f * -2 + 1) * h/2+yOffset))
 
                                 elif isinstance(event, TextEvent):
-                                    if pos >= time and pos <= time + event.length and not self.ending:    #myfingershurt: to not display events after ending!
+                                    if self.songTime >= time and self.songTime <= time + event.length and not self.ending:    #myfingershurt: to not display events after ending!
 
                                         xOffset = 0.5
                                         if self.scriptLyricPos == 0:
@@ -6205,6 +6193,9 @@ class GuitarScene(BandPlayBaseScene):
                         if self.countdownSeconds < 6:
                             if self.counting:
                                 for i,player in enumerate(self.players):
+                                    text = player.name
+                                    w2, h2 = font.getStringSize(text)
+
                                     if not self.instruments[i].isVocal:
                                         w = self.wPlayer[i]
                                         h = self.hPlayer[i]
@@ -6213,9 +6204,8 @@ class GuitarScene(BandPlayBaseScene):
                                         partX = ((i*2)+1) / (self.numOfPlayers*2.0)
                                         drawImage(self.part[i], scale = (partwFactor*0.25,partwFactor*-0.25), coord = (w*partX,h*.4), color = (1,1,1, 3.0 - abs(4.0 - self.countdownSeconds)))
                                         self.engine.theme.setBaseColor(min(1.0, 3.0 - abs(4.0 - self.countdownSeconds)))
-                                        text = player.name
-                                        w, h = font.getStringSize(text)
-                                        font.render(text,  (partX - w*.5, .5))
+
+                                        font.render(text,  (partX - w2*.5, .5))
                                     else:
                                         w = self.wFull
                                         h = self.hFull
@@ -6223,9 +6213,8 @@ class GuitarScene(BandPlayBaseScene):
                                         partwFactor = 250.000/partImgWidth
                                         drawImage(self.part[i], scale = (partwFactor*0.25, partwFactor*-0.25), coord = (w*.5,h*.75), color = (1,1,1, 3.0 - abs(4.0 - self.countdownSeconds)))
                                         self.engine.theme.setBaseColor(min(1.0, 3.0 - abs(4.0 - self.countdownSeconds)))
-                                        text = player.name
-                                        w, h = font.getStringSize(text)
-                                        font.render(text,  (.5 - w*.5, .25))
+
+                                        font.render(text,  (.5 - w2*.5, .25))
                             else:
                                 scale = 0.002 + 0.0005 * (self.countdownSeconds % 1) ** 3
                                 text = "%d" % (self.countdownSeconds)
@@ -6271,17 +6260,17 @@ class GuitarScene(BandPlayBaseScene):
                             Dialogs.wrapText(songFont, (self.songInfoDisplayX, self.songInfoDisplayY - h / 2), "%s \n %s%s%s%s%s" % (Song.removeSongOrderPrefixFromName(self.song.info.name), cover, self.song.info.artist, comma, self.song.info.year, extra), rightMargin = .6, scale = self.songInfoDisplayScale)
                     else:
                         #mfh: this is where the song countdown display is generated:
-                        if pos < 0:
-                            pos = 0
+                        if self.songTime < 0:
+                            self.songTime = 0
                         if countdownPos < 0:
                             countdownPos = 0
                         self.engine.theme.setBaseColor()
 
                         #Party mode #FIXME
                         if self.partyMode == True:
-                            timeleft = (now - self.partySwitch) / 1000
+                            timeleft = (self.songTime - self.partySwitch) / 1000
                             if timeleft > self.partyTime:
-                                self.partySwitch = now
+                                self.partySwitch = self.songTime
                                 if self.partyPlayer == 0:
                                     self.instruments[0].keys = PLAYER2KEYS
                                     self.instruments[0].actions = PLAYER2ACTIONS
