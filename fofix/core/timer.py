@@ -36,13 +36,17 @@ else:
 class Timer(object):
     def __init__(self):
 
-        self.currentTime = self.previousTime = self.time()
+        self.startTime = self.currentTime = self.previousTime = self.time()
 
         self.tickDelta = 0
 
     def time(self):
         ''' Get current time in milliseconds '''
         return timeFunc() * 1000
+
+    def delta_time(self):
+        '''Return time delta since startTime'''
+        return self.time() - self.startTime
 
     def tick(self):
         ''' Returns the delta between the current and previous ticks '''
