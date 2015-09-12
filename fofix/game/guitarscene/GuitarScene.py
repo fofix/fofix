@@ -3303,9 +3303,6 @@ class GuitarScene(BandPlayBaseScene):
                 sngPos = self.song.getPosition()
                 if sngPos <= 0.0:
                     self.songTime = sngPos - self.countdown * self.song.period
-            if self.songTime >= -.02 and self.songTime <= 0.02:
-                self.songTime = 0.0
-
             if not self.resumeCountdown and not self.pause:
                 # increment song position
                 self.songTime += ticks
