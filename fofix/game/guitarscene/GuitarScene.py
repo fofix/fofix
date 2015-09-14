@@ -169,7 +169,7 @@ class BandPlayBaseScene(Scene):
         #self.tempoBpm = Song.DEFAULT_BPM
         #self.actualBpm = 0.0
         #self.targetPeriod   = 60000.0 / self.targetBpm
-        self.songTime = 0.0
+        self.songTime = -self.engine.config.get('audio', 'delay')
         self.disableVBPM  = self.engine.config.get("game", "disable_vbpm")
         self.currentBpm     = Song.DEFAULT_BPM
         self.currentPeriod  = 60000.0 / self.currentBpm
@@ -2324,7 +2324,7 @@ class GuitarScene(BandPlayBaseScene):
         self.targetBpm      = self.currentBpm
         self.lastBpmChange  = -1.0
         self.baseBeat       = 0.0
-        self.songTime       = 0.0
+        self.songTime = -self.engine.config.get('audio', 'delay')
 
 
         if self.midiLyricMode == 2 and not self.playingVocals:
@@ -3299,11 +3299,11 @@ class GuitarScene(BandPlayBaseScene):
         if self.song and self.song.readyToGo and not self.pause and not self.failed:
 
             # calculate song position during the song countdown
-            if self.songTime <= 0:
+            if self.songTime <= -self.song.delay:
                 sngPos = self.song.getPosition()
-                if sngPos <= 0.0:
+                if sngPos == -self.song.delay:
                     self.songTime = sngPos - self.countdown * self.song.period
-            if not self.resumeCountdown and not self.pause:
+            if not self.countdown and not self.resumeCountdown and not self.pause:
                 # increment song position
                 self.songTime += ticks
                 self.song.update(ticks)
@@ -6256,8 +6256,6 @@ class GuitarScene(BandPlayBaseScene):
                             Dialogs.wrapText(songFont, (self.songInfoDisplayX, self.songInfoDisplayY - h / 2), "%s \n %s%s%s%s%s" % (Song.removeSongOrderPrefixFromName(self.song.info.name), cover, self.song.info.artist, comma, self.song.info.year, extra), rightMargin = .6, scale = self.songInfoDisplayScale)
                     else:
                         #mfh: this is where the song countdown display is generated:
-                        if self.songTime < 0:
-                            self.songTime = 0
                         if countdownPos < 0:
                             countdownPos = 0
                         self.engine.theme.setBaseColor()
