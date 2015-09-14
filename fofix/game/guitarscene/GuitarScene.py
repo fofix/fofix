@@ -6247,4 +6247,3 @@ class GuitarScene(BandPlayBaseScene):
                         #mfh: this is where the song countdown display is generated:
                         if countdownPos < 0:
                             countdownPos = 0
-                        self.engine.theme.setBaseColor()
