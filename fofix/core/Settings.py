@@ -710,7 +710,6 @@ class SettingsMenu(Menu.Menu):
           ConfigChoice(self.engine, self.engine.config, "game", "ignore_open_strums", autoApply = True),      #myfingershurt
           ConfigChoice(self.engine, self.engine.config, "game", "big_rock_endings", autoApply = True, isQuickset = 2),#myfingershurt
           ConfigChoice(self.engine, self.engine.config, "game", "starpower_mode", autoApply = True),#myfingershurt
-          ConfigChoice(self.engine, self.engine.config, "game", "party_time", autoApply = True),
           ConfigChoice(self.engine, self.engine.config, "game", "keep_play_count", autoApply = True),
           ConfigChoice(self.engine, self.engine.config, "game", "lost_focus_pause", autoApply = True),
         ]

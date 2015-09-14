@@ -971,17 +971,13 @@ class Player(object):
 
     def getPart(self):
         #myfingershurt: this should not be reading from the ini file each time it wants to know the part.  Also add "self."
-        if self.whichPart == -1:
-            return "Party Mode"
-        elif self.whichPart == -2:
+        if self.whichPart == -2:
             return "No Player 2"
         else:
             return Song.parts.get(self.whichPart)
 
     def setPart(self, part):
-        if part == "Party Mode":
-            self.whichPart = -1    #myfingershurt: also need to set self.part here to avoid unnecessary ini reads
-        elif part == "No Player 2":
+        if part == "No Player 2":
             self.whichPart = -2    #myfingershurt: also need to set self.part here to avoid unnecessary ini reads
         else:
             self.whichPart = part.id    #myfingershurt: also need to set self.part here to avoid unnecessary ini reads

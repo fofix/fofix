@@ -684,15 +684,8 @@ class GuitarScene(BandPlayBaseScene):
 
         if self.gameMode1p == 1:
             self.practiceMode = True
-
-        #MFH - check for party mode
-        if self.gameMode2p == 2:
-            self.partyMode  = True
-            self.gamePlayers      = 1
-            self.partySwitch      = 0
-            self.partyTime        = self.engine.config.get("game", "party_time")
-            self.partyPlayer      = 0
-        elif self.gamePlayers > 1:
+        
+        if self.gamePlayers > 1:
             #MFH - check for battle mode
             if self.gameMode2p == 1:
                 self.battle   = True
@@ -701,6 +694,9 @@ class GuitarScene(BandPlayBaseScene):
                 self.coOpRB   = False
                 self.coOpGH   = False
                 self.coOpType = False
+
+            # Mode 2 was party mode
+
             elif self.gameMode2p == 3:
                 self.battle   = False
                 self.battleGH = False
@@ -2369,10 +2365,6 @@ class GuitarScene(BandPlayBaseScene):
             instrument.neck.guitarSolo = False
             instrument.currentGuitarSoloHitNotes = 0
 
-        if self.partyMode == True:
-            self.instruments[0].keys = self.players[0].keys
-            self.instruments[0].actions = self.players[0].actions
-            self.keysList   = self.players[0].keys
         if self.battle == True:
             for i in range(self.numOfPlayers):
                 self.instruments[i].actions = self.players[i].actions
@@ -6259,32 +6251,3 @@ class GuitarScene(BandPlayBaseScene):
                         if countdownPos < 0:
                             countdownPos = 0
                         self.engine.theme.setBaseColor()
-
-                        #Party mode #FIXME
-                        if self.partyMode == True:
-                            timeleft = (self.songTime - self.partySwitch) / 1000
-                            if timeleft > self.partyTime:
-                                self.partySwitch = self.songTime
-                                if self.partyPlayer == 0:
-                                    self.instruments[0].keys = PLAYER2KEYS
-                                    self.instruments[0].actions = PLAYER2ACTIONS
-                                    self.keysList   = [PLAYER2KEYS]
-                                    self.partyPlayer = 1
-                                else:
-                                    self.instruments[0].keys = PLAYER1KEYS
-                                    self.instruments[0].actions = PLAYER1ACTIONS
-                                    self.keysList   = [PLAYER1KEYS]
-                                    self.partyPlayer = 0
-                            t = "%d" % (self.partyTime - timeleft + 1)
-                            if self.partyTime - timeleft < 5:
-                                glColor3f(1, 0, 0)
-                                w, h = font.getStringSize(t)#QQstarS:party
-                                font.render(t,  (.5 - w / 2, 0.4))  #QQstarS:party
-                            elif self.partySwitch != 0 and timeleft < 1:
-                                t = "Switch"
-                                glColor3f(0, 1, 0)
-                                w, h = font.getStringSize(t)#QQstarS:party
-                                font.render(t,  (.5 - w / 2, 0.4))#QQstarS:party
-                            else:#QQstarS:party
-                                w, h = font.getStringSize(t)
-                                font.render(t,  (.5 - w / 2, y + h))

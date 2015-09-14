@@ -175,7 +175,6 @@ class MainMenu(BackgroundLayer):
         multPlayerMenu = [
             (_("Face-Off"),     lambda: self.newLocalGame(players = 2,             maxplayers = 4)),
             (_("Pro Face-Off"), lambda: self.newLocalGame(players = 2, mode2p = 1, maxplayers = 4)),
-            (_("Party Mode"),   lambda: self.newLocalGame(             mode2p = 2)),
             (_("FoFiX Co-Op"),  lambda: self.newLocalGame(players = 2, mode2p = 3, maxplayers = 4, allowMic = allowMic)),
             (_("RB Co-Op"),     lambda: self.newLocalGame(players = 2, mode2p = 4, maxplayers = 4, allowMic = allowMic)),
             (_("GH Co-Op"),     lambda: self.newLocalGame(players = 2, mode2p = 5, maxplayers = 4)),
