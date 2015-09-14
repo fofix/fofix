@@ -383,7 +383,6 @@ class BandPlayBaseScene(Scene):
         # before the song begins
 
 
-        self.partySwitch = 0
         for instrument in self.instruments:
             if instrument.isVocal:
                 instrument.stopMic()
@@ -405,7 +404,6 @@ class BandPlayBaseScene(Scene):
         if not self.song:
             return
 
-        self.partySwitch = 0
         for i,instrument in enumerate(self.instruments):
             if instrument.isVocal:
                 instrument.stopMic()
@@ -652,7 +650,6 @@ class GuitarScene(BandPlayBaseScene):
         superClass = super(GuitarScene, self)
         superClass.__init__(engine, libraryName, songName)
 
-        self.partyMode = False
         self.battle = False #QQstarS:new2 Bettle
         self.battleGH = False #Qstick
         self.coOp = False
@@ -684,7 +681,7 @@ class GuitarScene(BandPlayBaseScene):
 
         if self.gameMode1p == 1:
             self.practiceMode = True
-        
+
         if self.gamePlayers > 1:
             #MFH - check for battle mode
             if self.gameMode2p == 1:
