@@ -940,9 +940,6 @@ class Rockmeter(ConfigGetMixin):
             else:
                 self.createGroup(self.section, i)
 
-        print self.layerGroups
-        print self.sharedLayerGroups
-        print self.layersForRender
         self.reset()
 
     def reset(self):
