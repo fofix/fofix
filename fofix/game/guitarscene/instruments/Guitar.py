@@ -501,67 +501,6 @@ class Guitar(Instrument):
 
         return True
 
-    def controlsMatchNotes2(self, controls, notes, hopo = False):
-        # no notes?
-        if not notes:
-            return False
-
-        # check each valid chord
-        chords = {}
-        for time, note in notes:
-            if note.hopod == True and (controls.getState(self.keys[note.number]) or controls.getState(self.keys[note.number + 5])):
-                self.playedNotes = []
-                return True
-            if not time in chords:
-                chords[time] = []
-            chords[time].append((time, note))
-
-        #Make sure the notes are in the right time order
-        chordlist = chords.values()
-        chordlist.sort(lambda a, b: cmp(a[0][0], b[0][0]))
-
-        twochord = 0
-        for chord in chordlist:
-            # matching keys?
-            requiredKeys = [note.number for time, note in chord]
-            requiredKeys = self.uniqify(requiredKeys)
-
-            if len(requiredKeys) > 2 and self.twoChordMax == True:
-                twochord = 0
-                for n, k in enumerate(self.keys):
-                    if controls.getState(k):
-                        twochord += 1
-                if twochord == 2:
-                    skipped = len(requiredKeys) - 2
-                    requiredKeys = [min(requiredKeys), max(requiredKeys)]
-                else:
-                    twochord = 0
-
-            for n in range(self.strings):
-                if n in requiredKeys and not (controls.getState(self.keys[n]) or controls.getState(self.keys[n+5])):
-                    return False
-                if not n in requiredKeys and (controls.getState(self.keys[n]) or controls.getState(self.keys[n+5])):
-                    # The lower frets can be held down
-                    if hopo == False and n >= min(requiredKeys):
-                        return False
-            if twochord != 0:
-                if twochord != 2:
-                    for time, note in chord:
-                        note.played = True
-                else:
-                    self.twoChordApply = True
-                    for time, note in chord:
-                        note.skipped = True
-                    chord[0][1].skipped = False
-                    chord[-1][1].skipped = False
-                    chord[0][1].played = True
-                    chord[-1][1].played = True
-
-        if twochord == 2:
-            self.twoChord += skipped
-
-        return True
-
     def controlsMatchNotes3(self, controls, notes, hopo = False):
         # no notes?
         if not notes:
@@ -631,62 +570,12 @@ class Guitar(Instrument):
 
         return True
 
-    #MFH - special function for HOPO intentions checking
-    def controlsMatchNextChord(self, controls, notes):
-        # no notes?
-        if not notes:
-            return False
-
-        # check each valid chord
-        chords = {}
-        for time, note in notes:
-            if not time in chords:
-                chords[time] = []
-            chords[time].append((time, note))
-
-        #Make sure the notes are in the right time order
-        chordlist = chords.values()
-        chordlist.sort(key=lambda a: a[0][0])
-
-        twochord = 0
-        for chord in chordlist:
-            # matching keys?
-            self.requiredKeys = [note.number for time, note in chord]
-            self.requiredKeys = self.uniqify(self.requiredKeys)
-
-            if len(self.requiredKeys) > 2 and self.twoChordMax == True:
-                twochord = 0
-                self.twoChordApply = True
-                for n, k in enumerate(self.keys):
-                    if controls.getState(k):
-                        twochord += 1
-                if twochord == 2:
-                    self.requiredKeys = [min(self.requiredKeys), max(self.requiredKeys)]
-                else:
-                    twochord = 0
-
-            if (self.controlsMatchNote3(controls, chord, self.requiredKeys, False)):
-                return True
-            else:
-                return False
-
-
-
-
-    def uniqify(self, seq, idfun=None):
-        # order preserving
-        if idfun is None:
-            def idfun(x): return x
-        seen = {}
+    def uniqify(self, seq):
         result = []
-        for item in seq:
-            marker = idfun(item)
-            # in old Python versions:
-            # if seen.has_key(marker)
-            # but in new ones:
-            if marker in seen: continue
-            seen[marker] = 1
-            result.append(item)
+        for marker in seq:
+            if marker in result:
+                continue
+            result.append(marker)
         return result
 
     def controlsMatchNote3(self, controls, chordTuple, requiredKeys, hopo):
@@ -731,43 +620,6 @@ class Guitar(Instrument):
                 self.playedNotes.append([time, note])
                 if self.guitarSolo:
                     self.currentGuitarSoloHitNotes += 1
-            return True
-        return False
-
-    def startPick2(self, song, pos, controls, hopo = False):
-        if not song:
-            return False
-        if not song.readyToGo:
-            return False
-
-        self.playedNotes = []
-
-        self.matchingNotes = self.getRequiredNotes(song, pos)
-
-        if self.controlsMatchNotes2(controls, self.matchingNotes, hopo):
-            self.pickStartPos = pos
-            for time, note in self.matchingNotes:
-                if note.skipped == True:
-                    continue
-                self.pickStartPos = max(self.pickStartPos, time)
-                if hopo:
-                    note.hopod        = True
-                else:
-                    note.played       = True
-                if note.tappable == 1 or note.tappable == 2:
-                    self.hopoActive = time
-                    self.wasLastNoteHopod = True
-                elif note.tappable == 3:
-                    self.hopoActive = -time
-                    self.wasLastNoteHopod = True
-                else:
-                    self.hopoActive = 0
-                    self.wasLastNoteHopod = False
-                self.playedNotes.append([time, note])
-                if self.guitarSolo:
-                    self.currentGuitarSoloHitNotes += 1
-
-            self.hopoLast     = note.number
             return True
         return False
 

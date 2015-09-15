@@ -2867,12 +2867,7 @@ class GuitarScene(BandPlayBaseScene):
                 if guitar.isDrum:
                     self.doPick(i)
                 else:
-                    if self.hopoStyle ==  1:   #1 = rf-mod
-                        self.doPick3RF(i, hopo)
-                    elif self.hopoStyle == 2 or self.hopoStyle == 3 or self.hopoStyle == 4:  #GH2 style HOPO
-                        self.doPick3GH2(i, hopo, pullOff)
-                    else:   #2 = no HOPOs
-                        self.doPick(i)
+                    self.doPick3GH2(i, hopo, pullOff)
 
     def handleJurgen(self, pos):
         chordFudge = 1   #MFH - was 10 - #myfingershurt - needed to detect chords
@@ -3974,156 +3969,6 @@ class GuitarScene(BandPlayBaseScene):
         if self.instruments[num].isDrum and self.bassKickSoundEnabled:
             self.instruments[num].playDrumSounds(self.controls, playBassDrumOnly = True)
 
-    def doPick3RF(self, num, hopo = False):
-        if not self.song:
-            return
-
-        #clear out any past the window missed notes before this pick since they are already missed by virtue of the pick
-        missedNotes = self.instruments[num].getMissedNotes(self.song, self.songTime, catchup = True)
-
-        if self.coOpType:
-            scoreCard = self.coOpScoreCard
-        else:
-            scoreCard = self.scoring[num]
-
-        if len(missedNotes) > 0:
-            self.processedFirstNoteYet = True
-            scoreCard.streak = 0
-            if self.coOpType:
-                self.scoring[num].streak = 0
-                self.scoring[num].endingStreakBroken = True
-            self.instruments[num].setMultiplier(1)
-            self.instruments[num].hopoActive = 0
-            self.instruments[num].wasLastNoteHopod = False
-            self.instruments[num].hopoLast = -1
-            self.guitarSoloBroken[num] = True
-            scoreCard.endingStreakBroken = True   #MFH
-
-            self.notesMissed[num] = True  #qqstars
-            for tym, theNote in missedNotes:  #MFH
-                if theNote.star or theNote.finalStar:
-                    self.starNotesMissed[num] = True
-
-            if hopo == True:
-                return
-
-        #hopo fudge
-        hopoFudge = abs(abs(self.instruments[num].hopoActive) - self.songTime)
-        activeList = [k for k in self.keysList[num] if self.controls.getState(k)]
-
-        if len(activeList) == 1 and (self.instruments[num].keys[self.instruments[num].hopoLast] == activeList[0] or self.instruments[num].keys[self.instruments[num].hopoLast+5] == activeList[0]):
-            if self.instruments[num].wasLastNoteHopod and hopoFudge > 0 and hopoFudge < self.instruments[num].lateMargin:
-                return
-
-        self.killswitchEngaged[num] = False   #always reset killswitch status when picking / tapping
-        if self.instruments[num].startPick3(self.song, self.songTime, self.controls, hopo):
-            self.processedFirstNoteYet = True
-            self.song.setInstrumentVolume(1.0, self.players[num].part)
-            #Any previous notes missed, but new ones hit, reset streak counter
-            if len(self.instruments[num].missedNotes) != 0:
-                scoreCard.streak = 0
-                if self.coOpType:
-                    self.scoring[num].streak = 0
-                    self.scoring[num].endingStreakBroken = True
-                self.guitarSoloBroken[num] = True
-                scoreCard.endingStreakBroken = True   #MFH
-
-                self.notesMissed[num] = True  #qqstars
-
-                for chord in self.instruments[num].missedNotes:
-                    for tym, theNote in chord:  #MFH
-                        if not theNote.played and (theNote.star or theNote.finalStar):
-                            self.starNotesMissed[num] = True
-
-            isFirst = True
-            noteList = self.instruments[num].playedNotes
-            for tym, noat in noteList:
-                if noat.star and isFirst:
-                    self.instruments[num].isStarPhrase = True
-                isFirst = False
-
-            scoreCard.streak += 1
-            self.notesHit[num] = True #qqstars
-            self.currentlyAnimating = True
-            scoreCard.notesHit += 1  # glorandwarf: was len(self.instruments[num].playedNotes)
-
-            #MFH - tell ScoreCard to update its totalStreak counter if we've just passed 100% for some reason:
-            if scoreCard.notesHit > scoreCard.totalStreakNotes:
-                scoreCard.totalStreakNotes = scoreCard.notesHit
-
-
-            tempScoreValue = len(self.instruments[num].playedNotes) * self.baseScore * self.multi[num]
-
-            if self.coOpType:
-                self.scoring[num].streak += 1
-                self.scoring[num].notesHit += 1
-
-                #MFH - tell ScoreCard to update its totalStreak counter if we've just passed 100% for some reason:
-                if self.scoring[num].notesHit > self.scoring[num].totalStreakNotes:
-                    self.scoring[num].totalStreakNotes = self.scoring[num].notesHit
-
-
-                if self.coOpGH:
-                    scoreCard.addScore(tempScoreValue)
-                else:
-                    scoreCard.score += (tempScoreValue*self.scoring[num].getScoreMultiplier())
-            else:
-                scoreCard.addScore(tempScoreValue)
-
-            scoreCard.updateAvMult()
-            star = scoreCard.stars
-            a = scoreCard.getStarScores()
-
-            if a > star and ((self.inGameStars == 1 and self.theme == 2) or self.inGameStars == 2):
-                self.engine.data.starDingSound.play()
-
-            self.stage.triggerPick(self.songTime, [n[1].number for n in self.instruments[num].playedNotes])
-            if self.coOpGH:
-                if scoreCard.streak%10 == 0:
-                    self.lastMultTime[num] = self.songTime
-                    self.instruments[num].setMultiplier(scoreCard.getScoreMultiplier())
-            else:
-                if self.scoring[num].streak % 10 == 0:
-                    self.lastMultTime[num] = self.songTime
-                    self.instruments[num].setMultiplier(self.scoring[num].getScoreMultiplier())
-
-            #myfingershurt
-            if self.showAccuracy:
-                self.accuracy[num] = self.instruments[num].playedNotes[0][0] - self.songTime
-                self.dispAccuracy[num] = True
-
-        else:
-            self.currentlyAnimating = False
-            self.instruments[num].hopoActive = 0
-            self.instruments[num].wasLastNoteHopod = False
-            self.instruments[num].hopoLast = 0
-            self.song.setInstrumentVolume(0.0, self.players[num].part)
-            if self.whammyEffect == 1:    #pitchbend
-                self.song.resetInstrumentPitch(self.players[num].part)
-            scoreCard.streak = 0
-            if self.coOpType:
-                self.scoring[num].streak = 0
-                self.scoring[num].endingStreakBroken = True
-            self.guitarSoloBroken[num] = True
-            scoreCard.endingStreakBroken = True   #MFH
-            self.instruments[num].setMultiplier(1)
-            self.stage.triggerMiss(self.songTime)
-
-            self.notesMissed[num] = True  #qqstars
-
-            isFirst = True
-            noteList = self.instruments[num].matchingNotes
-            for tym, noat in noteList:
-                if (noat.star or noat.finalStar) and isFirst:
-                    self.starNotesMissed[num] = True
-                isFirst = False
-
-            self.screwUp(num, self.controls)
-
-            #myfingershurt: ensure accuracy display off when miss
-            self.dispAccuracy[num] = False
-
-
     def doPick3GH2(self, num, hopo = False, pullOff = False): #MFH - so DoPick knows when a pull-off was performed
         if not self.song:
             return
@@ -4637,6 +4482,32 @@ class GuitarScene(BandPlayBaseScene):
             if control == player.keyList[KILL] and not self.isKillAnalog[i]:  #MFH - only use this logic if digital killswitch
                 self.killswitchEngaged[i] = True
 
+    def keyReleased(self, key):
+
+        control = self.controls.keyReleased(key)
+        num = self.getPlayerNum(control)
+        if num is None:
+            return
+
+        if self.instruments[num].isDrum:
+            return True
+
+        if control in self.keysList[num] and self.song:
+            for time, note in self.instruments[num].playedNotes:
+                #myfingershurt: only end the pick if no notes are being held.
+                if (self.instruments[num].hit[note.number] == True and (control == self.keysList[num][note.number] or control == self.keysList[num][note.number+5])):
+                    self.endPick(num)
+
+        if self.keysList[num] is not None:
+            activeList = [k for k in self.keysList[num] if self.controls.getState(k) and k != control]
+            if len(activeList) != 0 and self.instruments[num].hopoActive > 0 and control in self.keysList[num]:
+                self.keyPressed(None, 0, control=activeList[0], pullOff = True)
+
+        #Digital killswitch disengage:
+        for i, player in enumerate(self.players):
+            if control == player.keyList[KILL] and not self.isKillAnalog[i]:  #MFH - only use this logic if digital killswitch
+                self.killswitchEngaged[i] = False
+
     def CheckForValidKillswitchNote(self, num):
         if not self.song:
             return False
@@ -4670,33 +4541,6 @@ class GuitarScene(BandPlayBaseScene):
                     self.engine.data.starDingSound.play()
             return int(tempExtraScore)   #original FoF sustain scoring
         return 0
-
-    def keyReleased(self, key):
-        #RF style HOPO playing
-
-        control = self.controls.keyReleased(key)
-        num = self.getPlayerNum(control)
-        if num is None:
-            return
-
-        if self.instruments[num].isDrum:
-            return True
-
-        if control in self.keysList[num] and self.song:
-            for time, note in self.instruments[num].playedNotes:
-                #myfingershurt: only end the pick if no notes are being held.
-                if (self.instruments[num].hit[note.number] == True and (control == self.keysList[num][note.number] or control == self.keysList[num][note.number+5])):
-                    self.endPick(num)
-
-        if self.keysList[num] is not None:
-            activeList = [k for k in self.keysList[num] if self.controls.getState(k) and k != control]
-            if len(activeList) != 0 and self.instruments[num].hopoActive > 0 and control in self.keysList[num]:
-                self.keyPressed(None, 0, control=activeList[0], pullOff = True)
-
-        #Digital killswitch disengage:
-        for i, player in enumerate(self.players):
-            if control == player.keyList[KILL] and not self.isKillAnalog[i]:  #MFH - only use this logic if digital killswitch
-                self.killswitchEngaged[i] = False
 
     def render(self, visibility, topMost):  #QQstarS: Fix this function for mostly. And there are lots of change in this, I just show the main ones
 
