@@ -714,10 +714,7 @@ class Guitar(Instrument):
 
         return True
 
-    def startPick(self, song, pos, controls, hopo = False):
-        if hopo == True:
-            res = startPick2(song, pos, controls, hopo)
-            return res
+    def startPick(self, song, pos, controls):
         if not song:
             return False
         if not song.readyToGo:
@@ -725,7 +722,7 @@ class Guitar(Instrument):
 
         self.playedNotes = []
 
-        self.matchingNotes = self.getRequiredNotesMFH(song, pos)
+        self.matchingNotes = self.getRequiredNotes(song, pos)
 
         if self.controlsMatchNotes(controls, self.matchingNotes):
             self.pickStartPos = pos
@@ -748,7 +745,7 @@ class Guitar(Instrument):
 
         self.playedNotes = []
 
-        self.matchingNotes = self.getRequiredNotesMFH(song, pos, hopo)
+        self.matchingNotes = self.getRequiredNotes(song, pos)
 
         if self.controlsMatchNotes2(controls, self.matchingNotes, hopo):
             self.pickStartPos = pos
@@ -786,7 +783,7 @@ class Guitar(Instrument):
         self.lastPlayedNotes = self.playedNotes
         self.playedNotes = []
 
-        self.matchingNotes = self.getRequiredNotesMFH(song, pos)
+        self.matchingNotes = self.getRequiredNotes(song, pos)
 
         self.controlsMatchNotes3(controls, self.matchingNotes, hopo)
 

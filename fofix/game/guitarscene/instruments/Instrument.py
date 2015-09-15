@@ -682,26 +682,20 @@ class Instrument(object):
         self.accThresholdEarly = (3*self.lateMargin/4)
         self.accThresholdVeryEarly = (4*self.lateMargin/4)
 
-    #MFH - corrected and optimized:
-    def getRequiredNotesMFH(self, song, pos, hopoTroubleCheck = False):
-        if self.battleStatus[2] and self.difficulty != 0:
-            if pos < self.battleStartTimes[2] + self.currentPeriod * self.beatsPerBoard or pos > self.battleStartTimes[2] - self.currentPeriod * self.beatsPerBoard + self.battleDiffUpLength:
-                song.difficulty[self.player] = Song.difficulties[self.battleDiffUpValue]
-            else:
-                song.difficulty[self.player] = Song.difficulties[self.battleDiffUpValue - 1]
+    def getRequiredNotes(self, song, pos):
 
         track   = song.track[self.player]
-        if hopoTroubleCheck:
-            notes = [(time, event) for time, event in track.getEvents(pos, pos + (self.earlyMargin*2)) if isinstance(event, Note)]
-            notes = [(time, event) for time, event in notes if not time==pos] #MFH - filter out the problem note that caused this check!
-        else:
-            notes = [(time, event) for time, event in track.getEvents(pos - self.lateMargin, pos + self.earlyMargin) if isinstance(event, Note)]
-            notes = [(time, event) for time, event in notes if not (event.hopod or event.played or event.skipped)]
-            notes = [(time, event) for time, event in notes if (time >= (pos - self.lateMargin)) and (time <= (pos + self.earlyMargin))]
 
-        if self.battleStatus[7]:
+        notes = [(time, event)
+            for time, event in track.getEvents(pos - self.lateMargin, pos + self.earlyMargin)
+                if isinstance(event, Note) and
+                    not (event.hopod or event.played or event.skipped) and
+                    (time >= (pos - self.lateMargin)) and (time <= (pos + self.earlyMargin)) ]
+
+        if not self.isDrum and self.battleStatus[7]:
             notes = self.getDoubleNotes(notes)
-        return sorted(notes, key=lambda x: x[0])    #MFH - what the hell, this should be sorted by TIME not note number....
+
+        return sorted(notes, key=lambda x: x[0])
 
     def areNotesTappable(self, notes):
         if not notes:
@@ -711,27 +705,26 @@ class Instrument(object):
                 return True
         return False
 
-    def getMissedNotesMFH(self, song, pos, catchup = False):
-        if not song:
-            return
-        if not song.readyToGo:
+    def getMissedNotes(self, song, pos, catchup = False):
+        if not song and not song.readyToGo:
             return
 
         m1      = self.lateMargin
         m2      = self.lateMargin * 2
 
         track   = song.track[self.player]
-        notes   = [(time, event) for time, event in track.getEvents(pos - m2, pos - m1) if isinstance(event, Note)]   #was out of order
 
-        #MFH - this additional filtration step removes sustains whose Note On event time is now outside the hitwindow.
-        notes   = [(time, event) for time, event in notes if (time >= (pos - m2)) and (time <= (pos - m1))]
-        notes   = [(time, event) for time, event in notes if not event.played and not event.hopod and not event.skipped]
+        notes   = [(time, event)
+            for time, event in track.getEvents(pos - m2, pos - m1)
+                if isinstance(event, Note) and
+                    time >= (pos - m2) and time <= (pos - m1) and
+                    not event.played and not event.hopod and not event.skipped ]
 
         if catchup:
             for time, event in notes:
                 event.skipped = True
 
-        return sorted(notes, key=lambda x: x[0])    #MFH - what the hell, this should be sorted by TIME not note number....
+        return sorted(notes, key=lambda x: x[0])
 
     def getRequiredNotesForRender(self, song, pos):
         if self.battleStatus[2] and self.difficulty != 0:

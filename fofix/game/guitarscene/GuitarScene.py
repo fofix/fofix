@@ -2853,8 +2853,8 @@ class GuitarScene(BandPlayBaseScene):
                             self.scoring[num].freestyleWasJustActive = True
 
                 #MFH - also must ensure notes that pass during this time are marked as skipped without resetting the streak
-                #missedNotes = self.guitars[num].getMissedNotesMFH(self.song, self.songTime, catchup = True)
-                missedNotes = guitar.getMissedNotesMFH(self.song, self.songTime + guitar.earlyMargin, catchup = True)  #MFh - check slightly ahead here.
+                #missedNotes = self.guitars[num].getMissedNotes(self.song, self.songTime, catchup = True)
+                missedNotes = guitar.getMissedNotes(self.song, self.songTime + guitar.earlyMargin, catchup = True)  #MFh - check slightly ahead here.
                 for tym, theNote in missedNotes:   #MFH - also want to mark these notes as Played so they don't count against the note total!
                     theNote.skipped = True
                     if guitar.isDrum:
@@ -2920,7 +2920,7 @@ class GuitarScene(BandPlayBaseScene):
 
                 # Have Jurgen attempt to strum on time instead of as early as possible
                 # This method retrieves all notes in the window and only attempts to play them as they pass the current position, like a real player
-                notes = self.instruments[i].getRequiredNotesMFH(self.song, pos)  #mfh - needed updatin'
+                notes = self.instruments[i].getRequiredNotes(self.song, pos)  #mfh - needed updatin'
 
                 #now, want to isolate the first note or set of notes to strum - then do it, and then release the controls
                 if notes:
@@ -3417,7 +3417,7 @@ class GuitarScene(BandPlayBaseScene):
 
                 #MFH - ensure this missed notes check doesn't fail you during a freestyle section
                 if guitar.freestyleActive or guitar.drumFillsActive:
-                    missedNotes = guitar.getMissedNotesMFH(self.song, self.songTime + guitar.lateMargin*2, catchup = True)  #MFH - get all notes in the freestyle section.
+                    missedNotes = guitar.getMissedNotes(self.song, self.songTime + guitar.lateMargin*2, catchup = True)  #MFH - get all notes in the freestyle section.
                     for tym, theNote in missedNotes:   #MFH - also want to mark these notes as Played so they don't count against the note total!
                         theNote.skipped = True
                         if guitar.isDrum:
@@ -3426,7 +3426,7 @@ class GuitarScene(BandPlayBaseScene):
                             self.scoring[playerNum].totalStreakNotes -= 1
 
                 else:
-                    missedNotes = guitar.getMissedNotesMFH(self.song, self.songTime)
+                    missedNotes = guitar.getMissedNotes(self.song, self.songTime)
                     if guitar.paused:
                         missedNotes = []
                     if missedNotes:
@@ -3859,7 +3859,7 @@ class GuitarScene(BandPlayBaseScene):
             # If all the played notes are tappable, there are no required notes and
             # the last note was played recently enough, ignore this pick
             if self.instruments[num].areNotesTappable(self.instruments[num].playedNotes) and \
-               not self.instruments[num].getRequiredNotesMFH(self.song, self.songTime) and \
+               not self.instruments[num].getRequiredNotes(self.song, self.songTime) and \
                self.songTime - self.lastPickPos[num] <= self.song.period / 2:
                 return
             self.endPick(num)
@@ -3973,132 +3973,6 @@ class GuitarScene(BandPlayBaseScene):
         #myfingershurt: bass drum sound play
         if self.instruments[num].isDrum and self.bassKickSoundEnabled:
             self.instruments[num].playDrumSounds(self.controls, playBassDrumOnly = True)
-
-
-    def doPick2(self, num, hopo = False):
-        if not self.song:
-            return
-
-        #clear out any missed notes before this pick since they are already missed by virtue of the pick
-        missedNotes = self.instruments[num].getMissedNotes(self.song, self.songTime, catchup = True)
-
-        if self.coOpType:
-            scoreCard = self.coOpScoreCard
-        else:
-            scoreCard = self.scoring[num]
-
-        if len(missedNotes) > 0:
-            self.processedFirstNoteYet = True
-            scoreCard.streak = 0
-            if self.coOpType:
-                self.scoring[num].streak = 0
-                self.scoring[num].endingStreakBroken = True
-            self.instruments[num].setMultiplier(1)
-            self.instruments[num].hopoActive = 0
-            self.instruments[num].wasLastNoteHopod = False
-            self.instruments[num].hopoLast = -1
-            self.guitarSoloBroken[num] = True
-            scoreCard.endingStreakBroken = True   #MFH
-
-            self.notesMissed[num] = True #QQstarS:Set [0] to [i]
-            for tym, theNote in missedNotes:  #MFH
-                if theNote.star or theNote.finalStar:
-                    self.starNotesMissed[num] = True
-
-            if hopo == True:
-                return
-
-        #hopo fudge
-        hopoFudge = abs(abs(self.instruments[num].hopoActive) - self.songTime)
-        activeList = [k for k in self.keysList[num] if self.controls.getState(k)]
-
-        if len(activeList) == 1 and (self.instruments[num].keys[self.instruments[num].hopoLast] == activeList[0] or self.instruments[num].keys[self.instruments[num].hopoLast+5] == activeList[0]):
-            if self.instruments[num].wasLastNoteHopod and hopoFudge > 0 and hopoFudge < self.instruments[num].lateMargin:
-                return
-
-        self.killswitchEngaged[num] = False   #always reset killswitch status when picking / tapping
-        if self.instruments[num].startPick2(self.song, self.songTime, self.controls, hopo):
-            self.song.setInstrumentVolume(1.0, self.players[num].part)
-            if self.instruments[num].playedNotes:
-                scoreCard.streak += 1
-                self.currentlyAnimating = True
-                if self.coOpType:
-                    self.scoring[num].streak += 1
-                    self.scoring[num].notesHit += 1
-
-                    #MFH - tell ScoreCard to update its totalStreak counter if we've just passed 100% for some reason:
-                    if self.scoring[num].notesHit > self.scoring[num].totalStreakNotes:
-                        self.scoring[num].totalStreakNotes = self.scoring[num].notesHit
-
-
-                self.notesHit[num] = True #QQstarS:Set [0] to [i]
-
-                scoreCard.notesHit += 1  # glorandwarf: was len(self.guitars[num].playedNotes)
-
-                #MFH - tell ScoreCard to update its totalStreak counter if we've just passed 100% for some reason:
-                if scoreCard.notesHit > scoreCard.totalStreakNotes:
-                    scoreCard.totalStreakNotes = scoreCard.notesHit
-
-
-                tempScoreValue = len(self.instruments[num].playedNotes) * self.baseScore * self.multi[num]
-
-            if self.coOpType and not self.coOpGH:
-                scoreCard.score += (tempScoreValue*self.scoring[num].getScoreMultiplier())
-            else:
-                scoreCard.addScore(tempScoreValue)
-
-            scoreCard.updateAvMult()
-            star = scoreCard.stars
-            a = scoreCard.getStarScores()
-            if a > star and ((self.inGameStars == 1 and self.theme == 2) or self.inGameStars == 2):
-                self.engine.data.starDingSound.play()
-            self.stage.triggerPick(self.songTime, [n[1].number for n in self.instruments[num].playedNotes])
-            if self.coOpGH:
-                if scoreCard.streak%10 == 0:
-                    self.lastMultTime[num] = self.songTime
-                    self.instruments[num].setMultiplier(scoreCard.getScoreMultiplier())
-            elif not self.battleGH:
-                if self.scoring[num].streak % 10 == 0:
-                    self.lastMultTime[num] = self.songTime
-                    self.instruments[num].setMultiplier(self.scoring[num].getScoreMultiplier())
-
-
-            isFirst = True
-            noteList = self.instruments[num].playedNotes
-            for tym, noat in noteList:
-                if noat.star and isFirst:
-                    self.instruments[num].isStarPhrase = True
-                isFirst = False
-
-        else:
-            self.instruments[num].hopoActive = 0
-            self.instruments[num].wasLastNoteHopod = False
-            self.currentlyAnimating = False
-            self.instruments[num].hopoLast = -1
-            self.song.setInstrumentVolume(0.0, self.players[num].part)
-            if self.whammyEffect == 1:    #pitchbend
-                self.song.resetInstrumentPitch(self.players[num].part)
-            scoreCard.streak = 0
-            if self.coOpType:
-                self.scoring[num].streak = 0
-                self.scoring[num].endingStreakBroken = True
-            self.instruments[num].setMultiplier(1)
-            self.stage.triggerMiss(self.songTime)
-            self.guitarSoloBroken[num] = True
-            scoreCard.endingStreakBroken = True   #MFH
-
-            self.notesMissed[num] = True #QQstarS:Set [0] to [i]
-
-
-
-            isFirst = True
-            noteList = self.instruments[num].matchingNotes
-            for tym, noat in noteList:
-                if (noat.star or noat.finalStar) and isFirst:
-                    self.starNotesMissed[num] = True
-                isFirst = False
-
-            self.screwUp(num, self.controls)
 
     def doPick3RF(self, num, hopo = False):
         if not self.song:
@@ -4259,7 +4133,7 @@ class GuitarScene(BandPlayBaseScene):
         else:
             scoreCard = self.scoring[num]
 
-        missedNotes = self.instruments[num].getMissedNotesMFH(self.song, self.songTime, catchup = True)
+        missedNotes = self.instruments[num].getMissedNotes(self.song, self.songTime, catchup = True)
         if len(missedNotes) > 0:
             self.processedFirstNoteYet = True
             scoreCard.streak = 0
@@ -4726,7 +4600,7 @@ class GuitarScene(BandPlayBaseScene):
             self.doPick(num)
         elif control in self.keysList[num] and self.song:
             # Check whether we can tap the currently required notes
-            notes = self.instruments[num].getRequiredNotesMFH(self.song, self.songTime)
+            notes = self.instruments[num].getRequiredNotes(self.song, self.songTime)
 
             if ((self.scoring[num].streak > 0 and self.instruments[num].areNotesTappable(notes)) or \
                 (self.instruments[num].guitarSolo and control in self.soloKeysList[num])) and \
@@ -4759,84 +4633,6 @@ class GuitarScene(BandPlayBaseScene):
                 self.activateSP(i)
             if control == player.keyList[KILL] and not self.isKillAnalog[i]:  #MFH - only use this logic if digital killswitch
                 self.killswitchEngaged[i] = True
-
-
-    def keyPressed2(self, key, unicode, control = None):
-        hopo = False
-        if not control:
-            control = self.controls.keyPressed(key)
-        else:
-            hopo = True
-
-        if self.battleGH:
-            if self.instruments[0].battleStatus[3]:
-                if control == self.instruments[0].keys[self.instruments[0].battleBreakString]:
-                    self.instruments[0].battleBreakNow -=1
-                    self.controls.toggle(control, False)
-            if self.instruments[1].battleStatus[3]:
-                if control == self.instruments[1].keys[self.instruments[1].battleBreakString]:
-                    self.instruments[1].battleBreakNow -=1
-                    self.controls.toggle(control, False)
-            if len(self.instruments) > 2:
-                if self.instruments[2].battleStatus[3]:
-                    if control == self.instruments[2].keys[self.instruments[2].battleBreakString]:
-                        self.instruments[2].battleBreakNow -= 1
-                        self.controls.toggle(control, False)
-
-        pressed = -1
-        for i in range(self.numOfPlayers):
-            if control in (self.instruments[i].actions):
-                hopo = False
-                pressed = i
-
-        numpressed = [len([1 for k in guitar.keys if self.controls.getState(k)]) for guitar in self.instruments]
-
-        for i in range(self.numOfPlayers):
-            if control in (self.instruments[i].keys) and self.song and numpressed[i] >= 1:
-                if self.instruments[i].wasLastNoteHopod and self.instruments[i].hopoActive >= 0:
-                    hopo = True
-                    pressed = i
-
-        if pressed >= 0:
-            for k in self.keysList[pressed]:
-                if self.controls.getState(k):
-                    self.keyBurstTimeout[pressed] = None
-                    break
-            else:
-                self.keyBurstTimeout[pressed] = self.engine.timer.time + self.keyBurstPeriod
-                return True
-
-        if pressed >= 0 and self.song:
-            self.doPick2(pressed, hopo)
-
-        if control in Player.starts:
-            if self.ending == True:
-                return True
-            self.pauseGame()
-            self.engine.view.pushLayer(self.menu)
-            return True
-        elif key >= ord('a') and key <= ord('z'):
-            # cheat codes
-            n = len(self.enteredCode)
-            for code, func in self.cheatCodes:
-                if n < len(code):
-                    if key == code[n]:
-                        self.enteredCode.append(key)
-                        if self.enteredCode == code:
-                            self.enteredCode     = []
-                            for player in self.players:
-                                player.cheating = True
-                            func()
-                        break
-            else:
-                self.enteredCode = []
-
-        for i, player in enumerate(self.players):
-            if (control == player.keyList[STAR] and not self.isSPAnalog[i]) or control == player.keyList[CANCEL]:
-                self.activateSP(i)
-            if control == player.keyList[KILL] and not self.isKillAnalog[i]:  #MFH - only use this logic if digital killswitch
-                self.killswitchEngaged[i] = True
-
 
     def keyPressed3(self, key, unicode, control = None, pullOff = False):  #MFH - gonna pass whether this was called from a pull-off or not
         hopo = False
@@ -4996,7 +4792,7 @@ class GuitarScene(BandPlayBaseScene):
 
         if control in self.keysList[num] and self.song:
             # Check whether we can tap the currently required notes
-            notes = self.instruments[num].getRequiredNotesMFH(self.song, self.songTime)
+            notes = self.instruments[num].getRequiredNotes(self.song, self.songTime)
 
             if ((self.scoring[num].streak > 0 and self.instruments[num].areNotesTappable(notes)) or \
                 (self.instruments[num].guitarSolo and control in self.soloKeysList[num])) and \
@@ -5010,26 +4806,6 @@ class GuitarScene(BandPlayBaseScene):
         for i, player in enumerate(self.players):
             if control == player.keyList[KILL] and not self.isKillAnalog[i]:  #MFH - only use this logic if digital killswitch
                 self.killswitchEngaged[i] = False
-
-
-    def keyReleased2(self, key):
-        control = self.controls.keyReleased(key)
-        for i, keys in enumerate(self.keysList):
-            if control in keys and self.song:
-                for time, note in self.instruments[i].playedNotes:
-                    if not self.instruments[i].wasLastNoteHopod or (self.instruments[i].hopoActive < 0 and (control == self.keysList[i][note.number] or control == self.keysList[i][note.number+5])):
-                        self.endPick(i)
-
-        #Digital killswitch disengage:
-        for i, player in enumerate(self.players):
-            if control == player.keyList[KILL] and not self.isKillAnalog[i]:  #MFH - only use this logic if digital killswitch
-                self.killswitchEngaged[i] = False
-
-
-        for i in range(self.numOfPlayers):
-            activeList = [k for k in self.keysList[i] if self.controls.getState(k) and k != control]
-            if len(activeList) != 0 and self.instruments[i].wasLastNoteHopod and activeList[0] != self.keysList[i][self.instruments[i].hopoLast] and activeList[0] != self.keysList[i][self.instruments[i].hopoLast+5] and control in self.keysList[i]:
-                self.keyPressed2(None, 0, activeList[0])
 
     def keyReleased3(self, key):
         control = self.controls.keyReleased(key)

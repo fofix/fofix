@@ -741,7 +741,7 @@ class Drum(Instrument):
         if not song.readyToGo:
             return
 
-        self.matchingNotes = self.getRequiredNotesMFH(song, pos)    #MFH - ignore skipped notes please!
+        self.matchingNotes = self.getRequiredNotes(song, pos)    #MFH - ignore skipped notes please!
 
 
         # no self.matchingNotes?
