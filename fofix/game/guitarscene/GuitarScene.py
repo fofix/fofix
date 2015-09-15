@@ -2709,10 +2709,10 @@ class GuitarScene(BandPlayBaseScene):
                 for n, k in enumerate(self.keysList[i]):
                     if n == self.slideValue[i] and not self.controls.getState(k):
                         self.controls.toggle(k, True)
-                        self.keyPressed3(None, 0, k)  #mfh
+                        self.keyPressed(None, 0, k)  #mfh
                     elif self.controls.getState(k):
                         self.controls.toggle(k, False)
-                        self.keyReleased3(k)
+                        self.keyReleased(k)
 
                 if self.slideValue[i] > -1:
                     self.handlePick(i)
@@ -4534,79 +4534,84 @@ class GuitarScene(BandPlayBaseScene):
             else:
                 self.changeSong()
 
-    def keyPressed(self, key, unicode, control = None):
-        #RF style HOPO playing
+    def keyPressed(self, key, unicode, control=None, pullOff = False):
 
-        #myfingershurt: drums :)
-        for i in range(self.numOfPlayers):
-            if self.instruments[i].isDrum and control in (self.instruments[i].keys):
-                if control in Player.bassdrums:
-                    self.instruments[i].drumsHeldDown[0] = 100
-                elif control in Player.drum1s:
-                    self.instruments[i].drumsHeldDown[1] = 100
-                elif control in Player.drum2s:
-                    self.instruments[i].drumsHeldDown[2] = 100
-                elif control in Player.drum3s:
-                    self.instruments[i].drumsHeldDown[3] = 100
-                elif control in Player.drum5s:
-                    self.instruments[i].drumsHeldDown[4] = 100
-                self.handlePick(i)
-                return True
-
-        if self.hopoStyle > 0:  #HOPOs enabled
-            res = self.keyPressed3(key, unicode, control)
-            return res
-
-        actual = False
         if not control:
-            actual  = True
             control = self.controls.keyPressed(key)
 
         num = self.getPlayerNum(control)
-        if num is None:
-            return True
-        if self.instruments[num].isDrum and control in self.instruments[num].keys:
-            if actual:
-                if control in Player.bassdrums:
-                    self.instruments[num].drumsHeldDown[0] = 100
-                    self.instruments[num].playedSound[0] = False
-                elif control in Player.drum1s:
-                    self.instruments[num].drumsHeldDown[1] = 100
-                    self.instruments[num].playedSound[1] = False
-                elif control in Player.drum2s:
-                    self.instruments[num].drumsHeldDown[2] = 100
-                    self.instruments[num].playedSound[2] = False
-                elif control in Player.drum3s:
-                    self.instruments[num].drumsHeldDown[3] = 100
-                    self.instruments[num].playedSound[3] = False
-                elif control in Player.drum5s:
-                    self.instruments[num].drumsHeldDown[4] = 100
-                    self.instruments[num].playedSound[4] = False
-        if self.battleGH:
-            if self.instruments[num].battleStatus[3]:
-                if control == self.instruments[num].keys[self.instruments[num].battleBreakString]:
-                    self.instruments[num].battleBreakNow -= 1
-                    self.controls.toggle(control, False)
 
-        if control in (self.instruments[num].actions):
-            for k in self.keysList[num]:
-                if self.controls.getState(k):
-                    self.keyBurstTimeout[num] = None
-                    break
+        print key, unicode, pullOff
+        pressed = False
+
+        if self.instruments[num].isDrum and control in (self.instruments[num].keys):
+            pressed = True
+            if control in Player.bassdrums:
+                self.instruments[num].drumsHeldDown[0] = 100
+                self.instruments[num].playedSound[0] = False
+            elif control in Player.drum1s:
+                self.instruments[num].drumsHeldDown[1] = 100
+                self.instruments[num].playedSound[1] = False
+            elif control in Player.drum2s:
+                self.instruments[num].drumsHeldDown[2] = 100
+                self.instruments[num].playedSound[2] = False
+            elif control in Player.drum3s:
+                self.instruments[num].drumsHeldDown[3] = 100
+                self.instruments[num].playedSound[3] = False
+            elif control in Player.drum5s:
+                self.instruments[num].drumsHeldDown[4] = 100
+                self.instruments[num].playedSound[4] = False
             else:
-                return True
+                pressed = False
+        else:
 
-        if control in (self.instruments[num].actions) and self.song:
-            self.doPick(num)
-        elif control in self.keysList[num] and self.song:
-            # Check whether we can tap the currently required notes
-            notes = self.instruments[num].getRequiredNotes(self.song, self.songTime)
+            activeList = [k for k in self.keysList[num] if self.controls.getState(k)]
 
-            if ((self.scoring[num].streak > 0 and self.instruments[num].areNotesTappable(notes)) or \
-                (self.instruments[num].guitarSolo and control in self.soloKeysList[num])) and \
-               self.instruments[num].controlsMatchNotes(self.controls, notes):
+            hopo = False
+            if control in self.instruments[num].actions:
+                pressed = True
+            elif control in self.instruments[num].keys:
+                if self.instruments[num].hopoActive > 0 or (self.instruments[num].wasLastNoteHopod and self.instruments[num].hopoActive == 0):
+
+                    hopo = True
+                    pressed = True
+                    if not pullOff:
+                        # don't allow lower-fret tapping while holding a higher fret
+                        activeKeyList = []
+                        LastHopoFretStillHeld = False
+                        HigherFretsHeld = False
+                        for p, k in enumerate(self.keysList[num]):
+                            if self.controls.getState(k):
+                                activeKeyList.append(k)
+                                if self.instruments[num].hopoLast == p or self.instruments[num].hopoLast-5 == p:
+                                    LastHopoFretStillHeld = True
+                                elif (p > self.instruments[num].hopoLast and p < 5) or (p > self.instruments[num].hopoLast and p > 4):
+                                    HigherFretsHeld = True
+
+                        if not(LastHopoFretStillHeld and not HigherFretsHeld):  #tapping a lower note should do nothing.
+                            pressed = True
+
+            if self.battleGH:
+                if self.instruments[num].battleStatus[3]:
+                    if control == self.instruments[num].keys[self.instruments[num].battleBreakString]:
+                        self.instruments[num].battleBreakNow -= 1
+                        self.controls.toggle(control, False)
+
+            if control in (self.instruments[num].actions):
+                for k in self.keysList[num]:
+                    if self.controls.getState(k):
+                        self.keyBurstTimeout[num] = None
+                        break
+                else:
+                    return True
+        if pressed:
+            #myfingershurt:
+            if self.instruments[num].isDrum:
                 self.doPick(num)
-        elif control in Player.starts:
+            else:
+                self.handlePick(num, hopo = hopo)
+
+        if control in Player.starts:
             if self.ending == True:
                 return True
             self.pauseGame()
@@ -4627,116 +4632,11 @@ class GuitarScene(BandPlayBaseScene):
             else:
                 self.enteredCode = []
 
-        #myfingershurt: Adding starpower and killswitch for "no HOPOs" mode
         for i, player in enumerate(self.players):
             if (control == player.keyList[STAR] and not self.isSPAnalog[i]) or control == player.keyList[CANCEL]:
                 self.activateSP(i)
             if control == player.keyList[KILL] and not self.isKillAnalog[i]:  #MFH - only use this logic if digital killswitch
                 self.killswitchEngaged[i] = True
-
-    def keyPressed3(self, key, unicode, control = None, pullOff = False):  #MFH - gonna pass whether this was called from a pull-off or not
-        hopo = False
-        actual = False
-        if not control:
-            actual  = True
-            control = self.controls.keyPressed(key)
-        else:
-            hopo = True
-        num = self.getPlayerNum(control)
-        if self.battleGH and num is not None:
-            if self.instruments[num].battleStatus[3]:
-                if control == self.instruments[num].keys[self.instruments[num].battleBreakString]:
-                    self.instruments[num].battleBreakNow -=1
-                    self.controls.toggle(control, False)
-
-        pressed = -1
-        for i in range(self.numOfPlayers):
-            if self.instruments[i].isDrum and control in self.instruments[i].keys and actual:
-                if control in Player.bassdrums:
-                    self.instruments[num].drumsHeldDown[0] = 100
-                    self.instruments[num].playedSound[0] = False
-                elif control in Player.drum1s:
-                    self.instruments[num].drumsHeldDown[1] = 100
-                    self.instruments[num].playedSound[1] = False
-                elif control in Player.drum2s:
-                    self.instruments[num].drumsHeldDown[2] = 100
-                    self.instruments[num].playedSound[2] = False
-                elif control in Player.drum3s:
-                    self.instruments[num].drumsHeldDown[3] = 100
-                    self.instruments[num].playedSound[3] = False
-                elif control in Player.drum5s:
-                    self.instruments[num].drumsHeldDown[4] = 100
-                    self.instruments[num].playedSound[4] = False
-            if control in (self.instruments[i].actions):
-                hopo = False
-                pressed = i
-
-        numpressed = [len([1 for k in guitar.keys if self.controls.getState(k)]) for guitar in self.instruments]
-
-
-        activeList = [k for k in self.keysList[pressed] if self.controls.getState(k)]
-
-        if self.ignoreOpenStrums and len(activeList) < 1:   #MFH - filter out strums without frets
-            pressed = -1
-
-        for i in range(self.numOfPlayers): #akedrou- probably loopable...
-            if control in self.instruments[i].keys and numpressed[i] >= 1:
-                if self.instruments[i].hopoActive > 0 or (self.instruments[i].wasLastNoteHopod and self.instruments[i].hopoActive == 0):
-                    if not pullOff and (self.hopoStyle == 2 or self.hopoStyle == 3): #GH2 or GH2 Strict, don't allow lower-fret tapping while holding a higher fret
-                        activeKeyList = []
-                        LastHopoFretStillHeld = False
-                        HigherFretsHeld = False
-                        for p, k in enumerate(self.keysList[i]):
-                            if self.controls.getState(k):
-                                activeKeyList.append(k)
-                                if self.instruments[i].hopoLast == p or self.instruments[i].hopoLast-5 == p:
-                                    LastHopoFretStillHeld = True
-                                elif (p > self.instruments[i].hopoLast and p < 5) or (p > self.instruments[i].hopoLast and p > 4):
-                                    HigherFretsHeld = True
-
-                        if not(LastHopoFretStillHeld and not HigherFretsHeld):  #tapping a lower note should do nothing.
-                            hopo = True
-                            pressed = i
-                    else:   #GH2 Sloppy or RF-Mod
-                        hopo = True
-                        pressed = i
-                break
-
-        #MFH - this is where the marked little block above used to be - possibly causing false "late pick" detections from HOPOs...
-
-        if pressed >= 0:
-            #myfingershurt:
-
-            self.handlePick(pressed, hopo = hopo, pullOff = pullOff)
-
-        if control in Player.starts:
-            if self.ending == True:
-                return True
-            self.pauseGame()
-            self.engine.view.pushLayer(self.menu)
-            return True
-        elif key >= ord('a') and key <= ord('z'):
-            # cheat codes
-            n = len(self.enteredCode)
-            for code, func in self.cheatCodes:
-                if n < len(code):
-                    if key == code[n]:
-                        self.enteredCode.append(key)
-                        if self.enteredCode == code:
-                            self.enteredCode     = []
-                            for player in self.players:
-                                player.cheating = True
-                            func()
-                        break
-            else:
-                self.enteredCode = []
-
-        for i, player in enumerate(self.players):
-            if (control == player.keyList[STAR] and not self.isSPAnalog[i]) or control == player.keyList[CANCEL]:
-                self.activateSP(i)
-            if control == player.keyList[KILL] and not self.isKillAnalog[i]:  #MFH - only use this logic if digital killswitch
-                self.killswitchEngaged[i] = True
-
 
     def CheckForValidKillswitchNote(self, num):
         if not self.song:
@@ -4783,61 +4683,21 @@ class GuitarScene(BandPlayBaseScene):
         if self.instruments[num].isDrum:
             return True
 
-        #myfingershurt:
-
-        if self.hopoStyle > 0:  #hopos enabled
-            res = self.keyReleased3(key)
-            return res
-
-
         if control in self.keysList[num] and self.song:
-            # Check whether we can tap the currently required notes
-            notes = self.instruments[num].getRequiredNotes(self.song, self.songTime)
+            for time, note in self.instruments[num].playedNotes:
+                #myfingershurt: only end the pick if no notes are being held.
+                if (self.instruments[num].hit[note.number] == True and (control == self.keysList[num][note.number] or control == self.keysList[num][note.number+5])):
+                    self.endPick(num)
 
-            if ((self.scoring[num].streak > 0 and self.instruments[num].areNotesTappable(notes)) or \
-                (self.instruments[num].guitarSolo and control in self.soloKeysList[num])) and \
-               self.instruments[num].controlsMatchNotes(self.controls, notes):
-                self.doPick(num)
-            # Otherwise we end the pick if the notes have been playing long enough
-            elif self.lastPickPos[num] is not None and self.songTime - self.lastPickPos[num] > self.song.period / 2:
-                self.endPick(num)
-
-        #Digital killswitch disengage:
-        for i, player in enumerate(self.players):
-            if control == player.keyList[KILL] and not self.isKillAnalog[i]:  #MFH - only use this logic if digital killswitch
-                self.killswitchEngaged[i] = False
-
-    def keyReleased3(self, key):
-        control = self.controls.keyReleased(key)
-        #myfingershurt: this is where the lower-fret-release causes a held note to break:
-        for i, keys in enumerate(self.keysList):
-            if keys is None:
-                continue
-            if control in keys and self.song:   #myfingershurt: if the released control was a fret:
-                for time, note in self.instruments[i].playedNotes:
-                        #myfingershurt: only end the pick if no notes are being held.
-                    if (self.instruments[i].hit[note.number] == True and (control == self.keysList[i][note.number] or control == self.keysList[i][note.number+5])):
-                        self.endPick(i)
+        if self.keysList[num] is not None:
+            activeList = [k for k in self.keysList[num] if self.controls.getState(k) and k != control]
+            if len(activeList) != 0 and self.instruments[num].hopoActive > 0 and control in self.keysList[num]:
+                self.keyPressed(None, 0, control=activeList[0], pullOff = True)
 
         #Digital killswitch disengage:
         for i, player in enumerate(self.players):
             if control == player.keyList[KILL] and not self.isKillAnalog[i]:  #MFH - only use this logic if digital killswitch
                 self.killswitchEngaged[i] = False
-
-        for i in range(self.numOfPlayers):
-            if self.keysList[i] is None:
-                continue
-            activeList = [k for k in self.keysList[i] if self.controls.getState(k) and k != control]
-            #myfingershurt: removing check for hopolast for GH2 system after-chord HOPOs
-            #myfingershurt: also added self.hopoAfterChord conditional to ensure this logic doesn't apply without HOPOs after chord
-            if self.hopoAfterChord and (self.hopoStyle == 2 or self.hopoStyle == 3 or self.hopoStyle == 4):   #for GH2 systems: so user can release lower fret from chord to "tap" held HOPO
-                if len(activeList) != 0 and self.instruments[i].hopoActive > 0 and control in self.keysList[i]:
-                    self.keyPressed3(None, 0, activeList[0], pullOff = True)
-
-            else:
-                if len(activeList) != 0 and self.instruments[i].hopoActive > 0 and activeList[0] != self.keysList[i][self.instruments[i].hopoLast] and activeList[0] != self.keysList[i][self.instruments[i].hopoLast+5] and control in self.keysList[i]:
-                    self.keyPressed3(None, 0, activeList[0], pullOff = True)
-
 
     def render(self, visibility, topMost):  #QQstarS: Fix this function for mostly. And there are lots of change in this, I just show the main ones
 
