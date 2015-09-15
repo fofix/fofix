@@ -75,7 +75,7 @@ class Drum(Instrument):
         self.lastFretWasC = False
 
 
-        self.matchingNotes = None
+        self.matchingNotes = []
 
         #MFH - I do not understand fully how the handicap scorecard works at the moment, nor do I have the time to figure it out.
         #... so for now, I'm just writing some extra code here for the early hitwindow size handicap.
@@ -739,9 +739,6 @@ class Drum(Instrument):
         if not song.readyToGo:
             return
 
-        self.matchingNotes = self.getRequiredNotes(song, pos)    #MFH - ignore skipped notes please!
-
-
         # no self.matchingNotes?
         if not self.matchingNotes:
             return False
@@ -771,6 +768,8 @@ class Drum(Instrument):
     def run(self, ticks, pos, controls):
         if not self.paused:
             self.time += ticks
+
+        self.matchingNotes = self.getRequiredNotes(self.scene.song, pos)
 
         #MFH - Determine which frame to display for starpower notes
         if self.noteSpin:

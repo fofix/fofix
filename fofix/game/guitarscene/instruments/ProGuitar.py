@@ -34,8 +34,8 @@ from fofix.core import Log
 
 
 class ProGuitar(Guitar):
-    def __init__(self, engine, playerObj, player = 0, bass = False):
-        super(ProGuitar, self).__init__(engine, playerObj, player = player, bass = bass)
+    def __init__(self, engine, playerObj, scene, player = 0, bass = False):
+        super(ProGuitar, self).__init__(engine, playerObj, scene, player = player, bass = bass)
 
         self.strings        = 6
 

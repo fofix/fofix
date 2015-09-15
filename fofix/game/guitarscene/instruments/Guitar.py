@@ -45,8 +45,8 @@ from fofix.core import cmgl
 from fofix.core import Log
 
 class Guitar(Instrument):
-    def __init__(self, engine, playerObj, player = 0, bass = False):
-        super(Guitar, self).__init__(engine, playerObj, player=player)
+    def __init__(self, engine, playerObj, scene, player = 0, bass = False):
+        super(Guitar, self).__init__(engine, playerObj, scene, player=player)
 
         self.isDrum = False
         self.isBassGuitar = bass
@@ -721,8 +721,6 @@ class Guitar(Instrument):
 
         self.playedNotes = []
 
-        self.matchingNotes = self.getRequiredNotes(song, pos)
-
         if self.controlsMatchNotes(controls, self.matchingNotes):
             self.pickStartPos = pos
             for time, note in self.matchingNotes:
@@ -781,8 +779,6 @@ class Guitar(Instrument):
 
         self.lastPlayedNotes = self.playedNotes
         self.playedNotes = []
-
-        self.matchingNotes = self.getRequiredNotes(song, pos)
 
         self.controlsMatchNotes3(controls, self.matchingNotes, hopo)
 
@@ -883,6 +879,8 @@ class Guitar(Instrument):
 
         if not self.paused:
             self.time += ticks
+
+        self.matchingNotes = self.getRequiredNotes(self.scene.song, pos)
 
         #MFH - Determine which frame to display for starpower notes
         if self.noteSpin:

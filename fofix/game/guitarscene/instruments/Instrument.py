@@ -36,8 +36,10 @@ from fofix.core import Log
 
 
 class Instrument(object):
-    def __init__(self, engine, playerObj, player = 0):
+    def __init__(self, engine, playerObj, scene, player = 0):
         self.engine = engine
+        self.scene = scene
+        self.song = self.scene.song
 
         self.starPowerDecreaseDivisor = 200.0/self.engine.audioSpeedFactor
 
