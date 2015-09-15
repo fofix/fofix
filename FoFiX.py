@@ -30,6 +30,34 @@ Main game executable.
 import argparse
 import sys
 import os
+import platform
+import subprocess
+import atexit
+
+def run_command(command):
+    command = command.split(' ')
+    cmd = subprocess.Popen(command,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        stdin=subprocess.PIPE)
+
+    output, err = cmd.communicate()
+    data = output.strip()
+
+    return data
+
+pisSet = None
+# This prevents the following message being displayed on osx:
+# ApplePersistenceIgnoreState: Existing state will not be touched. New state will be written to *path*
+if 'Darwin' in platform.platform():
+    data = run_command('defaults read org.python.python ApplePersistenceIgnoreState')
+
+    if data in ['1', 'ON']:
+        run_command('defaults write org.python.python ApplePersistenceIgnoreState 0')
+        atexit.register(run_command, 'defaults write org.python.python ApplePersistenceIgnoreState %s' % data)
+        apisSet = True
+    else:
+        apisSet = False
 
 # Add the directory of DLL dependencies to the PATH if we're running
 # from source on Windows so we pick them up when those bits are imported.
