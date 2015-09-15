@@ -4541,7 +4541,6 @@ class GuitarScene(BandPlayBaseScene):
 
         num = self.getPlayerNum(control)
 
-        print key, unicode, pullOff
         pressed = False
 
         if self.instruments[num].isDrum and control in (self.instruments[num].keys):
