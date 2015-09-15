@@ -1013,7 +1013,6 @@ class SettingsMenu(Menu.Menu):
         for i in range(maxplayer):
             choices.append(ConfigChoice(self.engine, self.engine.config, "game", "jurg_p%d" % i, autoApply = True))
             choices.append(ConfigChoice(self.engine, self.engine.config, "game", "jurg_skill_p%d" % i, autoApply = True))
-            choices.append(ConfigChoice(self.engine, self.engine.config, "game", "jurg_logic_p%d" % i, autoApply = True))
         if init:
             return choices
         self.engine.mainMenu.settingsMenuObject.jurgenSettingsMenu.choices = choices
@@ -1523,9 +1522,6 @@ class GameSettingsMenu(Menu.Menu):
 
         for i, player in enumerate(players):
             Cheats.append(ConfigChoice(engine, engine.config, "game", "jurg_p%d" % i, autoApply = True))#Jurgen config -- Spikehead777
-            if player.part.id != VOCAL_PART:
-                Cheats.append(ConfigChoice(engine, engine.config, "game", "jurg_logic_p%d" % i, autoApply = True))#MFH
-             #MFH
         CheatMenu = Menu.Menu(engine, Cheats, pos = (.350, .310), viewSize = 5, textColor = gTextColor, selectedColor = gSelectedColor)
 
         settings = [

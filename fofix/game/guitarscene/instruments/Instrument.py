@@ -703,17 +703,6 @@ class Instrument(object):
             notes = self.getDoubleNotes(notes)
         return sorted(notes, key=lambda x: x[0])    #MFH - what the hell, this should be sorted by TIME not note number....
 
-    #MFH - corrected and optimized:
-    def getRequiredNotesForJurgenOnTime(self, song, pos):
-        track   = song.track[self.player]
-        notes = [(time, event) for time, event in track.getEvents(pos - self.lateMargin, pos + 30) if isinstance(event, Note)]
-        notes = [(time, event) for time, event in notes if not (event.hopod or event.played or event.skipped)]
-
-        if not self.isDrum:
-            if self.battleStatus[7]:
-                notes = self.getDoubleNotes(notes)
-        return sorted(notes, key=lambda x: x[0])    #MFH - what the hell, this should be sorted by TIME not note number....
-
     def areNotesTappable(self, notes):
         if not notes:
             return

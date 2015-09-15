@@ -283,7 +283,6 @@ class BandPlayBaseScene(Scene):
         #Re-apply Jurgen Settings -- Spikehead777
         self.autoPlay         = False
         self.jurg             = [False for i in self.players]
-        self.jurgenLogic             = [0 for i in self.players]
         self.aiSkill             = [0 for i in self.players]
 
         for i, player in enumerate(self.players):
@@ -295,7 +294,6 @@ class BandPlayBaseScene(Scene):
             if player.part.id == Song.VOCAL_PART:
                 self.instruments[i].jurgenEnabled = jurgen
                 self.instruments[i].jurgenSkill   = self.aiSkill[i]
-            self.jurgenLogic[i] = self.engine.config.get("game", "jurg_logic_p%d" % i)
 
 
         #MFH - no Jurgen in Career mode.
@@ -781,10 +779,6 @@ class GuitarScene(BandPlayBaseScene):
                 self.soloShifts.append([])
 
         Log.debug("GuitarScene keysList: %s" % str(self.keysList))
-
-        self.jurgenLogic             = [0 for i in self.players]
-        for i in range(len(self.players)):
-            self.jurgenLogic[i] = self.engine.config.get("game", "jurg_logic_p%d" % i)
 
         self.aiSkill                 = [0 for i in self.players]
         self.aiHitPercentage         = [0 for i in self.players]
@@ -2895,7 +2889,7 @@ class GuitarScene(BandPlayBaseScene):
                         continue
                 if instrument.isVocal:
                     continue
-                guitar = instrument
+
                 if self.battleGH:
                     self.aiUseSP[i] = 0
                     if self.aiSkill[i] == 4 or self.aiSkill[i] == 5:
@@ -2908,198 +2902,77 @@ class GuitarScene(BandPlayBaseScene):
                     else:
                         self.aiUseSP[i] = 100
 
-                if self.battleGH: #PRELIM LOGIC until algorithm goes in
-                    if guitar.battleObjects[0] != 0:
-                        if self.aiUseSP[i] > 50 and pos > guitar.battleGetTime + self.jurgBattleUseTime[i]:
+                    #PRELIM LOGIC until algorithm goes in
+                    if instrument.battleObjects[0] != 0:
+                        if self.aiUseSP[i] > 50 and pos > instrument.battleGetTime + self.jurgBattleUseTime[i]:
                             self.activateSP(i)
-                    if guitar.battleStatus[4]:
-                        if guitar.battleWhammyNow == 0:
-                            guitar.battleStatus[4] = False
-                            for k, nowUsed in enumerate(guitar.battleBeingUsed):
-                                if guitar.battleBeingUsed[k] == 4:
-                                    guitar.battleBeingUsed[k] = 0
-                        if guitar.battleWhammyNow != 0:
-                            if pos - guitar.battleStartTimes[4] > self.jurgBattleWhammyTime[i]:
-                                guitar.battleStartTimes[4] = pos
-                                guitar.battleWhammyNow -= 1
+                    if instrument.battleStatus[4]:
+                        if instrument.battleWhammyNow == 0:
+                            instrument.battleStatus[4] = False
+                            for k, nowUsed in enumerate(instrument.battleBeingUsed):
+                                if instrument.battleBeingUsed[k] == 4:
+                                    instrument.battleBeingUsed[k] = 0
+                        if instrument.battleWhammyNow != 0:
+                            if pos - instrument.battleStartTimes[4] > self.jurgBattleWhammyTime[i]:
+                                instrument.battleStartTimes[4] = pos
+                                instrument.battleWhammyNow -= 1
 
 
+                # Have Jurgen attempt to strum on time instead of as early as possible
+                # This method retrieves all notes in the window and only attempts to play them as they pass the current position, like a real player
+                notes = self.instruments[i].getRequiredNotesMFH(self.song, pos)  #mfh - needed updatin'
 
-                if self.jurgenLogic[i] == 0:   #original FoF / RF-Mod style Jurgen Logic (cannot handle fast notes / can only handle 1 strum per notewindow)
-                    notes = self.instruments[i].getRequiredNotesMFH(self.song, pos)  #mfh - needed updatin'
-                    notes = [note.number for time, note in notes]
-                    changed = False
-                    held = 0
+                #now, want to isolate the first note or set of notes to strum - then do it, and then release the controls
+                if notes:
+                    jurgStrumTime = notes[0][0]
+                    jurgStrumNotes = [note.number for time, note in notes if abs(time-jurgStrumTime) <= chordFudge]
+                else:
+                    jurgStrumTime = 0
+                    jurgStrumNotes = []
+
+                changed = False
+                held = 0
+
+                if self.battleJurgMissTime[i] != jurgStrumTime:
+                    self.battleJurgMissTime[i] = jurgStrumTime
+                    if instrument.battleStatus[2] or instrument.battleStatus[6] or instrument.battleStatus[7] or instrument.battleStatus[8]:
+                        if random.randint(0,100) > self.aiHitPercentage[i] - ((5-self.aiSkill[i])*15):
+                            self.aiPlayNote[i] = False
+                        else:
+                            self.aiPlayNote[i] = True
+                    else:
+                        if random.randint(1,100) > self.aiHitPercentage[i]:
+                            self.aiPlayNote[i] = False
+                        else:
+                            self.aiPlayNote[i] = True
+
+                # MFH - check if jurgStrumTime is close enough to the current position (or behind it) before actually playing the notes:
+                if (not notes or jurgStrumTime <= (pos + 30)) and self.aiPlayNote[i]:
                     for n, k in enumerate(self.keysList[i]):
                         if n > 4: break
-                        if (self.autoPlay and self.jurg[i]) or (k == guitar.keys[4] and self.playerAssist[i] == 2) or ((k == guitar.keys[4] or k == guitar.keys[3]) and self.playerAssist[i] == 1) or (self.playerAssist[i] == 3 and k == guitar.keys[0]):
-                            if n in notes and not self.controls.getState(k):
+                        if (self.autoPlay and self.jurg[i]) or (k == instrument.keys[4] and self.playerAssist[i] == 2) or ((k == instrument.keys[4] or k == instrument.keys[3]) and self.playerAssist[i] == 1) or (instrument.isDrum and self.playerAssist[i] == 3 and k == instrument.keys[0]):
+                            if n in jurgStrumNotes and not self.controls.getState(k):
                                 changed = True
                                 self.controls.toggle(k, True)
-                                self.keyPressed3(None, 0, k)  #mfh
-                            elif not n in notes and self.controls.getState(k):
+                                self.keyPressed(None, 0, k)  #mfh
+                            elif not n in jurgStrumNotes and self.controls.getState(k):
                                 changed = True
                                 self.controls.toggle(k, False)
-                                self.keyReleased3(k)    #mfh
+                                self.keyReleased(k)    #mfh
                             if self.controls.getState(k):
                                 held += 1
 
-                    if changed and held and not guitar.isDrum:  #dont need the extra pick for drums
+
+
+
+                    if changed and held and not instrument.isDrum:  #dont need the extra pick for drums
                         #myfingershurt:
                         self.handlePick(i)
-
-                elif self.jurgenLogic[i] == 1:   #Jurgen logic style MFH-Early -- will separate notes out by time index, with chord slop detection, and strum every note
-                    #MFH - Jurgen needs some logic that can handle notes that may be coming too fast to retrieve one set at a time
-                    notes = self.instruments[i].getRequiredNotesMFH(self.song, pos)  #mfh - needed updatin'
-
-                    #now, want to isolate the first note or set of notes to strum - then do it, and then release the controls
-                    if notes:
-                        jurgStrumTime = notes[0][0]
-                        jurgStrumNotes = [note.number for time, note in notes if abs(time-jurgStrumTime) <= chordFudge]
-                        if self.battleJurgMissTime[i] != jurgStrumTime:
-                            self.battleJurgMissTime[i] = jurgStrumTime
-                            if guitar.battleStatus[2] or guitar.battleStatus[6] or guitar.battleStatus[7] or guitar.battleStatus[8]:
-                                if random.randint(0,100) > self.aiHitPercentage[i] - ((5-self.aiSkill[i])*15):
-                                    self.aiPlayNote[i] = False
-                                else:
-                                    self.aiPlayNote[i] = True
-                            else:
-                                if random.randint(0,100) > self.aiHitPercentage[i]:
-                                    self.aiPlayNote[i] = False
-                                else:
-                                    self.aiPlayNote[i] = True
-                    else:
-                        jurgStrumNotes = []
-
-                    changed = False
-                    held = 0
-
-
-
-                    if self.aiPlayNote[i]:
-
-                        for n, k in enumerate(self.keysList[i]):
-                            if n > 4: break
-                            if (self.autoPlay and self.jurg[i]) or (k == guitar.keys[4] and self.playerAssist[i] == 2) or ((k == guitar.keys[4] or k == guitar.keys[3]) and self.playerAssist[i] == 1) or (guitar.isDrum and self.playerAssist[i] == 3 and k == guitar.keys[0]):
-                                if n in jurgStrumNotes and not self.controls.getState(k):
-                                    changed = True
-                                    self.controls.toggle(k, True)
-                                    self.keyPressed(None, 0, k)  #mfh
-                                elif not n in jurgStrumNotes and self.controls.getState(k):
-                                    changed = True
-                                    self.controls.toggle(k, False)
-                                    self.keyReleased(k)    #mfh
-                                if self.controls.getState(k):
-                                    held += 1
-
-
-                        if changed and held and not guitar.isDrum:  #dont need the extra pick for drums
-                            #myfingershurt:
-                            self.handlePick(i)
-
-                elif self.jurgenLogic[i] == 2:   #Jurgen logic style MFH-OnTime1 -- Have Jurgen attempt to strum on time instead of as early as possible
-                    #This method simply shrinks the note retrieval window to only notes that are on time and late.  No early notes are even considered.
-                    #MFH - Jurgen needs some logic that can handle notes that may be coming too fast to retrieve one set at a time
-                    notes = self.instruments[i].getRequiredNotesForJurgenOnTime(self.song, pos)  #mfh - needed updatin'
-
-                    #now, want to isolate the first note or set of notes to strum - then do it, and then release the controls
-                    if notes:
-                        jurgStrumTime = notes[0][0]
-                        jurgStrumNotes = [note.number for time, note in notes if abs(time-jurgStrumTime) <= chordFudge]
-                        if self.battleJurgMissTime[i] != jurgStrumTime:
-                            self.battleJurgMissTime[i] = jurgStrumTime
-                            if guitar.battleStatus[2] or guitar.battleStatus[6] or guitar.battleStatus[7] or guitar.battleStatus[8]:
-                                if random.randint(0,100) > self.aiHitPercentage[i] - ((5-self.aiSkill[i])*15):
-                                    self.aiPlayNote[i] = False
-                                else:
-                                    self.aiPlayNote[i] = True
-                            else:
-                                if random.randint(0,100) > self.aiHitPercentage[i]:
-                                    self.aiPlayNote[i] = False
-                                else:
-                                    self.aiPlayNote[i] = True
-                    else:
-                        jurgStrumNotes = []
-                        self.aiPlayNote[i] = True
-
-                    changed = False
-                    held = 0
-
-
-                    if self.aiPlayNote[i]:
-                        for n, k in enumerate(self.keysList[i]):
-                            if n > 4: break
-                            if (self.autoPlay and self.jurg[i]) or (k == guitar.keys[4] and self.playerAssist[i] == 2) or ((k == guitar.keys[4] or k == guitar.keys[3]) and self.playerAssist[i] == 1) or (guitar.isDrum and self.playerAssist[i] == 3 and k == guitar.keys[0]):
-                                if n in jurgStrumNotes and not self.controls.getState(k):
-                                    changed = True
-                                    self.controls.toggle(k, True)
-                                    self.keyPressed(None, 0, k)  #mfh
-                                elif not n in jurgStrumNotes and self.controls.getState(k):
-                                    changed = True
-                                    self.controls.toggle(k, False)
-                                    self.keyReleased(k)    #mfh
-                                if self.controls.getState(k):
-                                    held += 1
-                        if changed and held and not guitar.isDrum:  #dont need the extra pick for drums
-                            #myfingershurt:
-                            self.handlePick(i)
-
-                elif self.jurgenLogic[i] == 3:   #Jurgen logic style MFH-OnTime2 -- Have Jurgen attempt to strum on time instead of as early as possible
-                    #This method retrieves all notes in the window and only attempts to play them as they pass the current position, like a real player
-                    notes = self.instruments[i].getRequiredNotesMFH(self.song, pos)  #mfh - needed updatin'
-
-
-
-                    #now, want to isolate the first note or set of notes to strum - then do it, and then release the controls
-                    if notes:
-                        jurgStrumTime = notes[0][0]
-                        jurgStrumNotes = [note.number for time, note in notes if abs(time-jurgStrumTime) <= chordFudge]
-                    else:
-                        jurgStrumTime = 0
-                        jurgStrumNotes = []
-
-                    changed = False
-                    held = 0
-
-                    if self.battleJurgMissTime[i] != jurgStrumTime:
-                        self.battleJurgMissTime[i] = jurgStrumTime
-                        if guitar.battleStatus[2] or guitar.battleStatus[6] or guitar.battleStatus[7] or guitar.battleStatus[8]:
-                            if random.randint(0,100) > self.aiHitPercentage[i] - ((5-self.aiSkill[i])*15):
-                                self.aiPlayNote[i] = False
-                            else:
-                                self.aiPlayNote[i] = True
-                        else:
-                            if random.randint(1,100) > self.aiHitPercentage[i]:
-                                self.aiPlayNote[i] = False
-                            else:
-                                self.aiPlayNote[i] = True
-                    #MFH - check if jurgStrumTime is close enough to the current position (or behind it) before actually playing the notes:
-                    if (not notes or jurgStrumTime <= (pos + 30)) and self.aiPlayNote[i]:
-                        for n, k in enumerate(self.keysList[i]):
-                            if n > 4: break
-                            if (self.autoPlay and self.jurg[i]) or (k == guitar.keys[4] and self.playerAssist[i] == 2) or ((k == guitar.keys[4] or k == guitar.keys[3]) and self.playerAssist[i] == 1) or (guitar.isDrum and self.playerAssist[i] == 3 and k == guitar.keys[0]):
-                                if n in jurgStrumNotes and not self.controls.getState(k):
-                                    changed = True
-                                    self.controls.toggle(k, True)
-                                    self.keyPressed(None, 0, k)  #mfh
-                                elif not n in jurgStrumNotes and self.controls.getState(k):
-                                    changed = True
-                                    self.controls.toggle(k, False)
-                                    self.keyReleased(k)    #mfh
-                                if self.controls.getState(k):
-                                    held += 1
-
-
-
-
-                        if changed and held and not guitar.isDrum:  #dont need the extra pick for drums
-                            #myfingershurt:
-                            self.handlePick(i)
-                        #MFH - release all frets - who cares about held notes, I want a test player (actually if no keyReleased call, will hold notes fine)
-                        for n, k in enumerate(self.keysList[i]):
-                            if (self.autoPlay and self.jurg[i]) or (k == guitar.keys[4] and self.playerAssist[i] == 2) or ((k == guitar.keys[4] or k == guitar.keys[3]) and self.playerAssist[i] == 1) or (guitar.isDrum and self.playerAssist[i] == 3 and k == guitar.keys[0]):
-                                if self.controls.getState(k):
-                                    self.controls.toggle(k, False)
+                    #MFH - release all frets - who cares about held notes, I want a test player (actually if no keyReleased call, will hold notes fine)
+                    for n, k in enumerate(self.keysList[i]):
+                        if (self.autoPlay and self.jurg[i]) or (k == instrument.keys[4] and self.playerAssist[i] == 2) or ((k == instrument.keys[4] or k == instrument.keys[3]) and self.playerAssist[i] == 1) or (instrument.isDrum and self.playerAssist[i] == 3 and k == instrument.keys[0]):
+                            if self.controls.getState(k):
+                                self.controls.toggle(k, False)
 
 
     def rockmeterDecrease(self, playerNum, vScore = 0):
