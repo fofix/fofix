@@ -23,12 +23,10 @@
 #####################################################################
 
 # FoFiX fully unified setup script
-from distutils.core import setup, Extension
 import distutils.ccompiler
 from distutils.dep_util import newer
 from Cython.Distutils import build_ext as _build_ext
 from distutils.command.install import install as _install
-from distutils.cmd import Command
 import sys, glob, os
 import subprocess
 import shlex
@@ -36,6 +34,12 @@ import shlex
 import numpy as np
 
 from fofix.core import Version, SceneFactory
+
+try:
+    from setuptools import setup, Extension, Command
+except ImportError:
+    from distutils.core import setup, Extension
+    from distutils.cmd import Command
 
 
 # Start setting up py2{exe,app} and building the argument set for setup().
@@ -321,7 +325,18 @@ if os.name == 'nt':
     extra_soundtouch_src = []
 else:
     # Other systems: we ask pkg-config.
-    gl_info = pc_info('gl')
+    try:
+        gl_info = pc_info('gl')
+    except SystemExit:
+        # Work around to include opengl.framwork during compilation on OSX.
+        os.environ['LDFLAGS'] = '-framework opengl'
+        os.environ['CFLAGS'] = '-framework opengl'
+        gl_info = {
+          'define_macros': [],
+          'include_dirs': [],
+          'libraries': [],
+          'library_dirs': [],
+        }
     # And build our own soundtouch-c.
     extra_soundtouch_src = ['fofix/core/MixStream/soundtouch-c.cpp']
 # Build a similar info record for the numpy headers.
