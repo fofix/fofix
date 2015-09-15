@@ -45,8 +45,8 @@ from fofix.core import cmgl
 from fofix.core import Log
 
 class Guitar(Instrument):
-    def __init__(self, engine, playerObj, editorMode = False, player = 0, bass = False):
-        super(Guitar, self).__init__(engine, playerObj, player)
+    def __init__(self, engine, playerObj, player = 0, bass = False):
+        super(Guitar, self).__init__(engine, playerObj, player=player)
 
         self.isDrum = False
         self.isBassGuitar = bass
@@ -67,7 +67,6 @@ class Guitar(Instrument):
 
         self.missedNotes    = []
         self.missedNoteNums = []
-        self.editorMode     = editorMode
 
         self.freestyleHitFlameCounts = [0 for n in range(self.strings+1)]    #MFH
 
@@ -905,7 +904,7 @@ class Guitar(Instrument):
         activeFrets = [note.number for time, note in self.playedNotes]
 
         for n in range(self.strings):
-            if controls.getState(self.keys[n]) or controls.getState(self.keys[n+5]) or (self.editorMode and self.selectedString == n):
+            if controls.getState(self.keys[n]) or controls.getState(self.keys[n+5]):
                 self.fretWeight[n] = 0.5
             else:
                 self.fretWeight[n] = max(self.fretWeight[n] - ticks / 64.0, 0.0)

@@ -40,8 +40,9 @@ diffMod    = {0: 1.4, 1: 1.6, 2: 1.75, 3: 1.9}
 baseScores = {0: 1000, 1: 800, 2: 400, 3: 200}
 
 class Vocalist:
-    def __init__(self, engine, playerObj, editorMode = False, player = 0):
+    def __init__(self, engine, playerObj, player = 0):
         self.engine = engine
+
         self.mic = Microphone(self.engine, playerObj.controller)
 
         #Get theme

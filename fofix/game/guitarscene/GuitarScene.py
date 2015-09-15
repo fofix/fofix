@@ -731,7 +731,7 @@ class GuitarScene(BandPlayBaseScene):
         for j,player in enumerate(self.players):
             guitar = True
             if player.part.id == Song.VOCAL_PART:
-                inst = Vocalist(self.engine, player, False, j)
+                inst = Vocalist(self.engine, player, player=j)
                 if self.coOpRB:
                     inst.coOpRB = True
                 self.instruments.append(inst)
@@ -741,13 +741,13 @@ class GuitarScene(BandPlayBaseScene):
                 guitar = False
             elif player.part.id == Song.DRUM_PART:
                 #myfingershurt: drums :)
-                inst = Drum(self.engine,player,False,j)
+                inst = Drum(self.engine, player, player=j)
                 self.instruments.append(inst)
             else:
                 bass = False
                 if player.part.id == Song.BASS_PART:
                     bass = True
-                inst = Guitar(self.engine,player,False,j, bass = bass)
+                inst = Guitar(self.engine, player, player=j, bass = bass)
                 self.instruments.append(inst)
                 if player.part.id == Song.LEAD_PART or player.part.id == Song.GUITAR_PART:    #both these selections should get guitar solos
                     self.instruments[j].canGuitarSolo = True

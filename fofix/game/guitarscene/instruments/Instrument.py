@@ -37,7 +37,7 @@ from fofix.core import Log
 
 class Instrument(object):
     def __init__(self, engine, playerObj, player = 0):
-        self.engine         = engine
+        self.engine = engine
 
         self.starPowerDecreaseDivisor = 200.0/self.engine.audioSpeedFactor
 
@@ -46,7 +46,6 @@ class Instrument(object):
         self.isStarPhrase = False
         self.finalStarSeen = False
 
-        self.selectedString = 0
         self.time           = 0.0
         self.pickStartPos   = 0
         self.leftyMode      = False
@@ -596,15 +595,6 @@ class Instrument(object):
         self.loadNotes()
         self.loadTails()
         self.loadFlames()
-
-    def selectPreviousString(self):
-        self.selectedString = (self.selectedString - 1) % self.strings
-
-    def selectString(self, string):
-        self.selectedString = string % self.strings
-
-    def selectNextString(self):
-        self.selectedString = (self.selectedString + 1) % self.strings
 
     def setMultiplier(self, multiplier):
         self.scoreMultiplier = multiplier
