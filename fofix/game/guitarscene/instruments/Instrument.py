@@ -2023,36 +2023,21 @@ class Instrument(object):
             else:
                 isTappable = True
 
-            # Clip the played notes to the origin
-            #myfingershurt: this should be loaded once at init, not every render...
-            if self.notedisappear == 0:#Notes keep on going when missed
-                if event.played or event.hopod:#if the note isnt missed
+
+            if z < 0:# Note past frets
+                if event.played or event.hopod:# note hit
                     tailOnly = True
                     length += z
                     z = 0
                     if length <= 0:
                         continue
-                if z < 0 and not (event.played or event.hopod):#if the note is missed
-                    color = (.6, .6, .6, .5 * visibility * f)
-            elif self.notedisappear == 1:#Notes disappear when missed
-                if z < 0:#if note past frets
-                    if event.played or event.hopod:#if note was hit
-                        tailOnly = True
-                        length += z
-                        z = 0
-                        if length <= 0:
-                            continue
-                    else:#note missed
+                else:# note is missed
+                    if self.notedisappear == 0:#Notes keep on going when missed
                         color = (.6, .6, .6, .5 * visibility * f)
-            if self.notedisappear == 2:#turn red when missed
-                if event.played or event.hopod:  #if the note isnt missed
-                    tailOnly = True
-                    length += z
-                    z = 0
-                    if length <= 0:
-                        continue
-                if z < 0 and not (event.played or event.hopod): #if the note is missed
-                    color = (1, 0, 0, 1)#turn note red
+                    elif self.notedisappear == 1:#Notes disappear when missed
+                        color = (0.0, 0.0, 0.0, 0.0)
+                    if self.notedisappear == 2:#turn red when missed
+                        color = (1, 0, 0, 1)
 
             big = False
             self.bigMax = 0
