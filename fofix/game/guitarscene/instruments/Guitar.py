@@ -66,7 +66,6 @@ class Guitar(Instrument):
         self.lastPlayedNotes = []   #MFH - for reverting when game discovers it implied incorrectly
 
         self.missedNotes    = []
-        self.missedNoteNums = []
 
         self.freestyleHitFlameCounts = [0 for n in range(self.strings+1)]    #MFH
 
@@ -546,7 +545,6 @@ class Guitar(Instrument):
         chordlist.sort(key=lambda a: a[0][0])
 
         self.missedNotes = []
-        self.missedNoteNums = []
         twochord = 0
 
         for chord in chordlist:
@@ -559,6 +557,7 @@ class Guitar(Instrument):
                     if controls.getState(k):
                         twochord += 1
                 if twochord == 2:
+                    skipped = len(requiredKeys) - 2
                     requiredKeys = [min(requiredKeys), max(requiredKeys)]
                 else:
                     twochord = 0
@@ -581,12 +580,9 @@ class Guitar(Instrument):
             self.missedNotes.append(chord)
         else:
             self.missedNotes = []
-            self.missedNoteNums = []
 
         for chord in self.missedNotes:
             for time, note in chord:
-                if self.debugMode:
-                    self.missedNoteNums.append(note.number)
                 note.skipped = True
                 note.played = False
         if twochord == 2:
@@ -612,11 +608,12 @@ class Guitar(Instrument):
         self.playedNotes = []
 
         if self.controlsMatchNotes(controls, self.matchingNotes):
-            self.pickStartPos = pos
             for time, note in self.matchingNotes:
                 if note.skipped == True:
                     continue
-                self.pickStartPos = max(self.pickStartPos, time)
+
+                self.pickStartPos = max(pos, time)
+
                 note.played       = True
                 self.playedNotes.append([time, note])
                 if self.guitarSolo:
@@ -634,7 +631,7 @@ class Guitar(Instrument):
         self.lastPlayedNotes = self.playedNotes
         self.playedNotes = []
 
-        self.controlsMatchNotes3(controls, self.matchingNotes, hopo)
+        self.controlsMatchNotes3(controls, self.matchingNotes, hopo=hopo)
 
         #myfingershurt
 
@@ -642,13 +639,12 @@ class Guitar(Instrument):
             if note.played != True:
                 continue
 
+            self.pickStartPos = max(pos, time)
+
             if shaders.turnon:
                 shaders.var["fret"][self.player][note.number]=shaders.time()
                 shaders.var["fretpos"][self.player][note.number]=pos
 
-
-            self.pickStartPos = pos
-            self.pickStartPos = max(self.pickStartPos, time)
             if hopo:
                 note.hopod        = True
             else:
