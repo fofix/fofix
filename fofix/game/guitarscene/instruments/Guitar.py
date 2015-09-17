@@ -505,7 +505,6 @@ class Guitar(Instrument):
 
 
         def matchNotes(chordTuple, requiredKeys):
-            print requiredKeys
             if len(chordTuple) > 1: #Chords must match exactly
                 for n in range(self.strings):
                     if (n in requiredKeys and not (controls.getState(self.keys[n]) or controls.getState(self.keys[n+5]))) or (n not in requiredKeys and (controls.getState(self.keys[n]) or controls.getState(self.keys[n+5]))):
