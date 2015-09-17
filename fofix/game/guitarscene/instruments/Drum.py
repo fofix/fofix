@@ -57,8 +57,8 @@ from fofix.core import Log
 # to enable it, only here and Player.drums should need changing.
 
 class Drum(Instrument):
-    def __init__(self, engine, playerObj, song, player = 0):
-        super(Drum, self).__init__(engine, playerObj, player, song)
+    def __init__(self, engine, playerObj, scene, player = 0):
+        super(Drum, self).__init__(engine, playerObj, scene, player=player)
 
         self.isDrum = True
         self.isBassGuitar = False
