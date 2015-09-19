@@ -66,7 +66,7 @@ if os.name == 'nt' and not hasattr(sys, 'frozen'):
 
 def disable_gl_checks():
     assert 'OpenGL' not in sys.modules
-    
+
     import OpenGL
     if OpenGL.__version__ >= '3':
         OpenGL.ERROR_CHECKING = False
@@ -79,7 +79,7 @@ def disable_gl_checks():
 def cmd_args():
     parser = argparse.ArgumentParser(description='Frets On Fire X (FoFiX)')
     # Where the name automatically assigned to the metavar option is to long i used x in its place.
-    # Might go back and 
+    # Might go back and
     options = parser.add_argument_group('Options')
     options.add_argument('-r', '--resolution', type=str,  metavar='x',    help='Force a specific resolution to be used.')
     options.add_argument('-f', '--fullscreen',  action='store_true',       help='Force usage of full-screen mode.')
@@ -185,8 +185,13 @@ class Main():
         if self.playing is not None:
             Log.debug('Validating song directory for one-shot mode.')
 
+            # get paths
             library = Config.get("setlist","base_library")
             basefolder = os.path.join(Version.dataPath(),library,"songs",self.playing)
+            self.songName = os.path.basename(os.path.normpath(self.playing))
+            self.songFolder = self.playing.split(self.songName)[0]
+            self.libraryName = os.path.join(Version.dataPath(), library,
+                    "songs", self.songFolder)
 
 
             if not os.path.exists(os.path.join(basefolder, "song.ini")):
@@ -203,19 +208,20 @@ class Main():
 
             # Set up one-shot mode
             Log.debug('Entering one-shot mode.')
-            Config.set("setlist", "selected_song", playing)
+            Config.set("setlist", "selected_song", self.songName)
+            Config.set("setlist", "selected_library", self.libraryName)
 
             self.engine.cmdPlay = 1
 
-            if diff is not None:
-                self.engine.cmdDiff = int(diff)
-            if part is not None:
-                self.engine.cmdPart = int(part)
+            if self.diff is not None:
+                self.engine.cmdDiff = int(self.diff)
+            if self.part is not None:
+                self.engine.cmdPart = int(self.part)
 
-            if players == 1:
-                self.engine.cmdMode = players, mode, 0
+            if self.players == 1:
+                self.engine.cmdMode = self.players, self.mode, 0
             else:
-                self.engine.cmdMode = players, 0, mode
+                self.engine.cmdMode = self.players, 0, self.mode
 
     def restart(self):
         Log.notice("Restarting.")
