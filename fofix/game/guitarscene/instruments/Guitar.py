@@ -66,7 +66,6 @@ class Guitar(Instrument):
         self.lastPlayedNotes = []   #MFH - for reverting when game discovers it implied incorrectly
 
         self.missedNotes    = []
-        self.missedNoteNums = []
 
         self.freestyleHitFlameCounts = [0 for n in range(self.strings+1)]    #MFH
 
@@ -501,7 +500,31 @@ class Guitar(Instrument):
 
         return True
 
+
     def controlsMatchNotes3(self, controls, notes, hopo = False):
+
+
+        def matchNotes(chordTuple, requiredKeys):
+            if len(chordTuple) > 1: #Chords must match exactly
+                for n in range(self.strings):
+                    if (n in requiredKeys and not (controls.getState(self.keys[n]) or controls.getState(self.keys[n+5]))) or (n not in requiredKeys and (controls.getState(self.keys[n]) or controls.getState(self.keys[n+5]))):
+                        return False
+            else: #Single Note must match that note
+                requiredKey = requiredKeys[0]
+                if not controls.getState(self.keys[requiredKey]) and not controls.getState(self.keys[requiredKey+5]):
+                    return False
+
+
+                #myfingershurt: this is where to filter out higher frets held when HOPOing:
+                if hopo == False or self.hopoStyle == 2 or self.hopoStyle == 3:
+                #Check for higher numbered frets if not a HOPO or if GH2 strict mode
+                    for n, k in enumerate(self.keys):
+                        if (n > requiredKey and n < 5) or (n > 4 and n > requiredKey + 5):
+                        #higher numbered frets cannot be held
+                            if controls.getState(k):
+                                return False
+            return True
+
         # no notes?
         if not notes:
             return False
@@ -521,12 +544,11 @@ class Guitar(Instrument):
         chordlist.sort(key=lambda a: a[0][0])
 
         self.missedNotes = []
-        self.missedNoteNums = []
         twochord = 0
+
         for chord in chordlist:
             # matching keys?
-            requiredKeys = [note.number for time, note in chord]
-            requiredKeys = self.uniqify(requiredKeys)
+            requiredKeys = self.uniqify([note.number for time, note in chord])
 
             if len(requiredKeys) > 2 and self.twoChordMax == True:
                 twochord = 0
@@ -539,7 +561,7 @@ class Guitar(Instrument):
                 else:
                     twochord = 0
 
-            if (self.controlsMatchNote3(controls, chord, requiredKeys, hopo)):
+            if (matchNotes(chord, requiredKeys)):
                 if twochord != 2:
                     for time, note in chord:
                         note.played = True
@@ -557,12 +579,9 @@ class Guitar(Instrument):
             self.missedNotes.append(chord)
         else:
             self.missedNotes = []
-            self.missedNoteNums = []
 
         for chord in self.missedNotes:
             for time, note in chord:
-                if self.debugMode:
-                    self.missedNoteNums.append(note.number)
                 note.skipped = True
                 note.played = False
         if twochord == 2:
@@ -578,29 +597,6 @@ class Guitar(Instrument):
             result.append(marker)
         return result
 
-    def controlsMatchNote3(self, controls, chordTuple, requiredKeys, hopo):
-        if len(chordTuple) > 1:
-        #Chords must match exactly
-            for n in range(self.strings):
-                if (n in requiredKeys and not (controls.getState(self.keys[n]) or controls.getState(self.keys[n+5]))) or (n not in requiredKeys and (controls.getState(self.keys[n]) or controls.getState(self.keys[n+5]))):
-                    return False
-        else:
-        #Single Note must match that note
-            requiredKey = requiredKeys[0]
-            if not controls.getState(self.keys[requiredKey]) and not controls.getState(self.keys[requiredKey+5]):
-                return False
-
-
-            #myfingershurt: this is where to filter out higher frets held when HOPOing:
-            if hopo == False or self.hopoStyle == 2 or self.hopoStyle == 3:
-            #Check for higher numbered frets if not a HOPO or if GH2 strict mode
-                for n, k in enumerate(self.keys):
-                    if (n > requiredKey and n < 5) or (n > 4 and n > requiredKey + 5):
-                    #higher numbered frets cannot be held
-                        if controls.getState(k):
-                            return False
-
-        return True
 
     def startPick(self, song, pos, controls):
         if not song:
@@ -611,17 +607,19 @@ class Guitar(Instrument):
         self.playedNotes = []
 
         if self.controlsMatchNotes(controls, self.matchingNotes):
-            self.pickStartPos = pos
             for time, note in self.matchingNotes:
                 if note.skipped == True:
                     continue
-                self.pickStartPos = max(self.pickStartPos, time)
+
+                self.pickStartPos = max(pos, time)
+
                 note.played       = True
                 self.playedNotes.append([time, note])
                 if self.guitarSolo:
                     self.currentGuitarSoloHitNotes += 1
             return True
         return False
+
 
     def startPick3(self, song, pos, controls, hopo = False):
         if not song:
@@ -632,7 +630,7 @@ class Guitar(Instrument):
         self.lastPlayedNotes = self.playedNotes
         self.playedNotes = []
 
-        self.controlsMatchNotes3(controls, self.matchingNotes, hopo)
+        self.controlsMatchNotes3(controls, self.matchingNotes, hopo=hopo)
 
         #myfingershurt
 
@@ -640,13 +638,12 @@ class Guitar(Instrument):
             if note.played != True:
                 continue
 
+            self.pickStartPos = max(pos, time)
+
             if shaders.turnon:
                 shaders.var["fret"][self.player][note.number]=shaders.time()
                 shaders.var["fretpos"][self.player][note.number]=pos
 
-
-            self.pickStartPos = pos
-            self.pickStartPos = max(self.pickStartPos, time)
             if hopo:
                 note.hopod        = True
             else:

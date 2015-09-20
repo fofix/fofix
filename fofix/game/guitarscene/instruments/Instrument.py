@@ -2035,7 +2035,7 @@ class Instrument(object):
                     if self.notedisappear == 0:#Notes keep on going when missed
                         color = (.6, .6, .6, .5 * visibility * f)
                     elif self.notedisappear == 1:#Notes disappear when missed
-                        color = (0.0, 0.0, 0.0, 0.0)
+                        color = (.6, .6, .6, .5 * visibility * f)
                     if self.notedisappear == 2:#turn red when missed
                         color = (1, 0, 0, 1)
 

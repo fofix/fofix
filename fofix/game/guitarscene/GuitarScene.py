@@ -4062,11 +4062,6 @@ class GuitarScene(BandPlayBaseScene):
             #Any previous notes missed, but new ones hit, reset streak counter
             if len(self.instruments[num].missedNotes) > 0:
 
-                if self.hopoDebugDisp == 1  and not self.instruments[num].isDrum:
-                    problemNoteMatchingList = [(int(tym), noat.number, noat.played) for tym, noat in self.instruments[num].matchingNotes]
-                    Log.debug("Skipped note(s) detected in startpick3: %(missedNotes)s, notesToMatch: %(matchNotes)s, activeFrets: %(activeFrets)s, Song time=%(songTime)s" % \
-                      {'missedNotes': str(self.instruments[num].missedNoteNums), 'matchNotes': str(problemNoteMatchingList), 'activeFrets': str(activeKeyList), 'songTime': str(self.timeLeft)})
-
                 scoreCard.streak = 0
                 if self.coOpType:
                     self.scoring[num].streak = 0
@@ -4078,8 +4073,6 @@ class GuitarScene(BandPlayBaseScene):
                 for chord in self.instruments[num].missedNotes:
                     for tym, theNote in chord:  #MFH
                         if not theNote.played and (theNote.star or theNote.finalStar):
-                            if self.logStarpowerMisses == 1:
-                                Log.debug("SP Miss: doPick3GH2(), afterStartPick3Ok-foundMissedCatchupNote: %d, gameTime: %s" % (theNote.number, self.timeLeft) )
                             self.starNotesMissed[num] = True
                             if self.unisonActive:
                                 self.inUnison[num] = False
