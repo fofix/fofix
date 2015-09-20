@@ -243,19 +243,6 @@ def pc_exists(pkg):
         return False
 
 
-# {py26hack} - Python 2.7 has subprocess.check_output for this purpose.
-def grab_stdout(*args, **kw):
-    '''Obtain standard output from a subprocess invocation, raising an exception
-    if the subprocess fails.'''
-
-    kw['stdout'] = subprocess.PIPE
-    proc = subprocess.Popen(*args, **kw)
-    stdout = proc.communicate()[0]
-    if proc.returncode != 0:
-        raise RuntimeError('subprocess %r returned %d' % (args[0], proc.returncode))
-    return stdout.decode('utf-8')
-
-
 # Blacklist MinGW-specific dependency libraries on Windows.
 if os.name == 'nt':
     lib_blacklist = ['m', 'mingw32']
@@ -285,8 +272,8 @@ def pc_info(pkg, altnames=[]):
                 sys.stderr.write('(Check that you have the appropriate development package installed.)\n')
             sys.exit(1)
 
-    cflags = shlex.split(grab_stdout([pkg_config, '--cflags', pkg]))
-    libs = shlex.split(grab_stdout([pkg_config, '--libs', pkg]))
+    cflags = shlex.split(subprocess.check_output([pkg_config, '--cflags', pkg]))
+    libs = shlex.split(subprocess.check_output([pkg_config, '--libs', pkg]))
 
     # Pick out anything interesting in the cflags and libs, and
     # silently drop the rest.
