@@ -160,6 +160,7 @@ The following packages are required:
   * Cython ([link to 0.23](http://www.lfd.uci.edu/~gohlke/pythonlibs/#cython))
 
     This is a Python Wheel, after downloading install it using pip:
+    
     ```pip install Cython‑0.23‑cp27‑none‑win32.whl```
 
 The following packages are optional:
