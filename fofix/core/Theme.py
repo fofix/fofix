@@ -32,13 +32,14 @@ import math
 from OpenGL.GL import *
 from OpenGL.GLU import *
 
-from fofix.core import Log
+from fretwork import log
+from fretwork.task import Task
+
 from fofix.core import Version
 from fofix.core import Config
 from fofix.core.Language import _
 from fofix.core.Shader import shaders
 from fofix.core.Image import drawImage
-from fofix.core.Task import Task
 from fofix.core.constants import *
 
 #Theme Constants.
@@ -55,19 +56,19 @@ def halign(value, default='center'):
                 'center': CENTER,
                 'right':  RIGHT}[value.lower()]
     except KeyError:
-        Log.warn('Invalid horizontal alignment value - defaulting to %s' % default)
+        log.warn('Invalid horizontal alignment value - defaulting to %s' % default)
         return halign(default)
 
 def valign(value, default='middle'):
     try:
         if value.lower() == 'center':
-            Log.notice('Use of "center" for vertical alignment is deprecated. Use "middle" instead.')
+            log.notice('Use of "center" for vertical alignment is deprecated. Use "middle" instead.')
         return {'top':    TOP,
                 'middle': MIDDLE,  # for consistency with HTML/CSS terminology
                 'center': MIDDLE,  # for temporary backward compatibility
                 'bottom': BOTTOM}[value.lower()]
     except KeyError:
-        Log.warn('Invalid vertical alignment value - defaulting to %s' % default)
+        log.warn('Invalid vertical alignment value - defaulting to %s' % default)
         return valign(default)
 
 
@@ -104,16 +105,16 @@ class Theme(Task):
     def __getattr__(self, attr):
         try: #getting to this function is kinda slow. Set it on the first get to keep renders from lagging.
             object.__getattribute__(self, '__dict__')[attr] = defaultDict[attr]
-            Log.debug("No theme variable for %s - Loading default..." % attr)
+            log.debug("No theme variable for %s - Loading default..." % attr)
             return object.__getattribute__(self, attr)
         except KeyError:
             if attr in classNames.keys():
-                Log.warn("No theme class for %s - Loading default..." % attr)
+                log.warn("No theme class for %s - Loading default..." % attr)
                 object.__getattribute__(self, '__dict__')[attr] = classNames[attr](self)
                 return object.__getattribute__(self, attr)
             elif attr.startswith('__') and attr.endswith('__'): #for object's attributes (eg: __hash__, __eq__)
                 return object.__getattribute__(self, attr)
-            Log.error("Attempted to load theme variable %s - no default found." % attr)
+            log.error("Attempted to load theme variable %s - no default found." % attr)
 
     def __init__(self, path, name):
         self.name = name
@@ -121,21 +122,21 @@ class Theme(Task):
 
         self.themePath = os.path.join(Version.dataPath(),"themes", name)
         if not os.path.exists(self.themePath):
-            Log.warn("Theme: %s does not exist!\n" % self.themePath)
+            log.warn("Theme: %s does not exist!\n" % self.themePath)
             name = Config.get("coffee", "themename")
-            Log.notice("Theme: Attempting fallback to default theme \"%s\"." % name)
+            log.notice("Theme: Attempting fallback to default theme \"%s\"." % name)
             self.themePath = os.path.join(Version.dataPath(),"themes", name)
             if not os.path.exists(self.themePath):
-                Log.error("Theme: %s does not exist!\nExiting.\n" % self.themePath)
+                log.error("Theme: %s does not exist!\nExiting.\n" % self.themePath)
                 sys.exit(1)
 
         if os.path.exists(os.path.join(self.themePath, "theme.ini")):
             self.config = Config.MyConfigParser()
             self.config.read(os.path.join(self.themePath, "theme.ini"))
-            Log.debug("theme.ini loaded")
+            log.debug("theme.ini loaded")
         else:
             self.config = None
-            Log.debug("no theme.ini")
+            log.debug("no theme.ini")
 
         def get(value, type = str, default = None):
             if self.config:

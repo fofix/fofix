@@ -34,8 +34,9 @@ from OpenGL.GL.ARB.fragment_shader import *
 from OpenGL.GL.ARB.multitexture import *
 from OpenGL.GL.EXT.texture3D import *
 
+from fretwork import log
+
 from fofix.core.constants import isTrue
-from fofix.core import Log
 from fofix.core import Config
 from fofix.core import Version
 
@@ -72,7 +73,7 @@ class ShaderList:
             name = fname
         fullname = os.path.join(self.workdir, fname)
         vertname, fragname = fullname+".vert", fullname+".frag"
-        Log.debug('Compiling shader "%s" from %s and %s.' % (name, vertname, fragname))
+        log.debug('Compiling shader "%s" from %s and %s.' % (name, vertname, fragname))
         program = self.compile(open(vertname), open(fragname))
         sArray = {"program": program, "name": name, "textures": []}
         self.getVars(vertname, program, sArray)
@@ -389,7 +390,7 @@ class ShaderList:
             noise = open(file).read()
             size = int(len(noise)**(1/3.0))
         else:
-            Log.debug("Can't load %s; generating random 3D noise instead." % file)
+            log.debug("Can't load %s; generating random 3D noise instead." % file)
             return self.makeNoise3D(16)
 
 
@@ -410,7 +411,7 @@ class ShaderList:
             img = pygame.image.load(file)
             noise = pygame.image.tostring(img, "RGB")
         else:
-            Log.debug("Can't load %s; generating random 2D noise instead." % fname)
+            log.debug("Can't load %s; generating random 2D noise instead." % fname)
             return self.makeNoise2D(16)
 
         texture = 0
@@ -511,20 +512,20 @@ class ShaderList:
 
         #stump: check whether all needed extensions are actually supported
         if not glInitShaderObjectsARB():
-            Log.warn('OpenGL extension ARB_shader_objects not supported - shaders disabled')
+            log.warn('OpenGL extension ARB_shader_objects not supported - shaders disabled')
             return
         if not glInitVertexShaderARB():
-            Log.warn('OpenGL extension ARB_vertex_shader not supported - shaders disabled')
+            log.warn('OpenGL extension ARB_vertex_shader not supported - shaders disabled')
             return
         if not glInitFragmentShaderARB():
-            Log.warn('OpenGL extension ARB_fragment_shader not supported - shaders disabled')
+            log.warn('OpenGL extension ARB_fragment_shader not supported - shaders disabled')
             return
         if not glInitMultitextureARB():
-            Log.warn('OpenGL extension ARB_multitexture not supported - shaders disabled')
+            log.warn('OpenGL extension ARB_multitexture not supported - shaders disabled')
             return
         if not glInitTexture3DEXT():
             if sys.platform != 'darwin':
-                Log.warn('OpenGL extension EXT_texture3D not supported - shaders disabled')
+                log.warn('OpenGL extension EXT_texture3D not supported - shaders disabled')
                 return
 
         self.workdir = dir
@@ -534,7 +535,7 @@ class ShaderList:
             self.noise3D = self.loadTex3D("noise3d.dds")
             self.outline = self.loadTex2D("outline.tga")
         except:
-            Log.error('Could not load shader textures - shaders disabled: ')
+            log.error('Could not load shader textures - shaders disabled: ')
             return
 
         self.multiTex = (GL_TEXTURE0_ARB,GL_TEXTURE1_ARB,GL_TEXTURE2_ARB,GL_TEXTURE3_ARB)
@@ -546,7 +547,7 @@ class ShaderList:
         try:
             self.make("lightning","stage")
         except:
-            Log.error("Error compiling lightning shader: ")
+            log.error("Error compiling lightning shader: ")
         else:
             self.enable("stage")
             self.setVar("ambientGlowHeightScale",6.0)
@@ -566,7 +567,7 @@ class ShaderList:
         try:
             self.make("lightning","sololight")
         except:
-            Log.error("Error compiling lightning shader: ")
+            log.error("Error compiling lightning shader: ")
         else:
             self.enable("sololight")
             self.setVar("scalexy",(5.0,1.0))
@@ -588,7 +589,7 @@ class ShaderList:
         try:
             self.make("lightning","tail")
         except:
-            Log.error("Error compiling lightning shader: ")
+            log.error("Error compiling lightning shader: ")
         else:
             self.enable("tail")
             self.setVar("scalexy",(5.0,1.0))
@@ -611,7 +612,7 @@ class ShaderList:
         try:
             self.make("rockbandtail","tail2")
         except:
-            Log.error("Error compiling rockbandtail shader: ")
+            log.error("Error compiling rockbandtail shader: ")
         else:
             self.enable("tail2")
             self.setVar("height",0.2)
@@ -624,7 +625,7 @@ class ShaderList:
         try:
             self.make("metal","notes")
         except:
-            Log.error("Error compiling metal shader: ")
+            log.error("Error compiling metal shader: ")
         else:
             self.enable("notes")
             self.disable()
@@ -632,12 +633,12 @@ class ShaderList:
         try:
             self.make("neck","neck")
         except:
-            Log.error("Error compiling neck shader: ")
+            log.error("Error compiling neck shader: ")
 
         try:
             self.make("cd","cd")
         except:
-            Log.error("Error compiling cd shader: ")
+            log.error("Error compiling cd shader: ")
 
 def mixColors(c1,c2,blend=0.5):
     c1 = list(c1)

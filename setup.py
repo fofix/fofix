@@ -294,22 +294,14 @@ def pc_info(pkg, altnames=[]):
 
 
 ogg_info = pc_info('ogg')
-vorbisfile_info = pc_info('vorbisfile')
-sdl_info = pc_info('sdl')
-sdl_mixer_info = pc_info('SDL_mixer')
 theoradec_info = pc_info('theoradec')
 glib_info = pc_info('glib-2.0')
-gthread_info = pc_info('gthread-2.0')
 swscale_info = pc_info('libswscale')
-soundtouch_info = pc_info('soundtouch', ['soundtouch-1.4', 'soundtouch-1.0'])
 if os.name == 'nt':
     # Windows systems: we just know what the OpenGL library is.
     gl_info = {'libraries': ['opengl32']}
     # And glib needs a slight hack to work correctly.
     glib_info['define_macros'].append(('inline', '__inline'))
-    # And we use the prebuilt soundtouch-c.
-    soundtouch_info['libraries'].append('soundtouch-c')
-    extra_soundtouch_src = []
 else:
     # Other systems: we ask pkg-config.
     try:
@@ -324,8 +316,6 @@ else:
           'libraries': [],
           'library_dirs': [],
         }
-    # And build our own soundtouch-c.
-    extra_soundtouch_src = ['fofix/core/MixStream/soundtouch-c.cpp']
 # Build a similar info record for the numpy headers.
 numpy_info = {'include_dirs': [np.get_include()]}
 
@@ -442,10 +432,6 @@ setup_args.update({
               ['fofix/core/VideoPlayer/_VideoPlayer.pyx', 'fofix/core/VideoPlayer/VideoPlayer.c'],
               **combine_info(gl_info, ogg_info, theoradec_info, glib_info, swscale_info,
               {'include_dirs': ['.']})),
-    Extension('fofix.lib._MixStream',
-              ['fofix/core/MixStream/_MixStream.pyx', 'fofix/core/MixStream/MixStream.c',
-               'fofix/core/MixStream/vorbis.c'] + extra_soundtouch_src,
-              **combine_info(vorbisfile_info, soundtouch_info, glib_info, gthread_info, sdl_info, sdl_mixer_info)),
   ],
   'cmdclass': {'build_ext': build_ext, 'install': install, 'msgfmt': msgfmt, 'xgettext': xgettext},
 })

@@ -38,6 +38,9 @@ import os
 
 from OpenGL.GL import *
 
+
+from fretwork import log
+
 from fofix.game.Song import Note, TextEvent, PictureEvent, loadSong, Bars, VocalPhrase
 from fofix.core.Player import STAR, KILL, CANCEL, KEY1A
 from fofix.game.guitarscene.instruments import *
@@ -53,7 +56,6 @@ from fofix.game import Dialogs
 from fofix.core import Settings
 from fofix.game import Song
 from fofix.core import Player
-from fofix.core import Log
 
 import random
 
@@ -64,7 +66,7 @@ class BandPlayBaseScene(Scene):
         superClass.__init__(engine)
 
 
-        Log.debug("BandPlayBaseScene init...")
+        log.debug("BandPlayBaseScene init...")
 
         self.engine.world.sceneName = "GuitarScene"
         self.ready = False
@@ -141,7 +143,7 @@ class BandPlayBaseScene(Scene):
 
         if None not in [self.targetX, self.targetY, self.targetZ, self.originX, self.originY, self.originZ]:
             self.customPOV = True
-            Log.debug("All theme POV set. Using custom camera POV.")
+            log.debug("All theme POV set. Using custom camera POV.")
 
         #weirdpeople - sets the distances the neck has to move in the animation
         if self.neckintroAnimationType == 0: #Original
@@ -201,7 +203,7 @@ class BandPlayBaseScene(Scene):
         if self.engine.loadImgDrawing(self, "breScoreBackground", os.path.join("themes",self.themeName,"brescorebackground.png")):
             self.breScoreBackgroundWFactor = (w * self.engine.theme.breScoreBackgroundScale) / self.breScoreBackground.width1()
         else:
-            Log.debug("BRE score background image loading problem!")
+            log.debug("BRE score background image loading problem!")
             self.breScoreBackground = None
             self.breScoreBackgroundWFactor = None
 
@@ -657,7 +659,7 @@ class GuitarScene(BandPlayBaseScene):
         self.practiceMode = False
         self.bossBattle = False
 
-        Log.debug("GuitarScene init...")
+        log.debug("GuitarScene init...")
 
         self.coOpPlayerMeter = 0
 
@@ -778,7 +780,7 @@ class GuitarScene(BandPlayBaseScene):
                 self.soloKeysList.append([])
                 self.soloShifts.append([])
 
-        Log.debug("GuitarScene keysList: %s" % str(self.keysList))
+        log.debug("GuitarScene keysList: %s" % str(self.keysList))
 
         self.aiSkill                 = [0 for i in self.players]
         self.aiHitPercentage         = [0 for i in self.players]
@@ -1344,7 +1346,7 @@ class GuitarScene(BandPlayBaseScene):
         for i in range(self.numOfPlayers):   #MFH - count number of drum fills
             if self.instruments[i].isDrum:   #MFH - count number of drum fill markers
                 self.numDrumFills = len([1 for time, event in self.song.midiEventTrack[i].getAllEvents() if (isinstance(event, Song.MarkerNote) and (event.number == Song.freestyleMarkingNote) ) ])
-                Log.debug("Drum part found, scanning for drum fills.... %d freestyle markings found (the last one may be a Big Rock Ending)." % self.numDrumFills)
+                log.debug("Drum part found, scanning for drum fills.... %d freestyle markings found (the last one may be a Big Rock Ending)." % self.numDrumFills)
 
 
         #MFH - handle early hit window automatic type determination, and how it compares to the forced handicap if not auto
@@ -1352,7 +1354,7 @@ class GuitarScene(BandPlayBaseScene):
         self.automaticEarlyHitWindow = Song.EARLY_HIT_WINDOW_HALF
         self.forceEarlyHitWindowSetting = self.engine.config.get("handicap",   "early_hit_window")
         if self.song.info.early_hit_window_size:
-            Log.debug("song.ini setting found specifying early_hit_window_size - %s" % self.song.info.early_hit_window_size)
+            log.debug("song.ini setting found specifying early_hit_window_size - %s" % self.song.info.early_hit_window_size)
             if self.song.info.early_hit_window_size.lower() == "none":
                 self.automaticEarlyHitWindow = Song.EARLY_HIT_WINDOW_NONE
             elif self.song.info.early_hit_window_size.lower() == "half":
@@ -1361,10 +1363,10 @@ class GuitarScene(BandPlayBaseScene):
                 self.automaticEarlyHitWindow = Song.EARLY_HIT_WINDOW_FULL
 
         else:
-            Log.debug("No song.ini setting found specifying early_hit_window_size - using automatic detection...")
+            log.debug("No song.ini setting found specifying early_hit_window_size - using automatic detection...")
 
             if self.song.midiStyle == Song.MIDI_TYPE_RB:
-                Log.debug("Basic RB1/RB2 type MIDI found - early hitwindow of NONE is set as handicap base.")
+                log.debug("Basic RB1/RB2 type MIDI found - early hitwindow of NONE is set as handicap base.")
                 self.automaticEarlyHitWindow = Song.EARLY_HIT_WINDOW_NONE
 
         if self.forceEarlyHitWindowSetting > 0:   #MFH - if user is specifying a specific early hitwindow, then calculate handicap...
@@ -1456,19 +1458,19 @@ class GuitarScene(BandPlayBaseScene):
                                                 spEvent.finalStar = True
                                                 oneLastSpNoteMarked = True
                                 if self.logMarkerNotes == 1:
-                                    Log.debug("GuitarScene: P%d overdrive / starpower phrase marked between %f and %f" % ( i+1, time, time+event.length ) )
+                                    log.debug("GuitarScene: P%d overdrive / starpower phrase marked between %f and %f" % ( i+1, time, time+event.length ) )
                                     if lastSpNoteTime == 0:
-                                        Log.warn("This starpower phrase doesn't appear to have any finalStar notes marked... probably will not reward starpower!")
+                                        log.warn("This starpower phrase doesn't appear to have any finalStar notes marked... probably will not reward starpower!")
                     self.midiSP = True
                     unisonCheck.extend(self.spTimes[i])
 
                 elif self.starpowerMode == 2: #this particular instrument only has one starpower path marked!  Force auto-generation of SP paths.
-                    Log.warn("Instrument %s only has one starpower path marked!  ...falling back on auto-generated paths for this instrument." % self.players[i].part.text)
+                    log.warn("Instrument %s only has one starpower path marked!  ...falling back on auto-generated paths for this instrument." % self.players[i].part.text)
                     guitar.starNotesSet = False     #fallback on auto generation.
 
         elif self.starpowerMode == 2:
             if self.numberOfGuitars > 0:
-                Log.warn("This song does not appear to have any starpower or overdrive paths marked, falling back on auto-generated paths.")
+                log.warn("This song does not appear to have any starpower or overdrive paths marked, falling back on auto-generated paths.")
                 for instrument in self.instruments:
                     if instrument.isVocal:
                         continue
@@ -1567,7 +1569,7 @@ class GuitarScene(BandPlayBaseScene):
                         lastDrumNoteEvent = event
             if instrument.isDrum:
                 self.lastDrumNoteTime = lastDrumNoteTime
-                Log.debug("Last drum note located at time = " + str(self.lastDrumNoteTime) )
+                log.debug("Last drum note located at time = " + str(self.lastDrumNoteTime) )
                 self.scoring[i].totalStreakNotes = len([1 for time, event in self.song.track[i].getEvents(self.players[i].startPos,self.lastEvent) if isinstance(event, Note)])
             elif instrument.isVocal:
                 self.scoring[i].totalStreakNotes = len([1 for time, event in self.song.track[i].getEvents(self.players[i].startPos,self.lastEvent) if isinstance(event, VocalPhrase)])
@@ -1578,11 +1580,11 @@ class GuitarScene(BandPlayBaseScene):
             self.lastNoteTimes[i] = lastDrumNoteTime
             if lastDrumNoteEvent:
                 if isinstance(lastDrumNoteEvent, Note):
-                    Log.debug("Last note (number %d) found for player %d at time %f" % (lastDrumNoteEvent.number, i, lastDrumNoteTime) )
+                    log.debug("Last note (number %d) found for player %d at time %f" % (lastDrumNoteEvent.number, i, lastDrumNoteTime) )
                 elif isinstance(lastDrumNoteEvent, VocalPhrase):
-                    Log.debug("Last vocal phrase found for player %d at time %f" % (i, lastDrumNoteTime) )
+                    log.debug("Last vocal phrase found for player %d at time %f" % (i, lastDrumNoteTime) )
             else:
-                Log.debug("Last note event not found and is None!")
+                log.debug("Last note event not found and is None!")
 
             if instrument.isVocal:
                 self.scoring[i].totalNotes = self.scoring[i].totalStreakNotes - len(instrument.tapNoteTotals)
@@ -1606,7 +1608,7 @@ class GuitarScene(BandPlayBaseScene):
                                     breEnd = time + event.length
                                     numBreStreakNotes = len(set(time for time, event in self.song.track[i].getEvents(breStart, breEnd) if isinstance(event, Note)))
                                     self.scoring[i].totalStreakNotes -= numBreStreakNotes   #MFH - remove BRE notes correctly from streak count.
-                                    Log.debug("Removed %d streak notes from player %d" % (numBreStreakNotes, i) )
+                                    log.debug("Removed %d streak notes from player %d" % (numBreStreakNotes, i) )
                                     totalBreNotes += numBreStreakNotes
 
 
@@ -1619,7 +1621,7 @@ class GuitarScene(BandPlayBaseScene):
                                 endTime = time + event.length
                                 guitarSoloNoteCount = len([1 for Gtime, Gevent in self.song.track[i].getEvents(startTime, endTime) if isinstance(Gevent, Note)])
                                 self.guitarSolos[i].append(guitarSoloNoteCount - 1)
-                                Log.debug("P" + str(i+1) + " MIDI " + self.players[i].part.text + " Solo found from: " + str(startTime) + " to: " + str(endTime) + ", containing " + str(guitarSoloNoteCount) + " notes." )
+                                log.debug("P" + str(i+1) + " MIDI " + self.players[i].part.text + " Solo found from: " + str(startTime) + " to: " + str(endTime) + ", containing " + str(guitarSoloNoteCount) + " notes." )
 
                 elif instrument.markSolos == 1:   #mark using the old text-based system
 
@@ -1635,7 +1637,7 @@ class GuitarScene(BandPlayBaseScene):
                                 isGuitarSoloNow = False
                                 guitarSoloNoteCount = len([1 for Gtime, Gevent in self.song.track[i].getEvents(guitarSoloStartTime, time) if isinstance(Gevent, Note)])
                                 self.guitarSolos[i].append(guitarSoloNoteCount - 1)
-                                Log.debug("GuitarScene: Guitar Solo found: " + str(guitarSoloStartTime) + "-" + str(time) + " = " + str(guitarSoloNoteCount) )
+                                log.debug("GuitarScene: Guitar Solo found: " + str(guitarSoloStartTime) + "-" + str(time) + " = " + str(guitarSoloNoteCount) )
                     if isGuitarSoloNow:   #open solo until end - needs end event!
                         isGuitarSoloNow = False
                         #MFH - must find the real "last note" time, requires another iteration...
@@ -1647,7 +1649,7 @@ class GuitarScene(BandPlayBaseScene):
                         self.guitarSolos[i].append(guitarSoloNoteCount - 1)
                         newEvent = TextEvent("GSOLO OFF", 100.0)
                         self.song.eventTracks[Song.TK_GUITAR_SOLOS].addEvent(Ntime, newEvent) #adding the missing GSOLO OFF event
-                        Log.debug("GuitarScene: Guitar Solo until end of song found - (guitarSoloStartTime - Ntime = guitarSoloNoteCount): " + str(guitarSoloStartTime) + "-" + str(Ntime) + " = " + str(guitarSoloNoteCount) )
+                        log.debug("GuitarScene: Guitar Solo until end of song found - (guitarSoloStartTime - Ntime = guitarSoloNoteCount): " + str(guitarSoloStartTime) + "-" + str(Ntime) + " = " + str(guitarSoloNoteCount) )
 
 
 
@@ -1665,8 +1667,8 @@ class GuitarScene(BandPlayBaseScene):
                     for j in range(len(self.spTimes)):
                         if self.unisonConfirm[i] in self.spTimes[j]:
                             self.unisonPlayers[i].append(j)
-                Log.debug("Unisons confirmed: " + str(self.unisonConfirm))
-                Log.debug("Unisons between: " + str(self.unisonPlayers))
+                log.debug("Unisons confirmed: " + str(self.unisonConfirm))
+                log.debug("Unisons between: " + str(self.unisonPlayers))
 
 
         #MFH - handle gathering / sizing / grouping line-by-line lyric display here, during initialization:
@@ -1716,15 +1718,15 @@ class GuitarScene(BandPlayBaseScene):
             #MFH - test unpacking / decoding the lyrical lines:
             for midiLyricSubList in self.midiLyricLineEvents:
                 if self.logLyricEvents == 1:
-                    Log.debug("...New MIDI lyric line:")
+                    log.debug("...New MIDI lyric line:")
                 for lyricTuple in midiLyricSubList:
                     time, event = lyricTuple
                     if self.logLyricEvents == 1:
-                        Log.debug("MIDI Line-by-line lyric unpack test - time, event = " + str(time) + ", " + event.text )
+                        log.debug("MIDI Line-by-line lyric unpack test - time, event = " + str(time) + ", " + event.text )
 
             for lineStartTime, midiLyricSimpleLineText in self.midiLyricLines:
                 if self.logLyricEvents == 1:
-                    Log.debug("MIDI Line-by-line simple lyric line starting at time: " + str(lineStartTime) + ", " + midiLyricSimpleLineText)
+                    log.debug("MIDI Line-by-line simple lyric line starting at time: " + str(lineStartTime) + ", " + midiLyricSimpleLineText)
 
         self.numMidiLyricLines = len(self.midiLyricLines)
 
@@ -1733,7 +1735,7 @@ class GuitarScene(BandPlayBaseScene):
         self.coOpTotalNotes = 0
         if self.coOpScoreCard:
             self.coOpScoreCard.lastNoteTime  = max(self.lastNoteTimes)
-            Log.debug("Last note for co-op mode found at %.2f" % self.coOpScoreCard.lastNoteTime)
+            log.debug("Last note for co-op mode found at %.2f" % self.coOpScoreCard.lastNoteTime)
         for i, scoreCard in enumerate(self.scoring):   #accumulate base scoring values for co-op
             if self.coOpScoreCard:
                 self.coOpScoreCard.totalStreakNotes += scoreCard.totalStreakNotes
@@ -1827,7 +1829,7 @@ class GuitarScene(BandPlayBaseScene):
         settingsMenu.fadeScreen = False
         careerSettingsMenu.fadeScreen = False
 
-        Log.debug("Pause text / selected colors: " + str(self.pause_text_color) + " / " + str(self.pause_selected_color))
+        log.debug("Pause text / selected colors: " + str(self.pause_text_color) + " / " + str(self.pause_selected_color))
 
 
 
@@ -3175,7 +3177,7 @@ class GuitarScene(BandPlayBaseScene):
                     else:
                         count = 0
                     count += 1
-                    Log.debug("Song completed")
+                    log.debug("Song completed")
                     self.song.info.completed = True
                     self.song.info.count = "%d" % count
                     self.song.info.save()
@@ -3272,7 +3274,7 @@ class GuitarScene(BandPlayBaseScene):
 
                     if guitar.battleStatus[1]:
                         if self.songTime - guitar.battleDrainStart > guitar.battleDrainLength:
-                            Log.debug("Drain for Player %d disabled" % i)
+                            log.debug("Drain for Player %d disabled" % i)
                             guitar.battleStatus[1] = False
                             for k, nowUsed in enumerate(guitar.battleBeingUsed):
                                 if guitar.battleBeingUsed[k] == 1:
@@ -3286,7 +3288,7 @@ class GuitarScene(BandPlayBaseScene):
 
                     if guitar.battleStatus[6]:
                         if self.songTime - guitar.battleStartTimes[6] > guitar.battleLeftyLength:
-                            Log.debug("Lefty Mode for Player %d disabled" % i)
+                            log.debug("Lefty Mode for Player %d disabled" % i)
                             guitar.battleStatus[6] = False
                             for k, nowUsed in enumerate(guitar.battleBeingUsed):
                                 if guitar.battleBeingUsed[k] == 6:
@@ -3294,7 +3296,7 @@ class GuitarScene(BandPlayBaseScene):
 
                     if guitar.battleStatus[8]:
                         if self.songTime - guitar.battleStartTimes[8] > guitar.battleAmpLength:
-                            Log.debug("Diff Up Mode for Player %d disabled" % i)
+                            log.debug("Diff Up Mode for Player %d disabled" % i)
                             guitar.battleStatus[8] = False
                             for k, nowUsed in enumerate(guitar.battleBeingUsed):
                                 if guitar.battleBeingUsed[k] == 8:
@@ -3303,7 +3305,7 @@ class GuitarScene(BandPlayBaseScene):
 
                     if guitar.battleStatus[7]:
                         if self.songTime - guitar.battleStartTimes[7] > guitar.battleDoubleLength:
-                            Log.debug("Diff Up Mode for Player %d disabled" % i)
+                            log.debug("Diff Up Mode for Player %d disabled" % i)
                             guitar.battleStatus[7] = False
                             for k, nowUsed in enumerate(guitar.battleBeingUsed):
                                 if guitar.battleBeingUsed[k] == 7:
@@ -3319,7 +3321,7 @@ class GuitarScene(BandPlayBaseScene):
 
                     if guitar.battleStatus[2]:
                         if self.songTime - guitar.battleStartTimes[2] > guitar.battleDiffUpLength:
-                            Log.debug("Diff Up Mode for Player %d disabled" % i)
+                            log.debug("Diff Up Mode for Player %d disabled" % i)
                             guitar.battleStatus[2] = False
                             self.song.difficulty[i] = Song.difficulties[guitar.battleDiffUpValue]
                             guitar.difficulty = guitar.battleDiffUpValue
@@ -3339,7 +3341,7 @@ class GuitarScene(BandPlayBaseScene):
                     scoreCard = self.coOpScoreCard
                     if scoreCard.freestyleWasJustActive and not scoreCard.endingAwarded:
                         if scoreCard.lastNoteTime < self.songTime and not scoreCard.endingStreakBroken:
-                            Log.debug("Big Rock Ending bonus awarded for co-op players! %d points." % scoreCard.endingScore)
+                            log.debug("Big Rock Ending bonus awarded for co-op players! %d points." % scoreCard.endingScore)
                             if scoreCard.endingScore > 0:
                                 scoreCard.addEndingScore()
                                 self.engine.data.starActivateSound.play()
@@ -3349,7 +3351,7 @@ class GuitarScene(BandPlayBaseScene):
                     if scoreCard.freestyleWasJustActive and not scoreCard.endingAwarded:
                         if scoreCard.lastNoteEvent and not scoreCard.endingStreakBroken:
                             if scoreCard.lastNoteEvent.played or scoreCard.lastNoteEvent.hopod:
-                                Log.debug("Big Rock Ending bonus awarded for player %d: %d points" % (playerNum, scoreCard.endingScore) )
+                                log.debug("Big Rock Ending bonus awarded for player %d: %d points" % (playerNum, scoreCard.endingScore) )
                                 if scoreCard.endingScore > 0:
                                     scoreCard.addEndingScore()
                                     self.engine.data.starActivateSound.play()
@@ -3434,7 +3436,7 @@ class GuitarScene(BandPlayBaseScene):
                                 self.coOpScoreCard.notesMissed += 1
                             if theNote.star or theNote.finalStar:
                                 if self.logStarpowerMisses == 1:
-                                    Log.debug("SP Miss: run(), note: %d, gameTime: %s" % (theNote.number, self.timeLeft) )
+                                    log.debug("SP Miss: run(), note: %d, gameTime: %s" % (theNote.number, self.timeLeft) )
                                 self.starNotesMissed[i] = True
                                 if self.unisonActive:
                                     self.inUnison[i] = False
@@ -3458,7 +3460,7 @@ class GuitarScene(BandPlayBaseScene):
                         self.scoring[playerNum].endingStreakBroken = True   #MFH
                         if self.hopoDebugDisp == 1:
                             missedNoteNums = [noat.number for time, noat in missedNotes]
-                            Log.debug("Miss: run(), found missed note(s)... %(missedNotes)s, Song time=%(songTime)s" % \
+                            log.debug("Miss: run(), found missed note(s)... %(missedNotes)s, Song time=%(songTime)s" % \
                               {'missedNotes': str(missedNoteNums), 'songTime': str(self.timeLeft)})
 
                         guitar.hopoActive = 0
@@ -3997,14 +3999,14 @@ class GuitarScene(BandPlayBaseScene):
             for tym, theNote in missedNotes:  #MFH
                 if theNote.star or theNote.finalStar:
                     if self.logStarpowerMisses == 1:
-                        Log.debug("SP Miss: doPick3GH2(), foundMissedCatchupNote: %d, gameTime: %s" % (theNote.number, self.timeLeft) )
+                        log.debug("SP Miss: doPick3GH2(), foundMissedCatchupNote: %d, gameTime: %s" % (theNote.number, self.timeLeft) )
                     self.starNotesMissed[num] = True
                     if self.unisonActive:
                         self.inUnison[num] = False
 
             if self.hopoDebugDisp == 1:
                 missedNoteNums = [noat.number for time, noat in missedNotes]
-                Log.debug("Miss: dopick3gh2(), found missed note(s)... %(missedNotes)s, Song time=%(songTime)s" % \
+                log.debug("Miss: dopick3gh2(), found missed note(s)... %(missedNotes)s, Song time=%(songTime)s" % \
                   {'missedNotes': str(missedNoteNums), 'songTime': str(self.timeLeft)})
 
             if hopo == True:
@@ -4187,7 +4189,7 @@ class GuitarScene(BandPlayBaseScene):
                 self.stage.triggerMiss(self.songTime)
                 if self.hopoDebugDisp == 1 and not self.instruments[num].isDrum:
                     problemNoteMatchingList = [(int(tym), noat.number, noat.played) for tym, noat in self.instruments[num].matchingNotes]
-                    Log.debug("Miss: dopick3gh2(), fail-startpick3()...HigherFretsHeld: %(higherFrets)s, LastHopoFretHeld: %(lastHopoFret)s, lastStrumWasChord: %(lastStrumChord)s, sameNoteHopoStringFlag: %(sameNoteHopoFlag)s, notesToMatch: %(matchNotes)s, activeFrets: %(activeFrets)s, Song time=%(songTime)s" % \
+                    log.debug("Miss: dopick3gh2(), fail-startpick3()...HigherFretsHeld: %(higherFrets)s, LastHopoFretHeld: %(lastHopoFret)s, lastStrumWasChord: %(lastStrumChord)s, sameNoteHopoStringFlag: %(sameNoteHopoFlag)s, notesToMatch: %(matchNotes)s, activeFrets: %(activeFrets)s, Song time=%(songTime)s" % \
                       {'higherFrets': str(HigherFretsHeld), 'lastHopoFret': str(LastHopoFretStillHeld), 'lastStrumChord': str(lastStrumWasChordWas), 'sameNoteHopoFlag': str(sameNoteHopoFlagWas), 'matchNotes': str(problemNoteMatchingList), 'activeFrets': str(activeKeyList), 'songTime': str(self.timeLeft)})
 
                 self.notesMissed[num] = True #QQstarS:Set [0] to [i]
@@ -4197,7 +4199,7 @@ class GuitarScene(BandPlayBaseScene):
                 for tym, noat in noteList:
                     if (noat.star or noat.finalStar) and isFirst:
                         if self.logStarpowerMisses == 1:
-                            Log.debug("SP Miss: doPick3GH2(), afterStartPick3Fail, matchingNote: %d, gameTime: %s" % (noat.number, self.timeLeft) )
+                            log.debug("SP Miss: doPick3GH2(), afterStartPick3Fail, matchingNote: %d, gameTime: %s" % (noat.number, self.timeLeft) )
                         self.starNotesMissed[num] = True
                         if self.unisonActive:
                             self.inUnison[num] = False
@@ -4262,7 +4264,7 @@ class GuitarScene(BandPlayBaseScene):
 
         elif self.coOpGH: #akedrou also says don't let vocal players in GH Co-Op.
             if self.coOpStarPower >= (50 * self.numOfPlayers) and self.instruments[num].starPowerActive == False:
-                Log.debug("Star Power Activated at: " + str(self.songTime))
+                log.debug("Star Power Activated at: " + str(self.songTime))
                 self.coOpStarPowerActive[num] = self.songTime
                 if self.songTime - min(self.coOpStarPowerActive) < 300.0 and not self.instruments[num].starPowerActive:
                     self.engine.data.starActivateSound.play()
@@ -4274,7 +4276,7 @@ class GuitarScene(BandPlayBaseScene):
                 else:
                     if self.songTime - self.coOpStarPowerTimer > 1000.0:
                         for i in range(self.numOfPlayers):
-                            Log.debug(str(self.songTime - self.coOpStarPowerActive[i]))
+                            log.debug(str(self.songTime - self.coOpStarPowerActive[i]))
                             if self.songTime - self.coOpStarPowerActive[i] < 300.0:
                                 continue
                             if self.instruments[i].isDrum and self.autoDrumStarpowerActivate == 0 and self.numDrumFills < 2:

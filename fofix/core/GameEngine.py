@@ -38,9 +38,13 @@ import os
 import sys
 import imp
 
+from fretwork import log
+from fretwork.audio import Audio
+from fretwork.task import TaskEngine
+
 from fofix.core.constants import *
 from fofix.core.Video import Video
-from fofix.core.Audio import Audio
+
 from fofix.core.View import View
 from fofix.core.Input import Input, KeyListener, SystemEventListener
 from fofix.core.Resource import Resource
@@ -51,14 +55,12 @@ from fofix.core.Theme import Theme
 from fofix.core.Shader import shaders
 from fofix.core.Image import drawImage
 from fofix.core.timer import FpsTimer
-from fofix.core.Task import TaskEngine
 
 from fofix.core import cmgl
 from fofix.core import Config
 from fofix.core import ConfigDefs
 from fofix.core import Version
 from fofix.core import Player
-from fofix.core import Log
 from fofix.core import Mod
 from fofix.game import Dialogs
 
@@ -82,11 +84,11 @@ for name in allthemes:
 i = len(themes)
 if i == 0:
     if os.name == 'posix':
-        Log.error("No valid theme found!\n" +
+        log.error("No valid theme found!\n" +
                   "Make sure theme files are properly cased " +
                   "e.g. notes.png works, Notes.png doesn't\n")
     else:
-        Log.error("No valid theme found!")
+        log.error("No valid theme found!")
     sys.exit(1)
 
 if defaultTheme is None:
@@ -114,7 +116,7 @@ class FullScreenSwitcher(KeyListener):
             self.altStatus = True
         elif key == pygame.K_RETURN and self.altStatus:
             if not self.engine.toggleFullscreen():
-                Log.error("Unable to toggle fullscreen mode.")
+                log.error("Unable to toggle fullscreen mode.")
             return True
         elif key == pygame.K_d and self.altStatus:
             self.engine.setDebugModeEnabled(not self.engine.isDebugModeEnabled())
@@ -148,7 +150,7 @@ class GameEngine(object):
     """The main game engine."""
     def __init__(self, config = None):
 
-        Log.debug("GameEngine class init (GameEngine.py)...")
+        log.debug("GameEngine class init (GameEngine.py)...")
         self.mainMenu = None    #placeholder for main menu object - to prevent reinstantiation
 
         self.currentScene = None
@@ -157,20 +159,20 @@ class GameEngine(object):
         self.uploadVersion = "%s-4.0" % Version.PROGRAM_NAME #akedrou - the version passed to the upload site.
 
         self.dataPath = Version.dataPath()
-        Log.debug(self.versionString + " starting up...")
-        Log.debug("Python version: " + sys.version.split(' ')[0])
-        Log.debug("Pygame version: " + str(pygame.version.ver) )
-        Log.debug("PyOpenGL version: " + OpenGL.__version__)
-        Log.debug("Numpy version: " + np.__version__)
-        Log.debug("PIL version: " + Image.VERSION)
-        Log.debug("sys.argv: " + repr(sys.argv))
-        Log.debug("os.name: " + os.name)
-        Log.debug("sys.platform: " + sys.platform)
+        log.debug(self.versionString + " starting up...")
+        log.debug("Python version: " + sys.version.split(' ')[0])
+        log.debug("Pygame version: " + str(pygame.version.ver) )
+        log.debug("PyOpenGL version: " + OpenGL.__version__)
+        log.debug("Numpy version: " + np.__version__)
+        log.debug("PIL version: " + Image.VERSION)
+        log.debug("sys.argv: " + repr(sys.argv))
+        log.debug("os.name: " + os.name)
+        log.debug("sys.platform: " + sys.platform)
         if os.name == 'nt':
             import win32api
-            Log.debug("win32api.GetVersionEx(1): " + repr(win32api.GetVersionEx(1)))
+            log.debug("win32api.GetVersionEx(1): " + repr(win32api.GetVersionEx(1)))
         elif os.name == 'posix':
-            Log.debug("os.uname(): " + repr(os.uname()))
+            log.debug("os.uname(): " + repr(os.uname()))
 
         """
         Constructor.
@@ -226,7 +228,7 @@ class GameEngine(object):
         self.scrollRate        = self.config.get("game", "scroll_rate")
         self.scrollDelay       = self.config.get("game", "scroll_delay")
 
-        Log.debug("Initializing audio.")
+        log.debug("Initializing audio.")
         frequency    = self.config.get("audio", "frequency")
         bits         = self.config.get("audio", "bits")
         stereo       = self.config.get("audio", "stereo")
@@ -243,7 +245,7 @@ class GameEngine(object):
 
         self.audioSpeedFactor  = 1.0
 
-        Log.debug("Initializing video.")
+        log.debug("Initializing video.")
         #myfingershurt: ensuring windowed mode starts up in center of the screen instead of cascading positions:
         os.environ['SDL_VIDEO_WINDOW_POS'] = 'center'
 
@@ -251,10 +253,10 @@ class GameEngine(object):
         fullscreen    = self.config.get("video", "fullscreen")
         multisamples  = self.config.get("video", "multisamples")
         self.video.setMode((width, height), fullscreen = fullscreen, multisamples = multisamples)
-        Log.debug("OpenGL version: " + glGetString(GL_VERSION))
-        Log.debug("OpenGL vendor: " + glGetString(GL_VENDOR))
-        Log.debug("OpenGL renderer: " + glGetString(GL_RENDERER))
-        Log.debug("OpenGL extensions: " + ' '.join(sorted(glGetString(GL_EXTENSIONS).split())))
+        log.debug("OpenGL version: " + glGetString(GL_VERSION))
+        log.debug("OpenGL vendor: " + glGetString(GL_VENDOR))
+        log.debug("OpenGL renderer: " + glGetString(GL_RENDERER))
+        log.debug("OpenGL extensions: " + ' '.join(sorted(glGetString(GL_EXTENSIONS).split())))
 
         if self.video.default:
             self.config.set("video", "fullscreen", False)
@@ -265,7 +267,7 @@ class GameEngine(object):
 
         # Enable the high priority timer if configured
         if self.priority:
-            Log.debug("Enabling high priority timer.")
+            log.debug("Enabling high priority timer.")
             self.fps = 0 # High priority
 
         # evilynux - This was generating an error on the first pass (at least under
@@ -334,7 +336,7 @@ class GameEngine(object):
                 defaultAniStage = str(self.stageFolders[0])
             else:
                 defaultAniStage = "Normal"
-            Log.debug("Default animated stage for " + currentTheme + " theme = " + defaultAniStage)
+            log.debug("Default animated stage for " + currentTheme + " theme = " + defaultAniStage)
             aniStageOptions = dict([(str(self.stageFolders[n]),self.stageFolders[n]) for n in range(0, i)])
             aniStageOptions.update({"Normal":_("Slideshow")})
             if i > 1:   #only add Random setting if more than one animated stage exists
@@ -350,11 +352,11 @@ class GameEngine(object):
             selectedAnimatedStage = self.config.get("game", "animated_stage_folder")
             if selectedAnimatedStage != "Normal" and selectedAnimatedStage != "Random":
                 if not os.path.exists(os.path.join(stagespath,selectedAnimatedStage)):
-                    Log.warn("Selected animated stage folder " + selectedAnimatedStage + " does not exist, forcing Normal.")
+                    log.warn("Selected animated stage folder " + selectedAnimatedStage + " does not exist, forcing Normal.")
                     self.config.set("game","animated_stage_folder","Normal") #MFH: force "Standard" currently selected animated stage folder is invalid
         else:
             Config.define("game", "animated_stage_folder", str, "None", text = _("Animated Stage"), options = ["None",_("None")])
-            Log.warn("No stages\ folder found, forcing None setting for Animated Stage.")
+            log.warn("No stages\ folder found, forcing None setting for Animated Stage.")
             self.config.set("game","animated_stage_folder", "None") #MFH: force "None" when Stages folder can't be found
 
 
@@ -377,7 +379,7 @@ class GameEngine(object):
         self.loadingScreenShown = False
         self.graphicMenuShown   = False
 
-        Log.debug("Ready.")
+        log.debug("Ready.")
 
 
     # evilynux - This stops the crowd cheers if they're still playing (issue 317).
@@ -450,7 +452,7 @@ class GameEngine(object):
 
     def finishGame(self):
         if not self.world:
-            Log.notice("GameEngine.finishGame called before World created.")
+            log.notice("GameEngine.finishGame called before World created.")
             return
         self.world.finishGame()
         self.world = None

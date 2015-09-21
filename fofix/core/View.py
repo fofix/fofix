@@ -28,8 +28,8 @@ from contextlib import contextmanager
 
 import numpy as np
 
-from fofix.core.Task import Task
-from fofix.core import Log
+from fretwork import log
+from fretwork.task import Task
 
 
 class Layer(Task):
@@ -135,7 +135,7 @@ class View(Task):
         self.geometryNormalized[3] = h / w
 
     def pushLayer(self, layer):
-        Log.debug("View: Push: %s" % layer.__class__.__name__)
+        log.debug("View: Push: %s" % layer.__class__.__name__)
 
         if layer not in self.layers:
             self.layers.append(layer)
@@ -153,7 +153,7 @@ class View(Task):
         return layer
 
     def popLayer(self, layer):
-        Log.debug("View: Pop: %s" % layer.__class__.__name__)
+        log.debug("View: Pop: %s" % layer.__class__.__name__)
 
         if layer in self.incoming:
             self.incoming.remove(layer)
@@ -161,7 +161,7 @@ class View(Task):
             self.outgoing.append(layer)
 
     def popAllLayers(self):
-        Log.debug("View: Pop all")
+        log.debug("View: Pop all")
         [self.popLayer(l) for l in list(self.layers)]
 
     def isTransitionInProgress(self):

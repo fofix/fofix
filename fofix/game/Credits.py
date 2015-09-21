@@ -30,6 +30,8 @@ import pygame
 
 from OpenGL.GL import OpenGL, glColor4f, glTranslatef
 
+from fretwork import log
+
 from fofix.core.VideoPlayer import VideoLayer, VideoPlayerError
 from fofix.core.Input import KeyListener
 from fofix.core.Image import drawImage
@@ -39,7 +41,6 @@ from fofix.core.View import Layer
 from fofix.core import Version
 from fofix.core import Player
 from fofix.core import Config
-from fofix.core import Log
 
 
 
@@ -175,7 +176,7 @@ class Credits(Layer, KeyListener):
             try:
                 self.vidPlayer = VideoLayer(self.engine, vidSource, mute = True, loop = True)
             except (IOError, VideoPlayerError):
-                Log.error('Error loading credits video:')
+                log.error('Error loading credits video:')
             else:
                 self.vidPlayer.play()
                 self.engine.view.pushLayer(self.vidPlayer)
@@ -255,7 +256,7 @@ class Credits(Layer, KeyListener):
                     scale = float(line.strip("!"))
                     continue
             except ValueError:
-                Log.warn("CREDITS file does not parse properly")
+                log.warn("CREDITS file does not parse properly")
             if line == "":
                 self.credits.append(space)
             elif line.startswith("`") and line.endswith("`"):

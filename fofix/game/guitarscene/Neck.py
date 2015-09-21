@@ -27,11 +27,12 @@ import random
 from OpenGL.GL import *
 import numpy as np
 
+from fretwork import log
+
 from fofix.core.Shader import shaders, mixColors
 from fofix.game.Song import Bars
 from fofix.game import Song
 from fofix.core import cmgl
-from fofix.core import Log
 
 class Neck:
     def __init__(self, engine, instrument, playerObj):
@@ -267,9 +268,9 @@ class Neck:
                 i = random.randint(0,len(themeNeck)-1)
                 if engine.loadImgDrawing(self, "neckDrawing", os.path.join("themes", themename, "necks", themeNeck[i]), textureSize = (256, 256)):
                     neckFind = False
-                    Log.debug("Random theme neck chosen: " + themeNeck[i])
+                    log.debug("Random theme neck chosen: " + themeNeck[i])
                 else:
-                    Log.error("Unable to load theme neck: " + themeNeck[i])
+                    log.error("Unable to load theme neck: " + themeNeck[i])
                     # fall back to defaultneck
                     self.neck = "defaultneck"
         if neckFind:
@@ -289,9 +290,9 @@ class Neck:
 
                 i = random.randint(0,len(self.neck)-1)
                 if engine.loadImgDrawing(self, "neckDrawing", os.path.join("necks",self.neck[i]+".png"),  textureSize = (256, 256)):
-                    Log.debug("Random neck chosen: " + self.neck[i])
+                    log.debug("Random neck chosen: " + self.neck[i])
                 else:
-                    Log.error("Unable to load neck: " + self.neck[i])
+                    log.error("Unable to load neck: " + self.neck[i])
                     self.neck = "defaultneck"
                     engine.loadImgDrawing(self, "neckDrawing", os.path.join("necks",self.neck+".png"),  textureSize = (256, 256))
             else:

@@ -29,6 +29,9 @@ import string
 import sys
 import os
 
+from fretwork import log
+from fretwork.audio import Music
+
 from fofix.core.View import BackgroundLayer
 from fofix.core.Image import drawImage
 from fofix.core.Shader import shaders
@@ -38,11 +41,9 @@ from fofix.core.Language import _
 from fofix.game.Menu import Menu
 from fofix.core import Config
 from fofix.game import Dialogs
-from fofix.core import Audio
 from fofix.core import Settings
 from fofix.core import Version
 from fofix.core import VFS
-from fofix.core import Log
 
 
 class MainMenu(BackgroundLayer):
@@ -51,7 +52,7 @@ class MainMenu(BackgroundLayer):
 
         self.logClassInits = Config.get("game", "log_class_inits")
         if self.logClassInits == 1:
-            Log.debug("MainMenu class init (MainMenu.py)...")
+            log.debug("MainMenu class init (MainMenu.py)...")
 
         self.time                = 0.0
         self.nextLayer           = None
@@ -75,17 +76,17 @@ class MainMenu(BackgroundLayer):
         if exists == 0:
             if engine.loadImgDrawing(self, "ok", os.path.join("necks","Neck_1.png")):
                 Config.set("game", "default_neck", "1")
-                Log.warn("Default chosen neck not valid; fallback Neck_1.png forced.")
+                log.warn("Default chosen neck not valid; fallback Neck_1.png forced.")
                 exists = 1
 
         #MFH - check for defaultneck
         if exists == 0:
             if engine.loadImgDrawing(self, "ok", os.path.join("necks","defaultneck.png")):
-                Log.warn("Default chosen neck not valid; fallback defaultneck.png forced.")
+                log.warn("Default chosen neck not valid; fallback defaultneck.png forced.")
                 Config.set("game", "default_neck", "defaultneck")
                 exists = 1
             else:
-                Log.error("Default chosen neck not valid; fallbacks Neck_1.png and defaultneck.png also not valid!")
+                log.error("Default chosen neck not valid; fallbacks Neck_1.png and defaultneck.png also not valid!")
 
         #Get theme
         self.theme       = self.engine.data.theme
@@ -137,7 +138,7 @@ class MainMenu(BackgroundLayer):
             self.menumusic = True
             engine.menuMusic = True
 
-            self.song = Audio.Music(self.engine.resource.fileName(sound))
+            self.song = Music(self.engine.resource.fileName(sound))
             self.song.setVolume(self.engine.config.get("audio", "menu_volume"))
             self.song.play(0)  #no loop
         else:
@@ -261,7 +262,7 @@ class MainMenu(BackgroundLayer):
                 self.menumusic = True
                 self.engine.menuMusic = True
 
-                self.song = Audio.Music(self.engine.resource.fileName(sound))
+                self.song = Music(self.engine.resource.fileName(sound))
                 self.song.setVolume(self.engine.config.get("audio", "menu_volume"))
                 self.song.play(0)
             else:
@@ -298,7 +299,7 @@ class MainMenu(BackgroundLayer):
         # evilynux - Make sure tutorial exists before launching
         tutorialpath = self.engine.tutorialFolder
         if not os.path.isdir(self.engine.resource.fileName(tutorialpath)):
-            Log.debug("No folder found: %s" % tutorialpath)
+            log.debug("No folder found: %s" % tutorialpath)
             Dialogs.showMessage(self.engine, _("No tutorials found!"))
             return
 

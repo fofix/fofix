@@ -26,13 +26,14 @@ import os
 from OpenGL.GL import *
 import numpy as np
 
+from fretwork import log
+
 from fofix.game.Song import Note, Tempo
 from fofix.core.Image import draw3Dtex
 from fofix.core.Shader import shaders
 from fofix.core.Mesh import Mesh
 from fofix.game import Song
 from fofix.core import cmgl
-from fofix.core import Log
 
 
 class Instrument(object):
@@ -147,7 +148,7 @@ class Instrument(object):
         if self.engine.config.get("game", "battle_Steal") == 1:
             self.battleObjectsEnabled.append(5)
 
-        Log.debug("Battle Objects Enabled: "+str(self.battleObjectsEnabled))
+        log.debug("Battle Objects Enabled: "+str(self.battleObjectsEnabled))
         self.battleNextObject   = 0
         self.battleObjects      = [0] * 3
         self.battleBeingUsed    = [0] * 2
@@ -394,7 +395,7 @@ class Instrument(object):
         else:
             if lastResort and not self.engine.fileExists(os.path.join(defaultpath, file)):
                 return file
-            Log.debug("Image not found: " + themepath + "/" + file)
+            log.debug("Image not found: " + themepath + "/" + file)
             return os.path.join(defaultpath, file)
 
     def loadFlames(self):
@@ -575,7 +576,7 @@ class Instrument(object):
                     break
 
             if self.simpleTails:
-                Log.debug("Simple tails used; complex tail loading error...")
+                log.debug("Simple tails used; complex tail loading error...")
                 engine.loadImgDrawing(self, "tail1", getD("tail1.png"),  textureSize = (128, 128))
                 engine.loadImgDrawing(self, "tail2", getD("tail2.png"),  textureSize = (128, 128))
                 engine.loadImgDrawing(self, "bigTail1", getD("bigtail1.png"),  textureSize = (128, 128))
@@ -720,7 +721,7 @@ class Instrument(object):
 
     def getRequiredNotesForRender(self, song, pos):
         if self.battleStatus[2] and self.difficulty != 0:
-            Log.debug(self.battleDiffUpValue)
+            log.debug(self.battleDiffUpValue)
             song.difficulty[self.player] = Song.difficulties[self.battleDiffUpValue]
             track0 = song.track[self.player]
             notes0 = [(time, event) for time, event in track0.getEvents(pos - self.currentPeriod * 2, pos + self.currentPeriod * self.beatsPerBoard)]
@@ -754,7 +755,7 @@ class Instrument(object):
         self.coOpRestart = True #initializes Restart Timer
         self.coOpRescueTime  = pos
         self.starPower  = 0
-        Log.debug("Rescued at " + str(pos))
+        log.debug("Rescued at " + str(pos))
 
     def noteBeingHeld(self):
         noteHeld = False
@@ -1238,7 +1239,7 @@ class Instrument(object):
                     elif self.coOpRescueTime + (self.currentPeriod * self.beatsPerBoard * 2) < pos:
                         self.coOpFailed = False
                         self.coOpRestart = False
-                        Log.debug("Turning off coOpFailed. Rescue successful.")
+                        log.debug("Turning off coOpFailed. Rescue successful.")
                 else:
                     continue #can't break. Tempo.
 
@@ -1315,7 +1316,7 @@ class Instrument(object):
                         if self.starPower < 50 and self.isDrum:   #not enough starpower to activate yet, kill existing drumfills
                             for dfEvent in self.drumFillEvents:
                                 dfEvent.happened = True
-                        Log.debug("star power added")
+                        log.debug("star power added")
                         if self.gameMode2p == 6 and not self.isDrum:
                             if self.battleSuddenDeath:
                                 self.battleObjects = [1] + self.battleObjects[:2]
@@ -1323,7 +1324,7 @@ class Instrument(object):
                                 self.battleObjects = [self.battleObjectsEnabled[random.randint(0,len(self.battleObjectsEnabled)-1)]] + self.battleObjects[:2]
                             self.battleGetTime = pos
                             self.battleObjectGained = True
-                            Log.debug("Battle Object Gained, Objects %s" % str(self.battleObjects))
+                            log.debug("Battle Object Gained, Objects %s" % str(self.battleObjects))
                         else:
 
                             if self.starPower < 100:
@@ -1433,7 +1434,7 @@ class Instrument(object):
                     elif self.coOpRescueTime + (self.currentPeriod * self.beatsPerBoard * 2) < pos:
                         self.coOpFailed = False
                         self.coOpRestart = False
-                        Log.debug("Turning off coOpFailed. Rescue successful.")
+                        log.debug("Turning off coOpFailed. Rescue successful.")
                 else:
                     continue #can't break. Tempo.
 
@@ -1986,7 +1987,7 @@ class Instrument(object):
                     elif self.coOpRescueTime + (self.currentPeriod * self.beatsPerBoard * 2) < pos:
                         self.coOpFailed = False
                         self.coOpRestart = False
-                        Log.debug("Turning off coOpFailed. Rescue successful.")
+                        log.debug("Turning off coOpFailed. Rescue successful.")
                 else:
                     continue
 

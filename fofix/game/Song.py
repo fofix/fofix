@@ -33,13 +33,14 @@ import hashlib
 import binascii
 import cerealizer
 
+from fretwork import log
+from fretwork.audio import StreamingSound
+from fretwork.unicode import utf8
+
 from fofix.core.Theme import hexToColor, colorToHex
-from fofix.core.Unicode import utf8
 from fofix.core.Language import _
 from fofix.core.Theme import *
 from fofix.core import midi
-from fofix.core import Log
-from fofix.core import Audio
 from fofix.core import Config
 from fofix.core import Version
 from fofix.core import VFS
@@ -172,7 +173,7 @@ _songDB = VFS.openSqlite3('/userdata/SongCache.sqlite')
 try:
     _dbversion = _songDB.execute("SELECT `value` FROM `config` WHERE `key` = 'version'").fetchone()[0]
     if int(_dbversion) == 6:
-        Log.debug('Upgrading song cache schema version 6 to 7.')
+        log.debug('Upgrading song cache schema version 6 to 7.')
         _songDB.execute('ALTER TABLE `songinfo` ADD `seen` INT')
         _songDB.execute('UPDATE `songinfo` SET `seen` = 0')
         _songDB.execute("UPDATE `config` SET `value` = '7' WHERE `key` = 'version'")
@@ -182,7 +183,7 @@ try:
     #  able to upgrade starting at *any* schema version we support
     #  upgrading from, like so.)
     #if _dbversion == 7:
-    #  Log.debug('Upgrading song cache schema version 7 to 8.')
+    #  log.debug('Upgrading song cache schema version 7 to 8.')
     #  _songDB.execute(sql needed to do the update)
     #  _songDB.commit()
     #  _dbversion = 8
@@ -190,11 +191,11 @@ try:
         _mustReinitialize = False
     else:
         _mustReinitialize = True
-        Log.debug('Song cache has incompatible schema version; forcing reinitialization.')
+        log.debug('Song cache has incompatible schema version; forcing reinitialization.')
 except:
     _mustReinitialize = True
 if _mustReinitialize:
-    Log.debug('Initializing song cache.')
+    log.debug('Initializing song cache.')
     # Clean out the database, then make our tables.
     for tbl in _songDB.execute("SELECT `name` FROM `sqlite_master` WHERE `type` = 'table'").fetchall():
         _songDB.execute('DROP TABLE `%s`' % tbl)
@@ -231,7 +232,7 @@ class SongInfo(object):
 
         self.logClassInits = Config.get("game", "log_class_inits")
         if self.logClassInits == 1:
-            Log.debug("SongInfo class init (song.py): " + self.name)
+            log.debug("SongInfo class init (song.py): " + self.name)
 
         self.logSections = Config.get("game", "log_sections")
 
@@ -242,15 +243,15 @@ class SongInfo(object):
             if os.path.isfile(os.path.join(os.path.dirname(self.fileName), "notes-unedited.mid")):
                 notefile = "notes-unedited.mid"
                 if self.logUneditedMidis == 1:
-                    Log.debug("notes-unedited.mid found, using instead of notes.mid! - " + self.name)
+                    log.debug("notes-unedited.mid found, using instead of notes.mid! - " + self.name)
             else:
                 notefile = "notes.mid"
                 if self.logUneditedMidis == 1:
-                    Log.debug("notes-unedited.mid not found, using notes.mid - " + self.name)
+                    log.debug("notes-unedited.mid not found, using notes.mid - " + self.name)
         else:
             notefile = "notes.mid"
             if self.logUneditedMidis == 1:
-                Log.debug("notes-unedited.mid not found, using notes.mid - " + self.name)
+                log.debug("notes-unedited.mid not found, using notes.mid - " + self.name)
         self.noteFileName = os.path.join(os.path.dirname(self.fileName), notefile)
 
         for part in parts.values():
@@ -262,21 +263,21 @@ class SongInfo(object):
             try:    #MFH - it crashes here on previews!
                 result = _songDB.execute('SELECT `info` FROM `songinfo` WHERE `hash` = ?', [songhash]).fetchone()
                 if result is None:
-                    Log.debug('Song %s was not found in the cache.' % infoFileName)
+                    log.debug('Song %s was not found in the cache.' % infoFileName)
             except Exception:
-                Log.error('Cache retrieval failed for %s: ' % infoFileName)
+                log.error('Cache retrieval failed for %s: ' % infoFileName)
                 result = None
 
             if result is not None:
                 try:
                     self.__dict__.update(cPickle.loads(str(result[0])))
                     _songDB.execute('UPDATE `songinfo` SET `seen` = 1 WHERE `hash` = ?', [songhash])
-                    Log.debug('Song %s successfully loaded from cache.' % infoFileName)
+                    log.debug('Song %s successfully loaded from cache.' % infoFileName)
                     return
                 except:
                     # The entry is there but could not be loaded.
                     # Nuke it and let it be rebuilt.
-                    Log.error('Song %s has invalid cache data (will rebuild): ' % infoFileName)
+                    log.error('Song %s has invalid cache data (will rebuild): ' % infoFileName)
                     _songDB.execute('DELETE FROM `songinfo` WHERE `hash` = ?', [songhash])
 
             #stump: preload this stuff...
@@ -284,7 +285,7 @@ class SongInfo(object):
             self.getSections()
 
             #stump: Write this song's info into the cache.
-            Log.debug('Writing out cache for song %s.' % self.fileName)
+            log.debug('Writing out cache for song %s.' % self.fileName)
             pdict = {}
             for key in ('_parts', '_partDifficulties', '_midiStyle', '_sections'):
                 pdict[key] = getattr(self, key)
@@ -349,7 +350,7 @@ class SongInfo(object):
                     else:
                         self.addHighscore(difficulty, score, stars, name, part)
                 else:
-                    Log.warn("Weak hack attempt detected. Better luck next time.")
+                    log.warn("Weak hack attempt detected. Better luck next time.")
 
     def _set(self, attr, value):
         if not self.info.has_section("song"):
@@ -429,18 +430,18 @@ class SongInfo(object):
         # See which parts are available
         try:
             noteFileName = self.noteFileName
-            Log.debug("Retrieving parts from: " + noteFileName)
+            log.debug("Retrieving parts from: " + noteFileName)
             info = MidiPartsDiffReader()
 
             midiIn = midi.MidiInFile(info, noteFileName)
             midiIn.read()
             if info.parts == []:
-                Log.debug("Improperly named tracks. Attempting to force first track guitar.")
+                log.debug("Improperly named tracks. Attempting to force first track guitar.")
                 info = MidiPartsDiffReader(forceGuitar = True)
                 midiIn = midi.MidiInFile(info, noteFileName)
                 midiIn.read()
             if info.parts == []:
-                Log.warn("No tracks found!")
+                log.warn("No tracks found!")
                 raise Exception
             self._midiStyle = info.midiStyle
             info.parts.sort(lambda b, a: cmp(b.id, a.id))
@@ -452,7 +453,7 @@ class SongInfo(object):
                 info.difficulties[part.id].sort(lambda a, b: cmp(a.id, b.id))
                 self._partDifficulties[part.id] = info.difficulties[part.id]
         except:
-            Log.warn("Note file not parsed correctly. Selected part and/or difficulty may not be available.")
+            log.warn("Note file not parsed correctly. Selected part and/or difficulty may not be available.")
             self._parts = parts.values()
             for part in self._parts:
                 self._partDifficulties[part.id] = difficulties.values()
@@ -587,10 +588,10 @@ class SongInfo(object):
               "songPart": part
             }
             data = urllib.urlopen(url + "?" + urllib.urlencode(d)).read()
-            Log.debug("Score upload result: %s" % data)
+            log.debug("Score upload result: %s" % data)
             return data   #MFH - want to return the actual result data.
         except Exception as e:
-            Log.error("Score upload error: %s" % e)
+            log.error("Score upload error: %s" % e)
             return False
         return True
 
@@ -615,7 +616,7 @@ class SongInfo(object):
         # See which sections are available
         try:
             noteFileName = self.noteFileName
-            Log.debug("Retrieving sections from: " + noteFileName)
+            log.debug("Retrieving sections from: " + noteFileName)
             info = MidiSectionReader()
             midiIn = midi.MidiInFile(info, noteFileName)
             try:
@@ -628,19 +629,19 @@ class SongInfo(object):
                 self._sections.insert(0,["0:00 -> Start", 0.0])
 
                 #MFH - only log if enabled
-                Log.warn("Song.py: Using auto-generated note count sections...")
+                log.warn("Song.py: Using auto-generated note count sections...")
                 if self.logSections == 1:
-                    Log.debug("Practice sections: " + str(self._sections))
+                    log.debug("Practice sections: " + str(self._sections))
 
             else:
                 self._sections.insert(0,["0:00 -> Start", 0.0])
 
                 #MFH - only log if enabled
                 if self.logSections == 1:
-                    Log.debug("Practice sections: " + str(self._sections))
+                    log.debug("Practice sections: " + str(self._sections))
 
         except Exception as e:
-            Log.warn("Song.py: Unable to retrieve section names for practice mode selection: %s" % e)
+            log.warn("Song.py: Unable to retrieve section names for practice mode selection: %s" % e)
             self._sections = None
         return self._sections
 
@@ -707,7 +708,7 @@ class LibraryInfo(object):
 
         self.logClassInits = Config.get("game", "log_class_inits")
         if self.logClassInits == 1:
-            Log.debug("LibraryInfo class init (song.py)...")
+            log.debug("LibraryInfo class init (song.py)...")
 
 
         try:
@@ -776,7 +777,7 @@ class BlankSpaceInfo(object): #MFH
 
         self.logClassInits = Config.get("game", "log_class_inits")
         if self.logClassInits == 1:
-            Log.debug("BlankSpaceInfo class init (song.py)...")
+            log.debug("BlankSpaceInfo class init (song.py)...")
 
         self.name = nameToDisplay
         self.color = None
@@ -791,7 +792,7 @@ class CareerResetterInfo(object): #MFH
 
         self.logClassInits = Config.get("game", "log_class_inits")
         if self.logClassInits == 1:
-            Log.debug("CareerResetterInfo class init (song.py)...")
+            log.debug("CareerResetterInfo class init (song.py)...")
 
         self.name = _("Reset Career")
         self.color = None
@@ -802,7 +803,7 @@ class RandomSongInfo(object): #MFH
     def __init__(self):
         self.logClassInits = Config.get("game", "log_class_inits")
         if self.logClassInits == 1:
-            Log.debug("RandomSongInfo class init (song.py)...")
+            log.debug("RandomSongInfo class init (song.py)...")
 
         self.name = _("   (Random Song)")
         self.color = None
@@ -817,7 +818,7 @@ class TitleInfo(object):
 
         self.logClassInits = Config.get("game", "log_class_inits")
         if self.logClassInits == 1:
-            Log.debug("TitleInfo class init (song.py)...")
+            log.debug("TitleInfo class init (song.py)...")
 
         self.artist = None    #MFH - prevents search errors
 
@@ -859,7 +860,7 @@ class SortTitleInfo(object):
 
         self.logClassInits = Config.get("game", "log_class_inits")
         if self.logClassInits == 1:
-            Log.debug("TitleInfo class init (song.py)...")
+            log.debug("TitleInfo class init (song.py)...")
 
         self.name = nameToDisplay
         self.color = None
@@ -964,7 +965,7 @@ class Track:    #MFH - Changing Track class to a base class.  NoteTrack and Temp
         if engine is not None:
             self.logClassInits = Config.get("game", "log_class_inits")
             if self.logClassInits == 1:
-                Log.debug("Track class init (song.py)...")
+                log.debug("Track class init (song.py)...")
 
     def __getitem__(self, index):
         return self.allEvents[index]
@@ -1079,7 +1080,7 @@ class VocalTrack(Track):
             if isinstance(event, Tempo):
                 self.allEvents.remove((time, event))
                 if self.logTempoEvents == 1:
-                    Log.debug("Tempo event removed from VocalTrack during cleanup: " + str(event.bpm) + "bpm")
+                    log.debug("Tempo event removed from VocalTrack during cleanup: " + str(event.bpm) + "bpm")
 
     def markPhrases(self):
         phraseId = 0
@@ -1087,13 +1088,13 @@ class VocalTrack(Track):
         markStars = False
         if len(self.starTimes) < 2:
             markStars = True
-            Log.warn("This song does not appear to have any vocal star power events - falling back on auto-generation.")
+            log.warn("This song does not appear to have any vocal star power events - falling back on auto-generation.")
         for time, event in self.getAllEvents():
             if isinstance(event, VocalPhrase):
                 if time in self.starTimes and not markStars:
                     event.star = True
                 if time in phraseTimes:
-                    Log.warn("Phrase repeated - some lyric phrase errors may occur.")
+                    log.warn("Phrase repeated - some lyric phrase errors may occur.")
                     phraseId += 1
                     continue
                 if markStars and phraseId+1 % 7 == 0:
@@ -1222,7 +1223,7 @@ class NoteTrack(Track):   #MFH - special Track type for note events, with markin
             if isinstance(event, Tempo):
                 self.allEvents.remove((time, event))
                 if self.logTempoEvents == 1:
-                    Log.debug("Tempo event removed from NoteTrack during cleanup: " + str(event.bpm) + "bpm")
+                    log.debug("Tempo event removed from NoteTrack during cleanup: " + str(event.bpm) + "bpm")
 
     def flipDrums(self):
         for time, event in self.allEvents:
@@ -1241,9 +1242,9 @@ class NoteTrack(Track):   #MFH - special Track type for note events, with markin
             songHopoFreq = int(songHopoFreq)
         except Exception:
             songHopoFreq = None
-        #  Log.warn("Song.ini HOPO Frequency setting is invalid -- forcing Normal (value 1)")
+        #  log.warn("Song.ini HOPO Frequency setting is invalid -- forcing Normal (value 1)")
             if self.songHopoFreq == 1 and songHopoFreq in [0, 1, 2, 3, 4, 5]:
-                Log.debug("markHopoRF: song-specific HOPO frequency %d forced" % songHopoFreq)
+                log.debug("markHopoRF: song-specific HOPO frequency %d forced" % songHopoFreq)
                 self.hopoTick = songHopoFreq
 
         #dtb file says 170 ticks
@@ -1476,7 +1477,7 @@ class NoteTrack(Track):   #MFH - special Track type for note events, with markin
         except Exception:
             songHopoFreq = None
         if self.songHopoFreq == 1 and songHopoFreq in [0, 1, 2, 3, 4, 5]:
-            Log.debug("markHopoGH2: song-specific HOPO frequency %d forced" % songHopoFreq)
+            log.debug("markHopoGH2: song-specific HOPO frequency %d forced" % songHopoFreq)
             self.hopoTick = songHopoFreq
 
 
@@ -2013,7 +2014,7 @@ class Song(object):
 
         self.logClassInits = self.engine.config.get("game", "log_class_inits")
         if self.logClassInits == 1:
-            Log.debug("Song class init (song.py)...")
+            log.debug("Song class init (song.py)...")
 
         self.info         = SongInfo(infoFileName)
         self.tracks = []
@@ -2086,34 +2087,34 @@ class Song(object):
 
         try:
             if songTrackName:
-                self.songTrack = Audio.StreamingSound(self.engine.audio.getChannel(0), songTrackName)
+                self.songTrack = StreamingSound(self.engine.audio.getChannel(0), songTrackName)
         except Exception as e:
-            Log.warn("Unable to load song track: %s" % e)
+            log.warn("Unable to load song track: %s" % e)
 
         try:
             if guitarTrackName:
-                self.guitarTrack = Audio.StreamingSound(self.engine.audio.getChannel(1), guitarTrackName)
+                self.guitarTrack = StreamingSound(self.engine.audio.getChannel(1), guitarTrackName)
         except Exception as e:
-            Log.warn("Unable to load guitar track: %s" % e)
+            log.warn("Unable to load guitar track: %s" % e)
 
         try:
             if rhythmTrackName:
-                self.rhythmTrack = Audio.StreamingSound(self.engine.audio.getChannel(2), rhythmTrackName)
+                self.rhythmTrack = StreamingSound(self.engine.audio.getChannel(2), rhythmTrackName)
         except Exception as e:
-            Log.warn("Unable to load rhythm track: %s" % e)
+            log.warn("Unable to load rhythm track: %s" % e)
 
 
         try:
             if drumTrackName:
-                self.drumTrack = Audio.StreamingSound(self.engine.audio.getChannel(3), drumTrackName)
+                self.drumTrack = StreamingSound(self.engine.audio.getChannel(3), drumTrackName)
         except Exception as e:
-            Log.warn("Unable to load drum track: %s" % e)
+            log.warn("Unable to load drum track: %s" % e)
 
         try:
             if crowdTrackName:
-                self.crowdTrack = Audio.StreamingSound(self.engine.audio.getChannel(4), crowdTrackName)
+                self.crowdTrack = StreamingSound(self.engine.audio.getChannel(4), crowdTrackName)
         except Exception as e:
-            Log.warn("Unable to load crowd track: %s" % e)
+            log.warn("Unable to load crowd track: %s" % e)
 
         #MFH - single audio track song detection
         self.singleTrackSong = False
@@ -2121,12 +2122,12 @@ class Song(object):
             if self.songTrack or self.guitarTrack or self.rhythmTrack or self.drumTrack:
                 self.singleTrackSong = True
                 self.missVolume = self.engine.config.get("audio", "single_track_miss_volume")   #MFH - force single-track miss volume setting instead
-                Log.debug("Song with only a single audio track identified - single-track miss volume applied: " + str(self.missVolume))
+                log.debug("Song with only a single audio track identified - single-track miss volume applied: " + str(self.missVolume))
 
 
         # load the notes
         if noteFileName:
-            Log.debug("Retrieving notes from: " + noteFileName)
+            log.debug("Retrieving notes from: " + noteFileName)
             midiIn = midi.MidiInFile(MidiReader(self), noteFileName)
             midiIn.read()
 
@@ -2467,7 +2468,7 @@ class ScriptReader:
 
         self.logClassInits = Config.get("game", "log_class_inits")
         if self.logClassInits == 1:
-            Log.debug("ScriptReader class init (song.py)...")
+            log.debug("ScriptReader class init (song.py)...")
 
 
     def read(self):
@@ -2503,7 +2504,7 @@ class MidiReader(midi.MidiOutStream):
 
         self.logClassInits = Config.get("game", "log_class_inits")
         if self.logClassInits == 1:
-            Log.debug("MidiReader class init (song.py)...")
+            log.debug("MidiReader class init (song.py)...")
 
         self.logMarkerNotes = Config.get("game", "log_marker_notes")
 
@@ -2594,7 +2595,7 @@ class MidiReader(midi.MidiOutStream):
         #add tempo events to the universal tempo track
         self.song.tempoEventTrack.addEvent(time, event)
         if self.logTempoEvents == 1:
-            Log.debug("Tempo event added to Tempo track: " + str(time) + " - " + str(event.bpm) + "BPM" )
+            log.debug("Tempo event added to Tempo track: " + str(time) + " - " + str(event.bpm) + "BPM" )
 
     def addSpecialMidiEvent(self, track, event, time = None):    #MFH
         if self.partnumber == -1:
@@ -2675,7 +2676,7 @@ class MidiReader(midi.MidiOutStream):
             self.useVocalTrack = False
 
         if self.logSections == 1:
-            Log.debug(tempText + tempText2)
+            log.debug(tempText + tempText2)
 
         self.guitarSoloIndex = 0
         self.guitarSoloActive = False
@@ -2724,7 +2725,7 @@ class MidiReader(midi.MidiOutStream):
                     self.addSpecialMidiEvent(diff, MarkerNote(note, endTime - startTime), time = startTime)
                     self.addSpecialMidiEvent(diff, MarkerNote(note, 1, endMarker = True), time = endTime+1)   #ending marker note
                     if self.logMarkerNotes == 1:
-                        Log.debug("RB Overdrive MarkerNote at %f added to part: %s and difficulty: %s" % ( startTime, self.partnumber, difficulties[diff] ) )
+                        log.debug("RB Overdrive MarkerNote at %f added to part: %s and difficulty: %s" % ( startTime, self.partnumber, difficulties[diff] ) )
 
             elif note == starPowerMarkingNote:    #MFH
                 self.song.hasStarpowerPaths = True
@@ -2732,18 +2733,18 @@ class MidiReader(midi.MidiOutStream):
                     self.addSpecialMidiEvent(diff, MarkerNote(note, endTime - startTime), time = startTime)
                     self.addSpecialMidiEvent(diff, MarkerNote(note, 1, endMarker = True), time = endTime+1)   #ending marker note
                     if self.logMarkerNotes == 1:
-                        Log.debug("GH Starpower (or RB Solo) MarkerNote at %f added to part: %s and difficulty: %s" % ( startTime, self.partnumber, difficulties[diff] ) )
+                        log.debug("GH Starpower (or RB Solo) MarkerNote at %f added to part: %s and difficulty: %s" % ( startTime, self.partnumber, difficulties[diff] ) )
 
             elif note == freestyleMarkingNote:    #MFH - for drum fills and big rock endings
                 self.song.hasFreestyleMarkings = True
                 for diff in difficulties:
                     self.addSpecialMidiEvent(diff, MarkerNote(note, endTime - startTime), time = startTime)
                     if self.logMarkerNotes == 1:
-                        Log.debug("RB freestyle section (drum fill or BRE) at %f added to part: %s and difficulty: %s" % ( startTime, self.partnumber, difficulties[diff] ) )
+                        log.debug("RB freestyle section (drum fill or BRE) at %f added to part: %s and difficulty: %s" % ( startTime, self.partnumber, difficulties[diff] ) )
             else:
                 pass
         except KeyError:
-            Log.warn("MIDI note 0x%x on channel %d ending at %d was never started." % (note, channel, self.abs_time()))
+            log.warn("MIDI note 0x%x on channel %d ending at %d was never started." % (note, channel, self.abs_time()))
 
 
     #MFH - OK - this needs to be optimized.
@@ -2786,7 +2787,7 @@ class MidiReader(midi.MidiOutStream):
                     event = TextEvent(text, 250.0)
                     if text.lower().find("big rock ending") >= 0:
                         curTime = self.abs_time()
-                        Log.debug("Big Rock Ending section event marker found at " + str(curTime) )
+                        log.debug("Big Rock Ending section event marker found at " + str(curTime) )
                         self.song.breMarkerTime = curTime
 
                     if text.lower().find("solo") >= 0 and text.lower().find("drum") < 0 and text.lower().find("outro") < 0 and text.lower().find("organ") < 0 and text.lower().find("synth") < 0 and text.lower().find("bass") < 0 and text.lower().find("harmonica") < 0:
@@ -2829,7 +2830,7 @@ class MidiReader(midi.MidiOutStream):
                         if not self.guitarSoloActive:
                             self.guitarSoloActive = True
                             soloEvent = TextEvent("GSOLO ON", 250.0)
-                            Log.debug("GSOLO ON event " + event.text + " found at time " + str(self.abs_time()) )
+                            log.debug("GSOLO ON event " + event.text + " found at time " + str(self.abs_time()) )
                             self.song.eventTracks[TK_GUITAR_SOLOS].addEvent(self.abs_time(), soloEvent)  #MFH - add an event to the guitar solos track
                     else: #this is the cue to end solos...
                         if self.guitarSoloActive:
@@ -2838,7 +2839,7 @@ class MidiReader(midi.MidiOutStream):
                             if self.song.eventTracks[TK_GUITAR_SOLOS][-1][0] < curTime:
                                 self.guitarSoloActive = False
                                 soloEvent = TextEvent("GSOLO OFF", 250.0)
-                                Log.debug("GSOLO OFF event " + event.text + " found at time " + str(curTime) )
+                                log.debug("GSOLO OFF event " + event.text + " found at time " + str(curTime) )
                                 self.guitarSoloIndex += 1
                                 self.song.eventTracks[TK_GUITAR_SOLOS].addEvent(curTime, soloEvent)  #MFH - add an event to the guitar solos track
 
@@ -2870,7 +2871,7 @@ class MidiSectionReader(midi.MidiOutStream):
 
         self.logClassInits = Config.get("game", "log_class_inits")
         if self.logClassInits == 1:
-            Log.debug("MidiSectionReader class init (song.py)...")
+            log.debug("MidiSectionReader class init (song.py)...")
 
         self.logSections = Config.get("game", "log_sections")
 
@@ -2919,7 +2920,7 @@ class MidiSectionReader(midi.MidiOutStream):
 
             #MFH - only log if enabled
             if self.logSections == 1:
-                Log.debug("Found potential default practice section: " + str(pos) + " - " + text)
+                log.debug("Found potential default practice section: " + str(pos) + " - " + text)
 
             self.noteCountSections.append([text,pos])
 
@@ -2946,7 +2947,7 @@ class MidiSectionReader(midi.MidiOutStream):
 
                 #MFH - only log if enabled
                 if self.logSections == 1:
-                    Log.debug("Found <section> potential RB-style practice section: " + str(pos) + " - " + text)
+                    log.debug("Found <section> potential RB-style practice section: " + str(pos) + " - " + text)
 
                 text = "%d:%02d -> " % (pos / 60000, (pos % 60000) / 1000) + text
                 self.sections.append([text,pos])
@@ -2956,7 +2957,7 @@ class MidiSectionReader(midi.MidiOutStream):
 
                 #MFH - only log if enabled
                 if self.logSections == 1:
-                    Log.debug("Found potential GH1-style practice section: " + str(pos) + " - " + text)
+                    log.debug("Found potential GH1-style practice section: " + str(pos) + " - " + text)
 
                 text = "%d:%02d -> " % (pos / 60000, (pos % 60000) / 1000) + text
                 self.sections.append([text,pos])
@@ -2964,7 +2965,7 @@ class MidiSectionReader(midi.MidiOutStream):
 
                 #MFH - only log if enabled
                 if self.logSections == 1:
-                    Log.debug("Found potential GH1-style practice section: " + str(pos) + " - " + text)
+                    log.debug("Found potential GH1-style practice section: " + str(pos) + " - " + text)
 
                 text = "%d:%02d -> " % (pos / 60000, (pos % 60000) / 1000) + text
                 self.sections.append([text,pos])
@@ -2974,7 +2975,7 @@ class MidiSectionReader(midi.MidiOutStream):
 
                 #MFH - only log if enabled
                 if self.logSections == 1:
-                    Log.debug("Found potential GH1-style practice section: " + str(pos) + " - " + text)
+                    log.debug("Found potential GH1-style practice section: " + str(pos) + " - " + text)
 
                 text = "%d:%02d -> " % (pos / 60000, (pos % 60000) / 1000) + text
                 self.sections.append([text,pos])
@@ -2982,7 +2983,7 @@ class MidiSectionReader(midi.MidiOutStream):
 
                 #MFH - only log if enabled
                 if self.logSections == 1:
-                    Log.debug("Found potential GH1-style practice section: " + str(pos) + " - " + text)
+                    log.debug("Found potential GH1-style practice section: " + str(pos) + " - " + text)
 
                 text = "%d:%02d -> " % (pos / 60000, (pos % 60000) / 1000) + text
                 self.sections.append([text,pos])
@@ -3005,7 +3006,7 @@ class SongQueue:
 
         self.logClassInits = Config.get("game", "log_class_inits")
         if self.logClassInits == 1:
-            Log.debug("SongQueue class init (song.py)...")
+            log.debug("SongQueue class init (song.py)...")
 
     def __len__(self):
         return len(self.songName)
@@ -3046,7 +3047,7 @@ class SongQueue:
 
     def getSong(self):
         if len(self.songName) == 0 or len(self.library) == 0:
-            Log.warn("SongQueue.getSong: Empty queue get.")
+            log.warn("SongQueue.getSong: Empty queue get.")
             return False
         song = self.songName.pop(0)
         library = self.library.pop(0)
@@ -3054,7 +3055,7 @@ class SongQueue:
 
     def getRandomSong(self):
         if len(self.songName) == 0 or len(self.library) == 0:
-            Log.warn("SongQueue.getRandomSong: Empty queue get.")
+            log.warn("SongQueue.getRandomSong: Empty queue get.")
             return False
         n = random.randint(0,len(self.songName)-1)
         song = self.songName.pop(n)
@@ -3096,19 +3097,19 @@ class MidiPartsDiffReader(midi.MidiOutStream):
 
         self.logClassInits = Config.get("game", "log_class_inits")
         if self.logClassInits == 1:
-            Log.debug("MidiPartsDiffReader class init (song.py)...")
+            log.debug("MidiPartsDiffReader class init (song.py)...")
 
         self.logSections = Config.get("game", "log_sections")
 
     def getMidiStyle(self):
         if self._ODNoteFound:
-            Log.debug("MIDI Type identified as RB")
+            log.debug("MIDI Type identified as RB")
             return MIDI_TYPE_RB
         elif self._drumFound and self._SPNoteFound:
-            Log.debug("MIDI Type identified as WT")
+            log.debug("MIDI Type identified as WT")
             return MIDI_TYPE_WT
         else:
-            Log.debug("MIDI Type identified as GH")
+            log.debug("MIDI Type identified as GH")
             return MIDI_TYPE_GH
     midiStyle = property(getMidiStyle)
 
@@ -3125,10 +3126,10 @@ class MidiPartsDiffReader(midi.MidiOutStream):
                     if self.logSections == 1:
                         tempText = "No recognized tracks found. Using first track, and identifying it as "
                         tempText2 = "GUITAR_PART"
-                        Log.debug(tempText + tempText2)
+                        log.debug(tempText + tempText2)
                 self.firstTrack = True
             else:
-                Log.notice("This song has multiple tracks, none properly named. Behavior may be erratic.")
+                log.notice("This song has multiple tracks, none properly named. Behavior may be erratic.")
 
     def sequence_name(self, text):
 
@@ -3152,7 +3153,7 @@ class MidiPartsDiffReader(midi.MidiOutStream):
                             self._drumFound  = True
                     if self.logSections == 1:
                         tempText2 = part.trackName[0].replace(" ", "_")
-                        Log.debug(tempText + tempText2)
+                        log.debug(tempText + tempText2)
                     return
         self.currentPart = -1
 
@@ -3187,7 +3188,7 @@ class MidiPartsDiffReader(midi.MidiOutStream):
 
 def loadSong(engine, name, library = DEFAULT_LIBRARY, seekable = False, playbackOnly = False, notesOnly = False, part = [parts[GUITAR_PART]], practiceMode = False, practiceSpeed = .5):
 
-    Log.debug("loadSong function call (song.py)...")
+    log.debug("loadSong function call (song.py)...")
     crowdsEnabled = engine.config.get("audio", "enable_crowd_tracks")
 
     #RF-mod (not needed?)
@@ -3203,15 +3204,15 @@ def loadSong(engine, name, library = DEFAULT_LIBRARY, seekable = False, playback
         noteFile   = engine.resource.fileName(library, name, "notes-unedited.mid", writable = True)
         if os.path.isfile(noteFile):
             if logUneditedMidis == 1:
-                Log.debug("notes-unedited.mid found, using instead of notes.mid! - " + name)
+                log.debug("notes-unedited.mid found, using instead of notes.mid! - " + name)
         else:
             noteFile   = engine.resource.fileName(library, name, "notes.mid", writable = True)
             if logUneditedMidis == 1:
-                Log.debug("notes-unedited.mid not found, using notes.mid - " + name)
+                log.debug("notes-unedited.mid not found, using notes.mid - " + name)
     else:
         noteFile   = engine.resource.fileName(library, name, "notes.mid", writable = True)
         if logUneditedMidis == 1:
-            Log.debug("notes-unedited.mid not found, using notes.mid - " + name)
+            log.debug("notes-unedited.mid not found, using notes.mid - " + name)
 
     infoFile   = engine.resource.fileName(library, name, "song.ini", writable = True)
     scriptFile = engine.resource.fileName(library, name, "script.txt")
@@ -3296,7 +3297,7 @@ def getDefaultLibrary(engine):
     return LibraryInfo(DEFAULT_LIBRARY, engine.resource.fileName(DEFAULT_LIBRARY, "library.ini"))
 
 def getAvailableLibraries(engine, library = DEFAULT_LIBRARY):
-    Log.debug("Song.getAvailableLibraries function call...library = " + str(library) )
+    log.debug("Song.getAvailableLibraries function call...library = " + str(library) )
     # Search for libraries in both the read-write and read-only directories
     songRoots    = [engine.resource.fileName(library),
                     engine.resource.fileName(library, writable = True)]
@@ -3523,7 +3524,7 @@ def getAvailableTitles(engine, library = DEFAULT_LIBRARY):
             titles.append(BlankSpaceInfo(_("End of Career")))
 
     except:
-        Log.debug("titles.ini could not be read (song.py)")
+        log.debug("titles.ini could not be read (song.py)")
         return []
 
     return titles
@@ -3734,7 +3735,7 @@ def removeSongOrderPrefixFromName(name):
 #stump
 def updateSongDatabase(engine):
     from fofix.game import Dialogs  # putting it at the top causes circular-import-related problems...
-    Log.debug('Updating song cache.')
+    log.debug('Updating song cache.')
     _songDB.execute('UPDATE `songinfo` SET `seen` = 0')
     lastScreenUpdateTime = [time.time()]  # one-element list to avoid having to throw this into the global namespace for updatePhase's sake
     loadingScreen = Dialogs.showLoadingSplashScreen(engine, _('Checking song database...'))
@@ -3756,6 +3757,6 @@ def updateSongDatabase(engine):
     prunecount = _songDB.execute('DELETE FROM `songinfo` WHERE `seen` = 0').rowcount
     if prunecount != 0:
         _songDB.execute('VACUUM')
-        Log.debug('Pruned %d cache entries.' % prunecount)
+        log.debug('Pruned %d cache entries.' % prunecount)
     _songDB.commit()
     Dialogs.hideLoadingSplashScreen(engine, loadingScreen)

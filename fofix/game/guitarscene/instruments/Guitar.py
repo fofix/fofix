@@ -34,6 +34,8 @@ import os
 from OpenGL.GL import *
 import numpy as np
 
+from fretwork import log
+
 from fofix.game.guitarscene.instruments.Instrument import Instrument
 from fofix.game.guitarscene.Neck import Neck
 from fofix.game.Song import Note, Tempo
@@ -42,7 +44,6 @@ from fofix.core.Shader import shaders
 from fofix.core.Mesh import Mesh
 from fofix.game import Song
 from fofix.core import cmgl
-from fofix.core import Log
 
 class Guitar(Instrument):
     def __init__(self, engine, playerObj, scene, player = 0, bass = False):
@@ -61,7 +62,7 @@ class Guitar(Instrument):
 
         self.logClassInits = self.engine.config.get("game", "log_class_inits")
         if self.logClassInits == 1:
-            Log.debug("Guitar class init...")
+            log.debug("Guitar class init...")
 
         self.lastPlayedNotes = []   #MFH - for reverting when game discovers it implied incorrectly
 

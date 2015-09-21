@@ -26,12 +26,13 @@
 
 import pygame
 
+from fretwork import log
+
 from fofix.core.Language import _
 from fofix.core import Microphone  #stump
 from fofix.core import Config
 from fofix.game import Song
 from fofix.core import VFS
-from fofix.core import Log
 
 class ConfigOption:
     def __init__(self, id, text):
@@ -444,7 +445,7 @@ class Controls:
 
         self.logClassInits = Config.get("game", "log_class_inits")
         if self.logClassInits == 1:
-            Log.debug("Controls class init (Player.py)...")
+            log.debug("Controls class init (Player.py)...")
         self.controls = []
         self.controls.append(Config.get("game", "control0"))
         self.controls.append(Config.get("game", "control1"))
@@ -737,7 +738,7 @@ class Controls:
                     else:
                         return name + " " + guitarkeynames[j]
             else:
-                Log.notice("Key value not found.")
+                log.notice("Key value not found.")
                 return "Error"
 
         if self.keyCheckerMode == 0:
@@ -847,7 +848,7 @@ class Player(object):
 
         self.logClassInits = Config.get("game", "log_class_inits")
         if self.logClassInits == 1:
-            Log.debug("Player class init (Player.py)...")
+            log.debug("Player class init (Player.py)...")
 
         self.name     = name
 

@@ -30,11 +30,12 @@ import stat
 from Queue import Queue, Empty
 from threading import Thread, BoundedSemaphore
 
-from fofix.core.Task import Task
+from fretwork import log
+from fretwork.task import Task
+
 from fofix.core.VFS import getWritableResourcePath
 from fofix.core import Version
 from fofix.core import Config
-from fofix.core import Log
 
 class Loader(Thread):
     def __init__(self, target, name, function, resultQueue, loaderSemaphore, onLoad = None, onCancel = None):
@@ -122,7 +123,7 @@ class Loader(Thread):
             return
 
         if self.logLoadings == 1:
-            Log.notice("Loaded %s.%s in %.3f seconds" % (self.target.__class__.__name__, self.name, self.time))
+            log.notice("Loaded %s.%s in %.3f seconds" % (self.target.__class__.__name__, self.name, self.time))
 
         if self.exception:
             raise self.exception[0], self.exception[1], self.exception[2]
@@ -209,7 +210,7 @@ class Resource(Task):
                 # read-write path.
                 readWritePath = os.path.join(getWritableResourcePath(), *name)
                 if not os.path.isfile(readWritePath) and os.path.isfile(readOnlyPath):
-                    Log.notice("Copying '%s' to writable data directory." % "/".join(name))
+                    log.notice("Copying '%s' to writable data directory." % "/".join(name))
                     try:
                         os.makedirs(os.path.dirname(readWritePath))
                     except:
@@ -218,7 +219,7 @@ class Resource(Task):
                     self.makeWritable(readWritePath)
                 # Create directories if needed
                 if not os.path.isdir(readWritePath) and os.path.isdir(readOnlyPath):
-                    Log.notice("Creating writable directory '%s'." % "/".join(name))
+                    log.notice("Creating writable directory '%s'." % "/".join(name))
                     os.makedirs(readWritePath)
                     self.makeWritable(readWritePath)
                 return readWritePath
@@ -230,7 +231,7 @@ class Resource(Task):
     def load(self, target = None, name = None, function = lambda: None, synch = False, onLoad = None, onCancel = None):
 
         if self.logLoadings == 1:
-            Log.notice("Loading %s.%s %s" % (target.__class__.__name__, name, synch and "synchronously" or "asynchronously"))
+            log.notice("Loading %s.%s %s" % (target.__class__.__name__, name, synch and "synchronously" or "asynchronously"))
 
         l = Loader(target, name, function, self.resultQueue, self.loaderSemaphore, onLoad = onLoad, onCancel = onCancel)
         if synch:

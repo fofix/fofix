@@ -22,10 +22,11 @@
 
 import os
 
+from fretwork import log
+
 from fofix.core.Language import _
 from fofix.core import Config
 from fofix.core import Theme
-from fofix.core import Log
 
 def _getModPath(engine):
     return engine.resource.fileName("mods")
@@ -44,7 +45,7 @@ def getAvailableMods(engine):
     try:
         dirList = os.listdir(modPath)
     except OSError:
-        Log.warn("Could not find mods directory")
+        log.warn("Could not find mods directory")
         return []
     return [m for m in dirList if os.path.isdir(os.path.join(modPath, m)) and not m.startswith(".")]
 

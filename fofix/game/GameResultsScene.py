@@ -39,16 +39,18 @@ import cerealizer
 
 from OpenGL.GL import *
 
+from fretwork import log
+from fretwork.audio import Sound
+
 from fofix.core.Image import drawImage
 from fofix.core.Scene import Scene
-from fofix.core.Audio import Sound
+
 from fofix.core.constants import *
 from fofix.core.Language import _
 from fofix.game.Menu import Menu
 from fofix.game import Scorekeeper
 from fofix.game import Dialogs
 from fofix.game import Song
-from fofix.core import Log
 from fofix.core import VFS
 
 
@@ -61,7 +63,7 @@ class GameResultsScene(Scene):
 
         self.logClassInits = self.engine.config.get("game", "log_class_inits")
         if self.logClassInits == 1:
-            Log.debug("GameResultsScene class init...")
+            log.debug("GameResultsScene class init...")
 
         players = self.players
         if coOpType > 0:
@@ -200,7 +202,7 @@ class GameResultsScene(Scene):
         self.cheerLoopDelay  = self.engine.theme.crowdLoopDelay
         if self.cheerLoopDelay == None:
             self.cheerLoopDelay = self.engine.config.get("game", "cheer_loop_delay")
-        Log.debug("Cheer loop delay used: %d" % self.cheerLoopDelay)
+        log.debug("Cheer loop delay used: %d" % self.cheerLoopDelay)
 
         self.cheerLoopCounter = self.cheerLoopDelay
 
@@ -544,10 +546,10 @@ class GameResultsScene(Scene):
             d["scores_ext"] = binascii.hexlify(cerealizer.dumps(scores_ext))
             url = self.engine.config.get("network", "uploadurl_w67_starpower")
             data = urllib.urlopen(url + "?" + urllib.urlencode(d)).read()
-            Log.debug("Score upload result: %s" % data)
+            log.debug("Score upload result: %s" % data)
             return data   #MFH - want to return the actual result data.
         except Exception, e:
-            Log.error("Score upload error: %s" % e)
+            log.error("Score upload error: %s" % e)
             return False
         return True
 
@@ -711,7 +713,7 @@ class GameResultsScene(Scene):
                     count = 0
                 count += 1
                 if self.careerMode and not self.song.info.completed and self.scoring[0].stars >= self.careerStars:
-                    Log.debug("Song completed")
+                    log.debug("Song completed")
                     self.song.info.completed = True
                 self.song.info.count = "%d" % count
                 self.song.info.save()
@@ -1248,7 +1250,7 @@ class GameResultsScene(Scene):
                 try:
                     notesHit, notesTotal, noteStreak, modVersion, handicap, handicapLong, originalScore = scoreExt
                 except ValueError:
-                    Log.warn("Old highscores found.")
+                    log.warn("Old highscores found.")
                     notesHit, notesTotal, noteStreak, modVersion, oldScores1, oldScores2 = scoreExt
                 for j,player in enumerate(self.playerList):
                     if (self.time % 10.0) < 5.0 and i == self.highscoreIndex[j] and self.scoreDifficulty == player.difficulty and self.scorePart == player.part:

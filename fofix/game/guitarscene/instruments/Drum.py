@@ -32,6 +32,8 @@ import math
 import numpy as np
 from OpenGL.GL import *
 
+from fretwork import log
+
 from fofix.game.guitarscene.instruments.Instrument import Instrument
 from fofix.game.guitarscene.Neck import Neck
 from fofix.game.Song import Note, Tempo
@@ -40,7 +42,6 @@ from fofix.core.Shader import shaders
 from fofix.core.Mesh import Mesh
 from fofix.game import Song
 from fofix.core import cmgl
-from fofix.core import Log
 
 #Normal guitar key color order: Green, Red, Yellow, Blue, Orange
 #Drum fret color order: Red, Yellow, Blue, Green
@@ -104,7 +105,7 @@ class Drum(Instrument):
 
         self.logClassInits = self.engine.config.get("game", "log_class_inits")
         if self.logClassInits == 1:
-            Log.debug("Drum class initialization!")
+            log.debug("Drum class initialization!")
 
 
         self.freestyleHitFlameCounts = [0 for n in range(self.strings+1)]    #MFH

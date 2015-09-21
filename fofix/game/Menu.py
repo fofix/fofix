@@ -30,12 +30,13 @@ import os
 from OpenGL.GL import *
 import pygame
 
+from fretwork import log
+
 from fofix.core.Input import KeyListener
 from fofix.core.Image import drawImage
 from fofix.core.View import Layer
 from fofix.core import Player
 from fofix.core import Data
-from fofix.core import Log
 
 class Choice:
     def __init__(self, text, callback, name = None, values = None, valueIndex = 0, append_submenu_char = True, tipText = None):
@@ -96,7 +97,7 @@ class Menu(Layer, KeyListener):
 
         self.logClassInits = self.engine.config.get("game", "log_class_inits")
         if self.logClassInits == 1:
-            Log.debug("Menu class init (Menu.py)...")
+            log.debug("Menu class init (Menu.py)...")
 
         #Get theme
         self.themename = self.engine.data.themeLabel
@@ -158,9 +159,9 @@ class Menu(Layer, KeyListener):
                     self.vSpace = float(self.vSpace)
                 else:
                     self.vSpace = .08
-                Log.debug("Graphic menu enabled for submenu: %s" % self.name)
+                log.debug("Graphic menu enabled for submenu: %s" % self.name)
             except KeyError:
-                Log.warn("Your theme does not appear to properly support the %s graphical submenu. Check to be sure you have the latest version of your theme." % self.name)
+                log.warn("Your theme does not appear to properly support the %s graphical submenu. Check to be sure you have the latest version of your theme." % self.name)
                 self.menuBackground = None
                 self.menuText = None
 

@@ -29,8 +29,9 @@ import threading
 
 from OpenGL.GL import glColor3f
 
+from fretwork import log
+
 from fofix.core.View import Layer
-from fofix.core import Log
 
 
 
@@ -114,7 +115,7 @@ class DebugLayer(Layer):
         before = len(gc.get_objects())
         coll   = gc.collect()
         after  = len(gc.get_objects())
-        Log.debug("%d GC objects collected, total %d -> %d." % (coll, before, after))
+        log.debug("%d GC objects collected, total %d -> %d." % (coll, before, after))
         fn = "gcdump.txt"
         f = open(fn, "w")
         n = 0
@@ -126,4 +127,4 @@ class DebugLayer(Layer):
             except:
                 pass
         f.close()
-        Log.debug("Wrote a dump of %d GC garbage objects to %s." % (n, fn))
+        log.debug("Wrote a dump of %d GC garbage objects to %s." % (n, fn))

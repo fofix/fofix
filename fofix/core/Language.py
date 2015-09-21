@@ -24,8 +24,9 @@ import gettext
 import os
 import glob
 
-from fofix.core.Unicode import unicodify
-from fofix.core import Log
+from fretwork import log
+from fretwork.unicode import unicodify
+
 from fofix.core import Version
 from fofix.core import Config
 
@@ -48,7 +49,7 @@ if language:
             return catalog.ugettext(m)
         _ = translate
     except Exception as x:
-        Log.warn("Unable to select language '%s': %s" % (language, x))
+        log.warn("Unable to select language '%s': %s" % (language, x))
         language = None
         Config.set("game", "language", "")
 

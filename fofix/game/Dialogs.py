@@ -37,16 +37,17 @@ import os
 import pygame
 from OpenGL.GL import *
 
+from fretwork import log
+from fretwork.unicode import unicodify
+
 from fofix.core.View import Layer, BackgroundLayer
 from fofix.core.Input import KeyListener
-from fofix.core.Unicode import unicodify
 from fofix.core.Image import drawImage
 from fofix.game.Credits import Credits
 from fofix.core.constants import *
 from fofix.core.Language import _
 from fofix.game.Menu import Menu
 from fofix.core import Microphone
-from fofix.core import Log
 from fofix.core import Player
 from fofix.core import Config
 
@@ -157,7 +158,7 @@ class GetText(Layer, KeyListener):
 
         self.logClassInits = self.engine.config.get("game", "log_class_inits")
         if self.logClassInits == 1:
-            Log.debug("GetText class init (Dialogs.py)...")
+            log.debug("GetText class init (Dialogs.py)...")
 
         self.sfxVolume    = self.engine.config.get("audio", "SFX_volume")
 
@@ -292,7 +293,7 @@ class GetKey(Layer, KeyListener):
 
         self.logClassInits = self.engine.config.get("game", "log_class_inits")
         if self.logClassInits == 1:
-            Log.debug("GetKey class init (Dialogs.py)...")
+            log.debug("GetKey class init (Dialogs.py)...")
 
     def shown(self):
         self.engine.input.addKeyListener(self, priority = True)
@@ -358,7 +359,7 @@ class LoadingScreen(Layer, KeyListener):
 
         self.logClassInits = self.engine.config.get("game", "log_class_inits")
         if self.logClassInits == 1:
-            Log.debug("LoadingScreen class init (Dialogs.py)...")
+            log.debug("LoadingScreen class init (Dialogs.py)...")
 
         self.loadingx = self.engine.theme.loadingX
         self.loadingy = self.engine.theme.loadingY
@@ -437,7 +438,7 @@ class MessageScreen(Layer, KeyListener):
 
         self.logClassInits = self.engine.config.get("game", "log_class_inits")
         if self.logClassInits == 1:
-            Log.debug("MessageScreen class init (Dialogs.py)...")
+            log.debug("MessageScreen class init (Dialogs.py)...")
 
 
     def shown(self):
@@ -491,7 +492,7 @@ class FileChooser(BackgroundLayer, KeyListener):
 
         self.logClassInits = self.engine.config.get("game", "log_class_inits")
         if self.logClassInits == 1:
-            Log.debug("FileChooser class init (Dialogs.py)...")
+            log.debug("FileChooser class init (Dialogs.py)...")
 
 
         self.dirSelect      = dirSelect
@@ -644,7 +645,7 @@ class NeckChooser(Layer, KeyListener):
 
         self.logClassInits = self.engine.config.get("game", "log_class_inits")
         if self.logClassInits == 1:
-            Log.debug("%s NeckChooser class init (Dialogs.py)..." % (self.player))
+            log.debug("%s NeckChooser class init (Dialogs.py)..." % (self.player))
 
         splash = showLoadingSplashScreen(self.engine, _("Loading necks..."))
 
@@ -897,7 +898,7 @@ class AvatarChooser(Layer, KeyListener):
 
         self.logClassInits = self.engine.config.get("game", "log_class_inits")
         if self.logClassInits == 1:
-            Log.debug("AvatarChooser class init (Dialogs.py)...")
+            log.debug("AvatarChooser class init (Dialogs.py)...")
 
         splash = showLoadingSplashScreen(self.engine, _("Loading avatars..."))
 
@@ -956,7 +957,7 @@ class AvatarChooser(Layer, KeyListener):
                 self.avatars.append(image)
                 self.maxAv += 1
 
-        Log.debug("%d Theme Avatars found; %d total." % (self.themeAvs, len(self.avatars)))
+        log.debug("%d Theme Avatars found; %d total." % (self.themeAvs, len(self.avatars)))
         self.avScale = []
         for avatar in self.avatars:
             imgheight = avatar.height1()
@@ -1164,7 +1165,7 @@ class PartDiffChooser(MainDialog):
 
         self.logClassInits = self.engine.config.get("game", "log_class_inits")
         if self.logClassInits == 1:
-            Log.debug("PartDiffChooser class init (Dialogs.py)...")
+            log.debug("PartDiffChooser class init (Dialogs.py)...")
         self.time    = 0.0
 
         self.yes        = []
@@ -1346,7 +1347,7 @@ class ItemChooser(BackgroundLayer, KeyListener):
 
         self.logClassInits = self.engine.config.get("game", "log_class_inits")
         if self.logClassInits == 1:
-            Log.debug("ItemChooser class init (Dialogs.py)...")
+            log.debug("ItemChooser class init (Dialogs.py)...")
 
         self.accepted       = False
         self.selectedItem   = None
@@ -1427,7 +1428,7 @@ class KeyTester(Layer, KeyListener):
 
         self.logClassInits = self.engine.config.get("game", "log_class_inits")
         if self.logClassInits == 1:
-            Log.debug("KeyTester class init (Dialogs.py)...")
+            log.debug("KeyTester class init (Dialogs.py)...")
 
 
         self.accepted       = False
@@ -1992,7 +1993,7 @@ def showMessage(engine, text):
     @param engine:  Game engine
     @param text:    Message text
     """
-    Log.notice("%s" % text)
+    log.notice("%s" % text)
     d = MessageScreen(engine, text)
     _runDialog(engine, d)
 
@@ -2014,7 +2015,7 @@ class LoadingSplashScreen(Layer, KeyListener):
 
         self.logClassInits = self.engine.config.get("game", "log_class_inits")
         if self.logClassInits == 1:
-            Log.debug("LoadingSplashScreen class init (Dialogs.py)...")
+            log.debug("LoadingSplashScreen class init (Dialogs.py)...")
 
         #Get theme
         self.theme = self.engine.data.theme

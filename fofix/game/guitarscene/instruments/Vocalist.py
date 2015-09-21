@@ -28,14 +28,14 @@ from PIL import Image, ImageDraw
 from OpenGL.GL import *
 import numpy as np
 
+from fretwork import log
+
 from fofix.core.Microphone import Microphone
 from fofix.core.Image import ImgDrawing
 from fofix.game.Song import VocalNote
 from fofix.core.constants import *
 from fofix.core.Language import _
 from fofix.core import cmgl
-from fofix.core import Log
-
 diffMod    = {0: 1.4, 1: 1.6, 2: 1.75, 3: 1.9}
 baseScores = {0: 1000, 1: 800, 2: 400, 3: 200}
 
@@ -216,7 +216,7 @@ class Vocalist:
                     dispOverlay = ImgDrawing(self.engine.data.svg, overlay)
                     self.drawnVocalOverlays[degrees] = dispOverlay
             except:
-                Log.error('Could not prebuild vocal overlay textures: ')
+                log.error('Could not prebuild vocal overlay textures: ')
                 self.vocalContinuousAvailable = False
 
         self.vocalLaneSize        = self.engine.theme.vocalLaneSize
@@ -409,7 +409,7 @@ class Vocalist:
         self.coOpRestart = True #initializes Restart Timer
         self.coOpRescueTime  = 3000
         self.starPower  = 0
-        Log.debug("Rescued at " + str(pos))
+        log.debug("Rescued at " + str(pos))
 
     def render(self, visibility, song, pos, players):
         font = self.engine.data.font
@@ -452,7 +452,7 @@ class Vocalist:
             if self.coOpRestart:
                 self.coOpFailed = False
                 self.coOpRestart = False
-                Log.debug("Turning off coOpFailed. Rescue successful.")
+                log.debug("Turning off coOpFailed. Rescue successful.")
             else:
                 return
         if self.useOld:

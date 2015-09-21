@@ -110,12 +110,29 @@ import traceback
 
 import pygame
 
+
+from fretwork import log
+
+from fofix.core import Version
+from fofix.core import VFS
+
+# setup the logfile
+# File object representing the logfile.
+if os.name == "posix": # evilynux - logfile in ~/.fofix/ for GNU/Linux and MacOS X
+    # evilynux - Under MacOS X, put the logs in ~/Library/Logs
+    if os.uname()[0] == "Darwin":
+        logFile = open(os.path.expanduser('~/Library/Logs/%s.log' % Version.PROGRAM_UNIXSTYLE_NAME), 'w')
+    else: # GNU/Linux et al.
+        logFile = VFS.open('/userdata/%s.log' % Version.PROGRAM_UNIXSTYLE_NAME, 'w')
+else:
+    logFile = VFS.open('/userdata/%s.log' % Version.PROGRAM_UNIXSTYLE_NAME, 'w')
+
+log.setLogfile(logFile)
+
 from fofix.core.VideoPlayer import VideoLayer, VideoPlayerError
 from fofix.core.GameEngine import GameEngine
 from fofix.game.MainMenu import MainMenu
 from fofix.core.Language import _
-from fofix.core import Version
-from fofix.core import Log, VFS
 from fofix.core import Config
 
 class Main():
@@ -183,7 +200,7 @@ class Main():
 
         # Check for a valid invocation of one-shot mode.
         if self.playing is not None:
-            Log.debug('Validating song directory for one-shot mode.')
+            log.debug('Validating song directory for one-shot mode.')
 
             library = Config.get("setlist","base_library")
             basefolder = os.path.join(Version.dataPath(),library,"songs",self.playing)
@@ -197,12 +214,12 @@ class Main():
                     if not (os.path.exists(os.path.join(basefolder, "song.ogg")) or
                             os.path.exists(os.path.join(basefolder, "guitar.ogg"))):
 
-                        Log.warn("Song directory provided ('%s') is not a valid song directory. Starting up FoFiX in standard mode." % self.playing)
+                        log.warn("Song directory provided ('%s') is not a valid song directory. Starting up FoFiX in standard mode." % self.playing)
                         self.engine.startupMessages.append(_("Song directory provided ('%s') is not a valid song directory. Starting up FoFiX in standard mode.") % self.playing)
                         return
 
             # Set up one-shot mode
-            Log.debug('Entering one-shot mode.')
+            log.debug('Entering one-shot mode.')
             Config.set("setlist", "selected_song", playing)
 
             self.engine.cmdPlay = 1
@@ -218,7 +235,7 @@ class Main():
                 self.engine.cmdMode = players, 0, mode
 
     def restart(self):
-        Log.notice("Restarting.")
+        log.notice("Restarting.")
         self.engine.audio.close()
         self.restartRequested = True
 
@@ -234,7 +251,7 @@ class Main():
                 try:
                     vidPlayer = VideoLayer(self.engine, vidSource, cancellable=True)
                 except (IOError, VideoPlayerError):
-                    Log.error("Error loading intro video:")
+                    log.error("Error loading intro video:")
                 else:
                     vidPlayer.play()
                     self.engine.view.pushLayer(vidPlayer)
@@ -253,7 +270,7 @@ class Main():
             while self.engine.run():
                 pass
         except KeyboardInterrupt:
-            Log.notice("Left mainloop due to KeyboardInterrupt.")
+            log.notice("Left mainloop due to KeyboardInterrupt.")
             # don't reraise
 
         # Restart the program if the engine is asking that we do so.
@@ -275,8 +292,8 @@ if __name__ == '__main__':
     except (KeyboardInterrupt, SystemExit):
         raise
     except:
-        Log.error("Terminating due to unhandled exception: ")
-        _logname = os.path.abspath(Log.logFile.name)
+        log.error("Terminating due to unhandled exception: ")
+        _logname = os.path.abspath(log.logFile.name)
         _errmsg = "%s\n\n%s\n%s\n%s\n%s" % (
           _("Terminating due to unhandled exception:"),
           traceback.format_exc(),
@@ -289,7 +306,7 @@ if __name__ == '__main__':
             import win32api
             import win32con
             if win32api.MessageBox(0, "%s\n\n%s" % (_errmsg, _("Open the logfile now?")), "%s %s" % (Version.PROGRAM_NAME, Version.version()), win32con.MB_YESNO|win32con.MB_ICONSTOP) == win32con.IDYES:
-                Log.logFile.close()
+                log.logFile.close()
                 os.startfile(_logname)
             if hasattr(sys, 'frozen'):
                 sys.exit(1)  # don't reraise if py2exe'd so the "Errors occurred" box won't appear after this and confuse the user as to which logfile we actually want

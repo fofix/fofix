@@ -25,12 +25,13 @@ import os
 
 from OpenGL.GL import *
 
+from fretwork import log
+
 from fofix.game.guitarscene.instruments.Guitar import Guitar
 from fofix.game.Song import Note, Tempo
 from fofix.core.Image import draw3Dtex
 from fofix.core.Shader import shaders
 from fofix.core.Mesh import Mesh
-from fofix.core import Log
 
 
 class ProGuitar(Guitar):
@@ -240,7 +241,7 @@ class ProGuitar(Guitar):
                     elif self.coOpRescueTime + (self.currentPeriod * self.beatsPerBoard * 2) < pos:
                         self.coOpFailed = False
                         self.coOpRestart = False
-                        Log.debug("Turning off coOpFailed. Rescue successful.")
+                        log.debug("Turning off coOpFailed. Rescue successful.")
                 else:
                     continue #can't break. Tempo.
 
@@ -302,7 +303,7 @@ class ProGuitar(Guitar):
                         if self.starPower < 50:   #not enough starpower to activate yet, kill existing drumfills
                             for dfEvent in self.drumFillEvents:
                                 dfEvent.happened = True
-                        Log.debug("star power added")
+                        log.debug("star power added")
                         if self.gameMode2p == 6 and not self.isDrum:
                             if self.battleSuddenDeath:
                                 self.battleObjects = [1] + self.battleObjects[:2]
@@ -310,7 +311,7 @@ class ProGuitar(Guitar):
                                 self.battleObjects = [self.battleObjectsEnabled[random.randint(0,len(self.battleObjectsEnabled)-1)]] + self.battleObjects[:2]
                             self.battleGetTime = pos
                             self.battleObjectGained = True
-                            Log.debug("Battle Object Gained, Objects %s" % str(self.battleObjects))
+                            log.debug("Battle Object Gained, Objects %s" % str(self.battleObjects))
                         else:
                             if self.starPower < 100:
                                 self.starPower += 25

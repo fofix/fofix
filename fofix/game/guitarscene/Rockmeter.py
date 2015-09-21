@@ -36,6 +36,8 @@ import os
 from PIL import Image, ImageDraw
 from OpenGL.GL import *
 
+from fretwork import log
+
 from fofix.core.LinedConfigParser import LinedConfigParser
 from fofix.core.Theme import halign, valign
 from fofix.core.Image import ImgDrawing
@@ -44,7 +46,6 @@ from fofix.core.Image import drawImage
 from fofix.core.constants import *
 from fofix.core import Version
 from fofix.core import cmgl
-from fofix.core import Log
 
 #these are the variables for setting the alignment of text and images
 #when setting them up in the rockmeter.ini you do not have
@@ -907,7 +908,7 @@ class Rockmeter(ConfigGetMixin):
             self.customRMLayers = imp.load_module("CustomRMLayers", fp, pathname, description)
         except ImportError:
             self.customRMLayers = None
-            Log.notice("Custom Rockmeter layers are not available")
+            log.notice("Custom Rockmeter layers are not available")
 
         # Build the layers
         for i in range(Rockmeter._layerLimit):

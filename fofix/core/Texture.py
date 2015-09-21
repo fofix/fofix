@@ -27,7 +27,7 @@ from PIL import Image
 from OpenGL.GL import *
 from OpenGL.GLU import *
 
-from fofix.core import Log
+from fretwork import log
 
 
 class TextureException(Exception):
@@ -51,7 +51,7 @@ class Texture:
         except IndexError:
             pass
         except Exception as e:    #MFH - to catch "did you call glewInit?" crashes
-            Log.error("Texture.py texture deletion exception: %s" % e)
+            log.error("Texture.py texture deletion exception: %s" % e)
 
         self.texture = glGenTextures(1)
         self.texEnv = GL_MODULATE
@@ -85,7 +85,7 @@ class Texture:
         else:
             try:
                 image = image.convert('RGB')
-                Log.warn("Unsupported image mode '%s' converted to 'RGB'. May have unexpected results." % image.mode)
+                log.warn("Unsupported image mode '%s' converted to 'RGB'. May have unexpected results." % image.mode)
                 string = image.tostring('raw', 'RGB', 0, -1)
                 self.loadRaw(image.size, string, GL_RGB, 3)
             except:

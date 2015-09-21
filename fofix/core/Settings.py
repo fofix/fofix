@@ -33,6 +33,8 @@ import os
 
 import pygame
 
+from fretwork import log
+
 from fofix.core.Language import _
 from fofix.core.View import BackgroundLayer
 from fofix.core.Input import KeyListener
@@ -44,7 +46,6 @@ from fofix.core import Config
 from fofix.core import Player
 from fofix.core import Mod
 from fofix.core import VFS
-from fofix.core import Log
 
 class ConfigChoice(Menu.Choice):
     def __init__(self, engine, config, section, option, autoApply = False, isQuickset = 0):
@@ -53,7 +54,7 @@ class ConfigChoice(Menu.Choice):
 
         self.logClassInits = self.engine.config.get("game", "log_class_inits")
         if self.logClassInits == 1:
-            Log.debug("ConfigChoice class init (Settings.py)...")
+            log.debug("ConfigChoice class init (Settings.py)...")
 
         self.section    = section
         self.option     = option
@@ -126,7 +127,7 @@ class ActiveConfigChoice(ConfigChoice):
 
         self.logClassInits = self.engine.config.get("game", "log_class_inits")
         if self.logClassInits == 1:
-            Log.debug("ActiveConfigChoice class init (Settings.py)...")
+            log.debug("ActiveConfigChoice class init (Settings.py)...")
 
     def change(self, value):
         ConfigChoice.change(self, value)
@@ -146,7 +147,7 @@ class VolumeConfigChoice(ConfigChoice):
 
         self.logClassInits = self.engine.config.get("game", "log_class_inits")
         if self.logClassInits == 1:
-            Log.debug("VolumeConfigChoice class init (Settings.py)...")
+            log.debug("VolumeConfigChoice class init (Settings.py)...")
 
 
     def change(self, value):
@@ -161,7 +162,7 @@ class KeyConfigChoice(Menu.Choice):
 
         self.logClassInits = self.engine.config.get("game", "log_class_inits")
         if self.logClassInits == 1:
-            Log.debug("KeyConfigChoice class init (Settings.py)...")
+            log.debug("KeyConfigChoice class init (Settings.py)...")
 
         self.config  = config
         self.section = section
@@ -303,7 +304,7 @@ class ControlChooser(Menu.Menu):
 
         self.logClassInits = self.engine.config.get("game", "log_class_inits")
         if self.logClassInits == 1:
-            Log.debug("ControlChooser class init (Settings.py)...")
+            log.debug("ControlChooser class init (Settings.py)...")
 
         self.selected = None
         self.d        = None
@@ -341,7 +342,7 @@ class ControlCreator(BackgroundLayer, KeyListener):
         self.edit    = edit
         self.logClassInits = self.engine.config.get("game", "log_class_inits")
         if self.logClassInits == 1:
-            Log.debug("ControlCreator class init (Settings.py)...")
+            log.debug("ControlCreator class init (Settings.py)...")
 
         self.time   = 0.0
         self.badname     = ["defaultg", "defaultd", "defaultm"] #ensures that defaultm is included - duplicate is ok
@@ -628,7 +629,7 @@ class SettingsMenu(Menu.Menu):
         self.engine = engine
         self.logClassInits = self.engine.config.get("game", "log_class_inits")
         if self.logClassInits == 1:
-            Log.debug("SettingsMenu class init (Settings.py)...")
+            log.debug("SettingsMenu class init (Settings.py)...")
 
         self.keyCheckerMode = Config.get("game", "key_checker_mode")
 
@@ -1085,13 +1086,13 @@ class SettingsMenu(Menu.Menu):
         self.engine.scrollDelay = self.engine.config.get("game", "scroll_delay")
 
     def resetLanguageToEnglish(self):
-        Log.debug("settings.resetLanguageToEnglish function call...")
+        log.debug("settings.resetLanguageToEnglish function call...")
         if self.engine.config.get("game", "language") != "":
             self.engine.config.set("game", "language", "")
             self.engine.restart()
 
     def baseLibrarySelect(self):
-        Log.debug("settings.baseLibrarySelect function call...")
+        log.debug("settings.baseLibrarySelect function call...")
         newPath = Dialogs.chooseFile(self.engine, masks = ["*/*"], prompt = _("Choose a new songs directory."), dirSelect = True)
         if newPath is not None:
             Config.set("setlist", "base_library", os.path.dirname(newPath))
@@ -1109,7 +1110,7 @@ class BasicSettingsMenu(Menu.Menu):
 
         self.logClassInits = self.engine.config.get("game", "log_class_inits")
         if self.logClassInits == 1:
-            Log.debug("BasicSettingsMenu class init (Settings.py)...")
+            log.debug("BasicSettingsMenu class init (Settings.py)...")
 
         self.opt_text_x = self.engine.theme.opt_text_xPos
         self.opt_text_y = self.engine.theme.opt_text_yPos
@@ -1343,13 +1344,13 @@ class BasicSettingsMenu(Menu.Menu):
             Dialogs.testKeys(self.engine, controller)
 
     def resetLanguageToEnglish(self):
-        Log.debug("settings.resetLanguageToEnglish function call...")
+        log.debug("settings.resetLanguageToEnglish function call...")
         if self.engine.config.get("game", "language") != "":
             self.engine.config.set("game", "language", "")
             self.engine.restart()
 
     def baseLibrarySelect(self):
-        Log.debug("settings.baseLibrarySelect function call...")
+        log.debug("settings.baseLibrarySelect function call...")
         newPath = Dialogs.chooseFile(self.engine, masks = ["*/*"], prompt = _("Choose a new songs directory."), dirSelect = True)
         if newPath is not None:
             Config.set("setlist", "base_library", os.path.dirname(newPath))
@@ -1368,14 +1369,14 @@ def quickset(config):
         config.set("game", "big_rock_endings", 1)
         config.set("game", "in_game_stars", 1)
         config.set("game", "mark_solo_sections", 2)
-        Log.debug("Quickset Gameplay - Theme-Based")
+        log.debug("Quickset Gameplay - Theme-Based")
 
     elif gameSetNum == 2:
         config.set("game", "sp_notes_while_active", 2)
         config.set("game", "bass_groove_enable", 2)
         config.set("game", "big_rock_endings", 2)
         config.set("game", "mark_solo_sections", 3)
-        Log.debug("Quickset Gameplay - MIDI-Based")
+        log.debug("Quickset Gameplay - MIDI-Based")
 
     elif gameSetNum == 3:
         config.set("game", "sp_notes_while_active", 3)
@@ -1384,7 +1385,7 @@ def quickset(config):
         config.set("game", "in_game_stars", 2)
         config.set("game", "counting", True)
         config.set("game", "mark_solo_sections", 1)
-        Log.debug("Quickset Gameplay - RB style")
+        log.debug("Quickset Gameplay - RB style")
 
     elif gameSetNum == 4:
         config.set("game", "sp_notes_while_active", 0)
@@ -1393,7 +1394,7 @@ def quickset(config):
         config.set("game", "in_game_stars", 0)
         config.set("game", "counting", False)
         config.set("game", "mark_solo_sections", 0)
-        Log.debug("Quickset Gameplay - GH style")
+        log.debug("Quickset Gameplay - GH style")
 
     elif gameSetNum == 5: # This needs work.
         config.set("game", "sp_notes_while_active", 0)
@@ -1402,12 +1403,12 @@ def quickset(config):
         config.set("game", "in_game_stars", 0)
         config.set("game", "counting", True)
         config.set("game", "mark_solo_sections", 1)
-        Log.debug("Quickset Gameplay - WT style")
+        log.debug("Quickset Gameplay - WT style")
 
     # elif gameSetNum == 6: #FoFiX mode - perhaps soon.
 
     else:
-        Log.debug("Quickset Gameplay - Manual")
+        log.debug("Quickset Gameplay - Manual")
 
     if perfSetNum == 1:
         config.set("engine", "highpriority", False)
@@ -1432,7 +1433,7 @@ def quickset(config):
         config.set("performance", "killfx", 2)
         config.set("performance", "star_score_updates", 0)
         config.set("performance", "cache_song_metadata", False)
-        Log.debug("Quickset Performance - Fastest")
+        log.debug("Quickset Performance - Fastest")
 
     elif perfSetNum == 2:
         config.set("engine", "highpriority", False)
@@ -1457,7 +1458,7 @@ def quickset(config):
         config.set("performance", "killfx", 0)
         config.set("performance", "star_score_updates", 0)
         config.set("performance", "cache_song_metadata", True)
-        Log.debug("Quickset Performance - Fast")
+        log.debug("Quickset Performance - Fast")
 
     elif perfSetNum == 3:
         config.set("engine", "highpriority", False)
@@ -1481,7 +1482,7 @@ def quickset(config):
         config.set("performance", "killfx", 0)
         config.set("performance", "star_score_updates", 1)
         config.set("performance", "cache_song_metadata", True)
-        Log.debug("Quickset Performance - Quality")
+        log.debug("Quickset Performance - Quality")
 
     elif perfSetNum == 4:
         config.set("engine", "highpriority", False)
@@ -1506,17 +1507,17 @@ def quickset(config):
         config.set("performance", "killfx", 0)
         config.set("performance", "star_score_updates", 1)
         config.set("performance", "cache_song_metadata", True)
-        Log.debug("Quickset Performance - Highest Quality")
+        log.debug("Quickset Performance - Highest Quality")
 
     else:
-        Log.debug("Quickset Performance - Manual")
+        log.debug("Quickset Performance - Manual")
 
 class GameSettingsMenu(Menu.Menu):
     def __init__(self, engine, gTextColor, gSelectedColor, players):
 
         self.logClassInits = Config.get("game", "log_class_inits")
         if self.logClassInits == 1:
-            Log.debug("GameSettingsMenu class init (Settings.py)...")
+            log.debug("GameSettingsMenu class init (Settings.py)...")
 
         Cheats = []
 
@@ -1546,7 +1547,7 @@ class GameCareerSettingsMenu(Menu.Menu):
 
         self.logClassInits = Config.get("game", "log_class_inits")
         if self.logClassInits == 1:
-            Log.debug("GameSettingsMenu class init (Settings.py)...")
+            log.debug("GameSettingsMenu class init (Settings.py)...")
         settings = [
           VolumeConfigChoice(engine, engine.config, "audio",  "guitarvol", autoApply = True),
           VolumeConfigChoice(engine, engine.config, "audio",  "songvol", autoApply = True),

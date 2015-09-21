@@ -198,6 +198,18 @@ a subdirectory of the `win32/` directory.) Now you are ready to compile
 the native modules.
 
 
+#### Installing fretwork
+Fretwork is our new initiative to share some code with a fork of FoF called Frets on Fire: Reborn.
+Some code from this repo has been move out into fretwork. To install fretwork download the following wheel: ([direct link to 0.1.1](https://github.com/fofix/fretwork/releases/download/0.1.1/fretwork-0.1.1-cp27-none-win32.whl))
+Then install it using the following command:
+```pip install fretwork-0.1.1-cp27-none-win32.whl```
+
+#### Upgrading fretwork
+If you have previously installed fretwork make sure you download the latest release from above then following command:
+
+```pip install fretwork-0.1.1-cp27-none-win32.whl --upgrade```
+
+
 ### Mac OS X
 
 Someone with a Mac will have to expand this section.
@@ -234,6 +246,7 @@ The following are required:
   * Cython
   * pkg-config
   * cerealizer
+  * fretwork
   * The OpenGL, GLU, GLib, SDL, SDL_mixer, libogg, libvorbisfile,
     libtheora, libsoundtouch, and libswscale (part of ffmpeg) development headers
 
@@ -248,7 +261,16 @@ following packages: `python-pygame`, `python-opengl`, `python-numpy`,
 `python-imaging`, `python-dev`, `build-essential`, `cython`, `pkg-config`,
 `libgl1-mesa-dev`, `libglu1-mesa-dev`, `libglib2.0-dev`, `libsdl1.2-dev`,
 `libsdl-mixer1.2-dev`, `libogg-dev`, `libvorbisfile-dev`, `libtheora-dev`,
-`libswscale-dev`, `libsoundtouch-dev`, `python-cerealizer`, and if you want translations, `gettext`.
+`libswscale-dev`, `libsoundtouch-dev`, and if you want translations, `gettext`.
+
+Cerealizer should be installed via pip
+
+For Fretwork you should download the sourcecode of the latest release ([over here](https://github.com/fofix/fretwork/releases/)), extract the files and run the following command:
+
+```pip2 install fretwork-0.1.1.tar.gz```
+
+This command may depend on how your distribution provides pip, and what python versions you have installed.
+
 
 Some packages can be troublesome, so we have notes below about certain
 packages.

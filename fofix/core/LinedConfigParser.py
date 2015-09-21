@@ -94,7 +94,8 @@ except ImportError:
     _default_dict = dict
 
 import re
-from fofix.core.Unicode import unicodify
+
+from fretwork.unicode import unicodify
 
 __all__ = ["NoSectionError", "NoOptionError", "ParsingError",
            "MissingSectionHeaderError",

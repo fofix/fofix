@@ -28,7 +28,8 @@ from PIL import Image
 from OpenGL.GL import *
 from OpenGL.GL.ARB.multisample import *
 
-from fofix.core import Log
+from fretwork import log
+
 from fofix.core.Language import _
 
 class Video:
@@ -145,11 +146,11 @@ class Video:
         return bool(self.screen)
 
     def screenError(self):
-        Log.error("Video setup failed. Make sure your graphics card supports 32-bit display modes.")
+        log.error("Video setup failed. Make sure your graphics card supports 32-bit display modes.")
         raise
 
     def resolutionReset(self):
-        Log.warn("Video setup failed. Trying default windowed resolution.")
+        log.warn("Video setup failed. Trying default windowed resolution.")
         self.error.append(_("Video setup failed with your resolution settings, and so were reset to defaults."))
         if self.fullscreen:
             self.flags ^= pygame.FULLSCREEN
@@ -164,7 +165,7 @@ class Video:
                 self.screenError()
 
     def multisampleReset(self, resolution):
-        Log.warn("Video setup failed. Trying without antialiasing.")
+        log.warn("Video setup failed. Trying without antialiasing.")
         pygame.display.gl_set_attribute(pygame.GL_MULTISAMPLEBUFFERS, 0)
         pygame.display.gl_set_attribute(pygame.GL_MULTISAMPLESAMPLES, 0)
         self.multisamples = 0
@@ -196,7 +197,7 @@ class Video:
             import win32con
             import atexit
 
-            Log.debug('Disabling screensaver.')
+            log.debug('Disabling screensaver.')
 
             old_lowpowertimeout = win32gui.SystemParametersInfo(win32con.SPI_GETLOWPOWERTIMEOUT)
             if old_lowpowertimeout != 0:
@@ -214,4 +215,4 @@ class Video:
                 win32gui.SystemParametersInfo(win32con.SPI_SETSCREENSAVETIMEOUT, 0)
 
         else:
-            Log.debug('Screensaver disabling is not implemented on this platform.')
+            log.debug('Screensaver disabling is not implemented on this platform.')

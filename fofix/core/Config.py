@@ -26,9 +26,10 @@
 import os
 from ConfigParser import RawConfigParser
 
-from fofix.core import Log
+from fretwork import log
+from fretwork.unicode import utf8, unicodify
+
 from fofix.core import VFS
-from fofix.core.Unicode import utf8, unicodify
 
 config    = None
 prototype = {}
@@ -171,7 +172,7 @@ class Config:
             type    = self.prototype[section][option].type
             default = self.prototype[section][option].default
         except KeyError:
-            Log.error("Config key %s.%s not defined while reading %s." % (section, option, self.fileName))
+            log.error("Config key %s.%s not defined while reading %s." % (section, option, self.fileName))
             raise
 
         value = _convertValue(self.config.get(section, option) if self.config.has_option(section, option) else default, type, default)
@@ -192,7 +193,7 @@ class Config:
             keys    = self.prototype[section][option].options.keys()
             type    = self.prototype[section][option].type
         except KeyError:
-            Log.error("Config key %s.%s not defined while reading %s." % (section, option, self.fileName))
+            log.error("Config key %s.%s not defined while reading %s." % (section, option, self.fileName))
             raise
 
         optionList = []
@@ -216,7 +217,7 @@ class Config:
         try:
             text = self.prototype[section][option].tipText
         except KeyError:
-            Log.error("Config key %s.%s not defined while reading %s." % (section, option, self.fileName))
+            log.error("Config key %s.%s not defined while reading %s." % (section, option, self.fileName))
             raise
 
         return text
@@ -234,7 +235,7 @@ class Config:
             type    = self.prototype[section][option].type
             default = self.prototype[section][option].default
         except KeyError:
-            Log.error("Config key %s.%s not defined while reading %s." % (section, option, self.fileName))
+            log.error("Config key %s.%s not defined while reading %s." % (section, option, self.fileName))
             raise
 
         value = _convertValue(default, type)
@@ -253,7 +254,7 @@ class Config:
         try:
             prototype[section][option]
         except KeyError:
-            Log.error("Config key %s.%s not defined while writing %s." % (section, option, self.fileName))
+            log.error("Config key %s.%s not defined while writing %s." % (section, option, self.fileName))
             raise
 
         if not self.config.has_section(section):

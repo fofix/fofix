@@ -27,13 +27,15 @@ import os
 import glob
 import random
 
+from fretwork import log
+from fretwork.audio import Sound
+
 from fofix.core.Font import Font
 from fofix.core.Image import ImgDrawing
-from fofix.core.Audio import Sound
+
 from fofix.core import Config
 from fofix.core import Version
 from fofix.core import Player
-from fofix.core import Log
 
 # these constants define a few customized letters in the default font
 #MFH - with the new simplified Font.py, no more custom glyphs... let's do a simple replacement here for now...
@@ -57,7 +59,7 @@ class Data(object):
 
         self.logClassInits = Config.get("game", "log_class_inits")
         if self.logClassInits == 1:
-            Log.debug("Data class init (Data.py)...")
+            log.debug("Data class init (Data.py)...")
         self.logLoadings = Config.get("game", "log_loadings")
 
         self.logImageNotFound = Config.get("log", "log_image_not_found")
@@ -186,12 +188,12 @@ class Data(object):
                 f[0] = lambda: Font(fn, f[3], scale = scale*.5, reversed = reversed, systemFont = not asciiOnly, outline = False, aspectRatio = aspectRatio)
                 resource.load(self,f[1],f[0], synch = True)
             elif self.fileExists(os.path.join("themes",themename,"fonts","default.ttf")):
-                Log.debug("Theme font not found: " + f[2])
+                log.debug("Theme font not found: " + f[2])
                 fn = resource.fileName(os.path.join("themes",themename,"fonts","default.ttf"))
                 f[0] = lambda: Font(fn, f[3], scale = scale*.5, reversed = reversed, systemFont = not asciiOnly, outline = False, aspectRatio = aspectRatio)
                 resource.load(self,f[1],f[0], synch = True)
             else:
-                Log.debug("Default theme font not found: %s - using built-in default" % str(f[2]))
+                log.debug("Default theme font not found: %s - using built-in default" % str(f[2]))
                 fn = resource.fileName(os.path.join("fonts","default.ttf"))
                 f[0] = lambda: Font(fn, f[3], scale = scale*.5, reversed = reversed, systemFont = not asciiOnly, outline = False, aspectRatio = aspectRatio)
                 resource.load(self,f[1],f[0], synch = True)
@@ -239,10 +241,10 @@ class Data(object):
             if self.fileExists(os.path.join("themes",themename,"sounds",self.sounds[1])):
                 self.loadSoundEffect(self, self.sounds[0], os.path.join("themes",themename,"sounds",self.sounds[1]))
             elif self.fileExists(os.path.join("sounds", self.sounds[1])):
-                Log.debug("Theme sound not found: " + self.sounds[1])
+                log.debug("Theme sound not found: " + self.sounds[1])
                 self.loadSoundEffect(self, self.sounds[0], os.path.join("sounds",self.sounds[1]))
             else:
-                Log.warn("File " + self.sounds[1] + " not found using default instead.")
+                log.warn("File " + self.sounds[1] + " not found using default instead.")
                 self.loadSoundEffect(self, self.sounds[0], os.path.join("sounds","default.ogg"))
 
         #TODO: Simplify crowdSound stuff so it can join the rest of us.
@@ -253,10 +255,10 @@ class Data(object):
         elif self.fileExists(os.path.join("sounds","crowdcheers.ogg")):
             self.loadSoundEffect(self, "crowdSound", os.path.join("sounds","crowdcheers.ogg"), crowd = True)
             self.cheerSoundFound = 1
-            Log.warn(themename + "/sounds/crowdcheers.ogg not found -- using data/sounds/crowdcheers.ogg instead.")
+            log.warn(themename + "/sounds/crowdcheers.ogg not found -- using data/sounds/crowdcheers.ogg instead.")
         else:
             self.cheerSoundFound = 0
-            Log.warn("crowdcheers.ogg not found -- no crowd cheering.")
+            log.warn("crowdcheers.ogg not found -- no crowd cheering.")
 
     def loadPartImages(self):
         self.partImages = []
@@ -323,7 +325,7 @@ class Data(object):
         return soundNum-1
 
     def getSoundObjectList(self, soundPath, soundPrefix, numSounds, soundExtension = ".ogg"):   #MFH
-        Log.debug("{0}1{2} - {0}{1}{2} found in {3}".format(soundPrefix, numSounds, soundExtension, soundPath))
+        log.debug("{0}1{2} - {0}{1}{2} found in {3}".format(soundPrefix, numSounds, soundExtension, soundPath))
         
         sounds = []
         for i in xrange(1, numSounds+1):
@@ -401,9 +403,9 @@ class Data(object):
             fileName1 = os.path.join(dataPath, fileName)
             if self.logLoadings == 1:
                 if openImage:
-                    Log.notice("Trying to load image: %s" % fileName1)
+                    log.notice("Trying to load image: %s" % fileName1)
                 else:
-                    Log.notice("Checking image: %s" % fileName1)
+                    log.notice("Checking image: %s" % fileName1)
             #check if fileName1 exists (has extension)
             if os.path.exists(fileName1):
                 if openImage:
@@ -411,9 +413,9 @@ class Data(object):
                         imgDrawing = ImgDrawing(self.svg, fileName1)
                         return imgDrawing
                     except IOError:
-                        Log.warn("Unable to load image file: %s" % fileName1)
+                        log.warn("Unable to load image file: %s" % fileName1)
                     except OverflowError:
-                        Log.warn("Unable to read image file: %s" % fileName1)
+                        log.warn("Unable to read image file: %s" % fileName1)
                 else:
                     return True
             else:
@@ -426,12 +428,12 @@ class Data(object):
                             imgDrawing = ImgDrawing(self.svg, files[i])
                             return imgDrawing
                         except IOError:
-                            Log.warn("Unable to load image file: %s" % files[i])
+                            log.warn("Unable to load image file: %s" % files[i])
                 elif len(files) > 0:
                     return True
         #image not found
         if self.logImageNotFound:
-            Log.debug("Image not found: %s" % fileName)
+            log.debug("Image not found: %s" % fileName)
         return False
 
     def loadImgDrawing(self, target, name, fileName, textureSize = None):
@@ -450,7 +452,7 @@ class Data(object):
             if target and name:
                 setattr(target, name, None)
             else:
-                Log.error("Image not found: " + fileName)
+                log.error("Image not found: " + fileName)
                 return None
 
         if target:

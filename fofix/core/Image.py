@@ -27,9 +27,10 @@ import numpy as np
 from PIL import Image
 from OpenGL.GL import *
 
+from fretwork import log
+
 from fofix.core.Texture import Texture
 from fofix.core.constants import *
-from fofix.core import Log
 from fofix.core import cmgl
 
 #stump: the last few stubs of DummyAmanith.py are inlined here since this
@@ -212,7 +213,7 @@ class ImgDrawing(object):
                 e = "Unable to load texture for %s." % ImgData
             else:
                 e = "Unable to load texture for SVG file."
-            Log.error(e)
+            log.error(e)
             raise RuntimeError(e)
 
         self.pixelSize = self.texture.pixelSize #the size of the image in pixels (from texture)

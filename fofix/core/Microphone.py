@@ -24,9 +24,10 @@
 import math
 import numpy as np
 
-from fofix.core import Log
-from fofix.core import Audio
-from fofix.core.Task import Task
+from fretwork import log
+from fretwork.task import Task
+from fretwork.audio import MicrophonePassthroughStream
+
 from fofix.core.Language import _
 
 try:
@@ -34,7 +35,7 @@ try:
     from fofix.core import pypitch
     supported = True
 except ImportError:
-    Log.warn('Missing pyaudio or pypitch - microphone support will not be possible')
+    log.warn('Missing pyaudio or pypitch - microphone support will not be possible')
     supported = False
 
 if supported:
@@ -75,11 +76,11 @@ if supported:
             self.passthroughQueue = []
             passthroughVolume = self.engine.input.controls.micPassthroughVolume[controlnum]
             if passthroughVolume > 0.0:
-                Log.debug('Microphone: creating passthrough stream at %d%% volume' % round(passthroughVolume * 100))
-                self.passthroughStream = Audio.MicrophonePassthroughStream(engine, self)
+                log.debug('Microphone: creating passthrough stream at %d%% volume' % round(passthroughVolume * 100))
+                self.passthroughStream = MicrophonePassthroughStream(engine, self)
                 self.passthroughStream.setVolume(passthroughVolume)
             else:
-                Log.debug('Microphone: not creating passthrough stream')
+                log.debug('Microphone: not creating passthrough stream')
                 self.passthroughStream = None
 
         def __del__(self):
@@ -91,20 +92,20 @@ if supported:
                 self.mic_started = True
                 self.mic.start_stream()
                 self.engine.addTask(self)
-                Log.debug('Microphone: started %s' % self.devname)
+                log.debug('Microphone: started %s' % self.devname)
                 if self.passthroughStream is not None:
-                    Log.debug('Microphone: starting passthrough stream')
+                    log.debug('Microphone: starting passthrough stream')
                     self.passthroughStream.play()
 
         def stop(self):
             if self.mic_started:
                 if self.passthroughStream is not None:
-                    Log.debug('Microphone: stopping passthrough stream')
+                    log.debug('Microphone: stopping passthrough stream')
                     self.passthroughStream.stop()
                 self.engine.removeTask(self)
                 self.mic.stop_stream()
                 self.mic_started = False
-                Log.debug('Microphone: stopped %s' % self.devname)
+                log.debug('Microphone: stopped %s' % self.devname)
 
         # Called by the Task machinery: pump the mic and shove the data through the analyzer.
         def run(self, ticks):
@@ -113,7 +114,7 @@ if supported:
                     chunk = self.mic.read(1024)
                 except IOError as e:
                     if e.args[1] == pyaudio.paInputOverflowed:
-                        Log.notice('Microphone: ignoring input buffer overflow')
+                        log.notice('Microphone: ignoring input buffer overflow')
                         chunk = '\x00' * 4096
                     else:
                         raise

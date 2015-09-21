@@ -28,6 +28,8 @@ import os
 import time
 import pygame
 
+from fretwork import log
+
 from fofix.core.Scene import Scene
 
 from fofix.core.Settings import ConfigChoice, ActiveConfigChoice
@@ -42,7 +44,6 @@ from fofix.game import Song
 from fofix.core import Config
 from fofix.core import Version
 from fofix.game.Menu import Menu
-from fofix.core import Log
 from fofix.core.constants import *
 
 PRACTICE = 1
@@ -271,7 +272,7 @@ class SongChoosingScene(Scene):
             self.loadLibrary()
 
     def loadLibrary(self):
-        Log.debug("Loading libraries in %s" % self.library)
+        log.debug("Loading libraries in %s" % self.library)
         self.loaded = False
         self.tiersPresent = False
         if self.splash:
@@ -282,7 +283,7 @@ class SongChoosingScene(Scene):
         self.engine.resource.load(self, "libraries", lambda: Song.getAvailableLibraries(self.engine, self.library), onLoad = self.loadSongs, synch = True)
 
     def loadSongs(self, libraries):
-        Log.debug("Loading songs in %s" % self.library)
+        log.debug("Loading songs in %s" % self.library)
         self.engine.resource.load(self, "songs", lambda: Song.getAvailableSongsAndTitles(self.engine, self.library, progressCallback=self.progressCallback), onLoad = self.prepareSetlist, synch = True)
 
     def progressCallback(self, percent):
@@ -363,7 +364,7 @@ class SongChoosingScene(Scene):
                 self.loadLibrary()
                 return
 
-        Log.debug("Setlist loaded.")
+        log.debug("Setlist loaded.")
 
         self.loaded           = True
 
@@ -421,7 +422,7 @@ class SongChoosingScene(Scene):
                 guitars.append(part)
             if self.engine.cmdPlay == 2 and self.engine.cmdPart is not None and len(self.playerList) == 1:
                 if self.engine.cmdPart == part.id:
-                    Log.debug("Command-line mode: Part found!")
+                    log.debug("Command-line mode: Part found!")
                     if part.id == 4 and self.engine.input.gameDrums > 0:
                         autoPart = part.id
                     elif part.id == 5 and self.engine.input.gameMics > 0:
@@ -827,7 +828,7 @@ class SongChoosingScene(Scene):
             if isinstance(self.selectedItem, Song.LibraryInfo):
                 self.library = self.selectedItem.libraryName
                 self.startingSelected = None
-                Log.debug("New library selected: " + str(self.library) )
+                log.debug("New library selected: " + str(self.library) )
                 self.loadLibrary()
             elif isinstance(self.selectedItem, Song.SongInfo) and not self.selectedItem.getLocked():
                 if self.listingMode == 1 and not self.careerMode:

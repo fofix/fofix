@@ -29,9 +29,10 @@
 # MA  02110-1301, USA.                                              #
 #####################################################################
 
+from fretwork import log
+
 from fofix.core.Language import _
 from fofix.game import Song
-from fofix.core import Log
 from fofix.core import Config
 
 HANDICAPS = [.75, 1.0, .8, .9, .75, .8, 1.05, 1.1, 1.03, 1.02, 1.01, .95, .9, .85, .7, .95, 0.0, .5, .7, .7]
@@ -49,7 +50,7 @@ class ScoreCard(object):
         self.coOpType = coOpType
         logClassInits = Config.get("game", "log_class_inits")
         if logClassInits == 1:
-            Log.debug("ScoreCard class init...")
+            log.debug("ScoreCard class init...")
         self.starScoring = Config.get("game", "star_scoring")
         self.updateOnScore = Config.get("performance", "star_score_updates")
         self.avMult = 0.0

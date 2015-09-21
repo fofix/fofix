@@ -31,12 +31,14 @@ except ImportError:
     haveMidi = False
 
 haveMidi = False
+
+from fretwork import log
+from fretwork.audio import Music
+from fretwork.task import Task
+
 from fofix.core.Player import Controls
-from fofix.core.Task import Task
 from fofix.core import Player
 from fofix.core import Config
-from fofix.core import Audio
-from fofix.core import Log
 
 class KeyListener:
     def keyPressed(self, key, unicode):
@@ -81,7 +83,7 @@ class Input(Task):
 
         self.logClassInits = Config.get("game", "log_class_inits")
         if self.logClassInits == 1:
-            Log.debug("Input class init (Input.py)...")
+            log.debug("Input class init (Input.py)...")
 
         Task.__init__(self)
         self.mouse                = pygame.mouse
@@ -113,11 +115,11 @@ class Input(Task):
             self.joystickNames[j.get_id()] = j.get_name()
             self.joystickAxes[j.get_id()]  = [0] * j.get_numaxes()
             self.joystickHats[j.get_id()]  = [(0, 0)] * j.get_numhats()
-        Log.debug("%d joysticks found." % len(self.joysticks))
+        log.debug("%d joysticks found." % len(self.joysticks))
 
         # Enable music events
-        Audio.Music.setEndEvent(MusicFinished)
-        #Audio.Music.setEndEvent()   #MFH - no event required?
+        Music.setEndEvent(MusicFinished)
+        #Music.setEndEvent()   #MFH - no event required?
 
         # Custom key names
         self.getSystemKeyName = pygame.key.name
@@ -128,19 +130,19 @@ class Input(Task):
             pygame.midi.init()
             for i in range(pygame.midi.get_count()):
                 interface, name, is_input, is_output, is_opened = pygame.midi.get_device_info(i)
-                Log.debug("Found MIDI device: %s on %s" % (name, interface))
+                log.debug("Found MIDI device: %s on %s" % (name, interface))
                 if not is_input:
-                    Log.debug("MIDI device is not an input device.")
+                    log.debug("MIDI device is not an input device.")
                     continue
                 try:
                     self.midi.append(pygame.midi.Input(i))
-                    Log.debug("Device opened as device number %d." % len(self.midi))
+                    log.debug("Device opened as device number %d." % len(self.midi))
                 except pygame.midi.MidiException:
-                    Log.error("Error opening device for input.")
+                    log.error("Error opening device for input.")
             if len(self.midi) == 0:
-                Log.debug("No MIDI input ports found.")
+                log.debug("No MIDI input ports found.")
         else:
-            Log.notice("MIDI input support is not available; install at least pygame 1.9 to get it.")
+            log.notice("MIDI input support is not available; install at least pygame 1.9 to get it.")
 
     def showMouse(self):
         pygame.mouse.set_visible(True)
@@ -428,7 +430,7 @@ class Input(Task):
     # glorandwarf: check that there are no control conflicts #FIXME
     def checkControls(self):
         if self.controls.isKeyMappingOK() is False:
-            Log.warn("Conflicting player controls, resetting to defaults")
+            log.warn("Conflicting player controls, resetting to defaults")
             self.controls.restoreDefaultKeyMappings()
             self.reloadControls()
 
