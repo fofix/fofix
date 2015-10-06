@@ -209,7 +209,7 @@ class StatResult(object):
         self._attrs = ('st_mode', 'st_ino', 'st_dev', 'st_nlink', 'st_uid',
           'st_gid', 'st_size', 'st_atime', 'st_mtime', 'st_ctime')
         if path == '/':
-            self.st_mode = S_IFDIR | 0555
+            self.st_mode = S_IFDIR | 0o555
             self.st_ino = 0
             self.st_dev = 0
             self.st_nlink = 2 + len(_mountTable)
@@ -321,7 +321,7 @@ def exists(path):
     try:
         stat(path)
         return True
-    except OSError, e:
+    except OSError as e:
         if e.errno == errno.ENOENT:
             return False
         raise
@@ -335,7 +335,7 @@ def isfile(path):
     '''
     try:
         return S_ISREG(stat(path).st_mode)
-    except OSError, e:
+    except OSError as e:
         if e.errno == errno.ENOENT:
             return False
         raise
@@ -349,7 +349,7 @@ def isdir(path):
     '''
     try:
         return S_ISDIR(stat(path).st_mode)
-    except OSError, e:
+    except OSError as e:
         if e.errno == errno.ENOENT:
             return False
         raise
