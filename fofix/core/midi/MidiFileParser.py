@@ -132,6 +132,7 @@ class MidiFileParser:
                 # It should allways be there, but better safe than sorry
                 if raw_in.readBew(move_cursor=0) == END_OFF_EXCLUSIVE:
                     eo_sysex = raw_in.readBew()
+                dispatch.sysex_event(sysex_data)
                 # the sysex code has not been properly tested, and might be fishy!
 
 
