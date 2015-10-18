@@ -23,7 +23,7 @@
 import random
 import os
 
-from OpenGL.GL import *
+import OpenGL.GL as gl
 
 from fretwork import log
 
@@ -348,8 +348,8 @@ class ProGuitar(Guitar):
             if event.length > (1.4 * (60000.0 / event.noteBpm) / 4):
                 sustain = True
 
-            glPushMatrix()
-            glTranslatef(x, 0, z)
+            gl.glPushMatrix()
+            gl.glTranslatef(x, 0, z)
 
             if shaders.turnon:
                 shaders.setVar("note_position",(x, (1.0 - visibility) ** (event.number + 1), z),"notes")
@@ -360,7 +360,7 @@ class ProGuitar(Guitar):
                 renderNote = 0
             if renderNote == 0:
                 self.renderNote(length, sustain = sustain, color = color, tailOnly = tailOnly, isTappable = isTappable, string = event.lane, fret = event.number, spNote = spNote)
-            glPopMatrix()
+            gl.glPopMatrix()
 
         #myfingershurt: end FOR loop / note rendering loop
         if (not self.openStarNotesInView) and (not self.starNotesInView) and self.finalStarSeen:

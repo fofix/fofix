@@ -25,7 +25,7 @@ from random import random
 import os
 
 from PIL import Image, ImageDraw
-from OpenGL.GL import *
+import OpenGL.GL as gl
 import numpy as np
 
 from fretwork import log
@@ -403,7 +403,7 @@ class Vocalist:
                              [xEndPos,                      yEndPos  +self.vocalLaneSize, 0],
                              [xStartPos,                    yStartPos+self.vocalLaneSize, 0]],
                                dtype=np.float32)
-        cmgl.drawArrays(GL_QUADS, vertices=vertexArray, colors=colorArray)
+        cmgl.drawArrays(gl.GL_QUADS, vertices=vertexArray, colors=colorArray)
 
     def coOpRescue(self, pos):
         self.coOpRestart = True #initializes Restart Timer
@@ -427,20 +427,20 @@ class Vocalist:
             tappos = (h*(1-(addY-.02)))-(h*(height/2))
         if not song:
             return
-        glColor4f(1,1,1,1)
+        gl.glColor4f(1,1,1,1)
         if self.showData:
             if self.currentNote is None:
                 font.render(_('None'), (.55, .25))
             else:
                 if abs(self.currentNote) < .5 and not self.tapPhraseActive:
-                    glColor3f(0,1,0)
+                    gl.glColor3f(0,1,0)
                 font.render(str(self.currentNote), (.55, .25))
             if self.requiredNote is None:
                 font.render(_('None'), (.25, .25))
             else:
                 if self.tapPhraseActive:
                     if self.tap > 0:
-                        glColor3f(0,1,0)
+                        gl.glColor3f(0,1,0)
                     font.render(_("Tap!"), (.25, .25))
                 else:
                     font.render("MIDI note %d" % self.requiredNote, (.25, .25))
@@ -496,9 +496,9 @@ class Vocalist:
                         now = True
                     elif time > pos:
                         if self.activePhrase.star:
-                            glColor4f(1,1,0,1)
+                            gl.glColor4f(1,1,0,1)
                         else:
-                            glColor4f(1,1,1,1)
+                            gl.glColor4f(1,1,1,1)
                     if self.lyricMode == 0: #scrolling
                         xStart = time - pos
                         xEnd = time + event.length - pos
@@ -513,9 +513,9 @@ class Vocalist:
                             vEnd = (xEndPos*4)
                             if time < pos:
                                 if now:
-                                    glColor4f(0,1,0,vStart)
+                                    gl.glColor4f(0,1,0,vStart)
                                 else:
-                                    glColor4f(.5,.5,.5,vStart)
+                                    gl.glColor4f(.5,.5,.5,vStart)
                             font.render(event.lyric, (xStartPos, .085+addYText), scale = self.lyricScale)
                             if not (event.speak or event.extra):
                                 #stump: note lanes with RB2-like glow
@@ -560,9 +560,9 @@ class Vocalist:
                             vEnd = (xEndPos*4)
                             if time < pos:
                                 if now:
-                                    glColor4f(0,1,0,vStart)
+                                    gl.glColor4f(0,1,0,vStart)
                                 else:
-                                    glColor4f(.5,.5,.5,vStart)
+                                    gl.glColor4f(.5,.5,.5,vStart)
                             font.render(event.lyric, (xStartPos, .085+addYText), scale = self.lyricScale)
                             if not (event.speak or event.extra):
                                 #stump: note lanes with RB2-like glow
@@ -611,7 +611,7 @@ class Vocalist:
                                 val = float(event.note-self.minPitch)/float(self.pitchRange)
                             vStart = (xStartPos*4)
                             vEnd = (xEndPos*4)
-                            glColor4f(.5,.5,.5,vStart)
+                            gl.glColor4f(.5,.5,.5,vStart)
                             font.render(event.lyric, (xStartPos, .085+addYText), scale = self.lyricScale)
                             if not (event.speak or event.extra):
                                 #stump: note lanes with RB2-like glow
@@ -648,9 +648,9 @@ class Vocalist:
                             drawImage(self.vocalTapNote, scale = (.5,-.5), coord = (w*noteX,tappos))
                     else:
                         if self.nextPhrase[1].star:
-                            glColor4f(1,1,0,1)
+                            gl.glColor4f(1,1,0,1)
                         else:
-                            glColor4f(1,1,1,1)
+                            gl.glColor4f(1,1,1,1)
                         xStart = time - pos
                         xEnd = time + event.length - pos
                         if xStart < self.currentPeriod * 6:
@@ -808,7 +808,7 @@ class Vocalist:
             if self.vocalText:
                 drawImage(self.vocalText, scale = (.5, (-.5/6.0)*(1-self.textTrans)), coord = (w*self.vocalMeterX,h*(self.vocalMeterY-addY)), rect = (0, 1, self.scoreBox[0], self.scoreBox[1]-(self.textTrans/6.0)), color = (1,1,1,1-self.textTrans))
             else:
-                glColor4f(1,1,1,1-self.textTrans)
+                gl.glColor4f(1,1,1,1-self.textTrans)
                 font.render(self.scorePhrases[self.textScore],(self.vocalMeterX,((1-self.vocalMeterY)*self.engine.data.fontScreenBottom+addYText)), .002)
         if self.showText <= 0 or self.textTrans > 0:
             val1,val2 = self.getMultVals()

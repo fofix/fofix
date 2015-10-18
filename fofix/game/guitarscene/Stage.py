@@ -29,7 +29,7 @@ import random
 import math
 import os
 
-from OpenGL.GL import *
+import OpenGL.GL as gl
 
 from fretwork import log
 
@@ -61,8 +61,8 @@ class Layer(object):
         self.angle       = 0.0
         self.scale       = (1.0, 1.0)
         self.color       = (1.0, 1.0, 1.0, 1.0)
-        self.srcBlending = GL_SRC_ALPHA
-        self.dstBlending = GL_ONE_MINUS_SRC_ALPHA
+        self.srcBlending = gl.GL_SRC_ALPHA
+        self.dstBlending = gl.GL_ONE_MINUS_SRC_ALPHA
         self.transforms  = [[1,1], [1,1], 1, [1,1,1,1]] #scale, coord, angle, color
         self.effects     = []
 
@@ -89,10 +89,10 @@ class Layer(object):
         for effect in self.effects:
             effect.apply()
 
-        glBlendFunc(self.srcBlending, self.dstBlending)
+        gl.glBlendFunc(self.srcBlending, self.dstBlending)
         drawImage(self.drawing, self.transforms[0], self.transforms[1],
                                                   self.transforms[2], self.transforms[3])
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
+        gl.glBlendFunc(gl.GL_SRC_ALPHA, gl.GL_ONE_MINUS_SRC_ALPHA)
 
 class Effect(object):
     """
@@ -322,8 +322,8 @@ class Stage(object):
                 layer.position    = (get("xpos",   float, 0.0), get("ypos",   float, 0.0))
                 layer.scale       = (get("xscale", float, 1.0), get("yscale", float, 1.0))
                 layer.angle       = math.pi * get("angle", float, 0.0) / 180.0
-                layer.srcBlending = globals()["GL_%s" % get("src_blending", str, "src_alpha").upper()]
-                layer.dstBlending = globals()["GL_%s" % get("dst_blending", str, "one_minus_src_alpha").upper()]
+                layer.srcBlending = getattr(gl, "GL_%s" % get("src_blending", str, "src_alpha").upper())
+                layer.dstBlending = getattr(gl, "GL_%s" % get("dst_blending", str, "one_minus_src_alpha").upper())
                 layer.color       = (get("color_r", float, 1.0), get("color_g", float, 1.0), get("color_b", float, 1.0), get("color_a", float, 1.0))
 
                 # Load any effects
@@ -622,12 +622,12 @@ class Stage(object):
             shaders.setVar("ambientGlow",height/1.5)
 
             shaders.setVar("glowStrength",60+height*80.0)
-            glBegin(GL_TRIANGLE_STRIP)
-            glVertex3f(-8.0, 1.0,7.0)
-            glVertex3f(8.0, 1.0,7.0)
-            glVertex3f(-8.0, 4.0,7.0)
-            glVertex3f(8.0, 4.0,7.0)
-            glEnd()
+            gl.glBegin(gl.GL_TRIANGLE_STRIP)
+            gl.glVertex3f(-8.0, 1.0,7.0)
+            gl.glVertex3f(8.0, 1.0,7.0)
+            gl.glVertex3f(-8.0, 4.0,7.0)
+            gl.glVertex3f(8.0, 4.0,7.0)
+            gl.glEnd()
             shaders.disable()
 
         self.scene.renderGuitar()

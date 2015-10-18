@@ -23,7 +23,7 @@
 import math
 import os
 
-from OpenGL.GL import *
+import OpenGL.GL as gl
 import numpy as np
 
 from fretwork import log
@@ -1047,15 +1047,15 @@ class Instrument(object):
     #group rendering of 2D notes into method
     def render3DNote(self, texture, model, color, isTappable):
         if (self.billboardNote):
-            glRotatef(self.camAngle + 90, 1, 0, 0)
+            gl.glRotatef(self.camAngle + 90, 1, 0, 0)
         if texture:
-            glColor3f(1,1,1)
-            glEnable(GL_TEXTURE_2D)
+            gl.glColor3f(1,1,1)
+            gl.glEnable(gl.GL_TEXTURE_2D)
             texture.texture.bind()
-            glMatrixMode(GL_TEXTURE)
-            glScalef(1, -1, 1)
-            glMatrixMode(GL_MODELVIEW)
-            glScalef(self.boardScaleX, self.boardScaleY, 1)
+            gl.glMatrixMode(gl.GL_TEXTURE)
+            gl.glScalef(1, -1, 1)
+            gl.glMatrixMode(gl.GL_MODELVIEW)
+            gl.glScalef(self.boardScaleX, self.boardScaleY, 1)
 
             if isTappable:
                 mesh = "Mesh_001"
@@ -1069,10 +1069,10 @@ class Instrument(object):
                 model.render(mesh)
                 shaders.disable()
 
-            glMatrixMode(GL_TEXTURE)
-            glLoadIdentity()
-            glMatrixMode(GL_MODELVIEW)
-            glDisable(GL_TEXTURE_2D)
+            gl.glMatrixMode(gl.GL_TEXTURE)
+            gl.glLoadIdentity()
+            gl.glMatrixMode(gl.GL_MODELVIEW)
+            gl.glDisable(gl.GL_TEXTURE_2D)
 
         else:
             #mesh = outer ring (black)
@@ -1081,22 +1081,22 @@ class Instrument(object):
             #mesh_003 = hopo bump (hopo color)
 
             #death_au: fixed 3D note colours
-            glColor4f(*color)
+            gl.glColor4f(*color)
             if shaders.enable("notes"):
                 shaders.setVar("isTextured",False)
             model.render("Mesh_001")
             shaders.disable()
-            glColor3f(self.spotColor[0], self.spotColor[1], self.spotColor[2])
+            gl.glColor3f(self.spotColor[0], self.spotColor[1], self.spotColor[2])
             if isTappable:
                 if self.hopoColor[0] == -2:
-                    glColor4f(*color)
+                    gl.glColor4f(*color)
                 else:
-                    glColor3f(self.hopoColor[0], self.hopoColor[1], self.hopoColor[2])
+                    gl.glColor3f(self.hopoColor[0], self.hopoColor[1], self.hopoColor[2])
                 if(model.find("Mesh_003")) == True:
                     model.render("Mesh_003")
-                    glColor3f(self.spotColor[0], self.spotColor[1], self.spotColor[2])
+                    gl.glColor3f(self.spotColor[0], self.spotColor[1], self.spotColor[2])
             model.render("Mesh_002")
-            glColor3f(self.meshColor[0], self.meshColor[1], self.meshColor[2])
+            gl.glColor3f(self.meshColor[0], self.meshColor[1], self.meshColor[2])
             model.render("Mesh")
 
     def renderNote(self, length, sustain, color, tailOnly = False, isTappable = False, fret = 0, spNote = False, isOpen = False, spAct = False):
@@ -1157,20 +1157,20 @@ class Instrument(object):
             else:
                 meshObj = self.noteMesh
 
-            glPushMatrix()
-            glEnable(GL_DEPTH_TEST)
-            glDepthMask(1)
-            glShadeModel(GL_SMOOTH)
+            gl.glPushMatrix()
+            gl.glEnable(gl.GL_DEPTH_TEST)
+            gl.glDepthMask(1)
+            gl.glShadeModel(gl.GL_SMOOTH)
 
             if spNote and self.threeDspin:
-                glRotate(90 + self.time/3, 0, 1, 0)
+                gl.glRotate(90 + self.time/3, 0, 1, 0)
             elif not spNote and self.noterotate:
-                glRotatef(90, 0, 1, 0)
-                glRotatef(-90, 1, 0, 0)
+                gl.glRotatef(90, 0, 1, 0)
+                gl.glRotatef(-90, 1, 0, 0)
 
             if fret >= 0 and fret <= 4:
-                glRotate(self.noterot[fret], 0, 0, 1)
-                glTranslatef(0, self.notepos[fret], 0)
+                gl.glRotate(self.noterot[fret], 0, 0, 1)
+                gl.glTranslatef(0, self.notepos[fret], 0)
 
             if self.notetex:
                 if self.startex and spNote:
@@ -1184,9 +1184,9 @@ class Instrument(object):
 
             self.render3DNote(texture, meshObj, color, isTappable)
 
-            glDepthMask(0)
-            glPopMatrix()
-            glDisable(GL_DEPTH_TEST)
+            gl.glDepthMask(0)
+            gl.glPopMatrix()
+            gl.glDisable(gl.GL_DEPTH_TEST)
 
     def renderNotes(self, visibility, song, pos):
         if not song:
@@ -1195,8 +1195,8 @@ class Instrument(object):
             return
 
         self.bigMax = 0
-
         # Update dynamic period
+
         self.currentPeriod = self.neckSpeed
         self.targetPeriod  = self.neckSpeed
 
@@ -1356,10 +1356,10 @@ class Instrument(object):
             if self.isDrum:
                 sustain = False
 
-                glPushMatrix()
-                glTranslatef(x, 0, z)
+                gl.glPushMatrix()
+                gl.glTranslatef(x, 0, z)
                 self.renderNote(length, sustain = sustain, color = color, tailOnly = tailOnly, isTappable = isTappable, fret = event.number, spNote = self.spNote, isOpen = isOpen)
-                glPopMatrix()
+                gl.glPopMatrix()
             else:
                 if z + length < -1.0:
                     continue
@@ -1370,8 +1370,8 @@ class Instrument(object):
                 if event.length > (1.4 * (60000.0 / event.noteBpm) / 4):
                     sustain = True
 
-                glPushMatrix()
-                glTranslatef(x, 0, z)
+                gl.glPushMatrix()
+                gl.glTranslatef(x, 0, z)
 
                 if shaders.turnon:
                     shaders.setVar("note_position",(x, (1.0 - visibility) ** (event.number + 1), z),"notes")
@@ -1382,7 +1382,7 @@ class Instrument(object):
                     renderNote = 0
                 if renderNote == 0:
                     self.renderNote(length, sustain = sustain, color = color, tailOnly = tailOnly, isTappable = isTappable, fret = event.number, spNote = self.spNote)
-                glPopMatrix()
+                gl.glPopMatrix()
 
         #myfingershurt: end FOR loop / note rendering loop
         if (not self.openStarNotesInView) and (not self.starNotesInView) and self.finalStarSeen:
@@ -1519,10 +1519,10 @@ class Instrument(object):
 
             sustain = False
 
-            glPushMatrix()
-            glTranslatef(x, 0, z)
+            gl.glPushMatrix()
+            gl.glTranslatef(x, 0, z)
             self.renderNote(length, sustain = sustain, color = color, tailOnly = tailOnly, isTappable = isTappable, fret = event.number, spNote = self.spNote, isOpen = isOpen)
-            glPopMatrix()
+            gl.glPopMatrix()
 
         #myfingershurt: end FOR loop / note rendering loop
         if (not self.openStarNotesInView) and (not self.starNotesInView) and self.finalStarSeen:
@@ -1532,55 +1532,60 @@ class Instrument(object):
 
     #group rendering of 3D keys/frets into method
     def render3DKey(self, texture, model, x, y, color, fretNum, f):
-        glPushMatrix()
-        glDepthMask(1)
-        glEnable(GL_LIGHTING)
-        glEnable(GL_LIGHT0)
-        glShadeModel(GL_SMOOTH)
-        glRotatef(90, 0, 1, 0)
-        glLightfv(GL_LIGHT0, GL_POSITION, np.array([5.0, 10.0, -10.0, 0.0], dtype=np.float32))
-        glLightfv(GL_LIGHT0, GL_AMBIENT, np.array([0.2, 0.2, 0.2, 0.0], dtype=np.float32))
-        glLightfv(GL_LIGHT0, GL_DIFFUSE, np.array([1.0, 1.0, 1.0, 0.0], dtype=np.float32))
+        gl.glPushMatrix()
+        gl.glDepthMask(1)
+        gl.glEnable(gl.GL_LIGHTING)
+        gl.glShadeModel(gl.GL_SMOOTH)
+        gl.glEnable(gl.GL_LIGHT0)
+        gl.glRotatef(90, 0, 1, 0)
+        gl.glLightfv(gl.GL_LIGHT0, gl.GL_POSITION, np.array([5.0, 10.0, -10.0, 0.0], dtype=np.float32))
+        gl.glLightfv(gl.GL_LIGHT0, gl.GL_AMBIENT, np.array([0.2, 0.2, 0.2, 0.0], dtype=np.float32))
+        gl.glLightfv(gl.GL_LIGHT0, gl.GL_DIFFUSE, np.array([1.0, 1.0, 1.0, 0.0], dtype=np.float32))
 
-        glRotatef(-90, 1, 0, 0)
-        glRotatef(-90, 0, 0, 1)
+        gl.glRotatef(-90, 1, 0, 0)
+        gl.glRotatef(-90, 0, 0, 1)
 
         if fretNum == 0: #green fret button
-            glRotate(self.keyrot[0], 0, 1, 0), glTranslatef(0, 0, self.keypos[0])
+            gl.glRotate(self.keyrot[0], 0, 1, 0)
+            gl.glTranslatef(0, 0, self.keypos[0])
         elif fretNum == 1: #red fret button
-            glRotate(self.keyrot[1], 0, 1, 0), glTranslatef(0, 0, self.keypos[1])
+            gl.glRotate(self.keyrot[1], 0, 1, 0)
+            gl.glTranslatef(0, 0, self.keypos[1])
         elif fretNum == 2: #yellow fret button
-            glRotate(self.keyrot[2], 0, 1, 0), glTranslatef(0, 0, self.keypos[2])
+            gl.glRotate(self.keyrot[2], 0, 1, 0)
+            gl.glTranslatef(0, 0, self.keypos[2])
         elif fretNum == 3: #blue fret button
-            glRotate(self.keyrot[3], 0, 1, 0), glTranslatef(0, 0, self.keypos[3])
+            gl.glRotate(self.keyrot[3], 0, 1, 0)
+            gl.glTranslatef(0, 0, self.keypos[3])
         elif fretNum == 4: #orange fret button
-            glRotate(self.keyrot[4], 0, 1, 0), glTranslatef(0, 0, self.keypos[4])
+            gl.glRotate(self.keyrot[4], 0, 1, 0)
+            gl.glTranslatef(0, 0, self.keypos[4])
 
         if self.battleStatus[4]:
-            glTranslatef(x, y + self.battleWhammyNow * .15 + color[3] * 6, 0)
+            gl.glTranslatef(x, y + self.battleWhammyNow * .15 + color[3] * 6, 0)
         else:
-            glTranslatef(x, y + color[3] * 6, 0)
+            gl.glTranslatef(x, y + color[3] * 6, 0)
 
         if texture:
-            glColor4f(1,1,1,color[3]+1.0)
-            glEnable(GL_TEXTURE_2D)
+            gl.glColor4f(1,1,1,color[3]+1.0)
+            gl.glEnable(gl.GL_TEXTURE_2D)
             texture.bind()
-            glMatrixMode(GL_TEXTURE)
-            glScalef(1, -1, 1)
-            glMatrixMode(GL_MODELVIEW)
-            glScalef(self.boardScaleX, self.boardScaleY, 1)
+            gl.glMatrixMode(gl.GL_TEXTURE)
+            gl.glScalef(1, -1, 1)
+            gl.glMatrixMode(gl.GL_MODELVIEW)
+            gl.glScalef(self.boardScaleX, self.boardScaleY, 1)
             if not self.hit[fretNum] and f:
                 model.render("Mesh_001")
             elif self.hit[fretNum]:
                 model.render("Mesh_002")
             else:
                 model.render("Mesh")
-            glMatrixMode(GL_TEXTURE)
-            glLoadIdentity()
-            glMatrixMode(GL_MODELVIEW)
-            glDisable(GL_TEXTURE_2D)
+            gl.glMatrixMode(gl.GL_TEXTURE)
+            gl.glLoadIdentity()
+            gl.glMatrixMode(gl.GL_MODELVIEW)
+            gl.glDisable(gl.GL_TEXTURE_2D)
         else:
-            glColor4f(color[0], color[1], color[2], color[3]+1.0)
+            gl.glColor4f(color[0], color[1], color[2], color[3]+1.0)
 
             #Mesh - Main fret
             #Key_001 - Top of fret (key_color)
@@ -1590,18 +1595,18 @@ class Instrument(object):
             if (model.find("Glow_001")):
                 model.render("Mesh")
                 if (model.find("Key_001")):
-                    glColor3f(self.keyColor[0], self.keyColor[1], self.keyColor[2])
+                    gl.glColor3f(self.keyColor[0], self.keyColor[1], self.keyColor[2])
                     model.render("Key_001")
                 if (model.find("Key_002")):
-                    glColor3f(self.key2Color[0], self.key2Color[1], self.key2Color[2])
+                    gl.glColor3f(self.key2Color[0], self.key2Color[1], self.key2Color[2])
                     model.render("Key_002")
             else:
                 model.render()
 
-        glDisable(GL_LIGHTING)
-        glDisable(GL_LIGHT0)
-        glDepthMask(0)
-        glPopMatrix()
+        gl.glDisable(gl.GL_LIGHTING)
+        gl.glDisable(gl.GL_LIGHT0)
+        gl.glDepthMask(0)
+        gl.glPopMatrix()
 
     def renderFrets(self, visibility, song, controls):
         pass
@@ -1627,23 +1632,23 @@ class Instrument(object):
 
                 while s < 1:
                     ms = s * (math.sin(self.time) * .25 + 1)
-                    glColor3f(c[0] * (1 - ms), c[1] * (1 - ms), c[2] * (1 - ms))
+                    gl.glColor3f(c[0] * (1 - ms), c[1] * (1 - ms), c[2] * (1 - ms))
 
-                    glPushMatrix()
+                    gl.glPushMatrix()
                     if self.battleStatus[4]:
-                        glTranslatef(x, y + self.battleWhammyNow * .15, 0)
+                        gl.glTranslatef(x, y + self.battleWhammyNow * .15, 0)
                     else:
-                        glTranslatef(x, y, 0)
-                    glScalef(.1 + .02 * ms * f, .1 + .02 * ms * f, .1 + .02 * ms * f)
-                    glRotatef( 90, 0, 1, 0)
-                    glRotatef(-90, 1, 0, 0)
-                    glRotatef(-90, 0, 0, 1)
+                        gl.glTranslatef(x, y, 0)
+                    gl.glScalef(.1 + .02 * ms * f, .1 + .02 * ms * f, .1 + .02 * ms * f)
+                    gl.glRotatef( 90, 0, 1, 0)
+                    gl.glRotatef(-90, 1, 0, 0)
+                    gl.glRotatef(-90, 0, 0, 1)
                     if self.twoDkeys == False and self.keytex == False:
                         if(self.keyMesh.find("Glow_001")) == True:
                             self.keyMesh.render("Glow_001")
                         else:
                             self.keyMesh.render()
-                    glPopMatrix()
+                    gl.glPopMatrix()
                     s += 0.2
 
                 #Hitglow color
@@ -1771,7 +1776,7 @@ class Instrument(object):
 
                 #Render the long part of the tail
 
-                glEnable(GL_TEXTURE_2D)
+                gl.glEnable(gl.GL_TEXTURE_2D)
 
                 if length >= self.boardLength:
                     movement1 = (project((offset * self.tailSpeed) * self.beatsPerUnit)*3) - (project(offset * self.beatsPerUnit)*3)
@@ -1793,9 +1798,9 @@ class Instrument(object):
 
                 tex1.texture.bind()
 
-                cmgl.drawArrays(GL_TRIANGLE_STRIP, vertices=self.tail_vtx, colors=self.tail_col, texcoords=self.tail_tex)
+                cmgl.drawArrays(gl.GL_TRIANGLE_STRIP, vertices=self.tail_vtx, colors=self.tail_col, texcoords=self.tail_tex)
 
-                glDisable(GL_TEXTURE_2D)
+                gl.glDisable(gl.GL_TEXTURE_2D)
 
                 draw3Dtex(tex2, vertex = (-size[0], size[1], size[0], size[1] + .6), texcoord = (0.0, 0.0, 1.0, 1.0), color = tailcol) # render the end of a tail
 
@@ -1931,20 +1936,20 @@ class Instrument(object):
                                 else:
                                     c = self.fretColors[theFret]
                                 color      = (.1 + .8 * c[0], .1 + .8 * c[1], .1 + .8 * c[2], 1.0 * visibility * f)
-                                glPushMatrix()
-                                glTranslatef(x, (1.0 - visibility) ** (theFret + 1), z)
+                                gl.glPushMatrix()
+                                gl.glTranslatef(x, (1.0 - visibility) ** (theFret + 1), z)
 
                                 self.renderFreeStyleTail(length, color, theFret, pos)
-                                glPopMatrix()
+                                gl.glPopMatrix()
 
 
                         if self.isDrum and ( self.drumFillsActive and self.drumFillsHits >= 4 and z + length<self.boardLength ):
-                            glPushMatrix()
+                            gl.glPushMatrix()
                             color      = (.1 + .8 * c[0], .1 + .8 * c[1], .1 + .8 * c[2], 1.0 * visibility * f)
-                            glTranslatef(x, 0.0, z + length)
-                            glScalef(1,1.7,1.3)
+                            gl.glTranslatef(x, 0.0, z + length)
+                            gl.glScalef(1,1.7,1.3)
                             self.renderNote(length, sustain = False, color = color, tailOnly = False, isTappable = False, fret = 4, spNote = False, isOpen = False, spAct = True)
-                            glPopMatrix()
+                            gl.glPopMatrix()
 
             self.freestyleActive = freestyleActive
             if self.isDrum:
@@ -2064,8 +2069,8 @@ class Instrument(object):
             if event.length > (1.4 * (60000.0 / event.noteBpm) / 4):
                 sustain = True
 
-            glPushMatrix()
-            glTranslatef(x, (1.0 - visibility) ** (event.number + 1), z)
+            gl.glPushMatrix()
+            gl.glTranslatef(x, (1.0 - visibility) ** (event.number + 1), z)
 
             if self.battleStatus[8]:
                 renderNote = random.randint(0,2)
@@ -2078,11 +2083,11 @@ class Instrument(object):
                 else:
                     self.renderTail(song, length, sustain = sustain, kill = killswitch, color = color, tailOnly = tailOnly, isTappable = isTappable, fret = event.number, spNote = spNote, pos = pos)
 
-            glPopMatrix()
+            gl.glPopMatrix()
 
 
             if killswitch and self.killfx == 1:
-                glBlendFunc(GL_SRC_ALPHA, GL_ONE)
+                gl.glBlendFunc(gl.GL_SRC_ALPHA, gl.GL_ONE)
                 for time, event in self.playedNotes:
                     step  = self.currentPeriod / 16
                     t     = time + event.length
@@ -2096,7 +2101,7 @@ class Instrument(object):
                         u = ((t - time) * -.1 + pos - time) / 64.0 + .0001
                         return (math.sin(event.number + self.time * -.01 + t * .03) + math.cos(event.number + self.time * .01 + t * .02)) * .1 + .1 + math.sin(u) / (5 * u)
 
-                    glBegin(GL_TRIANGLE_STRIP)
+                    gl.glBegin(gl.GL_TRIANGLE_STRIP)
                     f1 = 0
                     while t > time:
 
@@ -2110,19 +2115,19 @@ class Instrument(object):
                         f2 = min((s - t) / (6 * step), 1.0)
                         a1 = waveForm(t) * f1
                         a2 = waveForm(t - step) * f2
-                        glColor4f(c[0], c[1], c[2], .5)
-                        glVertex3f(x - a1, 0, z)
-                        glVertex3f(x - a2, 0, z - zStep)
-                        glColor4f(1, 1, 1, .75)
-                        glVertex3f(x, 0, z)
-                        glVertex3f(x, 0, z - zStep)
-                        glColor4f(c[0], c[1], c[2], .5)
-                        glVertex3f(x + a1, 0, z)
-                        glVertex3f(x + a2, 0, z - zStep)
-                        glVertex3f(x + a2, 0, z - zStep)
-                        glVertex3f(x - a2, 0, z - zStep)
+                        gl.glColor4f(c[0], c[1], c[2], .5)
+                        gl.glVertex3f(x - a1, 0, z)
+                        gl.glVertex3f(x - a2, 0, z - zStep)
+                        gl.glColor4f(1, 1, 1, .75)
+                        gl.glVertex3f(x, 0, z)
+                        gl.glVertex3f(x, 0, z - zStep)
+                        gl.glColor4f(c[0], c[1], c[2], .5)
+                        gl.glVertex3f(x + a1, 0, z)
+                        gl.glVertex3f(x + a2, 0, z - zStep)
+                        gl.glVertex3f(x + a2, 0, z - zStep)
+                        gl.glVertex3f(x - a2, 0, z - zStep)
                         t -= step
                         f1 = f2
-                    glEnd()
+                    gl.glEnd()
 
-                glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
+                gl.glBlendFunc(gl.GL_SRC_ALPHA, gl.GL_ONE_MINUS_SRC_ALPHA)

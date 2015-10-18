@@ -30,7 +30,7 @@ import os
 import math
 
 import numpy as np
-from OpenGL.GL import *
+import OpenGL.GL as gl
 
 from fretwork import log
 
@@ -295,21 +295,21 @@ class Drum(Instrument):
             else:
                 meshObj = self.noteMesh
 
-            glPushMatrix()
-            glEnable(GL_DEPTH_TEST)
-            glDepthMask(1)
-            glShadeModel(GL_SMOOTH)
+            gl.glPushMatrix()
+            gl.glEnable(gl.GL_DEPTH_TEST)
+            gl.glDepthMask(1)
+            gl.glShadeModel(gl.GL_SMOOTH)
 
             if not isOpen:
                 if spNote and self.threeDspin:
-                    glRotate(90 + self.time/3, 0, 1, 0)
+                    gl.glRotate(90 + self.time/3, 0, 1, 0)
                 elif not spNote and self.noterotate:
-                    glRotatef(90, 0, 1, 0)
-                    glRotatef(-90, 1, 0, 0)
+                    gl.glRotatef(90, 0, 1, 0)
+                    gl.glRotatef(-90, 1, 0, 0)
 
             if fret >= 0 and fret <= 4:
-                glRotate(self.noterot[fret], 0, 0, 1)
-                glTranslatef(0, self.notepos[fret], 0)
+                gl.glRotate(self.noterot[fret], 0, 0, 1)
+                gl.glTranslatef(0, self.notepos[fret], 0)
 
             texture = None
             if self.notetex:
@@ -336,9 +336,9 @@ class Drum(Instrument):
 
             self.render3DNote(texture, meshObj, color, isTappable)
 
-            glDepthMask(0)
-            glPopMatrix()
-            glDisable(GL_DEPTH_TEST)
+            gl.glDepthMask(0)
+            gl.glPopMatrix()
+            gl.glDisable(gl.GL_DEPTH_TEST)
 
 
     def renderFrets(self, visibility, song, controls):
@@ -346,7 +346,7 @@ class Drum(Instrument):
         size = (.22, .22)
         v = 1.0 - visibility
 
-        glEnable(GL_DEPTH_TEST)
+        gl.glEnable(gl.GL_DEPTH_TEST)
 
         for n in range(self.strings2):
             if n == 4:
@@ -371,7 +371,7 @@ class Drum(Instrument):
             if self.twoDkeys == True or not self.keyMesh:
 
                 if n == 4: #Weirdpeople - so the drum bass fret can be seen with 2d frets
-                    glDisable(GL_DEPTH_TEST)
+                    gl.glDisable(gl.GL_DEPTH_TEST)
                     size = (self.boardWidth/2, self.boardWidth/self.strings/2.4)
                     texSize = (0.0,1.0)
                 else:
@@ -443,7 +443,7 @@ class Drum(Instrument):
                 c = [.1 + .8 * c[0] + f, .1 + .8 * c[1] + f, .1 + .8 * c[2] + f, v]
                 self.render3DKey(texture, model, x, y, c, n, f)
 
-        glDisable(GL_DEPTH_TEST)
+        gl.glDisable(gl.GL_DEPTH_TEST)
 
     def renderFreestyleFlames(self, visibility, controls):
         if self.flameColors[0][0] == -1:
@@ -470,7 +470,7 @@ class Drum(Instrument):
 
                     ff = 1 + 0.25
                     y = v + ff / 6
-                    glBlendFunc(GL_ONE, GL_ONE)
+                    gl.glBlendFunc(gl.GL_ONE, gl.GL_ONE)
 
                     if self.theme == 2:
                         y -= 0.5
@@ -515,7 +515,7 @@ class Drum(Instrument):
                             if self.theme == 0 or self.theme == 1: #GH3 starcolor
                                 flamecol = self.spColor #(.3,.7,.9)
                             else: #Default starcolor (Rockband)
-                                #flamecol = glColor3f(.2,.2,.2)
+                                #flamecol = gl.glColor3f(.2,.2,.2)
                                 flamecol = (.2,.2,.2)
                         if self.disableFlameSFX != True:
                             draw3Dtex(self.hitflames2Drawing, coord = (x+.005, y +.25 +.005, 0), rot = (90, 1, 0, 0),
@@ -648,9 +648,9 @@ class Drum(Instrument):
                         event.star = True
             self.starNotesSet = True
         if not (self.coOpFailed and not self.coOpRestart):
-            glEnable(GL_BLEND)
-            glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
-            glEnable(GL_COLOR_MATERIAL)
+            gl.glEnable(gl.GL_BLEND)
+            gl.glBlendFunc(gl.GL_SRC_ALPHA, gl.GL_ONE_MINUS_SRC_ALPHA)
+            gl.glEnable(gl.GL_COLOR_MATERIAL)
 
             if self.freestyleActive or self.drumFillsActive:
                 self.renderOpenNotes(visibility, song, pos)

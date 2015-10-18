@@ -36,7 +36,7 @@ from math import degrees, atan
 import locale
 import os
 
-from OpenGL.GL import *
+import OpenGL.GL as gl
 
 
 from fretwork import log
@@ -3803,15 +3803,15 @@ class GuitarScene(BandPlayBaseScene):
                 continue
             self.engine.view.setViewport(self.numberOfGuitars,self.players[i].guitarNum)
             if self.theme not in (0, 1, 2) or (not self.pause and not self.failed):
-                glPushMatrix()
+                gl.glPushMatrix()
                 if guitar.fretboardHop > 0.0:
-                    glTranslatef(0.0, guitar.fretboardHop, 0.0)  #stump: fretboard hop
+                    gl.glTranslatef(0.0, guitar.fretboardHop, 0.0)  #stump: fretboard hop
                     guitar.fretboardHop -= 0.005
                     if guitar.fretboardHop < 0.0:
                         guitar.fretboardHop = 0.0
                 self.neckrender[i].render(self.visibility, self.song, self.songTime)
                 guitar.render(self.visibility, self.song, self.songTime, self.controls, self.killswitchEngaged[i])  #QQstarS: new
-                glPopMatrix()
+                gl.glPopMatrix()
             if self.coOp or self.coOpGH:
                 guitar.rockLevel = self.rock[self.coOpPlayerMeter] / self.rockMax
                 if self.rock[self.coOpPlayerMeter]< self.rockMax/3.0 and self.failingEnabled:
@@ -4641,12 +4641,12 @@ class GuitarScene(BandPlayBaseScene):
                                 xOffset = (time - self.songTime) / eventWindow
                                 EventHappeningNow = False
                                 if xOffset < (0.0 - lyricSlop * 2.0):   #past
-                                    glColor3f(0.5, 0.5, 0.5)
+                                    gl.glColor3f(0.5, 0.5, 0.5)
                                 elif xOffset < lyricSlop / 16.0:   #present
                                     EventHappeningNow = True
-                                    glColor3f(0, 1, 0.6)
+                                    gl.glColor3f(0, 1, 0.6)
                                 else:   #future, and all other text
-                                    glColor3f(1, 1, 1)
+                                    gl.glColor3f(1, 1, 1)
                                 xOffset += 0.250
 
                                 text = event.text
@@ -4669,12 +4669,12 @@ class GuitarScene(BandPlayBaseScene):
                                     xOffset = (time - self.songTime) / eventWindow
                                     EventHappeningNow = False
                                     if xOffset < (0.0 - lyricSlop * 2.0):   #past
-                                        glColor3f(0.5, 0.5, 0.5)
+                                        gl.glColor3f(0.5, 0.5, 0.5)
                                     elif xOffset < lyricSlop / 16.0:   #present
                                         EventHappeningNow = True
-                                        glColor3f(0, 1, 0.6)
+                                        gl.glColor3f(0, 1, 0.6)
                                     else:   #future, and all other text
-                                        glColor3f(1, 1, 1)
+                                        gl.glColor3f(1, 1, 1)
                                     xOffset += 0.250
 
                                     yOffset = 0.0696
@@ -4695,7 +4695,7 @@ class GuitarScene(BandPlayBaseScene):
                                     txtSize = 0.00175
                                 yOffset = 0.0696
                                 xOffset = 0.5 - (lyricFont.getStringSize(self.currentSimpleMidiLyricLine, scale = txtSize)[0] / 2.0)
-                                glColor3f(1, 1, 1)
+                                gl.glColor3f(1, 1, 1)
                                 lyricFont.render(self.currentSimpleMidiLyricLine, (xOffset, yOffset),(1, 0, 0),txtSize)
 
                             elif self.midiLyricMode == 2 and (self.numMidiLyricLines > self.activeMidiLyricLineIndex):   #line-by-line lyrics mode:
@@ -4709,20 +4709,20 @@ class GuitarScene(BandPlayBaseScene):
                                 tempTime, tempLyricLine = self.midiLyricLines[self.activeMidiLyricLineIndex]
 
                                 xOffset = 0.5 - (lyricFont.getStringSize(tempLyricLine, scale = txtSize)[0] / 2.0)
-                                glColor3f(0.75, 0.75, 0.75)
+                                gl.glColor3f(0.75, 0.75, 0.75)
                                 lyricFont.render(self.activeMidiLyricLine_GreyWords, (xOffset, yOffset),(1, 0, 0),txtSize)
 
                                 xOffset += lyricFont.getStringSize(self.activeMidiLyricLine_GreyWords, scale = txtSize)[0]
-                                glColor3f(0, 1, 0)
+                                gl.glColor3f(0, 1, 0)
                                 lyricFont.render(self.activeMidiLyricLine_GreenWords, (xOffset, yOffset),(1, 0, 0),txtSize)
 
                                 xOffset += lyricFont.getStringSize(self.activeMidiLyricLine_GreenWords, scale = txtSize)[0]
-                                glColor3f(1, 1, 1)
+                                gl.glColor3f(1, 1, 1)
                                 lyricFont.render(self.activeMidiLyricLine_WhiteWords, (xOffset, yOffset),(1, 0, 0),txtSize)
 
                                 yOffset += self.lyricHeight
                                 xOffset = 0.25
-                                glColor3f(1, 1, 1)
+                                gl.glColor3f(1, 1, 1)
                                 lyricFont.render(self.currentSimpleMidiLyricLine, (xOffset, yOffset),(1, 0, 0),txtSize)
 
                         #finally, handle the unused text events track
@@ -4737,12 +4737,12 @@ class GuitarScene(BandPlayBaseScene):
                                 xOffset = (time - self.songTime) / eventWindow
                                 EventHappeningNow = False
                                 if xOffset < (0.0 - lyricSlop * 2.0):   #past
-                                    glColor3f(0.5, 0.5, 0.5)
+                                    gl.glColor3f(0.5, 0.5, 0.5)
                                 elif xOffset < lyricSlop / 16.0:   #present
                                     EventHappeningNow = True
-                                    glColor3f(0, 1, 0.6)
+                                    gl.glColor3f(0, 1, 0.6)
                                 else:   #future, and all other text
-                                    glColor3f(1, 1, 1)
+                                    gl.glColor3f(1, 1, 1)
                                 xOffset += 0.250
 
                                 yOffset = 0.0190
@@ -4816,7 +4816,7 @@ class GuitarScene(BandPlayBaseScene):
                                 curxpos += font.getStringSize(diff, scale = 0.003)[0]
                                 curxpos = .5-curxpos/2.0
                                 c1,c2,c3 = self.fail_completed_color
-                                glColor3f(c1,c2,c3)
+                                gl.glColor3f(c1,c2,c3)
 
                                 # now render
                                 text = _("COMPLETED") + " "
@@ -4842,12 +4842,12 @@ class GuitarScene(BandPlayBaseScene):
                             if self.hopoIndicatorEnabled and not self.instruments[i].isDrum and not self.pause and not self.failed: #MFH - HOPO indicator (grey = strums required, white = strums not required)
                                 text = _("HOPO")
                                 if self.instruments[i].hopoActive > 0:
-                                    glColor3f(1.0, 1.0, 1.0)
+                                    gl.glColor3f(1.0, 1.0, 1.0)
                                 else:
-                                    glColor3f(0.4, 0.4, 0.4)
+                                    gl.glColor3f(0.4, 0.4, 0.4)
                                 w, h = font.getStringSize(text,0.00150)
                                 font.render(text, (.950 - w / 2, .710),(1, 0, 0),0.00150)     #off to the right slightly above fretboard
-                                glColor3f(1, 1, 1)
+                                gl.glColor3f(1, 1, 1)
 
                     #MFH - new location for star system support - outside theme-specific logic:
 
@@ -4884,7 +4884,7 @@ class GuitarScene(BandPlayBaseScene):
                             text = "%(notesHit)s/%(totalNotes)s: %(hitAcc)s%%" % \
                               {'notesHit': str(sNotesHit), 'totalNotes': str(sTotalNotes), 'hitAcc': str(trimmedTotalNoteAcc)}
                             c1,c2,c3 = self.ingame_stats_color
-                            glColor3f(c1, c2, c3)  #wht
+                            gl.glColor3f(c1, c2, c3)  #wht
                             w, h = font.getStringSize(text,0.00160)
                             if self.theme == 2:
                                 if self.numDecimalPlaces < 2:
@@ -4906,7 +4906,7 @@ class GuitarScene(BandPlayBaseScene):
                             trimmedAvMult = self.roundDecimalForDisplay(sAvMult)
                             text = "%(avLab)s: %(avMult)sx" % \
                               {'avLab': self.tsAvgLabel, 'avMult': str(trimmedAvMult)}
-                            glColor3f(c1, c2, c3)
+                            gl.glColor3f(c1, c2, c3)
                             w, h = font.getStringSize(text,0.00160)
                             font.render(text, (accDispX - w/2, accDispYam),(1, 0, 0),0.00140)     #top-centered by streak under score
 
@@ -4924,7 +4924,7 @@ class GuitarScene(BandPlayBaseScene):
                                 if self.soloReviewCountdown[i] < self.soloReviewDispDelay:
                                     self.soloReviewCountdown[i] += 1
                                     if not (self.instruments[i].freestyleActive or self.scoring[i].freestyleWasJustActive):
-                                        glColor3f(1, 1, 1)
+                                        gl.glColor3f(1, 1, 1)
                                         text1 = self.soloReviewText[i][0]
                                         text2 = self.soloReviewText[i][1]
                                         xOffset = 0.950
@@ -4972,34 +4972,34 @@ class GuitarScene(BandPlayBaseScene):
                                 font.render(self.lastTapText, (.750 - w / 2, .440),(1, 0, 0),0.00170)     #off to the right slightly above fretboard
 
                                 if self.instruments[i].hopoActive > 0:
-                                    glColor3f(1, 1, 0)
+                                    gl.glColor3f(1, 1, 0)
                                     hoActDisp = "+"
                                 elif self.instruments[i].hopoActive < 0:
-                                    glColor3f(0, 1, 1)
+                                    gl.glColor3f(0, 1, 1)
                                     hoActDisp = "-"
                                 else:
-                                    glColor3f(0.5, 0.5, 0.5)
+                                    gl.glColor3f(0.5, 0.5, 0.5)
                                     hoActDisp = "0"
                                 text = "HOact: %s" % hoActDisp
                                 w, h = font.getStringSize(text,0.00175)
                                 font.render(text, (.750 - w / 2, .410),(1, 0, 0),0.00170)     #off to the right slightly above fretboard
-                                glColor3f(1, 1, 1)
+                                gl.glColor3f(1, 1, 1)
 
 
                                 #MFH: HOPO intention determination flag debug
                                 if self.instruments[i].sameNoteHopoString:
-                                    glColor3f(1, 1, 0)
+                                    gl.glColor3f(1, 1, 0)
                                 else:
-                                    glColor3f(0.5, 0.5, 0.5)
+                                    gl.glColor3f(0.5, 0.5, 0.5)
 
                                 text = "HOflag: %s" % str(self.instruments[i].sameNoteHopoString)
 
                                 w, h = font.getStringSize(text,0.00175)
                                 font.render(text, (.750 - w / 2, .385),(1, 0, 0),0.00170)     #off to the right slightly above fretboard
-                                glColor3f(1, 1, 1)
+                                gl.glColor3f(1, 1, 1)
                                 #MFH: guitarSoloNoteCount list debug
                                 text = str(self.guitarSolos[i])
-                                glColor3f(0.9, 0.9, 0.9)
+                                gl.glColor3f(0.9, 0.9, 0.9)
                                 w, h = font.getStringSize(text,0.00110)
                                 font.render(text, (.900 - w / 2, .540),(1, 0, 0),0.00110)     #off to the right slightly above fretboard
 
@@ -5014,26 +5014,26 @@ class GuitarScene(BandPlayBaseScene):
 
                                         if self.analogKillMode[i] == 2: #xbox mode:
                                             if self.actualWhammyVol[i] < 1.0:
-                                                glColor3f(1, 1, 0)
+                                                gl.glColor3f(1, 1, 0)
                                             else:
-                                                glColor3f(0.5, 0.5, 0.5)
+                                                gl.glColor3f(0.5, 0.5, 0.5)
                                         else: #ps2 mode:
                                             if self.actualWhammyVol[i] > 0.0:
-                                                glColor3f(1, 1, 0)
+                                                gl.glColor3f(1, 1, 0)
                                             else:
-                                                glColor3f(0.5, 0.5, 0.5)
+                                                gl.glColor3f(0.5, 0.5, 0.5)
                                         text = str(self.roundDecimalForDisplay(self.actualWhammyVol[i]))
                                         w, h = font.getStringSize(text,killTsize)
                                         font.render(text, (killXpos - w / 2, killYpos),(1, 0, 0),killTsize)     #off to the right slightly above fretboard
                                     else:
                                         if self.killswitchEngaged[i]:
-                                            glColor3f(1, 1, 0)
+                                            gl.glColor3f(1, 1, 0)
                                         else:
-                                            glColor3f(0.5, 0.5, 0.5)
+                                            gl.glColor3f(0.5, 0.5, 0.5)
                                         text = str(self.killswitchEngaged[i])
                                         w, h = font.getStringSize(text,killTsize)
                                         font.render(text, (killXpos - w / 2, killYpos),(1, 0, 0),killTsize)     #off to the right slightly above fretboard
-                            glColor3f(1, 1, 1)
+                            gl.glColor3f(1, 1, 1)
 
                             #MFH - freestyle active status debug display
                             if self.showFreestyleActive == 1 and not self.pause and not self.failed:    #MFH - shows when freestyle is active
@@ -5079,37 +5079,37 @@ class GuitarScene(BandPlayBaseScene):
                                     #MFH Precalculated these hit accuracy thresholds instead of every frame
                                     if (self.accuracy[i] >= self.instruments[i].accThresholdWorstLate) and (self.accuracy[i] < self.instruments[i].accThresholdVeryLate):
                                         text = self.tsAccVeryLate
-                                        glColor3f(1, 0, 0)
+                                        gl.glColor3f(1, 0, 0)
                                     elif (self.accuracy[i] >= self.instruments[i].accThresholdVeryLate) and (self.accuracy[i] < self.instruments[i].accThresholdLate):
                                         text = self.tsAccLate
-                                        glColor3f(1, 1, 0)
+                                        gl.glColor3f(1, 1, 0)
                                     elif (self.accuracy[i] >= self.instruments[i].accThresholdLate) and (self.accuracy[i] < self.instruments[i].accThresholdSlightlyLate):
                                         text = self.tsAccSlightlyLate
-                                        glColor3f(1, 1, 0)
+                                        gl.glColor3f(1, 1, 0)
                                     elif (self.accuracy[i] >= self.instruments[i].accThresholdSlightlyLate) and (self.accuracy[i] < self.instruments[i].accThresholdExcellentLate):
                                         text = self.tsAccExcellentLate
-                                        glColor3f(0, 1, 0)
+                                        gl.glColor3f(0, 1, 0)
                                     elif (self.accuracy[i] >= self.instruments[i].accThresholdExcellentLate) and (self.accuracy[i] < self.instruments[i].accThresholdPerfect):
                                         #give the "perfect" reading some slack, -1.0 to 1.0
                                         text = self.tsAccPerfect
-                                        glColor3f(0, 1, 1) #changed color
+                                        gl.glColor3f(0, 1, 1) #changed color
                                     elif (self.accuracy[i] >= self.instruments[i].accThresholdPerfect) and (self.accuracy[i] < self.instruments[i].accThresholdExcellentEarly):
                                         text = self.tsAccExcellentEarly
-                                        glColor3f(0, 1, 0)
+                                        gl.glColor3f(0, 1, 0)
                                     elif (self.accuracy[i] >= self.instruments[i].accThresholdExcellentEarly) and (self.accuracy[i] < self.instruments[i].accThresholdSlightlyEarly):
                                         text = self.tsAccSlightlyEarly
-                                        glColor3f(1, 1, 0)
+                                        gl.glColor3f(1, 1, 0)
                                     elif (self.accuracy[i] >= self.instruments[i].accThresholdSlightlyEarly) and (self.accuracy[i] < self.instruments[i].accThresholdEarly):
                                         text = self.tsAccEarly
-                                        glColor3f(1, 1, 0)
+                                        gl.glColor3f(1, 1, 0)
                                     elif (self.accuracy[i] >= self.instruments[i].accThresholdEarly) and (self.accuracy[i] < self.instruments[i].accThresholdVeryEarly):
                                         text = self.tsAccVeryEarly
-                                        glColor3f(1, 0, 0)
+                                        gl.glColor3f(1, 0, 0)
                                     else:
                                         #bug catch - show the problematic number:
                                         text = "%(acc)s %(ms)s" % \
                                           {'acc': str(trimmedAccuracy), 'ms': self.msLabel}
-                                        glColor3f(1, 0, 0)
+                                        gl.glColor3f(1, 0, 0)
 
                                 w, h = font.getStringSize(text,0.00175)
 
@@ -5142,7 +5142,7 @@ class GuitarScene(BandPlayBaseScene):
                                     w, h = font.getStringSize(text,0.00140)
                                     font.render(text, (posX - w / 2, posY - h / 2 + .030),(1, 0, 0),0.00140)
 
-                            glColor3f(1, 1, 1)
+                            gl.glColor3f(1, 1, 1)
 
                             #handle the guitar solo track
                             if (not self.pause and not self.failed and not self.ending):
@@ -5412,7 +5412,7 @@ class GuitarScene(BandPlayBaseScene):
                         # evilynux - Display framerate
                         if self.engine.show_fps: #probably only need to once through.
                             c1,c2,c3 = self.ingame_stats_color
-                            glColor3f(c1, c2, c3)
+                            gl.glColor3f(c1, c2, c3)
                             text = _("FPS: %.2f" % self.engine.fpsEstimate)
                             w, h = font.getStringSize(text, scale = 0.00140)
                             font.render(text, (self.fpsRenderPos[0], self.fpsRenderPos[1] - h/2), (1,0,0), 0.00140)
@@ -5512,7 +5512,7 @@ class GuitarScene(BandPlayBaseScene):
                 if (not self.pause and not self.failed and not self.ending):
                     if self.coOpType: #render co-op phrases (full screen width) above the rest.
                         if self.displayText[self.coOpPhrase] != None:
-                            glColor3f(.8,.75,.01)
+                            gl.glColor3f(.8,.75,.01)
                             size = sphraseFont.getStringSize(self.displayText[self.coOpPhrase], scale = self.displayTextScale[self.coOpPhrase])
                             sphraseFont.render(self.displayText[self.coOpPhrase], (.5-size[0]/2,self.textY[self.coOpPhrase]-size[1]), scale = self.displayTextScale[self.coOpPhrase])
 
