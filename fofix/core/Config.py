@@ -2,7 +2,7 @@
 # -*- coding: iso-8859-1 -*-                                        #
 #                                                                   #
 # Frets on Fire                                                     #
-# Copyright (C) 2006 Sami Kyöstilä                                  #
+# Copyright (C) 2006 Sami KyÃ¶stilÃ¤                                  #
 #               2008 myfingershurt                                  #
 #               2008 Capo                                           #
 #               2008 Glorandwarf                                    #
@@ -69,7 +69,7 @@ class MyConfigParser(RawConfigParser):
             value = utf8(value)
         RawConfigParser.set(self, section, option, value)
 
-class Option:
+class Option(object):
     """A prototype configuration key."""
     def __init__(self, **args):
         for key, value in args.items():
@@ -128,7 +128,7 @@ def _convertValue(value, type, default=False):
         except:
             return None
 
-class Config:
+class Config(object):
     """A configuration registry."""
     def __init__(self, prototype, fileName = None, type = 0):
         """
@@ -274,7 +274,6 @@ def get(section, option):
     @param option:    Option name
     @return:          Key value
     """
-    global config
 
     return config.get(section, option)
 
@@ -286,7 +285,6 @@ def set(section, option, value):
     @param option:    Option name
     @param value:     New key value
     """
-    global config
     return config.set(section, option, value)
 
 def getDefault(section, option):
@@ -297,7 +295,6 @@ def getDefault(section, option):
     @param option:    Option name
     @return:          Key value
     """
-    global config
     return config.getDefault(section, option)
 
 def getTipText(section, option):
@@ -308,7 +305,6 @@ def getTipText(section, option):
     @param option:    Option name
     @return:          Tip Text String
     """
-    global config
     return config.getTipText(section, option)
 
 def getOptions(section, option):
@@ -319,5 +315,4 @@ def getOptions(section, option):
     @param option:    Option name
     @return:          Tuple of Key list and Values list
     """
-    global config
     return config.getOptions(section, option)
