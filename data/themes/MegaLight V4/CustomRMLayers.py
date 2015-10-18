@@ -34,7 +34,7 @@ class CoOpMeter(Rockmeter.Group):
                 effect.update()
             layer.position = [p*scale for p in layer.position]
             layer.scale = [s*scale for s in layer.scale]
-            if isinstance(layer, FontLayer):
+            if isinstance(layer, Rockmeter.FontLayer):
                 layer.position = [layer.position[0] + (self.position[0]/w), layer.position[1] - (self.position[1]/h)*.75]
                 layer.position[1] -= (self.ySpacing*scale/h)*.75*(i/2)
             else:
