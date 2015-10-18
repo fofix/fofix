@@ -1,7 +1,7 @@
 
-from Rockmeter import *
+from fofix.game.guitarscene import Rockmeter
 
-class CoOpMeter(Group):
+class CoOpMeter(Rockmeter.Group):
     def __init__(self, stage, section):
 
         super(CoOpMeter, self).__init__(stage, section)
