@@ -171,7 +171,8 @@ class BandPlayBaseScene(Scene):
         #self.tempoBpm = Song.DEFAULT_BPM
         #self.actualBpm = 0.0
         #self.targetPeriod   = 60000.0 / self.targetBpm
-        self.songTime = -self.engine.config.get('audio', 'delay')
+        self.audioDelay = self.engine.config.get("audio", "delay")
+        self.songTime = -self.audioDelay
         self.disableVBPM  = self.engine.config.get("game", "disable_vbpm")
         self.currentBpm     = Song.DEFAULT_BPM
         self.currentPeriod  = 60000.0 / self.currentBpm
@@ -3158,7 +3159,7 @@ class GuitarScene(BandPlayBaseScene):
         if self.song and self.song.readyToGo and not self.pause and not self.failed:
 
             # calculate song position during the song countdown
-            if self.songTime <= -self.song.delay:
+            if self.songTime <= -self.audioDelay:
                 sngPos = self.song.getPosition()
                 if sngPos == -self.song.delay:
                     self.songTime = sngPos - self.countdown * self.song.period
