@@ -49,7 +49,7 @@ class MidiToText(MidiOutStream):
 
 
     def system_exclusive(self, data):
-        print 'system_exclusive - data size: %s' % len(date)
+        print 'system_exclusive - data size: %s' % len(data)
 
 
     def song_position_pointer(self, value):

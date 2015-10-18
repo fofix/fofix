@@ -140,7 +140,7 @@ class MidiOutFile(MidiOutStream):
         values: 0-15
         """
         value = (msg_type<<4) + values
-        self.event_slice(fromBytes([MIDI_TIME_CODE, value]))
+        self.event_slice(fromBytes([MTC, value]))
 
 
     def song_position_pointer(self, value):
@@ -246,7 +246,7 @@ class MidiOutFile(MidiOutStream):
         """
         value: 0-65535
         """
-        self.meta_slice(meta_type, writeBew(value, 2))
+        self.meta_slice(SEQUENCE_NUMBER, writeBew(value, 2))
 
 
     def text(self, text):
@@ -387,7 +387,7 @@ class MidiOutFile(MidiOutStream):
         """
         data: The data as byte values
         """
-        self.meta_slice(SEQUENCER_SPECIFIC, data)
+        self.meta_slice(SPECIFIC, data)
 
 
 
