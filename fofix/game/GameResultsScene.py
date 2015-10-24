@@ -250,21 +250,6 @@ class GameResultsScene(Scene):
         else:
             self.skipCheats = True
 
-        self.hopoStyle = self.engine.config.get("game", "hopo_system")
-        gh2sloppy      = self.engine.config.get("game", "gh2_sloppy")
-        if gh2sloppy == 1:
-            self.hopoStyle = _("GH2 Sloppy")
-        elif self.hopoStyle == 0:
-            self.hopoStyle = _("None")
-        elif self.hopoStyle == 1:
-            self.hopoStyle = _("RF-Mod")
-        elif self.hopoStyle == 2:
-            self.hopoStyle = _("GH2 Strict")
-        elif self.hopoStyle == 3:
-            self.hopoStyle = _("GH2")
-        else:
-            self.hopoStyle = _("New System")
-
         self.hopoFreq   = self.engine.config.get("coffee", "hopo_frequency")
         useSongHopoFreq = self.engine.config.get("game", "song_hopo_freq")
         songHopoFreq    = self.playerList[0].hopoFreq
@@ -891,7 +876,7 @@ class GameResultsScene(Scene):
                     hspacing = 1.0
                 self.engine.drawStarScore(w, h, self.resultStar[0], self.resultStar[1], scoreCard.stars, scale, space = space, horiz_spacing = hspacing, align = 1)
 
-                settingsText = "%s %s - %s: %s / %s, %s: %s" % (self.engine.versionString, self.tsSettings, self.tsHopos, self.hopoStyle, self.hopoFreq, self.tsHitWindow, self.hitWindow)
+                settingsText = "%s %s - %s %s, %s: %s" % (self.engine.versionString, self.tsSettings, self.tsHopos, self.hopoFreq, self.tsHitWindow, self.hitWindow)
                 settingsScale = 0.0012
                 wText, hText = defFont.getStringSize(settingsText, settingsScale)
                 defFont.render(settingsText, (.5 - wText/2, 0.05), scale = settingsScale)
@@ -1043,7 +1028,7 @@ class GameResultsScene(Scene):
                 hspacing = 1.1
             self.engine.drawStarScore(w, h, self.resultStar[0], self.resultStar[1], scoreCard.stars, scale, horiz_spacing = hspacing, space = space, align = 1)
 
-            settingsText = "%s %s - %s: %s / %s, %s: %s" % (self.engine.versionString, self.tsSettings, self.tsHopos, self.hopoStyle, self.hopoFreq, self.tsHitWindow, self.hitWindow)
+            settingsText = "%s %s - %s %s, %s: %s" % (self.engine.versionString, self.tsSettings, self.tsHopos, self.hopoFreq, self.tsHitWindow, self.hitWindow)
             settingsScale = 0.0012
             wText, hText = font.getStringSize(settingsText, settingsScale)
             defFont.render(settingsText, (.5 - wText/2, 0.0), scale = settingsScale)

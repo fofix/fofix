@@ -308,11 +308,8 @@ class BandPlayBaseScene(Scene):
             self.jurg[1] = True
 
         self.hopoStyle        = self.engine.config.get("game", "hopo_system")
-        self.gh2sloppy        = self.engine.config.get("game", "gh2_sloppy")
         self.allTaps          = 0
         self.autoKickBass     = [0 for i in self.players]
-        if self.gh2sloppy == 1:
-            self.hopoStyle = 4
         self.hopoAfterChord = self.engine.config.get("game", "hopo_after_chord")
 
         self.pov              = self.engine.config.get("fretboard", "point_of_view")
@@ -2020,12 +2017,6 @@ class GuitarScene(BandPlayBaseScene):
                         if (self.coOpScoreCard.handicap>>2)&1 != 1:
                             self.coOpScoreCard.handicap += 0x4
                 continue
-            if self.gh2sloppy == 1 and not self.instruments[i].isDrum: # or self.rb2sloppy == 1:
-                if (scoreCard.handicap)&1 != 1:
-                    scoreCard.handicap += 1
-                if self.coOpType:
-                    if self.coOpScoreCard.handicap&1 != 1:
-                        self.coOpScoreCard.handicap += 1
             if self.engine.audioSpeedFactor != 1 or scoreCard.earlyHitWindowSizeHandicap != 1.0: #scalable handicaps
                 if (scoreCard.handicap>>1)&1 != 1:
                     scoreCard.handicap += 0x2

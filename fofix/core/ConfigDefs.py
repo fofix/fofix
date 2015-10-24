@@ -115,7 +115,6 @@ Config.define("game", "lost_focus_pause", bool, True, text = _("Pause on Loss of
 
 #myfingershurt: HOPO settings
 Config.define("game",   "hopo_system",          int,   3,      text = _("HO/PO System"), options = sortOptionsByKey({0: _("None"), 1: _("RF-Mod"), 2: _("GH2 Strict"), 3: _("GH2")}), tipText = _("Set the system used for marking hammer-ons and pull-offs (HO/PO). You can either disable them altogether, use the RF-Mod method, or the GH2 system."))
-Config.define("game",   "gh2_sloppy",          int,   0,      text = _("GH2 Sloppy Mode"), options = {0: _("Off"), 1: _("On")}, tipText = _("Sloppy mode allows you to hold higher frets while tapping lower frets during HO/PO sections. This will lower your score by 25%."))
 Config.define("coffee", "hopo_frequency",            int,   2,   text = _("HO/PO Frequency"),    options = sortOptionsByKey({0: _("Least"), 1: _("Less"), 2: _("Normal"), 3: _("More"), 4: _("Even More"), 5: _("Most")}), tipText = _("Sets the window used to determine HO/PO notes. Increasing the frequency will reduce your score, and lower settings will give you a tiny bonus."))
 Config.define("game", "hopo_after_chord",      int,   1,   text = _("HO/PO After Chord"),    options = {0: _("Off"), 1: _("On")}, tipText = _("This will determine whether or not HO/PO notes can follow a chord. This only applies to the GH2 systems."))
 Config.define("game", "accuracy_mode",      int,   2,   text = _("Show Hit Accuracy"),    options = sortOptionsByKey({0: _("Off"), 1: _("Numeric"), 2: _("Friendly"), 3: _("Both")}), tipText = _("Shows how accurate your note hits are. Numeric will give a time in milliseconds, and Friendly will use English to inform you. Both will show, well, both. Useful for determining your A/V delay."))
@@ -306,4 +305,3 @@ Config.define("coffee", "failingEnabled",       bool, True,     text = _("No Fai
 Config.define("game", "songlist_difficulty", int, 0, text = _("Difficulty (Setlist Score)"), options = difficulties, tipText = _("Sets the default difficulty displayed in the setlist score."))
 
 Config.define("game", "songlist_instrument", int, 0, text = _("Instrument (Setlist Score)"), options = parts, tipText = _("Sets the default part displayed in the setlist score."))  #MFH
-
