@@ -7,6 +7,7 @@
 *.mo
 *.pot
 .project
+.idea/
 .pydevproject
 .settings
 fofix/html
