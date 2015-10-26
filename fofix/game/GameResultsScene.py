@@ -1080,19 +1080,18 @@ class GameResultsScene(Scene):
                     self.engine.theme.setBaseColor(1-v)
                 font.render(text, (float(self.engine.theme.result_stats_accuracy[0]) - wText / 2, float(self.engine.theme.result_stats_accuracy[1]) + v), scale = float(self.engine.theme.result_stats_accuracy[2]))
 
-                if self.coOpType < 2: # not GH Co-Op
-                    text = _(self.engine.theme.result_stats_streak_text) % scoreCard.hiStreak
-                    try:
-                        font = self.engine.data.fontDict[self.engine.theme.result_stats_streak[4]]
-                    except:
-                        font = defFont
-                    wText, hText = font.getStringSize(text)
-                    try:
-                        r, g, b = self.engine.theme.hexToColorResults(self.engine.theme.result_stats_streak[3])
-                        glColor3f(r, g, b)
-                    except IndexError:
-                        self.engine.theme.setBaseColor(1-v)
-                    font.render(text, (float(self.engine.theme.result_stats_streak[0]) - wText / 2, float(self.engine.theme.result_stats_streak[1]) + v), scale = float(self.engine.theme.result_stats_streak[2]))
+                text = _(self.engine.theme.result_stats_streak_text) % scoreCard.hiStreak
+                try:
+                    font = self.engine.data.fontDict[self.engine.theme.result_stats_streak[4]]
+                except:
+                    font = defFont
+                wText, hText = font.getStringSize(text)
+                try:
+                    r, g, b = self.engine.theme.hexToColorResults(self.engine.theme.result_stats_streak[3])
+                    glColor3f(r, g, b)
+                except IndexError:
+                    self.engine.theme.setBaseColor(1-v)
+                font.render(text, (float(self.engine.theme.result_stats_streak[0]) - wText / 2, float(self.engine.theme.result_stats_streak[1]) + v), scale = float(self.engine.theme.result_stats_streak[2]))
 
                 text = _(self.engine.theme.result_stats_diff_text) % self.playerList[i].difficulty
                 try:
