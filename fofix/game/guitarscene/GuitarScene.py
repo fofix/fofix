@@ -3827,8 +3827,41 @@ class GuitarScene(BandPlayBaseScene):
         self.engine.view.setViewport(1,0)
 
 
-    def screwUp(self, num, controls):
-        if self.screwUpVolume > 0.0:
+    def screwUp(self, num, controls, sounds=True):
+
+        if self.coOpType:
+            scoreCard = self.coOpScoreCard
+        else:
+            scoreCard = self.scoring[num]
+
+        self.song.setInstrumentVolume(0.0, self.players[num].part)
+        if self.whammyEffect == 1:    #pitchbend
+            self.song.resetInstrumentPitch(self.players[num].part)
+        scoreCard.streak = 0
+
+        if self.coOpType:
+            self.scoring[num].streak = 0
+            self.scoring[num].endingStreakBroken = True
+
+        self.guitarSoloBroken[num] = True
+        scoreCard.endingStreakBroken = True   #MFH
+        self.instruments[num].setMultiplier(1)
+        self.stage.triggerMiss(self.songTime)
+
+        self.notesMissed[num] = True #QQstarS:Set [0] to [i]
+
+        isFirst = True
+        noteList = self.instruments[num].matchingNotes
+        for tym, noat in noteList:
+            if (noat.star or noat.finalStar) and isFirst:
+                self.starNotesMissed[num] = True
+                if self.unisonActive:
+                    self.inUnison[num] = False
+            isFirst = False
+
+        self.dispAccuracy[num] = False
+
+        if self.screwUpVolume > 0.0 and sounds:
             if self.instruments[num].isBassGuitar:
                 self.engine.data.screwUpSoundBass.play()
             elif self.instruments[num].isDrum:
@@ -3925,39 +3958,11 @@ class GuitarScene(BandPlayBaseScene):
                 isFirst = False
 
         else:
-            ApplyPenalty = True
-            if self.instruments[num].isDrum:
-                if self.instruments[num].drumFillWasJustActive:
-                    ApplyPenalty = False
-                    self.instruments[num].freestylePick(self.song, self.songTime, self.controls)    #MFH - to allow late drum fill SP activation
-                    self.instruments[num].drumFillWasJustActive = False
-
-            if ApplyPenalty:
-                self.song.setInstrumentVolume(0.0, self.players[num].part)
-                if self.whammyEffect == 1:    #pitchbend
-                    self.song.resetInstrumentPitch(self.players[num].part)
-                scoreCard.streak = 0
-                if self.coOpType:
-                    self.scoring[num].streak = 0
-                    self.scoring[num].endingStreakBroken = True
-                self.instruments[num].setMultiplier(1)
-                self.currentlyAnimating = False
-                self.stage.triggerMiss(self.songTime)
-                self.guitarSoloBroken[num] = True
-                scoreCard.endingStreakBroken = True   #MFH
-                self.notesMissed[num] = True #QQstarS:Set [0] to [i]
-
-                isFirst = True
-                noteList = self.instruments[num].matchingNotes
-                for tym, noat in noteList:
-                    if (noat.star or noat.finalStar) and isFirst:
-                        self.starNotesMissed[num] = True
-                    isFirst = False
-
-                self.screwUp(num, self.controls) #MFH - call screw-up sound handling function
-
-                #myfingershurt: ensure accuracy display off when miss
-                self.dispAccuracy[num] = False
+            if self.instruments[num].isDrum and self.instruments[num].drumFillWasJustActive:
+                self.instruments[num].freestylePick(self.song, self.songTime, self.controls)    #MFH - to allow late drum fill SP activation
+                self.instruments[num].drumFillWasJustActive = False
+            else:
+                self.screwUp(num, self.controls)
 
         #myfingershurt: bass drum sound play
         if self.instruments[num].isDrum and self.bassKickSoundEnabled:
@@ -3975,31 +3980,8 @@ class GuitarScene(BandPlayBaseScene):
         missedNotes = self.instruments[num].getMissedNotes(self.song, self.songTime, catchup = True)
         if len(missedNotes) > 0:
             self.processedFirstNoteYet = True
-            scoreCard.streak = 0
-            if self.coOpType:
-                self.scoring[num].streak = 0
-                self.scoring[num].endingStreakBroken = True
-            self.guitarSoloBroken[num] = True
-            scoreCard.endingStreakBroken = True   #MFH
-            self.instruments[num].setMultiplier(1)
-            self.instruments[num].hopoActive = 0
-            self.instruments[num].sameNoteHopoString = False
-            self.instruments[num].hopoProblemNoteNum = -1
-            self.instruments[num].wasLastNoteHopod = False
-            self.instruments[num].hopoLast = -1
-            self.notesMissed[num] = True #QQstarS:Set [0] to [i]
-            for tym, theNote in missedNotes:  #MFH
-                if theNote.star or theNote.finalStar:
-                    if self.logStarpowerMisses == 1:
-                        log.debug("SP Miss: doPick3GH2(), foundMissedCatchupNote: %d, gameTime: %s" % (theNote.number, self.timeLeft) )
-                    self.starNotesMissed[num] = True
-                    if self.unisonActive:
-                        self.inUnison[num] = False
 
-            if self.hopoDebugDisp == 1:
-                missedNoteNums = [noat.number for time, noat in missedNotes]
-                log.debug("Miss: dopick3gh2(), found missed note(s)... %(missedNotes)s, Song time=%(songTime)s" % \
-                  {'missedNotes': str(missedNoteNums), 'songTime': str(self.timeLeft)})
+            self.screwUp(num, self.controls, sounds=False)
 
             if hopo == True:
                 return
@@ -4168,38 +4150,8 @@ class GuitarScene(BandPlayBaseScene):
                 self.instruments[num].sameNoteHopoString = False
                 self.instruments[num].hopoProblemNoteNum = -1
                 self.instruments[num].hopoLast = -1
-                self.song.setInstrumentVolume(0.0, self.players[num].part)
-                if self.whammyEffect == 1:    #pitchbend
-                    self.song.resetInstrumentPitch(self.players[num].part)
-                scoreCard.streak = 0
-                if self.coOpType:
-                    self.scoring[num].streak = 0
-                    self.scoring[num].endingStreakBroken = True
-                self.guitarSoloBroken[num] = True
-                scoreCard.endingStreakBroken = True   #MFH
-                self.instruments[num].setMultiplier(1)
-                self.stage.triggerMiss(self.songTime)
-                if self.hopoDebugDisp == 1 and not self.instruments[num].isDrum:
-                    problemNoteMatchingList = [(int(tym), noat.number, noat.played) for tym, noat in self.instruments[num].matchingNotes]
-                    log.debug("Miss: dopick3gh2(), fail-startpick3()...HigherFretsHeld: %(higherFrets)s, LastHopoFretHeld: %(lastHopoFret)s, lastStrumWasChord: %(lastStrumChord)s, sameNoteHopoStringFlag: %(sameNoteHopoFlag)s, notesToMatch: %(matchNotes)s, activeFrets: %(activeFrets)s, Song time=%(songTime)s" % \
-                      {'higherFrets': str(HigherFretsHeld), 'lastHopoFret': str(LastHopoFretStillHeld), 'lastStrumChord': str(lastStrumWasChordWas), 'sameNoteHopoFlag': str(sameNoteHopoFlagWas), 'matchNotes': str(problemNoteMatchingList), 'activeFrets': str(activeKeyList), 'songTime': str(self.timeLeft)})
-
-                self.notesMissed[num] = True #QQstarS:Set [0] to [i]
-
-                isFirst = True
-                noteList = self.instruments[num].matchingNotes
-                for tym, noat in noteList:
-                    if (noat.star or noat.finalStar) and isFirst:
-                        if self.logStarpowerMisses == 1:
-                            log.debug("SP Miss: doPick3GH2(), afterStartPick3Fail, matchingNote: %d, gameTime: %s" % (noat.number, self.timeLeft) )
-                        self.starNotesMissed[num] = True
-                        if self.unisonActive:
-                            self.inUnison[num] = False
-                    isFirst = False
 
                 self.screwUp(num, self.controls)
-
-                self.dispAccuracy[num] = False
 
         #myfingershurt: bass drum sound play
         if self.instruments[num].isDrum and self.bassKickSoundEnabled:
