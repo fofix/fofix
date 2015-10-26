@@ -24,7 +24,7 @@
 import os
 import random
 
-from OpenGL.GL import *
+import OpenGL.GL as gl
 import numpy as np
 
 from fretwork import log
@@ -389,7 +389,7 @@ class Neck:
         l = self.boardLength
         z = ((time - pos) / self.currentPeriod) / self.beatsPerUnit
 
-        glEnable(GL_TEXTURE_2D)
+        gl.glEnable(gl.GL_TEXTURE_2D)
 
         self.board_scroll_vtx[0][2] = self.board_scroll_vtx[1][2] = z
         self.board_scroll_vtx[2][2] = self.board_scroll_vtx[3][2] = z + 1
@@ -399,9 +399,9 @@ class Neck:
         if neckTexture:
             neckTexture.texture.bind()
 
-        cmgl.drawArrays(GL_TRIANGLE_STRIP, vertices=self.board_scroll_vtx, colors=self.board_col, texcoords=self.board_tex_static)
+        cmgl.drawArrays(gl.GL_TRIANGLE_STRIP, vertices=self.board_scroll_vtx, colors=self.board_col, texcoords=self.board_tex_static)
 
-        glDisable(GL_TEXTURE_2D)
+        gl.glDisable(gl.GL_TEXTURE_2D)
 
     def renderIncomingSideBars(self, song, pos, time, sideBarImg):
         if not song:
@@ -412,7 +412,7 @@ class Neck:
         l = self.boardLength
         z = ((time - pos) / self.currentPeriod) / self.beatsPerUnit
 
-        glEnable(GL_TEXTURE_2D)
+        gl.glEnable(gl.GL_TEXTURE_2D)
 
         self.sidebars_scroll_vtx[0][2] = self.sidebars_scroll_vtx[1][2] = z
         self.sidebars_scroll_vtx[2][2] = self.sidebars_scroll_vtx[3][2] = z + 1
@@ -422,9 +422,9 @@ class Neck:
         if sideBarImg:
             sideBarImg.texture.bind()
 
-        cmgl.drawArrays(GL_TRIANGLE_STRIP, vertices=self.sidebars_scroll_vtx, colors=self.board_col, texcoords=self.board_tex_static)
+        cmgl.drawArrays(gl.GL_TRIANGLE_STRIP, vertices=self.sidebars_scroll_vtx, colors=self.board_col, texcoords=self.board_tex_static)
 
-        glDisable(GL_TEXTURE_2D)
+        gl.glDisable(gl.GL_TEXTURE_2D)
 
     def renderIncomingNecks(self, visibility, song, pos):
         if not song:
@@ -518,7 +518,7 @@ class Neck:
 
         v = visibility
 
-        glEnable(GL_TEXTURE_2D)
+        gl.glEnable(gl.GL_TEXTURE_2D)
 
         if offset == 0:
             board_tex = self.board_tex_static
@@ -531,15 +531,15 @@ class Neck:
             board_col = self.board_col
 
         if alpha == True:
-            glBlendFunc(GL_ONE, GL_ONE)
+            gl.glBlendFunc(gl.GL_ONE, gl.GL_ONE)
         if neck:
             neck.texture.bind()
-        cmgl.drawArrays(GL_TRIANGLE_STRIP, vertices=self.board_vtx, colors=board_col, texcoords=board_tex)
+        cmgl.drawArrays(gl.GL_TRIANGLE_STRIP, vertices=self.board_vtx, colors=board_col, texcoords=board_tex)
 
         if alpha == True:
-            glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
+            gl.glBlendFunc(gl.GL_SRC_ALPHA, gl.GL_ONE_MINUS_SRC_ALPHA)
 
-        glDisable(GL_TEXTURE_2D)
+        gl.glDisable(gl.GL_TEXTURE_2D)
 
     def renderNeck(self, visibility, song, pos):
         if not song:
@@ -629,7 +629,7 @@ class Neck:
         if shaders.enable("neck"):
             shaders.setVar("fretcol",neckcol)
             shaders.update()
-            cmgl.drawArrays(GL_TRIANGLE_STRIP, vertices=self.shader_neck_vtx)
+            cmgl.drawArrays(gl.GL_TRIANGLE_STRIP, vertices=self.shader_neck_vtx)
             shaders.disable()
         else:
             if self.isFailing:
@@ -652,7 +652,7 @@ class Neck:
         else:
             track_tex = self.board_tex
 
-        glEnable(GL_TEXTURE_2D)
+        gl.glEnable(gl.GL_TEXTURE_2D)
 
         #MFH - logic to briefly display oFlash
         if self.overdriveFlashCount < self.overdriveFlashCounts and self.oFlash:
@@ -663,9 +663,9 @@ class Neck:
             if self.centerLines:
                 self.centerLines.texture.bind()
 
-        cmgl.drawArrays(GL_TRIANGLE_STRIP, vertices=self.track_vtx, colors=self.board_col, texcoords=track_tex)
+        cmgl.drawArrays(gl.GL_TRIANGLE_STRIP, vertices=self.track_vtx, colors=self.board_col, texcoords=track_tex)
 
-        glDisable(GL_TEXTURE_2D)
+        gl.glDisable(gl.GL_TEXTURE_2D)
 
     def drawSideBars(self, visibility, song, pos):
         if not song:
@@ -681,7 +681,7 @@ class Neck:
         else:
             board_col = self.board_col
 
-        glEnable(GL_TEXTURE_2D)
+        gl.glEnable(gl.GL_TEXTURE_2D)
 
         if self.instrument.starPowerActive and self.oSideBars and not (self.guitarSolo or self.soloSideBars):
             self.oSideBars.texture.bind()
@@ -697,16 +697,16 @@ class Neck:
         if self.isFailing and self.failSideBars and v == self.failcount:
             self.failSideBars.texture.bind()
 
-        cmgl.drawArrays(GL_TRIANGLE_STRIP, vertices=self.sidebars_vtx, colors=board_col, texcoords=self.board_tex)
-        glDisable(GL_TEXTURE_2D)
+        cmgl.drawArrays(gl.GL_TRIANGLE_STRIP, vertices=self.sidebars_vtx, colors=board_col, texcoords=self.board_tex)
+        gl.glDisable(gl.GL_TEXTURE_2D)
 
         if shaders.enable("sololight"):
             shaders.modVar("color",shaders.var["solocolor"])
             shaders.setVar("offset",(-3.5,-w/2))
-            cmgl.drawArrays(GL_TRIANGLE_STRIP, vertices=self.soloLightVtx1)
+            cmgl.drawArrays(gl.GL_TRIANGLE_STRIP, vertices=self.soloLightVtx1)
             shaders.setVar("offset",(-3.5,w/2))
             shaders.setVar("time",shaders.time()+0.5)
-            cmgl.drawArrays(GL_TRIANGLE_STRIP, vertices=self.soloLightVtx2)
+            cmgl.drawArrays(gl.GL_TRIANGLE_STRIP, vertices=self.soloLightVtx2)
             shaders.disable()
 
     def drawBPM(self, visibility, song, pos):
@@ -717,13 +717,13 @@ class Neck:
 
         track = song.track[self.player]
 
-        glEnable(GL_TEXTURE_2D)
+        gl.glEnable(gl.GL_TEXTURE_2D)
 
         for time, event in track.getEvents(pos - self.currentPeriod * 2, pos + self.currentPeriod * self.beatsPerBoard):
             if not isinstance(event, Bars):
                 continue
 
-            glPushMatrix()
+            gl.glPushMatrix()
             z  = ((time - pos) / self.currentPeriod) / self.beatsPerUnit
             sw = 0.1 #width
 
@@ -737,11 +737,11 @@ class Neck:
             elif event.barType == 2: #measure
                 self.bpm_measure.texture.bind()
 
-            cmgl.drawArrays(GL_TRIANGLE_STRIP, vertices=self.bpm_vtx, colors=self.bpm_col, texcoords=self.bpm_tex)
+            cmgl.drawArrays(gl.GL_TRIANGLE_STRIP, vertices=self.bpm_vtx, colors=self.bpm_col, texcoords=self.bpm_tex)
 
-            glPopMatrix()
+            gl.glPopMatrix()
 
-        glDisable(GL_TEXTURE_2D)
+        gl.glDisable(gl.GL_TEXTURE_2D)
 
     def render(self, visibility, song, pos):
 

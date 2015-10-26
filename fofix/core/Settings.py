@@ -961,7 +961,6 @@ class SettingsMenu(Menu.Menu):
 
         self.cheats = [
           (_("AI Settings"), self.jurgenSettingsMenu, _("Change the settings of the AI")),
-          ConfigChoice(engine, engine.config, "game", "gh2_sloppy", autoApply = True),
           ConfigChoice(engine, engine.config, "game", "whammy_saves_starpower", autoApply = True),#myfingershurt
           ConfigChoice(self.engine, self.engine.config, "game",   "note_hit_window", autoApply = True), #alarian: defines hit window
           ConfigChoice(engine, engine.config, "coffee", "hopo_frequency", autoApply = True),
@@ -1289,8 +1288,7 @@ class BasicSettingsMenu(Menu.Menu):
         maxplayers = self.engine.config.get("performance", "max_players")
         for i in range(maxplayers):
             choices.append(ConfigChoice(self.engine, self.engine.config, "game", "jurg_p%d" % i, autoApply = True))
-        choicesb = [ConfigChoice(self.engine, self.engine.config, "game", "gh2_sloppy", autoApply = True),
-          ConfigChoice(self.engine, self.engine.config, "game", "whammy_saves_starpower", autoApply = True),#myfingershurt
+        choicesb = [ConfigChoice(self.engine, self.engine.config, "game", "whammy_saves_starpower", autoApply = True),#myfingershurt
           ConfigChoice(self.engine, self.engine.config, "game",   "note_hit_window", autoApply = True), #alarian: defines hit window
           ConfigChoice(self.engine, self.engine.config, "coffee", "hopo_frequency", autoApply = True),
           ConfigChoice(self.engine, self.engine.config, "coffee", "failingEnabled", autoApply = True),

@@ -40,7 +40,7 @@ from fofix.core.Player import Controls
 from fofix.core import Player
 from fofix.core import Config
 
-class KeyListener:
+class KeyListener(object):
     def keyPressed(self, key, unicode):
         pass
 
@@ -53,7 +53,7 @@ class KeyListener:
     def exitRequested(self):
         pass
 
-class MouseListener:
+class MouseListener(object):
     def mouseButtonPressed(self, button, pos):
         pass
 
@@ -63,7 +63,7 @@ class MouseListener:
     def mouseMoved(self, pos, rel):
         pass
 
-class SystemEventListener:
+class SystemEventListener(object):
     def screenResized(self, size):
         pass
 

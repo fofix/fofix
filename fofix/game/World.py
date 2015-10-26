@@ -36,7 +36,7 @@ class World:
         self.minPlayers   = players
         self.maxPlayers   = maxplayers or players
         self.gameMode     = gameMode  #Quickplay, Practice, Career
-        self.multiMode    = multiMode #Face-Off, Pro FO, Co-Op, RB Co-Op, GH Co-Op, Battle
+        self.multiMode    = multiMode #Face-Off, Pro FO, Co-Op, RB Co-Op, Battle
         self.allowGuitar  = allowGuitar
         self.allowDrum    = allowDrum
         self.allowMic     = allowMic
@@ -58,8 +58,6 @@ class World:
                 self.gameName = _("FoFiX Co-Op Mode")
             elif self.gameMode == 4:
                 self.gameName = _("RB Co-Op Mode")
-            elif self.gameMode == 5:
-                self.gameName = _("GH Co-Op Mode")
             elif self.gameMode == 6:
                 self.gameName = _("Battle Mode")
         else:

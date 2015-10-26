@@ -31,7 +31,7 @@ from copy import deepcopy
 import math
 import os
 
-from OpenGL.GL import *
+import OpenGL.GL as gl
 import numpy as np
 
 from fretwork import log
@@ -77,9 +77,6 @@ class Guitar(Instrument):
 
         #myfingershurt:
         self.hopoStyle        = self.engine.config.get("game", "hopo_system")
-        self.gh2sloppy        = self.engine.config.get("game", "gh2_sloppy")
-        if self.gh2sloppy == 1:
-            self.hopoStyle = 4
         self.sfxVolume    = self.engine.config.get("audio", "SFX_volume")
 
         #blazingamer
@@ -115,7 +112,7 @@ class Guitar(Instrument):
         size = (.22, .22)
         v = 1.0 - visibility
 
-        glEnable(GL_DEPTH_TEST)
+        gl.glEnable(gl.GL_DEPTH_TEST)
 
         for n in range(self.strings2):
             keyNumb = n
@@ -160,7 +157,7 @@ class Guitar(Instrument):
                 c = [.1 + .8 * c[0] + f, .1 + .8 * c[1] + f, .1 + .8 * c[2] + f, v]
                 self.render3DKey(texture,self.keyMesh, x, y, c, n, f)
 
-        glDisable(GL_DEPTH_TEST)
+        gl.glDisable(gl.GL_DEPTH_TEST)
 
     def renderFreestyleFlames(self, visibility, controls):
         if self.flameColors[0][0] == -1:
@@ -299,15 +296,15 @@ class Guitar(Instrument):
             self.starNotesSet = True
 
         if not (self.coOpFailed and not self.coOpRestart):
-            glEnable(GL_BLEND)
-            glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
-            glEnable(GL_COLOR_MATERIAL)
+            gl.glEnable(gl.GL_BLEND)
+            gl.glBlendFunc(gl.GL_SRC_ALPHA, gl.GL_ONE_MINUS_SRC_ALPHA)
+            gl.glEnable(gl.GL_COLOR_MATERIAL)
 
             if self.leftyMode:
                 if not self.battleStatus[6]:
-                    glScalef(-1, 1, 1)
+                    gl.glScalef(-1, 1, 1)
             elif self.battleStatus[6]:
-                glScalef(-1, 1, 1)
+                gl.glScalef(-1, 1, 1)
 
             if self.freestyleActive:
                 self.renderFreestyleLanes(visibility, song, pos, None) #MFH - render the lanes on top of the notes.
@@ -338,9 +335,9 @@ class Guitar(Instrument):
 
             if self.leftyMode:
                 if not self.battleStatus[6]:
-                    glScalef(-1, 1, 1)
+                    gl.glScalef(-1, 1, 1)
             elif self.battleStatus[6]:
-                glScalef(-1, 1, 1)
+                gl.glScalef(-1, 1, 1)
 
     def getDoubleNotes(self, notes):
         if self.battleStatus[7] and notes != []:

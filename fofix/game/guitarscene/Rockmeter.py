@@ -34,7 +34,7 @@ import imp
 import os
 
 from PIL import Image, ImageDraw
-from OpenGL.GL import *
+import OpenGL.GL as gl
 
 from fretwork import log
 
@@ -333,11 +333,11 @@ class FontLayer(Layer):
         color = self.color
 
         if bool(eval(self.condition)):
-            glPushMatrix()
-            glColor4f(*color)
+            gl.glPushMatrix()
+            gl.glColor4f(*color)
             self.font.render(self.text, position, align = alignment,
                                shadow = self.shadow, outline = self.outline, shadowOpacity = self.shadowOpacity)
-            glPopMatrix()
+            gl.glPopMatrix()
 
 #creates a layer that is shaped like a pie-slice/circle instead of a rectangle
 class CircleLayer(ImageLayer):

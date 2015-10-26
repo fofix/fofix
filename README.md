@@ -1,3 +1,5 @@
+[![Code Health](https://landscape.io/github/fofix/fofix/master/landscape.svg?style=flat)](https://landscape.io/github/fofix/fofix/master)
+
 Frets on Fire X - FoFiX
 =======================
 
@@ -160,7 +162,7 @@ The following packages are required:
   * Cython ([link to 0.23](http://www.lfd.uci.edu/~gohlke/pythonlibs/#cython))
 
     This is a Python Wheel, after downloading install it using pip:
-    
+
     ```pip install Cython‑0.23‑cp27‑none‑win32.whl```
 
 The following packages are optional:
@@ -431,4 +433,3 @@ this section.
 We don't support GNU/Linux binaries anymore.  Just run from source for
 now; we'll make the standard `python setup.py install` do the right
 thing sooner or later (certainly before 4.0 is released).
-

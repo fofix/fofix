@@ -64,7 +64,7 @@ class EventDispatcher:
 
     def sysex_event(self, data):
         "Dispatcher for sysex events"
-        self.outstream.sysex_event(data)
+        self.outstream.system_exclusive(data)
 
 
     def eof(self):
