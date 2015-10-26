@@ -77,9 +77,6 @@ class Guitar(Instrument):
 
         #myfingershurt:
         self.hopoStyle        = self.engine.config.get("game", "hopo_system")
-        self.gh2sloppy        = self.engine.config.get("game", "gh2_sloppy")
-        if self.gh2sloppy == 1:
-            self.hopoStyle = 4
         self.sfxVolume    = self.engine.config.get("audio", "SFX_volume")
 
         #blazingamer

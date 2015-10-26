@@ -1524,7 +1524,7 @@ class GuitarScene(BandPlayBaseScene):
                 #MFH - should only be done the first time.
                 if self.hopoStyle > 0 or self.song.info.hopo == "on":
                     if not self.instruments[i].isDrum and not self.instruments[i].isVocal:
-                        if self.hopoStyle == 2 or self.hopoStyle == 3 or self.hopoStyle == 4:  #GH2 style HOPO system
+                        if self.hopoStyle == 2 or self.hopoStyle == 3:  #GH2 style HOPO system
                             self.song.track[i].markHopoGH2(self.song.info.eighthNoteHopo, self.hopoAfterChord, self.song.info.hopofreq)
                         elif self.hopoStyle == 1:   #RF-Mod style HOPO system
                             self.song.track[i].markHopoRF(self.song.info.eighthNoteHopo, self.song.info.hopofreq)
@@ -1535,7 +1535,7 @@ class GuitarScene(BandPlayBaseScene):
                         self.song.track[i].markBars()
                         if self.hopoStyle > 0 or self.song.info.hopo == "on":
                             if not self.instruments[i].isDrum:
-                                if self.hopoStyle == 2 or self.hopoStyle == 3 or self.hopoStyle == 4:  #GH2 style HOPO system
+                                if self.hopoStyle == 2 or self.hopoStyle == 3:  #GH2 style HOPO system
                                     self.song.track[i].markHopoGH2(self.song.info.eighthNoteHopo, self.hopoAfterChord, self.song.info.hopofreq)
                                 elif self.hopoStyle == 1:   #RF-Mod style HOPO system
                                     self.song.track[i].markHopoRF(self.song.info.eighthNoteHopo, self.song.info.hopofreq)
@@ -4117,9 +4117,6 @@ class GuitarScene(BandPlayBaseScene):
             if (self.hopoStyle == 2 and hopo == True):  #GH2 Strict
                 if (self.instruments[num].LastStrumWasChord or (self.instruments[num].wasLastNoteHopod and LastHopoFretStillHeld)):
                     ApplyPenalty = False
-
-            if (self.hopoStyle == 4 and hopo == True):  #GH2 Sloppy
-                ApplyPenalty = False
 
             if (self.hopoStyle == 3 and hopo == True):  #GH2
                 ApplyPenalty = False
