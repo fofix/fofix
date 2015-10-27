@@ -700,13 +700,13 @@ class GuitarScene(BandPlayBaseScene):
                 self.coOp     = False
                 self.coOpRB   = True
                 self.coOpType = True
-            elif self.gameMode2p == 5:
+            # mode 5 was coop gh
+            elif self.gameMode2p == 6:
                 self.battle   = False
-                self.battleGH = False
+                self.battleGH = True
                 self.coOp     = False
                 self.coOpRB   = False
-                self.coOpType = True
-            # mode 5 was coop gh
+                self.coOpType = False
             else:
                 self.battle   = False
                 self.coOp     = False
