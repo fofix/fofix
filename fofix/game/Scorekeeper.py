@@ -40,7 +40,7 @@ HANDICAP_NAMES = [_("Auto Kick Bass"), _("Medium Assist Mode"), _("Easy Assist M
                   _("Effects Saved SP"), _("All Tapping"), _("HOPO Frequency: Most"), _("HOPO Frequency: Even More"), \
                   _("HOPO Frequency: More"), _("HOPO Frequency: Less"), _("HOPO Frequency: Least"), _("HOPO Disabled!"), \
                   _("Hit Window: Tightest!"), _("Hit Window: Tight!"), _("Hit Window: Wider"), _("Hit Window: Widest"), \
-                  _("Two Note Chords"), _("No Fail Mode"), "Scalable Cheat", _("Sloppy Mode!")]
+                  _("Two Note Chords"), _("No Fail Mode"), "Scalable Cheat"]
 SCALABLE_NAMES = [_("Song Slowdown"), _("Early Hit Window Adjustment")]
 SCORE_MULTIPLIER = [0, 10, 20, 30]
 BASS_GROOVE_SCORE_MULTIPLIER = [0, 10, 20, 30, 40, 50]
