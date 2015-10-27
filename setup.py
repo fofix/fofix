@@ -348,7 +348,7 @@ class build_ext(_build_ext):
         if self.compiler == 'msvc':
             msvc = distutils.ccompiler.new_compiler(compiler='msvc', verbose=self.verbose, dry_run=self.dry_run, force=self.force)
             msvc.initialize()
-            for deffile in glob.glob(os.path.join(__file__, 'win32', 'deps', 'lib', '*.def')):
+            for deffile in glob.glob(os.path.join('..', 'win32', 'deps', 'lib', '*.def')):
                 libfile = os.path.splitext(deffile)[0] + '.lib'
                 if newer(deffile, libfile):
                     msvc.spawn([msvc.lib, '/nologo', '/machine:x86', '/out:'+libfile, '/def:'+deffile])
