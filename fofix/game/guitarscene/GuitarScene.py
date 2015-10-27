@@ -1297,7 +1297,7 @@ class GuitarScene(BandPlayBaseScene):
         self.players[0].hopoFreq = self.song.info.hopofreq
 
         bassGrooveEnableSet = self.engine.config.get("game", "bass_groove_enable")
-        if bassGrooveEnableSet == 1 and self.theme == 2:
+        if bassGrooveEnableSet == 1:
             self.bassGrooveEnabled = True
         elif bassGrooveEnableSet == 2 and self.song.midiStyle == Song.MIDI_TYPE_RB:
             self.bassGrooveEnabled = True
@@ -1381,10 +1381,7 @@ class GuitarScene(BandPlayBaseScene):
         self.markSolos = self.engine.config.get("game", "mark_solo_sections")
         if self.markSolos == 2:
             if self.engine.theme.markSolos == 2:
-                if self.theme == 2:
-                    self.markSolos = 1
-                else:
-                    self.markSolos = 0
+                self.markSolos = 1
             else:
                 self.markSolos = self.engine.theme.markSolos
 
@@ -1664,10 +1661,7 @@ class GuitarScene(BandPlayBaseScene):
 
         if self.midiLyricsEnabled > 0 and (self.midiLyricMode == 1 or self.midiLyricMode == 2) and not self.playingVocals:   #line-by-line lyrics mode is selected and enabled:
             lyricFont = self.engine.data.songFont
-            if self.theme == 2:
-                txtSize = 0.00170
-            else:
-                txtSize = 0.00175
+            txtSize = 0.00170
             self.lyricHeight = lyricFont.getStringSize("A", scale = txtSize)[1]
 
             #MFH - now we need an appropriate array to store and organize the lyric events into "lines"
@@ -4927,10 +4921,7 @@ class GuitarScene(BandPlayBaseScene):
                                 w, h = font.getStringSize(text,0.00175)
 
                                 posX = 0.98 - (w / 2)
-                                if self.theme == 2:
-                                    posY = 0.284
-                                else:
-                                    posY = 0.296
+                                posY = 0.296
 
                                 if self.hitAccuracyPos == 0: #Center
                                     posX = .500
@@ -5051,8 +5042,6 @@ class GuitarScene(BandPlayBaseScene):
                                             drawImage(self.part[j], scale = (.15,-.15), coord = (self.wFull*(.5-freeX+freeI*j),self.hFull*.58), color = (.8, .8, .8, 1))
 
                                     text = "%s" % scoreCard.endingScore
-                                    if self.theme == 2:
-                                        text = text.replace("0","O")
                                     tW, tH = self.solo_soloFont.getStringSize(text, scale = self.solo_txtSize)
                                     yOffset = 0.175
                                     xOffset = 0.500
@@ -5116,8 +5105,6 @@ class GuitarScene(BandPlayBaseScene):
                                             drawImage(self.part[j], scale = (.15,-.15), coord = (self.wFull*(.5-freeX+freeI*j),self.hFull*.58))
 
                                     text = "%s" % scoreCard.endingScore
-                                    if self.theme == 2:
-                                        text = text.replace("0","O")
                                     tW, tH = self.solo_soloFont.getStringSize(text, scale = self.solo_txtSize)
                                     yOffset = 0.175
                                     xOffset = 0.500
@@ -5184,8 +5171,6 @@ class GuitarScene(BandPlayBaseScene):
                                             drawImage(self.part[j], scale = (.15,-.15), coord = (self.wFull*(.5-freeX+freeI*j),self.hFull*.58), color = partcolor)
 
                                     text = "%s" % 0
-                                    if self.theme == 2:
-                                        text = text.replace("0","O")
                                     tW, tH = self.solo_soloFont.getStringSize(text, scale = self.solo_txtSize)
                                     yOffset = 0.175
                                     xOffset = 0.500
@@ -5243,11 +5228,7 @@ class GuitarScene(BandPlayBaseScene):
                                     w = self.wFull
                                     h = self.hFull
 
-                                    if self.theme == 2:
-                                        yOffset = 0.715
-                                    else:
-                                        #gh3 or other standard mod
-                                        yOffset = 0.69
+                                    yOffset = 0.715
 
                                     fadePeriod = 500.0
                                     f = (1.0 - min(1.0, abs(self.songTime - time) / fadePeriod) * min(1.0, abs(self.songTime - time - event.length) / fadePeriod)) ** 2
@@ -5259,13 +5240,8 @@ class GuitarScene(BandPlayBaseScene):
 
                                         xOffset = 0.5
                                         if self.scriptLyricPos == 0:
-                                            if self.theme == 2:
-                                                yOffset = 0.715
-                                                txtSize = 0.00170
-                                            else:
-                                                #gh3 or other standard mod
-                                                yOffset = 0.69
-                                                txtSize = 0.00175
+                                            yOffset = 0.715
+                                            txtSize = 0.00170
                                         else:   #display in lyric bar position
                                             yOffset = 0.0696    #last change +0.0000
                                             txtSize = 0.00160
@@ -5379,25 +5355,20 @@ class GuitarScene(BandPlayBaseScene):
 
                     # show song name
                     if self.countdown and self.song:
-                        cover = ""
+                        self.songDisplayPrefix = ""
                         if self.song.info.findTag("cover") == True: #kk69: misc changes to make it more GH/RB
-                            cover = "%s  \n " % self.tsAsMadeFamousBy #kk69: no more ugly colon! ^_^
-                        else:
-                            if self.theme == 2:
-                                cover = "" #kk69: for RB
-                            else:
-                                cover = self.tsBy   #kk69: for GH
+                            self.songDisplayPrefix = "%s  \n " % self.tsAsMadeFamousBy #kk69: no more ugly colon! ^_^
+
                         self.engine.theme.setBaseColor(min(1.0, 4.0 - abs(4.0 - self.countdown)))
-                        comma = ""
+
+                        comma = ', ' if self.song.info.year else ""
                         extra = ""
-                        if self.song.info.year: #add comma between year and artist
-                            comma = ", "
                         if self.song.info.frets:
                             extra = "%s \n %s%s" % (extra, self.tsFrettedBy, self.song.info.frets)
                         if self.song.info.version:
                             extra = "%s \n v%s" % (extra, self.song.info.version)
 
-                        Dialogs.wrapText(songFont, (self.songInfoDisplayX, self.songInfoDisplayY - h / 2), "%s \n %s%s%s%s%s" % (Song.removeSongOrderPrefixFromName(self.song.info.name), cover, self.song.info.artist, comma, self.song.info.year, extra), rightMargin = .6, scale = self.songInfoDisplayScale)
+                        Dialogs.wrapText(songFont, (self.songInfoDisplayX, self.songInfoDisplayY - h / 2), "%s \n %s%s%s%s%s" % (Song.removeSongOrderPrefixFromName(self.song.info.name), self.songDisplayPrefix, self.song.info.artist, comma, self.song.info.year, extra), rightMargin = .6, scale = self.songInfoDisplayScale)
                     else:
                         #mfh: this is where the song countdown display is generated:
                         if countdownPos < 0:
