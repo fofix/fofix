@@ -67,7 +67,7 @@ class MyConfigParser(RawConfigParser):
                     #self._read(fp, filename)
                     configData = fp.read()
                 configLines = configData.split('\n')
-                configLines = [line for line in configSplit
+                configLines = [line for line in configLines
                                    if line.strip()[0:2] != '//']
                 configData = '\n'.join(configLines)
                 strFp = StringIO.StringIO(configData)
