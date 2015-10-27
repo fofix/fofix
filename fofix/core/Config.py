@@ -53,8 +53,8 @@ class MyConfigParser(RawConfigParser):
         for section in sorted(self.sections()):
             if section not in ("theme", "controller", "player"):
                 self._writeSection(fp, section, self.items(section))
+
     def read(self, filenames, encoding=None):
-        print filenames
         if isinstance(filenames, str) or isinstance(filenames, unicode):
             filenames = [filenames]
 
