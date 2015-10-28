@@ -4,7 +4,7 @@
 #                                                                   #
 # Frets on Fire X                                                   #
 # Copyright (C) 2009-2011 FoFiX Team                                #
-#               2006 Sami Kyöstilä                                  #
+#               2006 Sami KyÃ¶stilÃ¤                                  #
 #                                                                   #
 # This program is free software; you can redistribute it and/or     #
 # modify it under the terms of the GNU General Public License       #
@@ -76,7 +76,7 @@ if os.name == 'nt':
                 #stump: the parameter below must consist only of up to four numerical fields separated by dots
                 Version.versionNum(),
                 file_description="Frets on Fire X",
-                legal_copyright=r"© 2008-2013 FoFiX Team.  GNU GPL v2 or later.",
+                legal_copyright=r"Â© 2008-2013 FoFiX Team.  GNU GPL v2 or later.",
                 company_name="FoFiX Team",
                 internal_name="FoFiX.exe",
                 original_filename="FoFiX.exe",
@@ -98,7 +98,7 @@ elif sys.platform == 'darwin':
     setup_args.update({
       'app': ['FoFiX.py'],
       'data_files': [
-        (".", ["./AUTHORS", "./COPYING", "./CREDITS", "./CHANGELOG", "./makefile", "../README.md"]),
+        (".", ["./AUTHORS", "./COPYING", "./CREDITS", "./CHANGELOG", "./makefile", "./README.md"]),
         ("doc", glob.glob("./doc/*")),
         ("data", glob.glob("./data/*")),
       ],

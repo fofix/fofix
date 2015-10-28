@@ -36,7 +36,7 @@ class World:
         self.minPlayers   = players
         self.maxPlayers   = maxplayers or players
         self.gameMode     = gameMode  #Quickplay, Practice, Career
-        self.multiMode    = multiMode #Face-Off, Pro FO, Co-Op, RB Co-Op, Battle
+        self.multiMode    = multiMode #Face-Off, Pro FO, Co-Op, RB Co-Op
         self.allowGuitar  = allowGuitar
         self.allowDrum    = allowDrum
         self.allowMic     = allowMic

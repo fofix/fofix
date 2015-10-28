@@ -716,26 +716,6 @@ class SettingsMenu(Menu.Menu):
         ]
         self.advancedGameSettingsMenu = Menu.Menu(self.engine, self.advancedGameSettings, pos = (self.opt_text_x, self.opt_text_y), textColor = self.opt_text_color, selectedColor = self.opt_selected_color)
 
-        self.battleObjectSettings = [
-          ConfigChoice(engine, engine.config, "game", "battle_Whammy", autoApply = True),
-          ConfigChoice(engine, engine.config, "game", "battle_Diff_Up", autoApply = True),
-          ConfigChoice(engine, engine.config, "game", "battle_String_Break", autoApply = True),
-          ConfigChoice(engine, engine.config, "game", "battle_Double", autoApply = True),
-          ConfigChoice(engine, engine.config, "game", "battle_Death_Drain", autoApply = True),
-          ConfigChoice(engine, engine.config, "game", "battle_Amp_Overload", autoApply = True),
-          ConfigChoice(engine, engine.config, "game", "battle_Switch_Controls", autoApply = True),
-          ConfigChoice(engine, engine.config, "game", "battle_Steal", autoApply = True),
-          ConfigChoice(engine, engine.config, "game", "battle_Tune", autoApply = True),
-        ]
-
-        self.battleObjectSettingsMenu = Menu.Menu(self.engine, self.battleObjectSettings, pos = (self.opt_text_x, self.opt_text_y), textColor = self.opt_text_color, selectedColor = self.opt_selected_color)
-
-        self.battleSettings = [
-          (_("Battle Objects"), self.battleObjectSettingsMenu, _("Set which objects can appear in Battle Mode")),
-        ]
-
-        self.battleSettingsMenu = Menu.Menu(self.engine, self.battleSettings, pos = (self.opt_text_x, self.opt_text_y), textColor = self.opt_text_color, selectedColor = self.opt_selected_color)
-
         self.basicSettings = [
           ConfigChoice(self.engine, self.engine.config, "game",  "language"),
           ConfigChoice(self.engine, self.engine.config, "game", "T_sound", autoApply = True), #Faaa Drum sound
@@ -749,7 +729,6 @@ class SettingsMenu(Menu.Menu):
           (_("Advanced Gameplay Settings"), self.advancedGameSettingsMenu, _("Set advanced gameplay settings that affect the game rules.")),
           (_("Vocal Mode Settings"), self.lyricsSettingsMenu, _("Change settings that affect lyrics and in-game vocals.")),
           (_("HO/PO Settings"), self.hopoSettingsMenu, _("Change settings that affect hammer-ons and pull-offs (HO/PO).")),
-          (_("Battle Settings"), self.battleSettingsMenu, _("Change settings that affect battle mode.")),
         ]
 
         self.basicSettingsMenu = Menu.Menu(self.engine, self.basicSettings, pos = (self.opt_text_x, self.opt_text_y), textColor = self.opt_text_color, selectedColor = self.opt_selected_color)
