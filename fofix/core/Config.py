@@ -54,7 +54,7 @@ class MyConfigParser(RawConfigParser):
             if section not in ("theme", "controller", "player"):
                 self._writeSection(fp, section, self.items(section))
 
-    def read(self, filenames, encoding=None):
+    def read(self, filenames):
         if isinstance(filenames, str) or isinstance(filenames, unicode):
             filenames = [filenames]
 
@@ -63,8 +63,6 @@ class MyConfigParser(RawConfigParser):
             configData = None
             try:
                 with open(filename) as fp:
-
-                    #self._read(fp, filename)
                     configData = fp.read()
                 configLines = configData.split('\n')
                 configLines = [line for line in configLines
@@ -72,9 +70,10 @@ class MyConfigParser(RawConfigParser):
                 configData = '\n'.join(configLines)
                 strFp = StringIO.StringIO(configData)
                 self._read(strFp, filename)
-            except OSError:
+            except IOError:
                 continue
             read_ok.append(filename)
+
         return read_ok
 
     def writeController(self, fp):
