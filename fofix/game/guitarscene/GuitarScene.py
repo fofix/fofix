@@ -3132,16 +3132,13 @@ class GuitarScene(BandPlayBaseScene):
                 # increment song position
                 self.songTime += ticks
                 sngDiff = abs(sngPos - self.songTime)
-                if sngDiff > 100: # Correct the random large diff.
+                if sngDiff > 100: # Correct for potential large lag spikes
                     self.songTime = sngPos
-                    print 'BOOOM: skipped ahead!!'
-                elif sngDiff < 1.0:
-                    pass#print 'within range'
-                elif self.songTime > sngPos:
-                    print 'Adapting: Too fast', sngDiff, 'ms'
+                elif sngDiff < 1.0: # normal operation
+                    pass
+                elif self.songTime > sngPos: # to fast
                     self.songTime -= 0.1
-                elif self.songTime < sngPos:
-                    print 'Adapting: To slow', sngDiff, 'ms'
+                elif self.songTime < sngPos: # to slow
                     self.songTime += 0.1
 
                 self.song.update(ticks)
