@@ -128,50 +128,7 @@ class Instrument(object):
 
         self.cappedScoreMult = 0
 
-        self.battleSuddenDeath  = False
-        self.battleObjectsEnabled = []
-        self.battleSDObjectsEnabled = []
-        if self.engine.config.get("game", "battle_Whammy") == 1:
-            self.battleObjectsEnabled.append(4)
-        if self.engine.config.get("game", "battle_Diff_Up") == 1:
-            self.battleObjectsEnabled.append(2)
-        if self.engine.config.get("game", "battle_String_Break") == 1:
-            self.battleObjectsEnabled.append(3)
-        if self.engine.config.get("game", "battle_Double") == 1:
-            self.battleObjectsEnabled.append(7)
-        if self.engine.config.get("game", "battle_Death_Drain") == 1:
-            self.battleObjectsEnabled.append(1)
-        if self.engine.config.get("game", "battle_Amp_Overload") == 1:
-            self.battleObjectsEnabled.append(8)
-        if self.engine.config.get("game", "battle_Switch_Controls") == 1:
-            self.battleObjectsEnabled.append(6)
-        if self.engine.config.get("game", "battle_Steal") == 1:
-            self.battleObjectsEnabled.append(5)
-
-        log.debug("Battle Objects Enabled: "+str(self.battleObjectsEnabled))
-        self.battleNextObject   = 0
-        self.battleObjects      = [0] * 3
-        self.battleBeingUsed    = [0] * 2
-        self.battleStatus       = [False] * 9
-        self.battleStartTimes    = [0] * 9
-        self.battleGetTime      = 0
         self.battleTarget       = 0
-
-        self.battleLeftyLength  = 8000
-        self.battleDiffUpLength = 15000
-        self.battleDiffUpValue  = playerObj.getDifficultyInt()
-        self.battleDoubleLength = 8000
-        self.battleAmpLength    = 8000
-        self.battleWhammyLimit  = 6
-        self.battleWhammyNow    = 0
-        self.battleWhammyDown   = False
-        self.battleBreakLimit   = 8.0
-        self.battleBreakNow     = 0.0
-        self.battleBreakString  = 0
-        self.battleObjectGained = 0
-        self.battleSuddenDeath  = False
-        self.battleDrainStart   = 0
-        self.battleDrainLength  = 8000
 
         self.currentBpm     = 120.0   #MFH - need a default 120BPM to be set in case a custom song has no tempo events.
         self.currentPeriod  = 60000.0 / self.currentBpm
@@ -455,15 +412,7 @@ class Instrument(object):
                 engine.loadImgDrawing(self, "noteAnimatedPowerActive", get("animated_power_active.png"))
                 engine.loadImgDrawing(self, "noteAnimatedPowerActiveHOPO", get("animated_power_active_hopo.png"))
 
-                if self.gameMode2p == 6: #battle multiplayer
-                    if engine.loadImgDrawing(self, "noteButtons", get("spinnotesbattle.png")):
-                        self.starSpinFrames = 8
-
-            if not self.isDrum and self.gameMode2p == 6: #battle multiplayer
-                if not self.engine.loadImgDrawing(self, "noteButtons", get("notesbattle.png")):
-                    engine.loadImgDrawing(self, "noteButtons", get("notes.png"))
-            else:
-                engine.loadImgDrawing(self, "noteButtons", get("notes.png"))
+            engine.loadImgDrawing(self, "noteButtons", get("notes.png"))
 
             size = (self.boardWidth/self.strings/2, self.boardWidth/self.strings/2)
             self.noteVtx = np.array([[-size[0],  0.0, size[1]],
@@ -527,8 +476,6 @@ class Instrument(object):
         get = lambda file: self.checkPath("frets", file)
 
         if self.twoDkeys == True: #death_au
-            if self.gameMode2p == 6:
-                engine.loadImgDrawing(self, "battleFrets", get("battle_frets.png"))
             engine.loadImgDrawing(self, "fretButtons", get("fretbuttons.png"))
         else:
             defaultKey = False
@@ -685,9 +632,6 @@ class Instrument(object):
                     not (event.hopod or event.played or event.skipped) and
                     (time >= (pos - self.lateMargin)) and (time <= (pos + self.earlyMargin)) ]
 
-        if not self.isDrum and self.battleStatus[7]:
-            notes = self.getDoubleNotes(notes)
-
         return sorted(notes, key=lambda x: x[0])
 
     def areNotesTappable(self, notes):
@@ -720,34 +664,8 @@ class Instrument(object):
         return sorted(notes, key=lambda x: x[0])
 
     def getRequiredNotesForRender(self, song, pos):
-        if self.battleStatus[2] and self.difficulty != 0:
-            log.debug(self.battleDiffUpValue)
-            song.difficulty[self.player] = Song.difficulties[self.battleDiffUpValue]
-            track0 = song.track[self.player]
-            notes0 = [(time, event) for time, event in track0.getEvents(pos - self.currentPeriod * 2, pos + self.currentPeriod * self.beatsPerBoard)]
-
-            song.difficulty[self.player] = Song.difficulties[self.battleDiffUpValue - 1]
-            track1   = song.track[self.player]
-            notes1 = [(time, event) for time, event in track1.getEvents(pos - self.currentPeriod * 2, pos + self.currentPeriod * self.beatsPerBoard)]
-
-            notes = []
-            for time,note in notes0:
-                if time < self.battleStartTimes[2] + self.currentPeriod * self.beatsPerBoard or time > self.battleStartTimes[2] - self.currentPeriod * self.beatsPerBoard + self.battleDiffUpLength:
-                    notes.append((time,note))
-            for time,note in notes1:
-                if time > self.battleStartTimes[2] + self.currentPeriod * self.beatsPerBoard and time < self.battleStartTimes[2] - self.currentPeriod * self.beatsPerBoard + self.battleDiffUpLength:
-                    notes.append((time,note))
-            notes0 = None
-            notes1 = None
-            track0 = None
-            track1 = None
-            notes = sorted(notes, key=lambda x: x[0])
-        else:
-            track   = song.track[self.player]
-            notes = [(time, event) for time, event in track.getEvents(pos - self.currentPeriod * 2, pos + self.currentPeriod * self.beatsPerBoard)]
-
-        if self.battleStatus[7]:
-            notes = self.getDoubleNotes(notes)
+        track   = song.track[self.player]
+        notes = [(time, event) for time, event in track.getEvents(pos - self.currentPeriod * 2, pos + self.currentPeriod * self.beatsPerBoard)]
         return notes
 
 
@@ -1317,20 +1235,11 @@ class Instrument(object):
                             for dfEvent in self.drumFillEvents:
                                 dfEvent.happened = True
                         log.debug("star power added")
-                        if self.gameMode2p == 6 and not self.isDrum:
-                            if self.battleSuddenDeath:
-                                self.battleObjects = [1] + self.battleObjects[:2]
-                            else:
-                                self.battleObjects = [self.battleObjectsEnabled[random.randint(0,len(self.battleObjectsEnabled)-1)]] + self.battleObjects[:2]
-                            self.battleGetTime = pos
-                            self.battleObjectGained = True
-                            log.debug("Battle Object Gained, Objects %s" % str(self.battleObjects))
-                        else:
 
-                            if self.starPower < 100:
-                                self.starPower += 25
-                            if self.starPower > 100:
-                                self.starPower = 100
+                        if self.starPower < 100:
+                            self.starPower += 25
+                        if self.starPower > 100:
+                            self.starPower = 100
                         self.overdriveFlashCount = 0  #MFH - this triggers the oFlash strings & timer
                         self.starPowerGained = True
 
@@ -1376,12 +1285,7 @@ class Instrument(object):
                 if shaders.turnon:
                     shaders.setVar("note_position",(x, (1.0 - visibility) ** (event.number + 1), z),"notes")
 
-                if self.battleStatus[8]:
-                    renderNote = random.randint(0,2)
-                else:
-                    renderNote = 0
-                if renderNote == 0:
-                    self.renderNote(length, sustain = sustain, color = color, tailOnly = tailOnly, isTappable = isTappable, fret = event.number, spNote = self.spNote)
+                self.renderNote(length, sustain = sustain, color = color, tailOnly = tailOnly, isTappable = isTappable, fret = event.number, spNote = self.spNote)
                 gl.glPopMatrix()
 
         #myfingershurt: end FOR loop / note rendering loop
@@ -1561,10 +1465,7 @@ class Instrument(object):
             gl.glRotate(self.keyrot[4], 0, 1, 0)
             gl.glTranslatef(0, 0, self.keypos[4])
 
-        if self.battleStatus[4]:
-            gl.glTranslatef(x, y + self.battleWhammyNow * .15 + color[3] * 6, 0)
-        else:
-            gl.glTranslatef(x, y + color[3] * 6, 0)
+        gl.glTranslatef(x, y + color[3] * 6, 0)
 
         if texture:
             gl.glColor4f(1,1,1,color[3]+1.0)
@@ -1635,10 +1536,7 @@ class Instrument(object):
                     gl.glColor3f(c[0] * (1 - ms), c[1] * (1 - ms), c[2] * (1 - ms))
 
                     gl.glPushMatrix()
-                    if self.battleStatus[4]:
-                        gl.glTranslatef(x, y + self.battleWhammyNow * .15, 0)
-                    else:
-                        gl.glTranslatef(x, y, 0)
+                    gl.glTranslatef(x, y, 0)
                     gl.glScalef(.1 + .02 * ms * f, .1 + .02 * ms * f, .1 + .02 * ms * f)
                     gl.glRotatef( 90, 0, 1, 0)
                     gl.glRotatef(-90, 1, 0, 0)
@@ -1659,14 +1557,9 @@ class Instrument(object):
 
                 f += 2
 
-                if self.battleStatus[4]:
-                    draw3Dtex(self.glowDrawing, coord = (x, self.battleWhammyNow * .15, 0.01), rot = (f * 90 + self.time, 0, 1, 0),
-                                        texcoord = (0.0, 0.0, 1.0, 1.0), vertex = (-size * f, -size * f, size * f, size * f),
-                                        multiples = True, alpha = True, color = glowcol)
-                else:
-                    draw3Dtex(self.glowDrawing, coord = (x, 0, 0.01), rot = (f * 90 + self.time, 0, 1, 0),
-                                        texcoord = (0.0, 0.0, 1.0, 1.0), vertex = (-size * f, -size * f, size * f, size * f),
-                                        multiples = True, alpha = True, color = glowcol)
+                draw3Dtex(self.glowDrawing, coord = (x, 0, 0.01), rot = (f * 90 + self.time, 0, 1, 0),
+                                    texcoord = (0.0, 0.0, 1.0, 1.0), vertex = (-size * f, -size * f, size * f, size * f),
+                                    multiples = True, alpha = True, color = glowcol)
 
     def renderTail(self, song, length, sustain, kill, color, tailOnly = False, isTappable = False, big = False, fret = 0, spNote = False, freestyleTail = 0, pos = 0):
 
@@ -2072,16 +1965,11 @@ class Instrument(object):
             gl.glPushMatrix()
             gl.glTranslatef(x, (1.0 - visibility) ** (event.number + 1), z)
 
-            if self.battleStatus[8]:
-                renderNote = random.randint(0,2)
+            if big == True and num < self.bigMax:
+                num += 1
+                self.renderTail(song, length, sustain = sustain, kill = killswitch, color = color, tailOnly = tailOnly, isTappable = isTappable, big = True, fret = event.number, spNote = spNote, pos = pos)
             else:
-                renderNote = 0
-            if renderNote == 0:
-                if big == True and num < self.bigMax:
-                    num += 1
-                    self.renderTail(song, length, sustain = sustain, kill = killswitch, color = color, tailOnly = tailOnly, isTappable = isTappable, big = True, fret = event.number, spNote = spNote, pos = pos)
-                else:
-                    self.renderTail(song, length, sustain = sustain, kill = killswitch, color = color, tailOnly = tailOnly, isTappable = isTappable, fret = event.number, spNote = spNote, pos = pos)
+                self.renderTail(song, length, sustain = sustain, kill = killswitch, color = color, tailOnly = tailOnly, isTappable = isTappable, fret = event.number, spNote = spNote, pos = pos)
 
             gl.glPopMatrix()
 

@@ -127,20 +127,16 @@ class Guitar(Instrument):
                 size = (self.boardWidth / self.strings / 2, self.boardWidth / self.strings / 2.4)
                 texSize = (n / self.lanenumber, n / self.lanenumber + 1 / self.lanenumber)
 
-                if self.battleStatus[3] and self.battleFrets != None and self.battleBreakString == n:
-                    texSize = (n/5.0+.042,n/5.0+0.158)
-                    size = (.30, .40)
-                    fretPos = 8 - round((self.battleBreakNow/self.battleBreakLimit) * 8)
-                    texY = (fretPos/8.0,(fretPos + 1.0)/8)
+                # fret normal guitar/bass/drums
+                texY = (0.0, 1.0 / self.fretImgColNumber)
 
-                else:
-                    texY = (0.0, 1.0 / self.fretImgColNumber)#fret normal guitar/bass/drums
+                # fret press
+                if controls.getState(self.keys[n]) or controls.getState(self.keys[n+5]):
+                    texY = (1.0 / self.fretImgColNumber, 2.0 / self.fretImgColNumber)
 
-                    if controls.getState(self.keys[n]) or controls.getState(self.keys[n+5]):#fret press
-                        texY = (1.0 / self.fretImgColNumber, 2.0 / self.fretImgColNumber)
-
-                    elif self.hit[n] or (self.battleStatus[3] and self.battleBreakString == n):#frets on note hit
-                        texY = (2.0 / self.fretImgColNumber,1.0)
+                #frets on note hit
+                elif self.hit[n]:
+                    texY = (2.0 / self.fretImgColNumber,1.0)
 
                 draw3Dtex(self.fretButtons, vertex = (size[0],size[1],-size[0],-size[1]), texcoord = (texSize[0], texY[0], texSize[1], texY[1]),
                                         coord = (x,v,0), multiples = True,color = fretColor, depth = True)
@@ -301,9 +297,6 @@ class Guitar(Instrument):
             gl.glEnable(gl.GL_COLOR_MATERIAL)
 
             if self.leftyMode:
-                if not self.battleStatus[6]:
-                    gl.glScalef(-1, 1, 1)
-            elif self.battleStatus[6]:
                 gl.glScalef(-1, 1, 1)
 
             if self.freestyleActive:
@@ -334,112 +327,7 @@ class Guitar(Instrument):
                 self.renderFlames(song, pos)    #MFH - only when freestyle inactive!
 
             if self.leftyMode:
-                if not self.battleStatus[6]:
-                    gl.glScalef(-1, 1, 1)
-            elif self.battleStatus[6]:
                 gl.glScalef(-1, 1, 1)
-
-    def getDoubleNotes(self, notes):
-        if self.battleStatus[7] and notes != []:
-            notes = sorted(notes, key=lambda x: x[0])
-            curTime = 0
-            tempnotes = []
-            tempnumbers = []
-            curNumbers = []
-            noteCount = 0
-            for time, note in notes:
-                noteCount += 1
-                if not isinstance(note, Note):
-                    if noteCount == len(notes) and len(curNumbers) < 3 and len(curNumbers) > 0:
-                        maxNote = curNumbers[0]
-                        minNote = curNumbers[0]
-                        for i in range(0, len(curNumbers)):
-                            if curNumbers[i] > maxNote:
-                                maxNote = curNumbers[i]
-                            if curNumbers[i] < minNote:
-                                minNote = curNumbers[i]
-                        curNumbers = []
-                        if maxNote < 4:
-                            tempnumbers.append(maxNote + 1)
-                        elif minNote > 0:
-                            tempnumbers.append(minNote - 1)
-                        else:
-                            tempnumbers.append(2)
-                    elif noteCount == len(notes) and len(curNumbers) > 2:
-                        tempnumbers.append(-1)
-                        curNumbers = []
-                    continue
-                if time != curTime:
-                    if curTime != 0 and len(curNumbers) < 3:
-                        maxNote = curNumbers[0]
-                        minNote = curNumbers[0]
-                        for i in range(0, len(curNumbers)):
-                            if curNumbers[i] > maxNote:
-                                maxNote = curNumbers[i]
-                            if curNumbers[i] < minNote:
-                                minNote = curNumbers[i]
-                        curNumbers = []
-                        if maxNote < 4:
-                            tempnumbers.append(maxNote + 1)
-                        elif minNote > 0:
-                            tempnumbers.append(minNote - 1)
-                        else:
-                            tempnumbers.append(2)
-                    elif (curTime != 0 or noteCount == len(notes)) and len(curNumbers) > 2:
-                        tempnumbers.append(-1)
-                        curNumbers = []
-                    tempnotes.append((time,deepcopy(note)))
-                    curTime = time
-                    curNumbers.append(note.number)
-                    if noteCount == len(notes) and len(curNumbers) < 3:
-                        maxNote = curNumbers[0]
-                        minNote = curNumbers[0]
-                        for i in range(0, len(curNumbers)):
-                            if curNumbers[i] > maxNote:
-                                maxNote = curNumbers[i]
-                            if curNumbers[i] < minNote:
-                                minNote = curNumbers[i]
-                        curNumbers = []
-                        if maxNote < 4:
-                            tempnumbers.append(maxNote + 1)
-                        elif minNote > 0:
-                            tempnumbers.append(minNote - 1)
-                        else:
-                            tempnumbers.append(2)
-                    elif noteCount == len(notes) and len(curNumbers) > 2:
-                        tempnumbers.append(-1)
-                        curNumbers = []
-                else:
-                    curNumbers.append(note.number)
-                    if noteCount == len(notes) and len(curNumbers) < 3:
-                        maxNote = curNumbers[0]
-                        minNote = curNumbers[0]
-                        for i in range(0, len(curNumbers)):
-                            if curNumbers[i] > maxNote:
-                                maxNote = curNumbers[i]
-                            if curNumbers[i] < minNote:
-                                minNote = curNumbers[i]
-                        curNumbers = []
-                        if maxNote < 4:
-                            tempnumbers.append(maxNote + 1)
-                        elif minNote > 0:
-                            tempnumbers.append(minNote - 1)
-                        else:
-                            tempnumbers.append(2)
-                    elif noteCount == len(notes) and len(curNumbers) > 2:
-                        tempnumbers.append(-1)
-                        curNumbers = []
-            noteCount = 0
-            for time, note in tempnotes:
-                if tempnumbers[noteCount] != -1:
-                    note.number = tempnumbers[noteCount]
-                    noteCount += 1
-                    if time > self.battleStartTimes[7] + self.currentPeriod * self.beatsPerBoard and time < self.battleStartTimes[7] - self.currentPeriod * self.beatsPerBoard + self.battleDoubleLength:
-                        notes.append((time,note))
-                else:
-                    noteCount += 1
-        return sorted(notes, key=lambda x: x[0])
-
 
     def controlsMatchNotes(self, controls, notes):
         # no notes?
