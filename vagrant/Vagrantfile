@@ -76,8 +76,34 @@ Vagrant.configure(2) do |config|
 
   config.vm.define "osx" do |osx|
     osx.vm.box = "jhcook/osx-elcapitan-10.11"
-    osx.vm.synced_folder "../", "/fofix"
     osx.vm.provider "virtualbox" do |vb|
+      osx.vm.synced_folder "../", "/fofix", type: "rsync"
+      if OS.windows?
+        vb.customize [
+          "modifyvm", :id,
+          "--audio", "dsound",
+          "--audiocontroller", "ac97"
+        ]
+      elsif OS.mac?
+        vb.customize [
+          "modifyvm", :id,
+          "--audio", "coreaudio",
+          "--audiocontroller", "ac97"
+        ]
+      elsif OS.unix? || OS.linux?
+        vb.customize [
+          "modifyvm", :id,
+          "--audio", "alsa",
+          "--audiocontroller", "ac97"
+        ]
+      end
+    end
+  end
+
+  config.vm.define "win81" do |win81|
+    win81.vm.box = "opentable/win-8.1-enterprise-amd64-nocm"
+    win81.vm.synced_folder "../", "/fofix"
+    win81.vm.provider "virtualbox" do |vb|
       if OS.windows?
         vb.customize [
           "modifyvm", :id,
