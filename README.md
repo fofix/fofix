@@ -26,6 +26,7 @@ Table of Contents
 6. [Building the translations](#Building-the-translations)
 7. [Starting the game](#Starting-the-game)
 8. [Making binaries](#Making-binaries)
+9. [Test environment](#TestEnv)
 
 <a name="Checking-out-the-latest-code"></a>
 Checking out the latest code
@@ -433,3 +434,21 @@ this section.
 We don't support GNU/Linux binaries anymore.  Just run from source for
 now; we'll make the standard `python setup.py install` do the right
 thing sooner or later (certainly before 4.0 is released).
+
+----
+<a name="TestEnv"></a>
+Test environment
+----------------
+
+In order to properly test FoFiX on multiples OSes, we use a Vagrant setup.
+
+1. Install [Vagrant](https://www.vagrantup.com/downloads.html) (available for Linux, OSX, Windows)
+2. Install [Virtualbox](https://www.virtualbox.org/wiki/Downloads)
+3. cd to vagrant subdirectory
+4. vagrant up
+
+At the moment, this should spawn a Ubuntu 14.04 Desktop VM, ready to launch FoFiX.
+
+Inside the VM :
+1. cd to /fofix
+2. python FoFiX.py
