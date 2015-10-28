@@ -3124,15 +3124,26 @@ class GuitarScene(BandPlayBaseScene):
     def run(self, ticks): #QQstarS: Fix this funcion
         super(GuitarScene, self).run(ticks)
         if self.song and self.song.readyToGo and not self.pause and not self.failed:
-
+            sngPos = self.song.getPosition()
             # calculate song position during the song countdown
-            if self.songTime <= -self.audioDelay:
-                sngPos = self.song.getPosition()
-                if sngPos == -self.song.delay:
-                    self.songTime = sngPos - self.countdown * self.song.period
+            if self.songTime <= -self.audioDelay and sngPos == -self.song.delay:
+                self.songTime = sngPos-(self.countdown * self.song.period)
             if not self.countdown and not self.resumeCountdown and not self.pause:
                 # increment song position
                 self.songTime += ticks
+                sngDiff = abs(sngPos - self.songTime)
+                if sngDiff > 100: # Correct the random large diff.
+                    self.songTime = sngPos
+                    print 'BOOOM: skipped ahead!!'
+                elif sngDiff < 1.0:
+                    pass#print 'within range'
+                elif self.songTime > sngPos:
+                    print 'Adapting: Too fast', sngDiff, 'ms'
+                    self.songTime -= 0.1
+                elif self.songTime < sngPos:
+                    print 'Adapting: To slow', sngDiff, 'ms'
+                    self.songTime += 0.1
+
                 self.song.update(ticks)
 
             if self.vbpmLogicType == 1:
