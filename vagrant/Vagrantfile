@@ -36,11 +36,7 @@ Vagrant.configure(2) do |config|
 
   config.vm.define "ubuntu" do |ubuntu|
     ubuntu.vm.box = "boxcutter/ubuntu1404-desktop"
-    ubuntu.vm.synced_folder "../", "/fofix"
-    # config.vm.network "forwarded_port", guest: 80, host: 8080
-    # config.vm.network "private_network", ip: "192.168.33.10"
-    # config.vm.network "public_network"
-    
+    ubuntu.vm.synced_folder "../", "/fofix", type: "rsync"  
     ubuntu.vm.provider "virtualbox" do |vb|
       if OS.windows?
         vb.customize [
@@ -101,7 +97,7 @@ Vagrant.configure(2) do |config|
   end
 
   config.vm.define "win81" do |win81|
-    win81.vm.box = "opentable/win-8.1-enterprise-amd64-nocm"
+    win81.vm.box = "modernIE/w8.1-ie11"
     win81.vm.synced_folder "../", "/fofix"
     win81.vm.provider "virtualbox" do |vb|
       if OS.windows?

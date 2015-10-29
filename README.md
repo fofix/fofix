@@ -444,10 +444,11 @@ In order to properly test FoFiX on multiples OSes, we use a Vagrant setup.
 
 1. Install [Vagrant](https://www.vagrantup.com/downloads.html) (available for Linux, OSX, Windows)
 2. Install [Virtualbox](https://www.virtualbox.org/wiki/Downloads)
-3. cd to vagrant subdirectory
-4. vagrant up
+3. Install [Virtual Box Guest extensions](http://download.virtualbox.org/virtualbox/5.0.8/Oracle_VM_VirtualBox_Extension_Pack-5.0.8-103449.vbox-extpack)
+4. cd to vagrant subdirectory
+5. vagrant up
 
-At the moment, this should spawn a Ubuntu 14.04 Desktop VM, ready to launch FoFiX.
+At the moment, this should spawn a Ubuntu 14.04 Desktop VM, ready to launch FoFiX, and a base OSX and Windows 8.1 VMs.
 
 Inside the VM :
 1. cd to /fofix
