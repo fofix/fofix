@@ -186,14 +186,13 @@ class GameEngine(object):
 
         self.config  = config
 
-        fps          = self.config.get("video", "fps")
+        self.fps = self.config.get("video", "fps")
 
-        self.fps = fps
         self.running = True
         self.clock = FpsTimer()
         self.tickDelta = 0
         self.task = TaskEngine(self)
-        
+
         # Compatiblity task management
         self.addTask = self.task.addTask
         self.removeTask = self.task.removeTask
