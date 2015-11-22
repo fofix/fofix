@@ -41,6 +41,7 @@ import imp
 from fretwork import log
 from fretwork.audio import Audio
 from fretwork.task import TaskEngine
+from fretwork.timer import FpsTimer
 
 from fofix.core.constants import *
 from fofix.core.Video import Video
@@ -54,7 +55,6 @@ from fofix.core.Language import _
 from fofix.core.Theme import Theme
 from fofix.core.Shader import shaders
 from fofix.core.Image import drawImage
-from fofix.core.timer import FpsTimer
 
 from fofix.core import cmgl
 from fofix.core import Config
