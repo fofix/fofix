@@ -141,7 +141,7 @@ Installed: {0}
 Required: {1}
 '''
 if getattr(fretwork, '__version__'): # The first version of fretwork didnt have __version__
-    version, verType = fretwork.__version__.split('-') # remove 'dev' from ver
+    version = fretwork.__version__.split('-')[0] # remove 'dev' from ver
     version = tuple([int(i) for i in version.split('.')])
 
     if version < fretworkRequired:
