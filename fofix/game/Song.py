@@ -2249,7 +2249,7 @@ class Song(object):
     def setInstrumentVolume(self, volume, part):
         # This function is called way to much during sustained notes.
         # IMO it should be called only if the note is hit or missed not
-        # paractically every game loop...
+        # practically every game loop...
         if not self.singleTrackSong:
             for trackId in TRACK_ID_NAME_MAP.keys():
                 if part == parts[trackId]:
@@ -3194,12 +3194,12 @@ def loadSong(engine, name, library = DEFAULT_LIBRARY, playbackOnly = False, note
                 songFiles[instName] = []
             songFiles[instName].append(engine.resource.fileName(library, name, f))
 
-        if 'song.ogg' not in songOggFiles:
+        if 'song' not in songFiles:
             songFiles['song'] = songFiles['guitar']
             del songFiles['guitar']
 
         # check to see if the guitar and song ogg's are the same file, if so use only one.
-        if 'song.ogg' in songOggFiles and 'guitar.ogg' in songOggFiles:
+        if 'song' in songFiles and 'guitar' in songFiles:
 
             with open(songFiles['song'][0], 'rb') as f:
                 songHash = hashlib.sha1(f.read()).hexdigest()
