@@ -113,9 +113,6 @@ class Drum(Instrument):
         self.fretWeight     = [0.0] * self.strings
         self.fretActivity   = [0.0] * self.strings
 
-        #myfingershurt:
-        self.hopoStyle = 0
-
         self.drumFretButtons = None
 
         #blazingamer

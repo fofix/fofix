@@ -303,7 +303,6 @@ class BandPlayBaseScene(Scene):
         if self.careerMode:
             self.autoPlay = False
 
-        self.hopoStyle        = self.engine.config.get("game", "hopo_system")
         self.allTaps          = 0
         self.autoKickBass     = [0 for i in self.players]
         self.hopoAfterChord = self.engine.config.get("game", "hopo_after_chord")
@@ -1215,8 +1214,6 @@ class GuitarScene(BandPlayBaseScene):
 
         Dialogs.changeLoadingSplashScreenText(self.engine, self.splash, self.phrase + " \n " + _("Preparing Note Phrases..."))
 
-
-
         if self.players[0].practiceMode or self.song.info.tutorial or self.tut:
             self.failingEnabled = False
 
@@ -1427,14 +1424,9 @@ class GuitarScene(BandPlayBaseScene):
                 #myfingershurt: preventing ever-thickening BPM lines after restarts
                 self.song.track[i].markBars()
                 #MFH - should only be done the first time.
-                if self.hopoStyle > 0 or self.song.info.hopo == "on":
-                    if not self.instruments[i].isDrum and not self.instruments[i].isVocal:
-                        if self.hopoStyle == 2 or self.hopoStyle == 3:  #GH2 style HOPO system
-                            self.song.track[i].markHopoGH2(self.song.info.eighthNoteHopo, self.hopoAfterChord, self.song.info.hopofreq)
-                        elif self.hopoStyle == 1:   #RF-Mod style HOPO system
-                            self.song.track[i].markHopoRF(self.song.info.eighthNoteHopo, self.song.info.hopofreq)
+                if not self.instruments[i].isDrum and not self.instruments[i].isVocal:
+                    self.song.track[i].markHopo(self.song.info.eighthNoteHopo, self.hopoAfterChord, self.song.info.hopofreq)
 
-        #myfingershurt: removing buggy disable stats option
         lastTime = 0
         for i in range(self.numOfPlayers):
             for time, event in self.song.track[i].getAllEvents():
@@ -1945,12 +1937,6 @@ class GuitarScene(BandPlayBaseScene):
                 if self.coOpType:
                     if (self.coOpScoreCard.handicap>>7)&1 != 1:
                         self.coOpScoreCard.handicap += 0x80
-            if self.hopoStyle == 0 and not self.instruments[i].isDrum: #no taps
-                if (scoreCard.handicap>>8)&1 != 1:
-                    scoreCard.handicap += 0x100
-                if self.coOpType:
-                    if (self.coOpScoreCard.handicap>>8)&1 != 1:
-                        self.coOpScoreCard.handicap += 0x100
             elif hopoFreq == 0 and songHopo != 1 and not self.instruments[i].isDrum:
                 if (scoreCard.handicap>>9)&1 != 1:
                     scoreCard.handicap += 0x200
@@ -3730,11 +3716,7 @@ class GuitarScene(BandPlayBaseScene):
             if pullOff:   #always ignore bad pull-offs
                 ApplyPenalty = False
 
-            if (self.hopoStyle == 2 and hopo == True):  #GH2 Strict
-                if (self.instruments[num].LastStrumWasChord or (self.instruments[num].wasLastNoteHopod and LastHopoFretStillHeld)):
-                    ApplyPenalty = False
-
-            if (self.hopoStyle == 3 and hopo == True):  #GH2
+            if hopo == True:
                 ApplyPenalty = False
                 if not (self.instruments[num].LastStrumWasChord or (self.instruments[num].wasLastNoteHopod and LastHopoFretStillHeld)):
                     self.instruments[num].hopoActive = 0
