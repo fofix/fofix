@@ -2963,13 +2963,9 @@ def loadSong(engine, name, library = DEFAULT_LIBRARY, playbackOnly = False, note
             # get the number of additional tracks
             instReNumbered = re.compile('^{0}_\d'.format(instName))
             numCount = len([i for i in songOggFiles if instReNumbered.match(i)])
-            
-            print f, bool(isNumbered), numCount
 
             # skip non numbered ogg files if there are others that are.
             if numCount > 0 and not isNumbered:
-
-                print 'Skipped', f
                 continue
 
             if instName not in songFiles:
