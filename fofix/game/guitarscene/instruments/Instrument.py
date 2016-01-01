@@ -28,11 +28,11 @@ import numpy as np
 
 from fretwork import log
 
-from fofix.game.Song import Note, Tempo
+from fofix.game.song import Note, Tempo, \
+    MarkerNote, FREESTYLE_MARKING_NOTE
 from fofix.core.Image import draw3Dtex
 from fofix.core.Shader import shaders
 from fofix.core.Mesh import Mesh
-from fofix.game import Song
 from fofix.core import cmgl
 
 
@@ -1766,8 +1766,8 @@ class Instrument(object):
                 self.drumFillsActive = False
                 drumFillEvents = []
             for time, event in track.getEvents(pos - self.freestyleOffset, boardWindowMax + self.freestyleOffset):
-                if isinstance(event, Song.MarkerNote):
-                    if event.number == Song.freestyleMarkingNote and (not event.happened or self.bigRockEndingMarkerSeen):          #MFH - don't kill the BRE!
+                if isinstance(event, MarkerNote):
+                    if event.number == FREESTYLE_MARKING_NOTE and (not event.happened or self.bigRockEndingMarkerSeen):          #MFH - don't kill the BRE!
                         if self.isDrum:
                             drumFillEvents.append(event)
                         length     = (event.length - 50) / self.currentPeriod / beatsPerUnit

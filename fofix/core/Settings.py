@@ -38,7 +38,7 @@ from fretwork import log
 from fofix.core.Language import _
 from fofix.core.View import BackgroundLayer
 from fofix.core.Input import KeyListener
-from fofix.game.Song import VOCAL_PART
+from fofix.game.song import VOCAL_PART
 from fofix.game import Menu
 from fofix.game import Dialogs
 from fofix.core import Version

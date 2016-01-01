@@ -32,7 +32,7 @@
 from fretwork import log
 
 from fofix.core.Language import _
-from fofix.game import Song
+from fofix.game import song
 from fofix.core import Config
 
 HANDICAPS = [.75, 1.0, .8, .9, .75, .8, 1.05, 1.1, 1.03, 1.02, 1.01, .95, .9, .85, .7, .95, 0.0, .5, .7, .7]
@@ -89,7 +89,7 @@ class ScoreCard(object):
             self.star[0] = 0.0
         elif self.starScoring > 1: #RB-style (mult thresholds, optional 100% gold star)
             if self.starScoring == 4:
-                if self.instrument[0] == Song.BASS_PART and not self.coOpType:
+                if self.instrument[0] == song.BASS_PART and not self.coOpType:
                     self.star[6] = 6.78
                     self.star[5] = 4.62
                     self.star[4] = 2.77
@@ -98,9 +98,9 @@ class ScoreCard(object):
                     self.star[1] = 0.21
                     self.star[0] = 0.0
                 else:
-                    if self.instrument[0] == Song.DRUM_PART and not self.coOpType:
+                    if self.instrument[0] == song.DRUM_PART and not self.coOpType:
                         self.star[6] = 4.29
-                    elif self.instrument[0] == Song.VOCAL_PART and not self.coOpType:
+                    elif self.instrument[0] == song.VOCAL_PART and not self.coOpType:
                         self.star[6] = 4.18
                     else:
                         self.star[6] = 4.52
@@ -119,9 +119,9 @@ class ScoreCard(object):
                 self.star[0] = 0.0
                 if self.coOpType:
                     self.star[6] = 4.8
-                elif self.instrument[0] == Song.BASS_PART: # bass
+                elif self.instrument[0] == song.BASS_PART: # bass
                     self.star[6] = 4.8
-                elif self.instrument[0] == Song.DRUM_PART: # drum
+                elif self.instrument[0] == song.DRUM_PART: # drum
                     self.star[6] = 4.65
                 else:
                     self.star[6] = 5.3
@@ -163,7 +163,7 @@ class ScoreCard(object):
         self.freestyleWasJustActive = False  #MFH
 
     def getStarScores(self, tempExtraScore = 0):
-        if self.updateOnScore == 1 and self.instrument[0] != Song.VOCAL_PART:
+        if self.updateOnScore == 1 and self.instrument[0] != song.VOCAL_PART:
             avMult = float(self.score+tempExtraScore) / float(self.totalNotes * self.baseScore)
         else:
             avMult = self.avMult
@@ -240,7 +240,7 @@ class ScoreCard(object):
         except ZeroDivisionError:
             self.hitAccuracy = 0.0
         try:
-            if self.instrument[0] == Song.VOCAL_PART and not self.coOpType:
+            if self.instrument[0] == song.VOCAL_PART and not self.coOpType:
                 self.avMult = float(self.score)/float(self.baseScore)
             else:
                 self.avMult      = self.score/float(self.totalNotes*self.baseScore)
@@ -281,12 +281,12 @@ class ScoreCard(object):
         self.score += self.endingScore
 
     def getScoreMultiplier(self):
-        if self.instrument == [Song.BASS_PART] and self.bassGrooveEnabled:    #myfingershurt: bass groove
+        if self.instrument == [song.BASS_PART] and self.bassGrooveEnabled:    #myfingershurt: bass groove
             try:
                 return BASS_GROOVE_SCORE_MULTIPLIER.index((self.streak / 10) * 10) + 1
             except ValueError:
                 return len(BASS_GROOVE_SCORE_MULTIPLIER)
-        elif self.instrument == [Song.VOCAL_PART]:
+        elif self.instrument == [song.VOCAL_PART]:
             return min(self.streak + 1, 4)
         else:
             try:

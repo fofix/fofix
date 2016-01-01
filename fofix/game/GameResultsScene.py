@@ -50,7 +50,7 @@ from fofix.core.Language import _
 from fofix.game.Menu import Menu
 from fofix.game import Scorekeeper
 from fofix.game import Dialogs
-from fofix.game import Song
+from fofix.game import song
 from fofix.core import VFS
 
 
@@ -184,7 +184,7 @@ class GameResultsScene(Scene):
             else:
                 phrase = _("That's how it's done!")
         loadingScreen = Dialogs.showLoadingSplashScreen(self.engine, phrase)
-        self.engine.resource.load(self, "song", lambda: Song.loadSong(self.engine, songName, library = self.libraryName, notesOnly = True, part = [player.part for player in self.playerList]), onLoad = self.songLoaded, synch = True)
+        self.engine.resource.load(self, "song", lambda: song.loadSong(self.engine, songName, library = self.libraryName, notesOnly = True, part = [player.part for player in self.playerList]), onLoad = self.songLoaded, synch = True)
 
         self.fullView = self.engine.view.geometry[2:4]
 
@@ -506,12 +506,12 @@ class GameResultsScene(Scene):
         if self.delay[playerNum] > 0:
             self.delay[playerNum] = 0
 
-    def uploadHighscores(self, part = Song.parts[Song.GUITAR_PART], playerNum = 0, scoreExt = None):
+    def uploadHighscores(self, part = song.parts[song.GUITAR_PART], playerNum = 0, scoreExt = None):
         player = self.playerList[playerNum]
         i      = playerNum
         try:
             d = {
-              "songName": "%s" % (Song.removeSongOrderPrefixFromName(self.song.info.name)),
+              "songName": "%s" % (song.removeSongOrderPrefixFromName(self.song.info.name)),
               "songHash": self.song.getHash(),
               "scores":   None,
               "scores_ext": None,
@@ -800,9 +800,9 @@ class GameResultsScene(Scene):
 
         if self.song:
             try:
-                text = self.engine.theme.result_song_text % Song.removeSongOrderPrefixFromName(self.song.info.name)
+                text = self.engine.theme.result_song_text % song.removeSongOrderPrefixFromName(self.song.info.name)
             except TypeError:
-                text = "%s %s" % (Song.removeSongOrderPrefixFromName(self.song.info.name), self.engine.theme.result_song_text)
+                text = "%s %s" % (song.removeSongOrderPrefixFromName(self.song.info.name), self.engine.theme.result_song_text)
             try:
                 r, g, b = self.engine.theme.hexToColorResults(self.engine.theme.result_song[3])
                 glColor3f(r, g, b)
@@ -968,9 +968,9 @@ class GameResultsScene(Scene):
 
         if self.song:
             try:
-                text = self.engine.theme.result_song_text % Song.removeSongOrderPrefixFromName(self.song.info.name)
+                text = self.engine.theme.result_song_text % song.removeSongOrderPrefixFromName(self.song.info.name)
             except TypeError:
-                text = "%s %s" % (Song.removeSongOrderPrefixFromName(self.song.info.name), self.engine.theme.result_song_text)
+                text = "%s %s" % (song.removeSongOrderPrefixFromName(self.song.info.name), self.engine.theme.result_song_text)
             try:
                 r, g, b = self.engine.theme.hexToColorResults(self.engine.theme.result_song[3])
                 glColor3f(r, g, b)
@@ -1211,7 +1211,7 @@ class GameResultsScene(Scene):
 
         # evilynux - highscore
         if self.song is not None:
-            text = _("%s High Scores for %s") % (self.scorePart, Song.removeSongOrderPrefixFromName(self.song.info.name))
+            text = _("%s High Scores for %s") % (self.scorePart, song.removeSongOrderPrefixFromName(self.song.info.name))
         else:
             text = _("%s High Scores") % self.scorePart
         w1, h1 = font.getStringSize(text)

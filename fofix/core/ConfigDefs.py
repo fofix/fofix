@@ -18,7 +18,7 @@
 # MA  02110-1301, USA.                                              #
 #####################################################################
 
-from fofix.game.Song import difficulties, parts
+from fofix.game.song import difficulties, parts
 from fofix.core.Language import _
 from fofix.core import Config
 

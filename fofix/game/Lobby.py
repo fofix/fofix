@@ -39,7 +39,7 @@ from fofix.core.Language import _
 from fofix.core.View import Layer
 from fofix.game import Dialogs
 from fofix.core import Player
-from fofix.game import Song
+from fofix.game import song
 
 
 class WorldNotStarted(Exception):
@@ -339,7 +339,7 @@ class Lobby(Layer, KeyListener):
                     self.engine.mainMenu.cutMusic()
                     self.preparePlayers()
                     if self.tutorial:
-                        self.engine.world.startGame(libraryName = Song.DEFAULT_LIBRARY, songName = "tutorial")
+                        self.engine.world.startGame(libraryName = song.DEFAULT_LIBRARY, songName = "tutorial")
                         self.handleGameStarted()
                     else:
                         self.engine.world.startGame()

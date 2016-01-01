@@ -23,11 +23,11 @@
 # MA  02110-1301, USA.                                              #
 #####################################################################
 
-from Theme import *
+from fofix.core.Theme import *
 from OpenGL.GL import *
 from OpenGL.GLU import *
 import math
-import Song
+from fofix.game import song
 
 class CustomTheme(Theme):
     def __init__(self, path, name):
@@ -140,13 +140,13 @@ class CustomSetlist(Setlist):
             for i, item in enumerate(scene.items):
                 c = math.sin(scene.itemRenderAngles[i] * math.pi / 180)
 
-                if isinstance(item, Song.SongInfo):
+                if isinstance(item, song.SongInfo):
                     h = c * 4.0 + (1 - c) * .8
-                elif isinstance(item, Song.LibraryInfo):
+                elif isinstance(item, song.LibraryInfo):
                     h = c * 4.0 + (1 - c) * 1.2
-                elif isinstance(item, Song.TitleInfo) or isinstance(item, Song.SortTitleInfo):
+                elif isinstance(item, song.TitleInfo) or isinstance(item, song.SortTitleInfo):
                     h = c * 4.0 + (1 - c) * 2.4
-                elif isinstance(item, Song.RandomSongInfo):
+                elif isinstance(item, song.RandomSongInfo):
                     h = c * 4.0 + (1 - c) * .8
                 else:
                     continue
@@ -166,10 +166,10 @@ class CustomSetlist(Setlist):
                         label = scene.img_random_label
                     if not label:
                         label = scene.img_empty_label
-                    if isinstance(item, Song.SongInfo):
+                    if isinstance(item, song.SongInfo):
                         glRotate(scene.itemRenderAngles[i], 0, 0, 1)
                         self.renderItem(scene, item.cassetteColor, label)
-                    elif isinstance(item, Song.LibraryInfo):
+                    elif isinstance(item, song.LibraryInfo):
                         #myfingershurt: cd cases are backwards
                         glRotate(-scene.itemRenderAngles[i], 0, 1, 0)    #spin 90 degrees around y axis
                         glRotate(-scene.itemRenderAngles[i], 0, 1, 0)    #spin 90 degrees around y axis again, now case is corrected
@@ -177,7 +177,7 @@ class CustomSetlist(Setlist):
                         if i == scene.selectedIndex:
                             glRotate(((scene.time - scene.lastTime) * 4 % 360) - 90, 1, 0, 0)
                         self.renderLibrary(scene, item.color, label)
-                    elif isinstance(item, Song.TitleInfo):
+                    elif isinstance(item, song.TitleInfo):
                         #myfingershurt: cd cases are backwards
                         glRotate(-scene.itemRenderAngles[i], 0, 0.5, 0)    #spin 90 degrees around y axis
                         glRotate(-scene.itemRenderAngles[i], 0, 0.5, 0)    #spin 90 degrees around y axis again, now case is corrected
@@ -185,7 +185,7 @@ class CustomSetlist(Setlist):
                         if i == scene.selectedIndex:
                             glRotate(((scene.time - scene.lastTime) * 4 % 360) - 90, 1, 0, 0)
                         self.renderTitle(scene, item.color, label)
-                    elif isinstance(item, Song.RandomSongInfo):
+                    elif isinstance(item, song.RandomSongInfo):
                         #myfingershurt: cd cases are backwards
                         glRotate(scene.itemRenderAngles[i], 0, 0, 1)
                         self.renderRandom(scene, item.color, label)
@@ -247,13 +247,13 @@ class CustomSetlist(Setlist):
         f = ((90.0 - angle) / 90.0) ** 2
 
         cText = item.name
-        if (isinstance(item, Song.SongInfo) and item.getLocked()):
+        if (isinstance(item, song.SongInfo) and item.getLocked()):
             cText = _("-- Locked --")
 
         fh = lfont.getHeight()*0.0016
         lfont.render(cText, (x, y), scale = 0.0016)
 
-        if isinstance(item, Song.SongInfo):
+        if isinstance(item, song.SongInfo):
             self.theme.setBaseColor(1)
 
             c1,c2,c3 = self.artist_selected_color
@@ -330,7 +330,7 @@ class CustomSetlist(Setlist):
                 else:
                     score, stars, name = "---", 0, "---"
                 self.theme.setBaseColor(1)
-                font.render(Song.difficulties[d.id].text, (x, y), scale = scale)
+                font.render(song.difficulties[d.id].text, (x, y), scale = scale)
 
                 starscale = 0.02
                 stary = 1.0 - y/scene.engine.data.fontScreenBottom
@@ -346,7 +346,7 @@ class CustomSetlist(Setlist):
                 font.render(unicode(score), (x + .15, y),     scale = scale)
                 font.render(name,       (x + .15, y + fh),     scale = scale)
                 y += 2 * fh
-        elif isinstance(item, Song.LibraryInfo):
+        elif isinstance(item, song.LibraryInfo):
             self.theme.setBaseColor(1)
             c1,c2,c3 = self.library_selected_color
 
@@ -358,7 +358,7 @@ class CustomSetlist(Setlist):
                 songCount = _("%d Songs In This Setlist") % item.songCount
             font.render(songCount, (x, y + 3*fh), scale = 0.0016)
 
-        elif isinstance(item, Song.RandomSongInfo):
+        elif isinstance(item, song.RandomSongInfo):
             self.theme.setBaseColor(1 - v)
 
             c1,c2,c3 = self.song_name_selected_color

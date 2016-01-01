@@ -24,7 +24,7 @@ import unittest, pygame
 import shutil, os, sys
 
 from fofix.core.engine import GameEngine
-from Song import Song, Note
+from fofix.game.song import Song, Note
 from configuration import Config
 import Version
 

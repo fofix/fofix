@@ -30,8 +30,8 @@ import numpy as np
 from fretwork import log
 
 from fofix.core.Shader import shaders, mixColors
-from fofix.game.Song import Bars
-from fofix.game import Song
+from fofix.game.song import Bars, \
+    MarkerNote, SP_MARKING_NOTE, TK_GUITAR_SOLOS
 from fofix.core import cmgl
 
 class Neck:
@@ -442,7 +442,7 @@ class Neck:
         if self.incomingNeckMode > 0:   #if enabled
             if self.useMidiSoloMarkers:
                 for time, event in track.getEvents(boardWindowMin, boardWindowMax):
-                    if isinstance(event, Song.MarkerNote) and event.number == Song.starPowerMarkingNote:
+                    if isinstance(event, MarkerNote) and event.number == SP_MARKING_NOTE:
                         if event.endMarker:   #solo end
                             if self.incomingNeckMode == 2 and self.guitarSolo:    #render both start and end incoming necks and only until the end of the guitar solo
                                 if self.soloNeck or self.soloSideBars:
@@ -482,7 +482,7 @@ class Neck:
                                     self.renderIncomingNeck(visibility*alpha, song, pos, time, neckImg)
 
             elif self.markSolos == 1:   #fall back on text-based guitar solo marking track
-                for time, event in song.eventTracks[Song.TK_GUITAR_SOLOS].getEvents(boardWindowMin, boardWindowMax):
+                for time, event in song.eventTracks[TK_GUITAR_SOLOS].getEvents(boardWindowMin, boardWindowMax):
                     if self.canGuitarSolo:
                         if event.text.find("ON") >= 0:
 

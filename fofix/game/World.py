@@ -21,7 +21,7 @@
 # MA  02110-1301, USA.                                              #
 #####################################################################
 
-from fofix.game.Song import SongQueue
+from fofix.game.song import SongQueue
 from fofix.core.Language import _
 from fofix.core import Player
 from fofix.game import Dialogs

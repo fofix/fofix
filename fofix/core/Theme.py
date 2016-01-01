@@ -1054,7 +1054,8 @@ class Setlist:
         pass
 
     def renderUnselectedItem(self, scene, i, n):
-        from fofix.game import Song
+        
+        from fofix.game import song
 
         w, h = scene.geometry
         font = scene.fontDict['songListFont']
@@ -1067,26 +1068,26 @@ class Setlist:
             item = scene.items[i]
 
             glColor4f(0,0,0,1)
-            if isinstance(item, Song.SongInfo) or isinstance(item, Song.RandomSongInfo):
+            if isinstance(item, song.SongInfo) or isinstance(item, song.RandomSongInfo):
                 c1,c2,c3 = self.song_name_text_color
                 glColor3f(c1,c2,c3)
-            elif isinstance(item, Song.LibraryInfo):
+            elif isinstance(item, song.LibraryInfo):
                 c1,c2,c3 = self.library_text_color
                 glColor3f(c1,c2,c3)
-            elif isinstance(item, Song.TitleInfo) or isinstance(item, Song.SortTitleInfo):
+            elif isinstance(item, song.TitleInfo) or isinstance(item, song.SortTitleInfo):
                 c1,c2,c3 = self.career_title_color
                 glColor3f(c1,c2,c3)
 
             text = item.name
 
-            if isinstance(item, Song.SongInfo) and item.getLocked(): #TODO: SongDB
+            if isinstance(item, song.SongInfo) and item.getLocked(): #TODO: SongDB
                 text = _("-- Locked --")
 
-            if isinstance(item, Song.SongInfo): #MFH - add indentation when tier sorting
+            if isinstance(item, song.SongInfo): #MFH - add indentation when tier sorting
                 if scene.tiersPresent:
                     text = "    " + text
 
-            if isinstance(item, Song.TitleInfo) or isinstance(item, Song.SortTitleInfo):
+            if isinstance(item, song.TitleInfo) or isinstance(item, song.SortTitleInfo):
                 text = string.upper(text)
 
             scale = lfont.scaleText(text, maxwidth = 0.440)
@@ -1095,7 +1096,7 @@ class Setlist:
 
 
             #MFH - Song list score / info display:
-            if isinstance(item, Song.SongInfo) and not item.getLocked():
+            if isinstance(item, song.SongInfo) and not item.getLocked():
                 scale = 0.0009
                 text = scene.scoreDifficulty.text
                 c1,c2,c3 = self.songlist_score_color
@@ -1189,26 +1190,26 @@ class Setlist:
             if not scene.items:
                 return
             item = scene.items[i]
-            if isinstance(item, Song.SongInfo) or isinstance(item, Song.RandomSongInfo):
+            if isinstance(item, song.SongInfo) or isinstance(item, song.RandomSongInfo):
                 c1,c2,c3 = self.song_name_text_color
                 glColor4f(c1,c2,c3,1)
-            if isinstance(item, Song.LibraryInfo):
+            if isinstance(item, song.LibraryInfo):
                 c1,c2,c3 = self.library_text_color
                 glColor4f(c1,c2,c3,1)
-            if isinstance(item, Song.TitleInfo) or isinstance(item, Song.SortTitleInfo):
+            if isinstance(item, song.TitleInfo) or isinstance(item, song.SortTitleInfo):
                 c1,c2,c3 = self.career_title_color
                 glColor4f(c1,c2,c3,1)
             text = item.name
-            if isinstance(item, Song.SongInfo) and item.getLocked():
+            if isinstance(item, song.SongInfo) and item.getLocked():
                 text = _("-- Locked --")
-            if isinstance(item, Song.SongInfo): #MFH - add indentation when tier sorting
+            if isinstance(item, song.SongInfo): #MFH - add indentation when tier sorting
                 if scene.tiersPresent:
                     text = "    " + text
-            if isinstance(item, Song.TitleInfo) or isinstance(item, Song.SortTitleInfo):
+            if isinstance(item, song.TitleInfo) or isinstance(item, song.SortTitleInfo):
                 text = string.upper(text)
             scale = font.scaleText(text, maxwidth = 0.45)
             font.render(text, (self.song_listcd_list_xpos, .09*(n+1)), scale = scale)
-            if isinstance(item, Song.SongInfo) and not item.getLocked():
+            if isinstance(item, song.SongInfo) and not item.getLocked():
                 if item.frets != "":
                     suffix = ", ("+item.frets+")"
                 else:
@@ -1238,11 +1239,11 @@ class Setlist:
                 imgheight = scene.img_tier.height1()
                 wfactor = 381.1/imgwidth
                 hfactor = 24.000/imgheight
-                if isinstance(item, Song.TitleInfo) or isinstance(item, Song.SortTitleInfo) and scene.img_tier:
+                if isinstance(item, song.TitleInfo) or isinstance(item, song.SortTitleInfo) and scene.img_tier:
                     drawImage(scene.img_tier, scale = (wfactor,-hfactor), coord = (w/1.587, h-((0.055*h)*(n+1))-(0.219*h)))
 
             icon = None
-            if isinstance(item, Song.SongInfo):
+            if isinstance(item, song.SongInfo):
                 if item.icon != "":
                     try:
                         icon = scene.itemIcons[item.icon]
@@ -1251,7 +1252,7 @@ class Setlist:
                         drawImage(icon, scale = (wfactor,-wfactor), coord = (w/2.86, h-((0.055*h)*(n+1))-(0.219*h)))
                     except KeyError:
                         pass
-            elif isinstance(item, Song.LibraryInfo):
+            elif isinstance(item, song.LibraryInfo):
                 try:
                     icon = scene.itemIcons["Library"]
                     imgwidth = icon.width1()
@@ -1259,7 +1260,7 @@ class Setlist:
                     drawImage(icon, scale = (wfactor,-wfactor), coord = (w/2.86, h-((0.055*h)*(n+1))-(0.219*h)))
                 except KeyError:
                     pass
-            elif isinstance(item, Song.RandomSongInfo):
+            elif isinstance(item, song.RandomSongInfo):
                 try:
                     icon = scene.itemIcons["Random"]
                     imgwidth = icon.width1()
@@ -1268,23 +1269,23 @@ class Setlist:
                 except KeyError:
                     pass
 
-            if isinstance(item, Song.SongInfo) or isinstance(item, Song.LibraryInfo):
+            if isinstance(item, song.SongInfo) or isinstance(item, song.LibraryInfo):
                 c1,c2,c3 = self.song_name_text_color
                 glColor4f(c1,c2,c3,1)
-            elif isinstance(item, Song.TitleInfo) or isinstance(item, Song.SortTitleInfo):
+            elif isinstance(item, song.TitleInfo) or isinstance(item, song.SortTitleInfo):
                 c1,c2,c3 = self.career_title_color
                 glColor4f(c1,c2,c3,1)
-            elif isinstance(item, Song.RandomSongInfo):
+            elif isinstance(item, song.RandomSongInfo):
                 c1,c2,c3 = self.song_name_text_color
                 glColor4f(c1,c2,c3,1)
 
             text = item.name
 
 
-            if isinstance(item, Song.SongInfo) and item.getLocked():
+            if isinstance(item, song.SongInfo) and item.getLocked():
                 text = _("-- Locked --")
 
-            if isinstance(item, Song.SongInfo): #MFH - add indentation when tier sorting
+            if isinstance(item, song.SongInfo): #MFH - add indentation when tier sorting
                 if scene.tiersPresent or icon:
                     text = "    " + text
 
@@ -1292,7 +1293,7 @@ class Setlist:
             # evilynux - Force uppercase display for Career titles
             maxwidth = .55
 
-            if isinstance(item, Song.TitleInfo) or isinstance(item, Song.SortTitleInfo):
+            if isinstance(item, song.TitleInfo) or isinstance(item, song.SortTitleInfo):
                 text = string.upper(text)
 
             scale = .0015
@@ -1308,7 +1309,7 @@ class Setlist:
 
             font.render(text, (.35, .0413*(n+1)+.15), scale = scale)
 
-            if isinstance(item, Song.SongInfo):
+            if isinstance(item, song.SongInfo):
                 score = _("Nil")
                 stars = 0
                 name = ""
@@ -1359,7 +1360,8 @@ class Setlist:
                     font.render(text, (.92, .0413*(n+1)+.15), scale=scale, align = 2)
 
     def renderSelectedItem(self, scene, n):
-        from fofix.game import Song
+        
+        from fofix.game import song
 
         w, h = scene.geometry
         font = scene.fontDict['songListFont']
@@ -1368,7 +1370,7 @@ class Setlist:
         item = scene.selectedItem
         if not item:
             return
-        if isinstance(item, Song.BlankSpaceInfo):
+        if isinstance(item, song.BlankSpaceInfo):
             return
         if self.setlist_type == 0:
             return
@@ -1378,26 +1380,26 @@ class Setlist:
                 wfactor = scene.img_item_select.widthf(pixelw = 635.000)
                 drawImage(scene.img_item_select, scale = (wfactor,-wfactor), coord = (w/2.1, y))
             glColor4f(0,0,0,1)
-            if isinstance(item, Song.SongInfo) or isinstance(item, Song.RandomSongInfo):
+            if isinstance(item, song.SongInfo) or isinstance(item, song.RandomSongInfo):
                 c1,c2,c3 = self.song_name_selected_color
                 glColor3f(c1,c2,c3)
-            elif isinstance(item, Song.LibraryInfo):
+            elif isinstance(item, song.LibraryInfo):
                 c1,c2,c3 = self.library_selected_color
                 glColor3f(c1,c2,c3)
-            elif isinstance(item, Song.TitleInfo) or isinstance(item, Song.SortTitleInfo):
+            elif isinstance(item, song.TitleInfo) or isinstance(item, song.SortTitleInfo):
                 c1,c2,c3 = self.career_title_color
                 glColor3f(c1,c2,c3)
 
             text = item.name
 
-            if isinstance(item, Song.SongInfo) and item.getLocked(): #TODO: SongDB
+            if isinstance(item, song.SongInfo) and item.getLocked(): #TODO: SongDB
                 text = _("-- Locked --")
 
-            if isinstance(item, Song.SongInfo): #MFH - add indentation when tier sorting
+            if isinstance(item, song.SongInfo): #MFH - add indentation when tier sorting
                 if scene.tiersPresent:
                     text = "    " + text
 
-            if isinstance(item, Song.TitleInfo) or isinstance(item, Song.SortTitleInfo):
+            if isinstance(item, song.TitleInfo) or isinstance(item, song.SortTitleInfo):
                 text = string.upper(text)
 
             scale = sfont.scaleText(text, maxwidth = 0.440)
@@ -1406,7 +1408,7 @@ class Setlist:
 
 
             #MFH - Song list score / info display:
-            if isinstance(item, Song.SongInfo) and not item.getLocked():
+            if isinstance(item, song.SongInfo) and not item.getLocked():
                 scale = 0.0009
                 text = scene.scoreDifficulty.text
                 c1,c2,c3 = self.songlist_score_color
@@ -1506,7 +1508,7 @@ class Setlist:
             if scene.songLoader:
                 font.render(_("Loading Preview..."), (.05, .7), scale = 0.001)
 
-            if isinstance(item, Song.SongInfo):
+            if isinstance(item, song.SongInfo):
                 c1,c2,c3 = self.song_name_selected_color
                 glColor4f(c1,c2,c3,1)
                 if item.getLocked():
@@ -1523,7 +1525,7 @@ class Setlist:
                         text = _("Played %d times.") % count
                 else:
                     text = _("Quickplay")
-            elif isinstance(item, Song.LibraryInfo):
+            elif isinstance(item, song.LibraryInfo):
                 c1,c2,c3 = self.library_selected_color
                 glColor4f(c1,c2,c3,1)
                 if item.songCount == 1:
@@ -1532,41 +1534,41 @@ class Setlist:
                     text = _("There Are %d Songs In This Setlist.") % (item.songCount)
                 else:
                     text = ""
-            elif isinstance(item, Song.TitleInfo) or isinstance(item, Song.SortTitleInfo):
+            elif isinstance(item, song.TitleInfo) or isinstance(item, song.SortTitleInfo):
                 text = _("Tier")
                 c1,c2,c3 = self.career_title_color
                 glColor4f(c1,c2,c3,1)
-            elif isinstance(item, Song.RandomSongInfo):
+            elif isinstance(item, song.RandomSongInfo):
                 text = _("Random Song")
                 c1,c2,c3 = self.song_name_selected_color
                 glColor4f(c1,c2,c3,1)
 
             font.render(text, (self.song_listcd_score_xpos, .085), scale = 0.0012)
 
-            if isinstance(item, Song.SongInfo) or isinstance(item, Song.RandomSongInfo):
+            if isinstance(item, song.SongInfo) or isinstance(item, song.RandomSongInfo):
                 c1,c2,c3 = self.song_name_selected_color
                 glColor4f(c1,c2,c3,1)
-            elif isinstance(item, Song.LibraryInfo):
+            elif isinstance(item, song.LibraryInfo):
                 c1,c2,c3 = self.library_selected_color
                 glColor4f(c1,c2,c3,1)
-            elif isinstance(item, Song.TitleInfo) or isinstance(item, Song.SortTitleInfo):
+            elif isinstance(item, song.TitleInfo) or isinstance(item, song.SortTitleInfo):
                 c1,c2,c3 = self.career_title_color
                 glColor4f(c1,c2,c3,1)
             text = item.name
-            if isinstance(item, Song.SongInfo) and item.getLocked():
+            if isinstance(item, song.SongInfo) and item.getLocked():
                 text = _("-- Locked --")
 
-            if isinstance(item, Song.SongInfo): #MFH - add indentation when tier sorting
+            if isinstance(item, song.SongInfo): #MFH - add indentation when tier sorting
                 if scene.tiersPresent:
                     text = "    " + text
 
-            elif isinstance(item, Song.TitleInfo) or isinstance(item, Song.SortTitleInfo):
+            elif isinstance(item, song.TitleInfo) or isinstance(item, song.SortTitleInfo):
                 text = string.upper(text)
 
             scale = font.scaleText(text, maxwidth = 0.45)
             font.render(text, (self.song_listcd_list_xpos, .09*(n+1)), scale = scale)
 
-            if isinstance(item, Song.SongInfo) and not item.getLocked():
+            if isinstance(item, song.SongInfo) and not item.getLocked():
                 if item.frets != "":
                     suffix = ", ("+item.frets+")"
                 else:
@@ -1593,7 +1595,7 @@ class Setlist:
                 imgheight = scene.img_tier.height1()
                 wfactor = 381.1/imgwidth
                 hfactor = 24.000/imgheight
-                if isinstance(item, Song.TitleInfo) or isinstance(item, Song.SortTitleInfo):
+                if isinstance(item, song.TitleInfo) or isinstance(item, song.SortTitleInfo):
                     drawImage(scene.img_tier, scale = (wfactor,-hfactor), coord = (w/1.587, h-((0.055*h)*(n+1))-(0.219*h)))
 
             if scene.img_selected:
@@ -1606,7 +1608,7 @@ class Setlist:
 
 
             icon = None
-            if isinstance(item, Song.SongInfo):
+            if isinstance(item, song.SongInfo):
                 if item.icon != "":
                     try:
                         icon = scene.itemIcons[item.icon]
@@ -1632,7 +1634,7 @@ class Setlist:
                         text = _("Played %d times.") % count
                 else:
                     text = _("Quickplay")
-            elif isinstance(item, Song.LibraryInfo):
+            elif isinstance(item, song.LibraryInfo):
                 try:
                     icon = scene.itemIcons["Library"]
                     imgwidth = icon.width1()
@@ -1648,11 +1650,11 @@ class Setlist:
                     text = _("There Are %d Songs In This Setlist.") % (item.songCount)
                 else:
                     text = ""
-            elif isinstance(item, Song.TitleInfo) or isinstance(item, Song.SortTitleInfo):
+            elif isinstance(item, song.TitleInfo) or isinstance(item, song.SortTitleInfo):
                 text = _("Tier")
                 c1,c2,c3 = self.career_title_color
                 glColor3f(c1,c2,c3)
-            elif isinstance(item, Song.RandomSongInfo):
+            elif isinstance(item, song.RandomSongInfo):
                 try:
                     icon = scene.itemIcons["Random"]
                     imgwidth = icon.width1()
@@ -1667,25 +1669,25 @@ class Setlist:
             font.render(text, (0.92, .13), scale = 0.0012, align = 2)
 
             maxwidth = .45
-            if isinstance(item, Song.SongInfo) or isinstance(item, Song.LibraryInfo) or isinstance(item, Song.RandomSongInfo):
+            if isinstance(item, song.SongInfo) or isinstance(item, song.LibraryInfo) or isinstance(item, song.RandomSongInfo):
                 c1,c2,c3 = self.song_name_selected_color
                 glColor4f(c1,c2,c3,1)
-            if isinstance(item, Song.TitleInfo) or isinstance(item, Song.SortTitleInfo):
+            if isinstance(item, song.TitleInfo) or isinstance(item, song.SortTitleInfo):
                 c1,c2,c3 = self.career_title_color
                 glColor4f(c1,c2,c3,1)
 
             text = item.name
 
-            if isinstance(item, Song.SongInfo) and item.getLocked():
+            if isinstance(item, song.SongInfo) and item.getLocked():
                 text = _("-- Locked --")
 
-            if isinstance(item, Song.SongInfo): #MFH - add indentation when tier sorting
+            if isinstance(item, song.SongInfo): #MFH - add indentation when tier sorting
                 if scene.tiersPresent or icon:
                     text = "    " + text
 
 
             # evilynux - Force uppercase display for Career titles
-            if isinstance(item, Song.TitleInfo) or isinstance(item, Song.SortTitleInfo):
+            if isinstance(item, song.TitleInfo) or isinstance(item, song.SortTitleInfo):
                 maxwidth = .55
                 text = string.upper(text)
 
@@ -1702,7 +1704,7 @@ class Setlist:
 
             font.render(text, (.35, .0413*(n+1)+.15), scale = scale) #add theme option for song_listCD_xpos
 
-            if isinstance(item, Song.SongInfo):
+            if isinstance(item, song.SongInfo):
                 score = _("Nil")
                 stars = 0
                 name = ""
@@ -1753,7 +1755,8 @@ class Setlist:
                     font.render(text, (.92, .0413*(n+1)+.15), scale=scale, align = 2)
 
     def renderItem(self, scene, color, label):
-        from fofix.game import Song
+        
+        from fofix.game import song
 
         if not scene.itemMesh:
             return
@@ -1870,7 +1873,8 @@ class Setlist:
         glDisable(GL_NORMALIZE)
 
     def renderAlbumArt(self, scene):
-        from fofix.game import Song
+        
+        from fofix.game import song
 
         if not scene.itemLabels:
             return
@@ -1900,13 +1904,13 @@ class Setlist:
                 for i, item in enumerate(scene.items):
                     c = math.sin(scene.itemRenderAngles[i] * math.pi / 180)
 
-                    if isinstance(item, Song.SongInfo):
+                    if isinstance(item, song.SongInfo):
                         h = c * 4.0 + (1 - c) * .8
-                    elif isinstance(item, Song.LibraryInfo):
+                    elif isinstance(item, song.LibraryInfo):
                         h = c * 4.0 + (1 - c) * 1.2
-                    elif isinstance(item, Song.TitleInfo) or isinstance(item, Song.SortTitleInfo):
+                    elif isinstance(item, song.TitleInfo) or isinstance(item, song.SortTitleInfo):
                         h = c * 4.0 + (1 - c) * 2.4
-                    elif isinstance(item, Song.RandomSongInfo):
+                    elif isinstance(item, song.RandomSongInfo):
                         h = c * 4.0 + (1 - c) * .8
                     else:
                         continue
@@ -1926,10 +1930,10 @@ class Setlist:
                             label = scene.img_random_label
                         if not label:
                             label = scene.img_empty_label
-                        if isinstance(item, Song.SongInfo):
+                        if isinstance(item, song.SongInfo):
                             glRotate(scene.itemRenderAngles[i], 0, 0, 1)
                             self.renderItem(scene, item.cassetteColor, label)
-                        elif isinstance(item, Song.LibraryInfo):
+                        elif isinstance(item, song.LibraryInfo):
                             #myfingershurt: cd cases are backwards
                             glRotate(-scene.itemRenderAngles[i], 0, 1, 0)    #spin 90 degrees around y axis
                             glRotate(-scene.itemRenderAngles[i], 0, 1, 0)    #spin 90 degrees around y axis again, now case is corrected
@@ -1937,7 +1941,7 @@ class Setlist:
                             if i == scene.selectedIndex:
                                 glRotate(((scene.time - scene.lastTime) * 4 % 360) - 90, 1, 0, 0)
                             self.renderLibrary(scene, item.color, label)
-                        elif isinstance(item, Song.TitleInfo):
+                        elif isinstance(item, song.TitleInfo):
                             #myfingershurt: cd cases are backwards
                             glRotate(-scene.itemRenderAngles[i], 0, 0.5, 0)    #spin 90 degrees around y axis
                             glRotate(-scene.itemRenderAngles[i], 0, 0.5, 0)    #spin 90 degrees around y axis again, now case is corrected
@@ -1945,7 +1949,7 @@ class Setlist:
                             if i == scene.selectedIndex:
                                 glRotate(((scene.time - scene.lastTime) * 4 % 360) - 90, 1, 0, 0)
                             self.renderTitle(scene, item.color, label)
-                        elif isinstance(item, Song.RandomSongInfo):
+                        elif isinstance(item, song.RandomSongInfo):
                             #myfingershurt: cd cases are backwards
                             glRotate(scene.itemRenderAngles[i], 0, 0, 1)
                             self.renderRandom(scene, item.color, label)
@@ -1997,14 +2001,14 @@ class Setlist:
                     label = scene.img_random_label
                 if not label:
                     label = scene.img_empty_label
-                if isinstance(item, Song.SongInfo):
+                if isinstance(item, song.SongInfo):
                     if scene.labelType:
                         self.renderItem(scene, item.cassetteColor, label)
                     else:
                         self.renderLibrary(scene, item.cassetteColor, label)
-                elif isinstance(item, Song.LibraryInfo):
+                elif isinstance(item, song.LibraryInfo):
                     self.renderLibrary(scene, item.color, label)
-                elif isinstance(item, Song.RandomSongInfo):
+                elif isinstance(item, song.RandomSongInfo):
                     if scene.labelType:
                         self.renderItem(scene, None, label)
                     else:
@@ -2061,7 +2065,7 @@ class Setlist:
                 img = scene.itemLabels[i]
                 imgwidth = img.width1()
                 wfactor = 155.000/imgwidth
-            if isinstance(item, Song.SongInfo) and item.getLocked():
+            if isinstance(item, song.SongInfo) and item.getLocked():
                 if scene.img_locked_label:
                     imgwidth = scene.img_locked_label.width1()
                     wfactor2 = 155.000/imgwidth
@@ -2140,7 +2144,8 @@ class Setlist:
             drawImage(scene.img_list_fg, scale = (1.0, -1.0), coord = (w/2,h/2), stretched = FULL_SCREEN)
 
     def renderSelectedInfo(self, scene):
-        from fofix.game import Song
+        
+        from fofix.game import song
 
         if self.setlist_type == 0: #note... clean this up. this was a rush job.
             if not scene.selectedItem:
@@ -2185,13 +2190,13 @@ class Setlist:
             f = ((90.0 - angle) / 90.0) ** 2
 
             cText = item.name
-            if (isinstance(item, Song.SongInfo) and item.getLocked()):
+            if (isinstance(item, song.SongInfo) and item.getLocked()):
                 cText = _("-- Locked --")
 
             fh = lfont.getHeight()*0.0016
             lfont.render(cText, (x, y), scale = 0.0016)
 
-            if isinstance(item, Song.SongInfo):
+            if isinstance(item, song.SongInfo):
                 self.theme.setBaseColor(1)
 
                 c1,c2,c3 = self.artist_selected_color
@@ -2268,7 +2273,7 @@ class Setlist:
                     else:
                         score, stars, name = "---", 0, "---"
                     self.theme.setBaseColor(1)
-                    font.render(Song.difficulties[d.id].text, (x, y), scale = scale)
+                    font.render(song.difficulties[d.id].text, (x, y), scale = scale)
 
                     starscale = 0.02
                     stary = 1.0 - y/scene.fontScreenBottom
@@ -2284,7 +2289,7 @@ class Setlist:
                     font.render(unicode(score), (x + .15, y),     scale = scale)
                     font.render(name,       (x + .15, y + fh),     scale = scale)
                     y += 2 * fh
-            elif isinstance(item, Song.LibraryInfo):
+            elif isinstance(item, song.LibraryInfo):
                 self.theme.setBaseColor(1)
                 c1,c2,c3 = self.library_selected_color
 
@@ -2296,7 +2301,7 @@ class Setlist:
                     songCount = _("%d Songs In This Setlist") % item.songCount
                 font.render(songCount, (x, y + 3*fh), scale = 0.0016)
 
-            elif isinstance(item, Song.RandomSongInfo):
+            elif isinstance(item, song.RandomSongInfo):
                 self.theme.setBaseColor(1 - v)
 
                 c1,c2,c3 = self.song_name_selected_color
@@ -2324,7 +2329,7 @@ class Setlist:
             w, h = scene.geometry
             lfont = font
             fh = lfont.getHeight()*0.0016
-            if isinstance(item, Song.SongInfo):
+            if isinstance(item, song.SongInfo):
                 angle = scene.itemRenderAngles[scene.selectedIndex]
                 f = ((90.0 - angle) / 90.0) ** 2
 
@@ -2356,7 +2361,7 @@ class Setlist:
                     else:
                         score, stars, name = "---", 0, "---"
 
-                    font.render(Song.difficulties[d.id].text, (x, y), scale = scale)
+                    font.render(song.difficulties[d.id].text, (x, y), scale = scale)
 
                     starscale = 0.02
                     starx = x + starscale/2
@@ -2376,7 +2381,7 @@ class Setlist:
             w, h = scene.geometry
             font = scene.fontDict['songListFont']
             item = scene.selectedItem
-            if isinstance(item, Song.SongInfo):
+            if isinstance(item, song.SongInfo):
                 text = item.artist
                 if (item.getLocked()):
                     text = "" # avoid giving away artist of locked song

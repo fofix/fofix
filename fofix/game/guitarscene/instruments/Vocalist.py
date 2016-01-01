@@ -32,7 +32,7 @@ from fretwork import log
 
 from fofix.core.Microphone import Microphone
 from fofix.core.Image import ImgDrawing
-from fofix.game.Song import VocalNote
+from fofix.game.song import VocalNote
 from fofix.core.constants import *
 from fofix.core.Language import _
 from fofix.core import cmgl

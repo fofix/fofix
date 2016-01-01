@@ -41,7 +41,7 @@ import OpenGL.GL as gl
 
 from fretwork import log
 
-from fofix.game.Song import Note, TextEvent, PictureEvent, loadSong, Bars, VocalPhrase
+from fofix.game.song import Note, TextEvent, PictureEvent, loadSong, Bars, VocalPhrase
 from fofix.core.Player import STAR, KILL, CANCEL, KEY1A
 from fofix.game.guitarscene.instruments import *
 from fofix.game.Scorekeeper import ScoreCard
@@ -54,7 +54,7 @@ from fofix.core.Language import _
 from fofix.game.Menu import Menu
 from fofix.game import Dialogs
 from fofix.core import Settings
-from fofix.game import Song
+from fofix.game import song
 from fofix.core import Player
 
 import random
@@ -77,7 +77,7 @@ class BandPlayBaseScene(Scene):
 
         #myfingershurt: new loading place for "loading" screen for song preparation:
         #blazingamer new loading phrases
-        self.sinfo = Song.loadSongInfo(self.engine, songName, library = libraryName)
+        self.sinfo = song.loadSongInfo(self.engine, songName, library = libraryName)
         self.phrase = self.sinfo.loadingPhrase
         if self.phrase == "":
             self.phrase = random.choice(self.engine.theme.loadingPhrase)
@@ -168,13 +168,13 @@ class BandPlayBaseScene(Scene):
         # Song related init
 
         #MFH - TODO - single, global BPM here instead of in instrument objects:
-        #self.tempoBpm = Song.DEFAULT_BPM
+        #self.tempoBpm = song.DEFAULT_BPM
         #self.actualBpm = 0.0
         #self.targetPeriod   = 60000.0 / self.targetBpm
         self.audioDelay = self.engine.config.get("audio", "delay")
         self.songTime = -self.audioDelay
         self.disableVBPM  = self.engine.config.get("game", "disable_vbpm")
-        self.currentBpm     = Song.DEFAULT_BPM
+        self.currentBpm     = song.DEFAULT_BPM
         self.currentPeriod  = 60000.0 / self.currentBpm
         self.targetBpm      = self.currentBpm
         self.lastBpmChange  = -1.0
@@ -294,7 +294,7 @@ class BandPlayBaseScene(Scene):
                 self.jurg[i] = True
                 self.autoPlay = True
             self.aiSkill[i] = self.engine.config.get("game", "jurg_skill_p%d" % i)
-            if player.part.id == Song.VOCAL_PART:
+            if player.part.id == song.VOCAL_PART:
                 self.instruments[i].jurgenEnabled = jurgen
                 self.instruments[i].jurgenSkill   = self.aiSkill[i]
 
@@ -313,7 +313,7 @@ class BandPlayBaseScene(Scene):
         self.activeGameControls = self.engine.input.activeGameControls
 
         for i,player in enumerate(self.players):
-            if player.part.id == Song.VOCAL_PART:
+            if player.part.id == song.VOCAL_PART:
                 continue
             self.instruments[i].leftyMode   = False
             self.instruments[i].twoChordMax = False
@@ -458,7 +458,7 @@ class BandPlayBaseScene(Scene):
     def songLoaded(self, song):
         for i, player in enumerate(self.players):
             if self.instruments[i].isVocal:
-                song.difficulty[i] = Song.difficulties[Song.EXP_DIF] #for track-finding purposes! Don't change this, ok?
+                song.difficulty[i] = song.difficulties[song.EXP_DIF] #for track-finding purposes! Don't change this, ok?
                 continue
             song.difficulty[i] = player.difficulty
         self.song.readyToGo = False
@@ -693,7 +693,7 @@ class GuitarScene(BandPlayBaseScene):
         gNum = 0
         for j,player in enumerate(self.players):
             guitar = True
-            if player.part.id == Song.VOCAL_PART:
+            if player.part.id == song.VOCAL_PART:
                 inst = Vocalist(self.engine, player, self, player=j)
                 if self.coOpRB:
                     inst.coOpRB = True
@@ -702,17 +702,17 @@ class GuitarScene(BandPlayBaseScene):
                 self.numOfSingers += 1
                 self.numberOfGuitars -= 1
                 guitar = False
-            elif player.part.id == Song.DRUM_PART:
+            elif player.part.id == song.DRUM_PART:
                 #myfingershurt: drums :)
                 inst = Drum(self.engine, player, self, player=j)
                 self.instruments.append(inst)
             else:
                 bass = False
-                if player.part.id == Song.BASS_PART:
+                if player.part.id == song.BASS_PART:
                     bass = True
                 inst = Guitar(self.engine, player, self, player=j, bass = bass)
                 self.instruments.append(inst)
-                if player.part.id == Song.LEAD_PART or player.part.id == Song.GUITAR_PART:    #both these selections should get guitar solos
+                if player.part.id == song.LEAD_PART or player.part.id == song.GUITAR_PART:    #both these selections should get guitar solos
                     self.instruments[j].canGuitarSolo = True
 
             if player.practiceMode:
@@ -1131,16 +1131,16 @@ class GuitarScene(BandPlayBaseScene):
         self.scoring = []
         for instrument in self.instruments:
             if instrument.isDrum:
-                this = Song.DRUM_PART
+                this = song.DRUM_PART
                 coOpInstruments.append(this)
             elif instrument.isBassGuitar:
-                this = Song.BASS_PART
+                this = song.BASS_PART
                 coOpInstruments.append(this)
             elif instrument.isVocal:
-                this = Song.VOCAL_PART
+                this = song.VOCAL_PART
                 coOpInstruments.append(this)
             else:
-                this = Song.GUITAR_PART
+                this = song.GUITAR_PART
                 coOpInstruments.append(this) #while different guitars exist, they don't affect scoring.
             self.scoring.append(ScoreCard([this]))
         if self.coOpType:
@@ -1206,7 +1206,7 @@ class GuitarScene(BandPlayBaseScene):
 
         ### Begin song loading ###
 
-        Dialogs.changeLoadingSplashScreenText(self.engine, self.splash, self.phrase + " \n " + _("Loading Song..."))
+        Dialogs.changeLoadingSplashScreenText(self.engine, self.splash, self.phrase + " \n " + _("Loading song..."))
 
         #MFH - this is where song loading originally took place, and the loading screen was spawned.
 
@@ -1222,7 +1222,7 @@ class GuitarScene(BandPlayBaseScene):
         bassGrooveEnableSet = self.engine.config.get("game", "bass_groove_enable")
         if bassGrooveEnableSet == 1:
             self.bassGrooveEnabled = True
-        elif bassGrooveEnableSet == 2 and self.song.midiStyle == Song.MIDI_TYPE_RB:
+        elif bassGrooveEnableSet == 2 and self.song.midiStyle == song.MIDI_TYPE_RB:
             self.bassGrooveEnabled = True
         elif bassGrooveEnableSet == 3:
             self.bassGrooveEnabled = True
@@ -1233,7 +1233,7 @@ class GuitarScene(BandPlayBaseScene):
             if not drum.isDrum:
                 continue
             if drum.drumFlip:
-                for d in range(len(Song.difficulties)):
+                for d in range(len(song.difficulties)):
                     self.song.tracks[i][d].flipDrums()
 
         for scoreCard in self.scoring:
@@ -1248,29 +1248,29 @@ class GuitarScene(BandPlayBaseScene):
         #  marked, ignore them and force auto-generation of SP paths.
         for i in range(self.numOfPlayers):   #MFH - count number of drum fills
             if self.instruments[i].isDrum:   #MFH - count number of drum fill markers
-                self.numDrumFills = len([1 for time, event in self.song.midiEventTrack[i].getAllEvents() if (isinstance(event, Song.MarkerNote) and (event.number == Song.freestyleMarkingNote) ) ])
+                self.numDrumFills = len([1 for time, event in self.song.midiEventTrack[i].getAllEvents() if (isinstance(event, song.MarkerNote) and (event.number == song.FREESTYLE_MARKING_NOTE) ) ])
                 log.debug("Drum part found, scanning for drum fills.... %d freestyle markings found (the last one may be a Big Rock Ending)." % self.numDrumFills)
 
 
         #MFH - handle early hit window automatic type determination, and how it compares to the forced handicap if not auto
-        self.effectiveEarlyHitWindow = Song.EARLY_HIT_WINDOW_HALF
-        self.automaticEarlyHitWindow = Song.EARLY_HIT_WINDOW_HALF
+        self.effectiveEarlyHitWindow = song.EARLY_HIT_WINDOW_HALF
+        self.automaticEarlyHitWindow = song.EARLY_HIT_WINDOW_HALF
         self.forceEarlyHitWindowSetting = self.engine.config.get("handicap",   "early_hit_window")
         if self.song.info.early_hit_window_size:
             log.debug("song.ini setting found specifying early_hit_window_size - %s" % self.song.info.early_hit_window_size)
             if self.song.info.early_hit_window_size.lower() == "none":
-                self.automaticEarlyHitWindow = Song.EARLY_HIT_WINDOW_NONE
+                self.automaticEarlyHitWindow = song.EARLY_HIT_WINDOW_NONE
             elif self.song.info.early_hit_window_size.lower() == "half":
-                self.automaticEarlyHitWindow = Song.EARLY_HIT_WINDOW_HALF
+                self.automaticEarlyHitWindow = song.EARLY_HIT_WINDOW_HALF
             else:  #all other unrecognized cases, default to "full"
-                self.automaticEarlyHitWindow = Song.EARLY_HIT_WINDOW_FULL
+                self.automaticEarlyHitWindow = song.EARLY_HIT_WINDOW_FULL
 
         else:
             log.debug("No song.ini setting found specifying early_hit_window_size - using automatic detection...")
 
-            if self.song.midiStyle == Song.MIDI_TYPE_RB:
+            if self.song.midiStyle == song.MIDI_TYPE_RB:
                 log.debug("Basic RB1/RB2 type MIDI found - early hitwindow of NONE is set as handicap base.")
-                self.automaticEarlyHitWindow = Song.EARLY_HIT_WINDOW_NONE
+                self.automaticEarlyHitWindow = song.EARLY_HIT_WINDOW_NONE
 
         if self.forceEarlyHitWindowSetting > 0:   #MFH - if user is specifying a specific early hitwindow, then calculate handicap...
             self.effectiveEarlyHitWindow = self.forceEarlyHitWindowSetting
@@ -1298,7 +1298,7 @@ class GuitarScene(BandPlayBaseScene):
         for instrument in self.instruments:    #MFH - force update of early hit window
             instrument.earlyHitWindowSizeFactor = tempEarlyHitWindowSizeFactor
             instrument.actualBpm = 0.0
-            instrument.currentBpm = Song.DEFAULT_BPM
+            instrument.currentBpm = song.DEFAULT_BPM
             instrument.setBPM(instrument.currentBpm)
 
         self.markSolos = self.engine.config.get("game", "mark_solo_sections")
@@ -1314,13 +1314,13 @@ class GuitarScene(BandPlayBaseScene):
                     continue
 
                 #MFH - first, count the SP marker notes!
-                numOfSpMarkerNotes = len([1 for time, event in self.song.midiEventTrack[i].getAllEvents() if (isinstance(event, Song.MarkerNote) and not event.endMarker and (event.number == Song.overDriveMarkingNote or (event.number == Song.starPowerMarkingNote and self.song.midiStyle == Song.MIDI_TYPE_GH) ) ) ])
+                numOfSpMarkerNotes = len([1 for time, event in self.song.midiEventTrack[i].getAllEvents() if (isinstance(event, song.MarkerNote) and not event.endMarker and (event.number == song.OD_MARKING_NOTE or (event.number == song.SP_MARKING_NOTE and self.song.midiStyle == song.MIDI_TYPE_GH) ) ) ])
 
 
                 #also want to count RB solo sections in this track, if the MIDI type is RB.  Then we'll know to activate MIDI guitar solo markers or not
                 # for this instrument
-                if self.song.midiStyle == Song.MIDI_TYPE_RB:
-                    numMidiSoloMarkerNotes = len([1 for time, event in self.song.midiEventTrack[i].getAllEvents() if (isinstance(event, Song.MarkerNote) and not event.endMarker and event.number == Song.starPowerMarkingNote ) ])
+                if self.song.midiStyle == song.MIDI_TYPE_RB:
+                    numMidiSoloMarkerNotes = len([1 for time, event in self.song.midiEventTrack[i].getAllEvents() if (isinstance(event, song.MarkerNote) and not event.endMarker and event.number == song.SP_MARKING_NOTE ) ])
                     if numMidiSoloMarkerNotes > 0 and self.markSolos > 0:  #if at least 1 solo marked in this fashion, tell that guitar to ignore text solo events
                         self.useMidiSoloMarkers = True
                         guitar.useMidiSoloMarkers = True
@@ -1330,12 +1330,12 @@ class GuitarScene(BandPlayBaseScene):
                 if numOfSpMarkerNotes > 1:
 
                     for time, event in self.song.midiEventTrack[i].getAllEvents():
-                        if isinstance(event, Song.MarkerNote) and not event.endMarker:
+                        if isinstance(event, song.MarkerNote) and not event.endMarker:
                             markStarpower = False
-                            if event.number == Song.overDriveMarkingNote:
+                            if event.number == song.OD_MARKING_NOTE:
                                 markStarpower = True
-                            if event.number == Song.starPowerMarkingNote:
-                                if self.song.midiStyle == Song.MIDI_TYPE_GH:
+                            if event.number == song.SP_MARKING_NOTE:
+                                if self.song.midiStyle == song.MIDI_TYPE_GH:
                                     markStarpower = True
 
                             if markStarpower and self.starpowerMode == 2:     #auto-MIDI mode only:
@@ -1376,7 +1376,7 @@ class GuitarScene(BandPlayBaseScene):
                         continue
                     instrument.starNotesSet = False     #fallback on auto generation.
 
-        if self.useMidiSoloMarkers or self.song.midiStyle == Song.MIDI_TYPE_RB or self.markSolos == 3: #assume RB Midi-types with no solos don't want any, dammit!
+        if self.useMidiSoloMarkers or self.song.midiStyle == song.MIDI_TYPE_RB or self.markSolos == 3: #assume RB Midi-types with no solos don't want any, dammit!
             self.markSolos = 0
         for i, player in enumerate(self.players):
             if player.guitarNum is not None:
@@ -1480,8 +1480,8 @@ class GuitarScene(BandPlayBaseScene):
                 #MFH - determine which marker is BRE, and count streak notes behind it to remove from the scorecard
                 if self.song.hasFreestyleMarkings:
                     for time, event in self.song.midiEventTrack[i].getAllEvents():
-                        if isinstance(event, Song.MarkerNote) and not event.endMarker:
-                            if (event.number == Song.freestyleMarkingNote):
+                        if isinstance(event, song.MarkerNote) and not event.endMarker:
+                            if (event.number == song.FREESTYLE_MARKING_NOTE):
                                 thisIsABre = False
                                 if not instrument.isDrum:
                                     thisIsABre = True
@@ -1498,8 +1498,8 @@ class GuitarScene(BandPlayBaseScene):
 
                 if instrument.useMidiSoloMarkers:   #mark using the new MIDI solo marking system
                     for time, event in self.song.midiEventTrack[i].getAllEvents():
-                        if isinstance(event, Song.MarkerNote) and not event.endMarker:
-                            if (event.number == Song.starPowerMarkingNote) and (self.song.midiStyle == Song.MIDI_TYPE_RB):    #solo marker note.
+                        if isinstance(event, song.MarkerNote) and not event.endMarker:
+                            if (event.number == song.SP_MARKING_NOTE) and (self.song.midiStyle == song.MIDI_TYPE_RB):    #solo marker note.
                                 startTime = time
                                 endTime = time + event.length
                                 guitarSoloNoteCount = len([1 for Gtime, Gevent in self.song.track[i].getEvents(startTime, endTime) if isinstance(Gevent, Note)])
@@ -1509,9 +1509,9 @@ class GuitarScene(BandPlayBaseScene):
                 elif instrument.markSolos == 1:   #mark using the old text-based system
 
                     #Ntime now should contain the last note time - this can be used for guitar solo finishing
-                    #MFH - use new self.song.eventTracks[Song.TK_GUITAR_SOLOS] -- retrieve a gsolo on / off combo, then use it to count notes
+                    #MFH - use new self.song.eventTracks[song.TK_GUITAR_SOLOS] -- retrieve a gsolo on / off combo, then use it to count notes
                     # just like before, detect if end reached with an open solo - and add a GSOLO OFF event just before the end of the song.
-                    for time, event in self.song.eventTracks[Song.TK_GUITAR_SOLOS].getAllEvents():
+                    for time, event in self.song.eventTracks[song.TK_GUITAR_SOLOS].getAllEvents():
                         if event.text.find("GSOLO") >= 0:
                             if event.text.find("ON") >= 0:
                                 isGuitarSoloNow = True
@@ -1531,7 +1531,7 @@ class GuitarScene(BandPlayBaseScene):
                         guitarSoloNoteCount = len([1 for Gtime, Gevent in self.song.track[i].getEvents(guitarSoloStartTime, Ntime) if isinstance(Gevent, Note)])
                         self.guitarSolos[i].append(guitarSoloNoteCount - 1)
                         newEvent = TextEvent("GSOLO OFF", 100.0)
-                        self.song.eventTracks[Song.TK_GUITAR_SOLOS].addEvent(Ntime, newEvent) #adding the missing GSOLO OFF event
+                        self.song.eventTracks[song.TK_GUITAR_SOLOS].addEvent(Ntime, newEvent) #adding the missing GSOLO OFF event
                         log.debug("GuitarScene: Guitar Solo until end of song found - (guitarSoloStartTime - Ntime = guitarSoloNoteCount): " + str(guitarSoloStartTime) + "-" + str(Ntime) + " = " + str(guitarSoloNoteCount) )
 
 
@@ -1576,7 +1576,7 @@ class GuitarScene(BandPlayBaseScene):
             tempLyricLine = ""
             tempLyricLineEvents = []
             firstTime = None
-            for time, event in self.song.eventTracks[Song.TK_LYRICS].getAllEvents():
+            for time, event in self.song.eventTracks[song.TK_LYRICS].getAllEvents():
                 if not firstTime:
                     firstTime = time
                 lastLyricLineContents = tempLyricLine
@@ -2159,7 +2159,7 @@ class GuitarScene(BandPlayBaseScene):
         self.nextLyricIsOnNewLine = False
 
         #MFH - reset global tempo variables
-        self.currentBpm     = Song.DEFAULT_BPM
+        self.currentBpm     = song.DEFAULT_BPM
         self.currentPeriod  = 60000.0 / self.currentBpm
         self.targetBpm      = self.currentBpm
         self.lastBpmChange  = -1.0
@@ -4079,7 +4079,7 @@ class GuitarScene(BandPlayBaseScene):
 
                         #handle the sections track
                         if self.midiSectionsEnabled > 0:
-                            for time, event in self.song.eventTracks[Song.TK_SECTIONS].getEvents(minPos, maxPos):
+                            for time, event in self.song.eventTracks[song.TK_SECTIONS].getEvents(minPos, maxPos):
                                 if self.theme == 2:
                                     yOffset = 0.715
                                     txtSize = 0.00170
@@ -4109,7 +4109,7 @@ class GuitarScene(BandPlayBaseScene):
                         #handle the lyrics track
                         if self.midiLyricsEnabled > 0 and not self.playingVocals:
                             if self.midiLyricMode == 0:   #scrolling lyrics mode:
-                                for time, event in self.song.eventTracks[Song.TK_LYRICS].getEvents(minPos, maxPos):
+                                for time, event in self.song.eventTracks[song.TK_LYRICS].getEvents(minPos, maxPos):
                                     if self.theme == 2:
                                         yOffset = 0.715
                                         txtSize = 0.00170
@@ -4178,7 +4178,7 @@ class GuitarScene(BandPlayBaseScene):
 
                         #finally, handle the unused text events track
                         if self.showUnusedTextEvents:
-                            for time, event in self.song.eventTracks[Song.TK_UNUSED_TEXT].getEvents(minPos, maxPos):
+                            for time, event in self.song.eventTracks[song.TK_UNUSED_TEXT].getEvents(minPos, maxPos):
                                 if self.theme == 2:
                                     yOffset = 0.715
                                     txtSize = 0.00170
@@ -4250,7 +4250,7 @@ class GuitarScene(BandPlayBaseScene):
 
                                 # evilynux - Closer to actual GH3
                                 font = self.engine.data.pauseFont
-                                text = Song.removeSongOrderPrefixFromName(self.song.info.name).upper()
+                                text = song.removeSongOrderPrefixFromName(self.song.info.name).upper()
                                 scale = font.scaleText(text, maxwidth = 0.398, scale = 0.0038)
                                 size = font.getStringSize(text, scale = scale)
                                 font.render(text, (.5-size[0]/2.0,.37-size[1]), scale = scale)
@@ -4588,8 +4588,8 @@ class GuitarScene(BandPlayBaseScene):
                                 #MFH - only use the TK_GUITAR_SOLOS track if at least one player has no MIDI solos marked:
                                 if self.instruments[i].useMidiSoloMarkers:   #mark using the new MIDI solo marking system
                                     for time, event in self.song.midiEventTrack[i].getEvents(minPos, maxPos):
-                                        if isinstance(event, Song.MarkerNote):
-                                            if (event.number == Song.starPowerMarkingNote) and (self.song.midiStyle == Song.MIDI_TYPE_RB):    #solo marker note.
+                                        if isinstance(event, song.MarkerNote):
+                                            if (event.number == song.SP_MARKING_NOTE) and (self.song.midiStyle == song.MIDI_TYPE_RB):    #solo marker note.
                                                 soloChangeNow = False
                                                 xOffset = (time - self.songTime) / eventWindow + .15
                                                 if xOffset < lyricSlop / 16.0:   #present
@@ -4606,7 +4606,7 @@ class GuitarScene(BandPlayBaseScene):
 
 
                                 elif self.markSolos == 1:   #fall back on old guitar solo marking system
-                                    for time, event in self.song.eventTracks[Song.TK_GUITAR_SOLOS].getEvents(minPos, maxPos):
+                                    for time, event in self.song.eventTracks[song.TK_GUITAR_SOLOS].getEvents(minPos, maxPos):
                                         #is event happening now?
                                         xOffset = (time - self.songTime) / eventWindow + .15
                                         EventHappeningNow = False
@@ -4850,7 +4850,7 @@ class GuitarScene(BandPlayBaseScene):
                             font.render(text, (self.fpsRenderPos[0], self.fpsRenderPos[1] - h/2), (1,0,0), 0.00140)
 
                         if self.showScriptLyrics and not self.pause and not self.failed:
-                            for time, event in self.song.eventTracks[Song.TK_SCRIPT].getEvents(self.songTime - self.song.period * 2, self.songTime + self.song.period * 4): #MFH - script track
+                            for time, event in self.song.eventTracks[song.TK_SCRIPT].getEvents(self.songTime - self.song.period * 2, self.songTime + self.song.period * 4): #MFH - script track
 
                                 if isinstance(event, PictureEvent):
                                     if self.songTime < time or self.songTime > time + event.length:
@@ -5005,7 +5005,7 @@ class GuitarScene(BandPlayBaseScene):
                         if self.song.info.version:
                             extra = "%s \n v%s" % (extra, self.song.info.version)
 
-                        Dialogs.wrapText(songFont, (self.songInfoDisplayX, self.songInfoDisplayY - h / 2), "%s \n %s%s%s%s%s" % (Song.removeSongOrderPrefixFromName(self.song.info.name), self.songDisplayPrefix, self.song.info.artist, comma, self.song.info.year, extra), rightMargin = .6, scale = self.songInfoDisplayScale)
+                        Dialogs.wrapText(songFont, (self.songInfoDisplayX, self.songInfoDisplayY - h / 2), "%s \n %s%s%s%s%s" % (song.removeSongOrderPrefixFromName(self.song.info.name), self.songDisplayPrefix, self.song.info.artist, comma, self.song.info.year, extra), rightMargin = .6, scale = self.songInfoDisplayScale)
                     else:
                         #mfh: this is where the song countdown display is generated:
                         if countdownPos < 0:

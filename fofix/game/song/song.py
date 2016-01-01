@@ -46,21 +46,7 @@ from fofix.core.Theme import *
 from fofix.core import Config
 from fofix.core import Version
 from fofix.core import VFS
-
-DEFAULT_BPM = 120.0
-DEFAULT_LIBRARY         = "songs"
-
-EXP_DIF     = 0
-HAR_DIF     = 1
-MED_DIF     = 2
-EAS_DIF     = 3
-
-#MFH - special / global text-event tracks for the separated text-event list variable
-TK_SCRIPT = 0         #script.txt events
-TK_SECTIONS = 1       #Section events
-TK_GUITAR_SOLOS = 2   #Guitar Solo start/stop events
-TK_LYRICS = 3         #RB MIDI Lyric events
-TK_UNUSED_TEXT = 4    #Unused / other text events
+from fofix.game.song.songconstants import *
 
 #code for adding tracks, inside song.py:
 #self.song.eventTracks[TK_SCRIPT].addEvent(self.abs_time(), event)  #MFH - add an event to the script.txt track
@@ -75,33 +61,6 @@ TK_UNUSED_TEXT = 4    #Unused / other text events
 #self.song.eventTracks[Song.TK_GUITAR_SOLOS]
 #self.song.eventTracks[Song.TK_LYRICS]
 #self.song.eventTracks[Song.TK_UNUSED_TEXT]
-
-GUITAR_TRACK             = 0
-RHYTHM_TRACK             = 1
-DRUM_TRACK               = 2
-
-#MFH
-MIDI_TYPE_GH            = 0       #GH type MIDIs have starpower phrases marked with a long G8 note on that instrument's track
-MIDI_TYPE_RB            = 1       #RB type MIDIs have overdrive phrases marked with a long G#9 note on that instrument's track
-MIDI_TYPE_WT            = 2       #WT type MIDIs have six notes and HOPOs marked on F# of the track
-
-#MFH
-EARLY_HIT_WINDOW_NONE   = 1       #GH1/RB1/RB2 = NONE
-EARLY_HIT_WINDOW_HALF   = 2       #GH2/GH3/GHA/GH80's = HALF
-EARLY_HIT_WINDOW_FULL   = 3       #FoF = FULL
-
-GUITAR_PART             = 0
-RHYTHM_PART             = 1
-BASS_PART               = 2
-LEAD_PART               = 3
-DRUM_PART               = 4
-VOCAL_PART              = 5
-KEYS_PART               = 6
-PRO_GUITAR_PART         = 7
-PRO_BASS_PART           = 8
-PRO_DRUM_PART           = 9
-PRO_KEYS_PART           = 10
-
 
 # This is the sorting order, grouped by instruments.
 #
@@ -118,8 +77,6 @@ PRO_KEYS_PART           = 10
 # Pro Drums
 
 PART_SORTING            = [0,3,4,2,9,8,6,1,5,10,7]
-
-
 
 TRACK_ID_NAME_MAP = {
     VOCAL_PART: 'vocals',
@@ -1876,6 +1833,7 @@ class Song(object):
         for i in partlist:
             if i == parts[VOCAL_PART]:
                 self.midiEventTracks.append([None])
+                self.activeAudioTracks.append(VOCAL_TRACK)
             else:
                 self.midiEventTracks.append([Track(self.engine) for t in range(len(difficulties))])
                 if i == parts[GUITAR_PART] or i == parts[LEAD_PART] or i == parts[PRO_GUITAR_PART]:
@@ -2137,70 +2095,6 @@ class Song(object):
     midiEventTrack = property(getMidiEventTrack)
 
 
-#MFH - translating / marking the common MIDI notes:
-noteMap = {     # difficulty, note
-  0x60: (EXP_DIF, 0), #=========#0x60 = 96 = C 8
-  0x61: (EXP_DIF, 1),           #0x61 = 97 = Db8
-  0x62: (EXP_DIF, 2),           #0x62 = 98 = D 8
-  0x63: (EXP_DIF, 3),           #0x63 = 99 = Eb8
-  0x64: (EXP_DIF, 4),           #0x64 = 100= E 8
-  0x54: (HAR_DIF, 0), #=========#0x54 = 84 = C 7
-  0x55: (HAR_DIF, 1),           #0x55 = 85 = Db7
-  0x56: (HAR_DIF, 2),           #0x56 = 86 = D 7
-  0x57: (HAR_DIF, 3),           #0x57 = 87 = Eb7
-  0x58: (HAR_DIF, 4),           #0x58 = 88 = E 7
-  0x48: (MED_DIF, 0), #=========#0x48 = 72 = C 6
-  0x49: (MED_DIF, 1),           #0x49 = 73 = Db6
-  0x4a: (MED_DIF, 2),           #0x4a = 74 = D 6
-  0x4b: (MED_DIF, 3),           #0x4b = 75 = Eb6
-  0x4c: (MED_DIF, 4),           #0x4c = 76 = E 6
-  0x3c: (EAS_DIF, 0), #=========#0x3c = 60 = C 5
-  0x3d: (EAS_DIF, 1),           #0x3d = 61 = Db5
-  0x3e: (EAS_DIF, 2),           #0x3e = 62 = D 5
-  0x3f: (EAS_DIF, 3),           #0x3f = 63 = Eb5
-  0x40: (EAS_DIF, 4),           #0x40 = 64 = E 5
-}
-
-realNoteMap = {       # difficulty, note
-  0x60: (EXP_DIF, 0),
-  0x61: (EXP_DIF, 1),
-  0x62: (EXP_DIF, 2),
-  0x63: (EXP_DIF, 3),
-  0x64: (EXP_DIF, 4),
-  0x65: (EXP_DIF, 5),
-  0x48: (HAR_DIF, 0),
-  0x49: (HAR_DIF, 1),
-  0x4a: (HAR_DIF, 2),
-  0x4b: (HAR_DIF, 3),
-  0x4c: (HAR_DIF, 4),
-  0x4d: (HAR_DIF, 5),
-  0x30: (MED_DIF, 0),
-  0x31: (MED_DIF, 1),
-  0x32: (MED_DIF, 2),
-  0x33: (MED_DIF, 3),
-  0x34: (MED_DIF, 4),
-  0x35: (MED_DIF, 5),
-  0x18: (EAS_DIF, 0),
-  0x19: (EAS_DIF, 1),
-  0x1a: (EAS_DIF, 2),
-  0x1b: (EAS_DIF, 3),
-  0x1c: (EAS_DIF, 4),
-  0x1d: (EAS_DIF, 5),
-}
-
-
-#MFH - special note numbers
-starPowerMarkingNote = 103     #note 103 = G 8
-overDriveMarkingNote = 116     #note 116 = G#9
-hopoMarkingNotes = []
-proHopoMarkingNotes = [0x1e, 0x36, 0x4e, 0x66]
-
-freestyleMarkingNote = 124      #notes 120 - 124 = drum fills & BREs - always all 5 notes present
-
-
-reverseNoteMap = dict([(v, k) for k, v in noteMap.items()])
-
-
 class ScriptReader:
     def __init__(self, song, scriptFile):
         self.song = song
@@ -2443,11 +2337,11 @@ class MidiReader(midi.MidiOutStream):
                     if startTime not in self.vocalOverlapCheck:
                         self.addVocalEvent(VocalPhrase(endTime - startTime), time = startTime)
                         self.vocalOverlapCheck.append(startTime)
-                elif note == overDriveMarkingNote:
+                elif note == OD_MARKING_NOTE:
                     self.addVocalStar(startTime)
                 return
-            if note in noteMap:
-                track, number = noteMap[note]
+            if note in NOTE_MAP:
+                track, number = NOTE_MAP[note]
                 self.addEvent(track, Note(number, endTime - startTime, special = self.velocity[note] == 127), time = startTime)
 
             #MFH: use self.midiEventTracks to store all the special MIDI marker notes, keep the clutter out of the main notes lists
@@ -2457,7 +2351,7 @@ class MidiReader(midi.MidiOutStream):
 
 
 
-            elif note == overDriveMarkingNote:    #MFH
+            elif note == OD_MARKING_NOTE:    #MFH
                 self.song.hasStarpowerPaths = True
                 self.earlyHitWindowSize = EARLY_HIT_WINDOW_NONE
 
@@ -2467,7 +2361,7 @@ class MidiReader(midi.MidiOutStream):
                     if self.logMarkerNotes == 1:
                         log.debug("RB Overdrive MarkerNote at %f added to part: %s and difficulty: %s" % ( startTime, self.partnumber, difficulties[diff] ) )
 
-            elif note == starPowerMarkingNote:    #MFH
+            elif note == SP_MARKING_NOTE:    #MFH
                 self.song.hasStarpowerPaths = True
                 for diff in difficulties:
                     self.addSpecialMidiEvent(diff, MarkerNote(note, endTime - startTime), time = startTime)
@@ -2475,7 +2369,7 @@ class MidiReader(midi.MidiOutStream):
                     if self.logMarkerNotes == 1:
                         log.debug("GH Starpower (or RB Solo) MarkerNote at %f added to part: %s and difficulty: %s" % ( startTime, self.partnumber, difficulties[diff] ) )
 
-            elif note == freestyleMarkingNote:    #MFH - for drum fills and big rock endings
+            elif note == FREESTYLE_MARKING_NOTE:    #MFH - for drum fills and big rock endings
                 self.song.hasFreestyleMarkings = True
                 for diff in difficulties:
                     self.addSpecialMidiEvent(diff, MarkerNote(note, endTime - startTime), time = startTime)
@@ -2905,9 +2799,9 @@ class MidiPartsDiffReader(midi.MidiOutStream):
     def note_on(self, channel, note, velocity):
         if self.currentPart == -1:
             return
-        if note == overDriveMarkingNote:
+        if note == OD_MARKING_NOTE:
             self._ODNoteFound = True
-        elif note == starPowerMarkingNote:
+        elif note == SP_MARKING_NOTE:
             self._SPNoteFound = True
         try:
             try:
@@ -2915,7 +2809,7 @@ class MidiPartsDiffReader(midi.MidiOutStream):
                     return
             except KeyError:
                 pass
-            track, number = noteMap[note]
+            track, number = NOTE_MAP[note]
             self.notesFound[track] += 1
             if self.notesFound[track] > 5:
                 if self.nextPart is not None:

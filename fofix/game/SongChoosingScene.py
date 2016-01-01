@@ -40,7 +40,7 @@ from fofix.core.Mesh import Mesh
 from fofix.core.Language import _
 from fofix.core import Player
 from fofix.game import Dialogs
-from fofix.game import Song
+from fofix.game import song
 from fofix.core import Config
 from fofix.core import Version
 from fofix.game.Menu import Menu
@@ -64,7 +64,7 @@ class SongChoosingScene(Scene):
 
         self.engine.world.sceneName = "SongChoosingScene"
 
-        Song.updateSongDatabase(self.engine)
+        song.updateSongDatabase(self.engine)
 
         self.wizardStarted = False
         self.libraryName   = libraryName
@@ -72,7 +72,7 @@ class SongChoosingScene(Scene):
         if not self.libraryName:
             self.libraryName = self.engine.config.get("setlist", "selected_library")
             if not self.libraryName:
-                self.libraryName = Song.DEFAULT_LIBRARY
+                self.libraryName = song.DEFAULT_LIBRARY
         if not self.songName:
             self.songName = self.engine.config.get("setlist", "selected_song")
         self.gameMode = self.engine.world.gameMode
@@ -121,7 +121,7 @@ class SongChoosingScene(Scene):
         else:
             self.library    = os.path.join(self.engine.config.get("setlist", "base_library"), self.libraryName)
             if not os.path.isdir(self.engine.resource.fileName(self.library)):
-                self.library = self.engine.resource.fileName(os.path.join(self.engine.config.get("setlist", "base_library"), Song.DEFAULT_LIBRARY))
+                self.library = self.engine.resource.fileName(os.path.join(self.engine.config.get("setlist", "base_library"), song.DEFAULT_LIBRARY))
 
         self.searchText = ""
 
@@ -134,8 +134,8 @@ class SongChoosingScene(Scene):
         self.scrollRate       = self.engine.config.get("game", "scroll_rate")
         self.scrollTime       = 0
         self.scroller         = [lambda: None, self.scrollUp, self.scrollDown]
-        self.scoreDifficulty  = Song.difficulties[self.engine.config.get("game", "songlist_difficulty")]
-        self.scorePart        = Song.parts[self.engine.config.get("game", "songlist_instrument")]
+        self.scoreDifficulty  = song.difficulties[self.engine.config.get("game", "songlist_difficulty")]
+        self.scorePart        = song.parts[self.engine.config.get("game", "songlist_instrument")]
         self.sortOrder        = self.engine.config.get("game", "sort_order")
         self.queueFormat      = self.engine.config.get("game", "queue_format")
         self.queueOrder       = self.engine.config.get("game", "queue_order")
@@ -258,8 +258,8 @@ class SongChoosingScene(Scene):
         self.menu_force_reload = True
 
     def resetQueueVars(self):
-        self.scoreDifficulty  = Song.difficulties[self.engine.config.get("game", "songlist_difficulty")]
-        self.scorePart        = Song.parts[self.engine.config.get("game", "songlist_instrument")]
+        self.scoreDifficulty  = song.difficulties[self.engine.config.get("game", "songlist_difficulty")]
+        self.scorePart        = song.parts[self.engine.config.get("game", "songlist_instrument")]
         self.sortOrder        = self.engine.config.get("game", "sort_order")
         self.queueFormat      = self.engine.config.get("game", "queue_format")
         self.queueOrder       = self.engine.config.get("game", "queue_order")
@@ -280,11 +280,11 @@ class SongChoosingScene(Scene):
         else:
             self.splash = Dialogs.showLoadingSplashScreen(self.engine, _("Browsing Collection..."))
             self.loadStartTime = time.time()
-        self.engine.resource.load(self, "libraries", lambda: Song.getAvailableLibraries(self.engine, self.library), onLoad = self.loadSongs, synch = True)
+        self.engine.resource.load(self, "libraries", lambda: song.getAvailableLibraries(self.engine, self.library), onLoad = self.loadSongs, synch = True)
 
     def loadSongs(self, libraries):
         log.debug("Loading songs in %s" % self.library)
-        self.engine.resource.load(self, "songs", lambda: Song.getAvailableSongsAndTitles(self.engine, self.library, progressCallback=self.progressCallback), onLoad = self.prepareSetlist, synch = True)
+        self.engine.resource.load(self, "songs", lambda: song.getAvailableSongsAndTitles(self.engine, self.library, progressCallback=self.progressCallback), onLoad = self.prepareSetlist, synch = True)
 
     def progressCallback(self, percent):
         if time.time() - self.loadStartTime > 7:
@@ -307,26 +307,26 @@ class SongChoosingScene(Scene):
 
         shownItems = []
         for item in self.items: #remove things we don't want to see. Some redundancy, but that's okay.
-            if isinstance(item, Song.TitleInfo) or isinstance(item, Song.SortTitleInfo):
+            if isinstance(item, song.TitleInfo) or isinstance(item, song.SortTitleInfo):
                 if self.showCareerTiers == 2:
-                    if isinstance(item, Song.TitleInfo):
+                    if isinstance(item, song.TitleInfo):
                         if len(shownItems) > 0:
-                            if isinstance(shownItems[-1], Song.TitleInfo):
+                            if isinstance(shownItems[-1], song.TitleInfo):
                                 shownItems.pop()
                         shownItems.append(item)
-                    elif isinstance(item, Song.SortTitleInfo):
+                    elif isinstance(item, song.SortTitleInfo):
                         continue
                 else:
-                    if isinstance(item, Song.TitleInfo):
+                    if isinstance(item, song.TitleInfo):
                         continue
-                    elif isinstance(item, Song.SortTitleInfo):
+                    elif isinstance(item, song.SortTitleInfo):
                         if not self.showSortTiers:
                             continue
                         if len(shownItems) > 0:
-                            if isinstance(shownItems[-1], Song.SortTitleInfo):
+                            if isinstance(shownItems[-1], song.SortTitleInfo):
                                 shownItems.pop()
                         shownItems.append(item)
-            elif isinstance(item, Song.SongInfo):
+            elif isinstance(item, song.SongInfo):
                 if self.careerMode and (not self.showLockedSongs) and item.getLocked():
                     continue
                 else:
@@ -334,7 +334,7 @@ class SongChoosingScene(Scene):
             else:
                 shownItems.append(item)
         if len(shownItems) > 0:
-            if isinstance(shownItems[-1], Song.TitleInfo) or isinstance(shownItems[-1], Song.SortTitleInfo):
+            if isinstance(shownItems[-1], song.TitleInfo) or isinstance(shownItems[-1], song.SortTitleInfo):
                 shownItems.pop()
 
         if len(self.items) > 0 and len(shownItems) == 0:
@@ -344,7 +344,7 @@ class SongChoosingScene(Scene):
             Dialogs.showMessage(self.engine, msg)
         elif len(shownItems) > 0:
             for item in shownItems:
-                if isinstance(item, Song.SongInfo) or isinstance(item, Song.LibraryInfo):
+                if isinstance(item, song.SongInfo) or isinstance(item, song.LibraryInfo):
                     self.items = shownItems #make sure at least one item is selectable
                     break
             else:
@@ -355,7 +355,7 @@ class SongChoosingScene(Scene):
                 self.items = []
 
         if self.items == []:    #MFH: Catch when there ain't a damn thing in the current folder - back out!
-            if self.library != Song.DEFAULT_LIBRARY:
+            if self.library != song.DEFAULT_LIBRARY:
                 Dialogs.hideLoadingSplashScreen(self.engine, self.splash)
                 self.splash = None
                 self.startingSelected = self.library
@@ -370,26 +370,26 @@ class SongChoosingScene(Scene):
 
         if self.setlistStyle == 1:
             for i in range(self.headerSkip):
-                self.items.insert(0, Song.BlankSpaceInfo())
+                self.items.insert(0, song.BlankSpaceInfo())
             for i in range(self.footerSkip):
-                self.items.append(Song.BlankSpaceInfo())
+                self.items.append(song.BlankSpaceInfo())
 
         if self.startingSelected is not None:
             for i, item in enumerate(self.items):
-                if isinstance(item, Song.SongInfo) and self.startingSelected == item.songName: #TODO: SongDB
+                if isinstance(item, song.SongInfo) and self.startingSelected == item.songName: #TODO: SongDB
                     self.selectedIndex =  i
                     break
-                elif isinstance(item, Song.LibraryInfo) and self.startingSelected == item.libraryName:
+                elif isinstance(item, song.LibraryInfo) and self.startingSelected == item.libraryName:
                     self.selectedIndex =  i
                     break
 
         for item in self.items:
-            if isinstance(item, Song.SongInfo):
-                item.name = Song.removeSongOrderPrefixFromName(item.name) #TODO: I don't like this.
-            elif not self.tiersPresent and (isinstance(item, Song.TitleInfo) or isinstance(item, Song.SortTitleInfo)):
+            if isinstance(item, song.SongInfo):
+                item.name = song.removeSongOrderPrefixFromName(item.name) #TODO: I don't like this.
+            elif not self.tiersPresent and (isinstance(item, song.TitleInfo) or isinstance(item, song.SortTitleInfo)):
                 self.tiersPresent = True
 
-        while isinstance(self.items[self.selectedIndex], Song.BlankSpaceInfo) or ((isinstance(self.items[self.selectedIndex], Song.TitleInfo) or isinstance(self.items[self.selectedIndex], Song.SortTitleInfo)) and not self.selectTiers):
+        while isinstance(self.items[self.selectedIndex], song.BlankSpaceInfo) or ((isinstance(self.items[self.selectedIndex], song.TitleInfo) or isinstance(self.items[self.selectedIndex], song.SortTitleInfo)) and not self.selectTiers):
             self.selectedIndex += 1
             if self.selectedIndex >= len(self.items):
                 self.selectedIndex = 0
@@ -408,7 +408,7 @@ class SongChoosingScene(Scene):
         self.splash = None
 
     def checkCmdPlay(self):
-        info = Song.loadSongInfo(self.engine, self.songName, library = self.libraryName)
+        info = song.loadSongInfo(self.engine, self.songName, library = self.libraryName)
         guitars = []
         drums = []
         vocals = []
@@ -458,7 +458,7 @@ class SongChoosingScene(Scene):
         p = self.playerList[0].part
         player = self.playerList[0]
         if self.engine.cmdDiff is not None:
-            diff = Song.difficulties[self.engine.cmdDiff]
+            diff = song.difficulties[self.engine.cmdDiff]
             if diff in info.partDifficulties[p.id]:
                 self.playerList[0].difficulty = diff
             else:
@@ -468,14 +468,14 @@ class SongChoosingScene(Scene):
                 Dialogs.hideLoadingSplashScreen(self.engine, self.splash)
                 self.splash = None
             self.playerList[0].difficulty = Dialogs.chooseItem(self.engine, info.partDifficulties[p.id],
-                                  "%s \n %s" % (Song.removeSongOrderPrefixFromName(info.name), _("%s Choose a difficulty:") % player.name), selected = player.difficulty)
+                                  "%s \n %s" % (song.removeSongOrderPrefixFromName(info.name), _("%s Choose a difficulty:") % player.name), selected = player.difficulty)
         return True
 
     def loadItemLabel(self, i, preload = False):
         # Load the item label if it isn't yet loaded
         item = self.items[i]
         if self.itemLabels[i] is None:
-            if isinstance(item, Song.SongInfo):
+            if isinstance(item, song.SongInfo):
                 if self.labelType == 1: #CD covers
                     f = "label.png"
                 else:
@@ -489,7 +489,7 @@ class SongChoosingScene(Scene):
                 else:
                     self.itemLabels[i] = self.engine.loadImgDrawing(None, "label", os.path.join(item.libraryNam, item.songName, f))
 
-            elif isinstance(item, Song.LibraryInfo):
+            elif isinstance(item, song.LibraryInfo):
                 if self.texturedLabels:
                     label = self.engine.resource.fileName(item.libraryName, "label.png")
                     if os.path.exists(label):
@@ -498,7 +498,7 @@ class SongChoosingScene(Scene):
                         self.itemLabels[i] = False
                 else:
                     self.itemLabels[i] = self.engine.loadImgDrawing(None, "label", os.path.join(item.libraryName, "label.png"))
-            elif isinstance(item, Song.RandomSongInfo):
+            elif isinstance(item, song.RandomSongInfo):
                 self.itemLabels[i] = "Random"
             else:
                 return
@@ -525,7 +525,7 @@ class SongChoosingScene(Scene):
             self.songName, self.libraryName = self.engine.world.songQueue.getRandomSong()
         else:
             self.songName, self.libraryName = self.engine.world.songQueue.getSong()
-        info = Song.loadSongInfo(self.engine, self.songName, library = self.libraryName)
+        info = song.loadSongInfo(self.engine, self.songName, library = self.libraryName)
         guitars = []
         drums = []
         vocals = []
@@ -548,72 +548,72 @@ class SongChoosingScene(Scene):
         if self.queued:
             showDialog = False
             for i, player in enumerate(self.players):
-                if Song.parts[j] in choose[i]:
-                    p = Song.parts[j]
+                if song.parts[j] in choose[i]:
+                    p = song.parts[j]
                 elif self.queueParts == 0:
                     if j == 0:
                         for k in [3, 1, 2]:
-                            if Song.parts[k] in choose[i]:
-                                p = Song.parts[k]
+                            if song.parts[k] in choose[i]:
+                                p = song.parts[k]
                                 break
                     elif j == 1:
                         for k in [2, 0, 3]:
-                            if Song.parts[k] in choose[i]:
-                                p = Song.parts[k]
+                            if song.parts[k] in choose[i]:
+                                p = song.parts[k]
                                 break
                     elif j == 2:
                         for k in [1, 0, 3]:
-                            if Song.parts[k] in choose[i]:
-                                p = Song.parts[k]
+                            if song.parts[k] in choose[i]:
+                                p = song.parts[k]
                                 break
                     elif j == 3:
                         for k in [0, 1, 2]:
-                            if Song.parts[k] in choose[i]:
-                                p = Song.parts[k]
+                            if song.parts[k] in choose[i]:
+                                p = song.parts[k]
                                 break
                 j = self.engine.world.songQueue.getDiffs()[i]
-                if Song.difficulties[j] in info.partDifficulties[p.id]:
-                    d = Song.difficulties[j]
+                if song.difficulties[j] in info.partDifficulties[p.id]:
+                    d = song.difficulties[j]
                 elif self.queueDiffs == 0:
                     if j == 0:
                         for k in range(1,4):
-                            if Song.difficulties[k] in info.partDifficulties[p.id]:
-                                d = Song.difficulties[k]
+                            if song.difficulties[k] in info.partDifficulties[p.id]:
+                                d = song.difficulties[k]
                     elif j == 1:
                         for k in range(2,5):
-                            if Song.difficulties[k%4] in info.partDifficulties[p.id]:
-                                d = Song.difficulties[k%4]
+                            if song.difficulties[k%4] in info.partDifficulties[p.id]:
+                                d = song.difficulties[k%4]
                     elif j == 2:
-                        if Song.difficulties[3] in info.partDifficulties[p.id]:
-                            d = Song.difficulties[3]
+                        if song.difficulties[3] in info.partDifficulties[p.id]:
+                            d = song.difficulties[3]
                         else:
                             for k in range(1, -1, -1):
-                                if Song.difficulties[k] in info.partDifficulties[p.id]:
-                                    d = Song.difficulties[k]
+                                if song.difficulties[k] in info.partDifficulties[p.id]:
+                                    d = song.difficulties[k]
                     else:
                         for k in range(2, -1, -1):
-                            if Song.difficulties[k] in info.partDifficulties[p.id]:
-                                d = Song.difficulties[k]
+                            if song.difficulties[k] in info.partDifficulties[p.id]:
+                                d = song.difficulties[k]
                 elif self.queueDiffs == 1:
                     if j == 3:
                         for k in range(2,-1, -1):
-                            if Song.difficulties[k] in info.partDifficulties[p.id]:
-                                d = Song.difficulties[k]
+                            if song.difficulties[k] in info.partDifficulties[p.id]:
+                                d = song.difficulties[k]
                     elif j == 2:
                         for k in range(1,-2,-1):
-                            if Song.difficulties[k%4] in info.partDifficulties[p.id]:
-                                d = Song.difficulties[k%4]
+                            if song.difficulties[k%4] in info.partDifficulties[p.id]:
+                                d = song.difficulties[k%4]
                     elif j == 1:
-                        if Song.difficulties[0] in info.partDifficulties[p.id]:
-                            d = Song.difficulties[0]
+                        if song.difficulties[0] in info.partDifficulties[p.id]:
+                            d = song.difficulties[0]
                         else:
                             for k in range(2,4):
-                                if Song.difficulties[k] in info.partDifficulties[p.id]:
-                                    d = Song.difficulties[k]
+                                if song.difficulties[k] in info.partDifficulties[p.id]:
+                                    d = song.difficulties[k]
                     else:
                         for k in range(1,4):
-                            if Song.difficulties[k] in info.partDifficulties[p.id]:
-                                d = Song.difficulties[k]
+                            if song.difficulties[k] in info.partDifficulties[p.id]:
+                                d = song.difficulties[k]
                 if p and d:
                     player.part = p
                     player.difficulty = d
@@ -632,7 +632,7 @@ class SongChoosingScene(Scene):
         self.gameStarted = True
 
     def checkParts(self):
-        info = Song.loadSongInfo(self.engine, self.songName, library = self.libraryName)
+        info = song.loadSongInfo(self.engine, self.songName, library = self.libraryName)
         guitars = []
         drums = []
         vocals = []
@@ -710,7 +710,7 @@ class SongChoosingScene(Scene):
 
     def previewSong(self):
         self.previewLoaded = True
-        if isinstance(self.selectedItem, Song.SongInfo):
+        if isinstance(self.selectedItem, song.SongInfo):
             song = self.selectedItem.songName #TODO: SongDB
         else:
             return
@@ -725,7 +725,7 @@ class SongChoosingScene(Scene):
             except:
                 self.songLoader = None
 
-        self.songLoader = self.engine.resource.load(self, None, lambda: Song.loadSong(self.engine, song, playbackOnly = True, library = self.library), synch = True, onLoad = self.songLoaded, onCancel = self.songCanceled)
+        self.songLoader = self.engine.resource.load(self, None, lambda: song.loadSong(self.engine, song, playbackOnly = True, library = self.library), synch = True, onLoad = self.songLoaded, onCancel = self.songCanceled)
 
     def songCanceled(self):
         self.songLoader = None
@@ -740,7 +740,7 @@ class SongChoosingScene(Scene):
             self.song.stop()
 
         song.crowdVolume = 0
-        song.activeAudioTracks = [Song.GUITAR_TRACK, Song.RHYTHM_TRACK, Song.DRUM_TRACK]
+        song.activeAudioTracks = [song.GUITAR_TRACK, song.RHYTHM_TRACK, song.DRUM_TRACK, song.VOCAL_TRACK]
         song.setAllTrackVolumes(1)
         song.play()
         self.song = song
@@ -764,7 +764,7 @@ class SongChoosingScene(Scene):
             else:
                 if unicode:
                     for i, item in enumerate(self.items):
-                        if isinstance(item, Song.SongInfo):
+                        if isinstance(item, song.SongInfo):
                             if self.sortOrder in [0, 2, 5]:
                                 sort = item.name.lower()
                             elif self.sortOrder == 1:
@@ -802,7 +802,7 @@ class SongChoosingScene(Scene):
                 return
             if self.song:
                 self.song.fadeout(1000)
-            if self.library != Song.DEFAULT_LIBRARY and not self.tut and (self.listingMode == 0 or self.careerMode):
+            if self.library != song.DEFAULT_LIBRARY and not self.tut and (self.listingMode == 0 or self.careerMode):
                 self.initialItem  = self.library
                 self.library      = os.path.dirname(self.library)
                 if self.library == os.path.join("..", self.engine.config.get("setlist", "base_library")):
@@ -825,12 +825,12 @@ class SongChoosingScene(Scene):
                 self.searchText = ""
                 return
             self.engine.data.acceptSound.play()
-            if isinstance(self.selectedItem, Song.LibraryInfo):
+            if isinstance(self.selectedItem, song.LibraryInfo):
                 self.library = self.selectedItem.libraryName
                 self.startingSelected = None
                 log.debug("New library selected: " + str(self.library) )
                 self.loadLibrary()
-            elif isinstance(self.selectedItem, Song.SongInfo) and not self.selectedItem.getLocked():
+            elif isinstance(self.selectedItem, song.SongInfo) and not self.selectedItem.getLocked():
                 if self.listingMode == 1 and not self.careerMode:
                     self.library = self.selectedItem.libraryNam #TODO: SongDB
                 self.libraryName = self.selectedItem.libraryNam
@@ -860,7 +860,7 @@ class SongChoosingScene(Scene):
         elif c in Player.key3s or key == pygame.K_F3:
             self.previewDelay = 0
         elif c in Player.key4s or key == pygame.K_F12:
-            if isinstance(self.selectedItem, Song.SongInfo):
+            if isinstance(self.selectedItem, song.SongInfo):
                 self.moreInfo = True
         elif c in Player.menuNo and c in Player.cancels:
             self.engine.view.pushLayer(self.menu)
@@ -873,7 +873,7 @@ class SongChoosingScene(Scene):
         self.selectedIndex -= 1
         if self.selectedIndex < 0:
             self.selectedIndex = len(self.items) - 1
-        while isinstance(self.items[self.selectedIndex], Song.BlankSpaceInfo) or ((isinstance(self.items[self.selectedIndex], Song.TitleInfo) or isinstance(self.items[self.selectedIndex], Song.SortTitleInfo)) and not self.selectTiers):
+        while isinstance(self.items[self.selectedIndex], song.BlankSpaceInfo) or ((isinstance(self.items[self.selectedIndex], song.TitleInfo) or isinstance(self.items[self.selectedIndex], song.SortTitleInfo)) and not self.selectTiers):
             self.selectedIndex -= 1
             if self.selectedIndex < 0:
                 self.selectedIndex = len(self.items) - 1
@@ -888,7 +888,7 @@ class SongChoosingScene(Scene):
         self.selectedIndex += 1
         if self.selectedIndex >= len(self.items):
             self.selectedIndex = 0
-        while isinstance(self.items[self.selectedIndex], Song.BlankSpaceInfo) or ((isinstance(self.items[self.selectedIndex], Song.TitleInfo) or isinstance(self.items[self.selectedIndex], Song.SortTitleInfo)) and not self.selectTiers):
+        while isinstance(self.items[self.selectedIndex], song.BlankSpaceInfo) or ((isinstance(self.items[self.selectedIndex], song.TitleInfo) or isinstance(self.items[self.selectedIndex], song.SortTitleInfo)) and not self.selectTiers):
             self.selectedIndex += 1
             if self.selectedIndex >= len(self.items):
                 self.selectedIndex = 0
@@ -982,7 +982,7 @@ class SongChoosingScene(Scene):
                 if i == self.selectedIndex:
                     ns = n
                     continue
-                if isinstance(self.items[i], Song.BlankSpaceInfo):
+                if isinstance(self.items[i], song.BlankSpaceInfo):
                     continue
                 self.engine.theme.setlist.renderUnselectedItem(self, i, n)
         self.engine.theme.setlist.renderSelectedItem(self, ns) #we render this last to allow overlapping effects.

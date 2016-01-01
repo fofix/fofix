@@ -38,11 +38,10 @@ from fretwork import log
 
 from fofix.game.guitarscene.instruments.Instrument import Instrument
 from fofix.game.guitarscene.Neck import Neck
-from fofix.game.Song import Note, Tempo
+from fofix.game.song import Note, Tempo
 from fofix.core.Image import draw3Dtex
 from fofix.core.Shader import shaders
 from fofix.core.Mesh import Mesh
-from fofix.game import Song
 from fofix.core import cmgl
 
 class Guitar(Instrument):
