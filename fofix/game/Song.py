@@ -2948,16 +2948,33 @@ def loadSong(engine, name, library = DEFAULT_LIBRARY, playbackOnly = False, note
 
         os.chdir(orgpath)
 
-
         # All song file entries are going to be lists because there is a possibilty
         # for the drums of having multiple tracks. This will make things simpler.
         for f in songOggFiles:
             instName = f.split('.')[0].lower()
-            if 'drums' in instName:
-                instName = 'drums'
-            drumTest = bool( [i for i in songFiles.keys() if 'drums' in i] )
-            if instName not in songFiles.keys() or drumTest is False:
+
+            # Check for numbered audio tracks
+            isNumbered = re.compile('^.*_\d').match(instName)
+            if isNumbered:
+                # take the part of the name before the underscore for the name.
+                instName = instName.split('_')[0]
+
+
+            # get the number of additional tracks
+            instReNumbered = re.compile('^{0}_\d'.format(instName))
+            numCount = len([i for i in songOggFiles if instReNumbered.match(i)])
+            
+            print f, bool(isNumbered), numCount
+
+            # skip non numbered ogg files if there are others that are.
+            if numCount > 0 and not isNumbered:
+
+                print 'Skipped', f
+                continue
+
+            if instName not in songFiles:
                 songFiles[instName] = []
+
             songFiles[instName].append(engine.resource.fileName(library, name, f))
 
         if 'song' not in songFiles:
