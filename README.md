@@ -194,7 +194,7 @@ get the proper environment set up to use them.
 Since building and setting up these libraries can be difficult, we are
 making available a prebuilt archive of everything you need to compile
 FoFiX's native modules. Download the latest FoFiX Win32 Dependency Pack
-from [here](https://code.google.com/p/fofix/downloads/list?q=Type%3DDepArchive) and unzip it into the
+from [here](https://dl.dropboxusercontent.com/u/37405488/fofix-win32-deppack-20130304-updated.zip) and unzip it into the
 `win32/` directory. (The `deps/` directory in the archive should become
 a subdirectory of the `win32/` directory.) Now you are ready to compile
 the native modules.
