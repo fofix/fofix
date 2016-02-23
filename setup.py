@@ -25,7 +25,6 @@
 # FoFiX fully unified setup script
 import distutils.ccompiler
 from distutils.dep_util import newer
-from Cython.Distutils import build_ext as _build_ext
 from distutils.command.install import install as _install
 import sys, glob, os
 import subprocess
@@ -35,11 +34,8 @@ import numpy as np
 
 from fofix.core import Version, SceneFactory
 
-try:
-    from setuptools import setup, Extension, Command
-except ImportError:
-    from distutils.core import setup, Extension
-    from distutils.cmd import Command
+from setuptools import setup, Extension, Command
+from Cython.Build import cythonize
 
 
 # Start setting up py2{exe,app} and building the argument set for setup().
@@ -338,34 +334,6 @@ def combine_info(*args):
 
     return info
 
-
-# Extend the build_ext command further to rebuild the import libraries on
-# an MSVC build under Windows so they actually work.
-class build_ext(_build_ext):
-    def run(self, *args, **kw):
-        if self.compiler is None:
-            self.compiler = distutils.ccompiler.get_default_compiler()
-        if self.compiler == 'msvc':
-            msvc = distutils.ccompiler.new_compiler(compiler='msvc', verbose=self.verbose, dry_run=self.dry_run, force=self.force)
-            msvc.initialize()
-            for deffile in glob.glob(os.path.join('..', 'win32', 'deps', 'lib', '*.def')):
-                libfile = os.path.splitext(deffile)[0] + '.lib'
-                if newer(deffile, libfile):
-                    msvc.spawn([msvc.lib, '/nologo', '/machine:x86', '/out:'+libfile, '/def:'+deffile])
-
-            # Also add the directory containing the msinttypes headers to the include path.
-            self.include_dirs.append(os.path.join('.', 'win32', 'deps', 'include', 'msinttypes'))
-
-        return _build_ext.run(self, *args, **kw)
-
-    def build_extension(self, ext):
-        # If we're using MSVC, specify C++ exception handling behavior to avoid compiler warnings.
-        if self.compiler.compiler_type == 'msvc':
-            ext.extra_compile_args.append('/EHsc')
-
-        return _build_ext.build_extension(self, ext)
-
-
 # Make "setup.py install" do nothing until we configure something more sensible.
 class install(_install):
     def run(self, *args, **kw):
@@ -418,12 +386,12 @@ class xgettext(Command):
          ['-k' + funcname for funcname in self.FUNCNAMES] +
           glob.glob('*.py'))
 
+if os.name == 'nt':
+    vidInclude = ['.', 'win32/deps/include/msinttypes']
+else:
+    vidInclude = ['.']
 
-# Add the common arguments to setup().
-# This includes arguments to cause FoFiX's extension modules to be built.
-setup_args.update({
-  'options': options,
-  'ext_modules': [
+extensions = [
     Extension('fofix.lib.cmgl', ['fofix/core/cmgl/cmgl.pyx'], **combine_info(numpy_info, gl_info)),
     Extension('fofix.lib._pypitch',
               language='c++',
@@ -431,9 +399,15 @@ setup_args.update({
     Extension('fofix.lib._VideoPlayer',
               ['fofix/core/VideoPlayer/_VideoPlayer.pyx', 'fofix/core/VideoPlayer/VideoPlayer.c'],
               **combine_info(gl_info, ogg_info, theoradec_info, glib_info, swscale_info,
-              {'include_dirs': ['.']})),
-  ],
-  'cmdclass': {'build_ext': build_ext, 'install': install, 'msgfmt': msgfmt, 'xgettext': xgettext},
+              {'include_dirs': vidInclude}))
+]
+
+# Add the common arguments to setup().
+# This includes arguments to cause FoFiX's extension modules to be built.
+setup_args.update({
+  'options': options,
+  'ext_modules': cythonize(extensions),
+  'cmdclass': {'install': install, 'msgfmt': msgfmt, 'xgettext': xgettext},
 })
 
 # If we're on Windows, add the dependency directory to the PATH so py2exe will
