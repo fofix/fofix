@@ -149,14 +149,14 @@ You will now need to download and install the necessary third-party
 dependency modules.  Versions are the most recent available at the time
 of this writing.  You may wish to check the project websites for more
 recent releases.  If you do not use the links here, or if you are not
-using 32-bit Python 2.6, be sure you get packages appropriate for your
+using 32-bit Python 2.7, be sure you get packages appropriate for your
 Python installation.
 
 The following packages are required:
 
   * PyWin32 ([direct link to build 219](http://sourceforge.net/projects/pywin32/files/pywin32/Build%20219/pywin32-219.win32-py2.7.exe))
   * numpy ([direct link to 1.9.2](http://sourceforge.net/projects/numpy/files/NumPy/1.9.2/numpy-1.9.2-win32-superpack-python2.7.exe))
-  * pygame ([direct link to 1.9.1](http://pygame.org/ftp/pygame-1.9.1.win32-py2.6.msi))
+  * pygame ([direct link to 1.9.1](http://pygame.org/ftp/pygame-1.9.1.win32-py2.7.msi))
   * PyOpenGL ([direct link to 3.0.1](https://pypi.python.org/packages/any/P/PyOpenGL/PyOpenGL-3.1.0.win32.exe#md5=f175505f4f9e21c8c5c6adc794296d81))
   * Pillow ([direct link to 2.9.0](https://pypi.python.org/packages/2.7/P/Pillow/Pillow-2.9.0.win32-py2.7.exe#md5=2a2d5d447e03d1231cfb7700b6806912))
   * Cython ([link to 0.23](http://www.lfd.uci.edu/~gohlke/pythonlibs/#cython))
