@@ -20,7 +20,6 @@ Table of Contents
 -----------------
 1. [Checking out the latest code](#Checking-out-the-latest-code)
 2. [Notes on Python versions](#Notes-on-Python-versions)
-3. [Notes on PyOpenGL versions](#Notes-on-PyOpenGL-versions)
 4. [Setting up Python and third-party dependencies](#Setting-up-Python-and-third-party-dependencies)
 5. [Compiling the native modules](#Compiling-the-native-modules)
 6. [Building the translations](#Building-the-translations)
@@ -55,50 +54,9 @@ state that worked if the latest one breaks on you._
 <a name="Notes-on-Python-versions"></a>
 Notes on Python versions
 ------------------------
+Python 2.7 is currently the lowest version we support. Anything below that support has been dropped.
 
-### Anything below 2.6
-Support for running FoFiX under Python 2.4 with PyOpenGL 2.x has been
-dropped for good.  We warned you for quite a while that support could be
-removed at any time.  If you still don't have a 2.6 environment set up,
-it's *long* past time to reconstruct your environment using Python 2.6
-and PyOpenGL 3.x.
-
-The code now uses Python features that are not compatible with anything
-below Python 2.6.
-
-### 2.6
-Our current gold standard.  2.6 is currently the lowest Python version
-we will maintain compatibility and support for, and most development
-takes place on Python 2.6.
-
-### 2.7 and any future 2.x version
-2.7 works, though you're on your own installing the dependency packages.
-We will actively work toward compatibility with any future 2.x release
-that may occur, though the Python developers are unlikely to release
-anything beyond the 2.7 series.
-
-### 3.x
-We do not support Python 3.x in any way, nor are we likely to for a very
-long time.  3.x breaks compatibility with 2.x in many non-trivial ways.
-
-----
-
-<a name="Notes-on-PyOpenGL-versions"></a>
-Notes on PyOpenGL versions
---------------------------
-
-### 2.x
-Nice and fast but obsolete, needs hacks to work completely right for us,
-and won't work on Python 2.5 and up.  Needless to say, we don't use or
-support this anymore.
-
-### 3.x
-An almost complete rewrite that does everything we need (and then some)
-right out of the box.  This is the only series we support.  Unfortunately,
-it's written in pure Python with many levels of wrapping, so it's
-rather slow.  PyOpenGL-accelerate helps somewhat, but it's not much.
-Sometimes we will write our own binding of hard-hit functions in C for
-increased speed.
+We do not currently support Python 3.x but we have been slowly preparing for the transition.  3.x breaks compatibility with 2.x in many non-trivial ways. Therfor we have a lot of work before we have a lot of work left before we can make the jump. Fretwork will likely get full python 3 support first, and then the games. 
 
 ----
 
@@ -214,7 +172,7 @@ If you have previously installed fretwork make sure you download the latest rele
 
 ### Mac OS X
 
-Someone with a Mac will have to expand this section.
+This section will be expanded soon, but as it stands it is only possible to run from sources on osx. Packaging is broken.
 
 
 ### GNU/Linux
