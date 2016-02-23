@@ -36,27 +36,25 @@ Otherwise, you have everything you need and so can skip this section.
 _If you go the Git way, remember that some things might be broken or
 incomplete at any given time!_
 
-There's a [guide][] to accessing the Git repository and interacting with
-other development resources if you don't know how to clone the repository.
-There is also the [Google Code wiki page about obtaining the source][gsfg].
-  [guide]: http://www.fretsonfire.net/forums/viewtopic.php?f=32&t=47966
-  [gsfg]: http://code.google.com/p/fofix/wiki/GettingSourceFromGit?tm=4
+To clone this repository you can use the following git command:
+`git clone https://github.com/fofix/fofix.git`
 
-_It is highly recommended that when you run from git, you keep a separate
+There's also [guide][] to accessing the Git repository and interacting with
+other development resources..
+  [guide]: http://www.fretsonfire.net/forums/viewtopic.php?f=32&t=47966
+
+_As a warning when you run from git, you will want keep a separate
 folder containing the latest stable release.  New features and fixes that
 become available from git might cause other issues affecting playability._
-
-_Alternatively, you can learn how to rewind the branch you are on to a
-state that worked if the latest one breaks on you._
 
 ----
 
 <a name="Notes-on-Python-versions"></a>
 Notes on Python versions
 ------------------------
-Python 2.7 is currently the lowest version we support. Anything below that support has been dropped.
+Python 2.7 is currently the lowest version we support. Anything below that has been dropped.
 
-We do not currently support Python 3.x but we have been slowly preparing for the transition.  3.x breaks compatibility with 2.x in many non-trivial ways. Therfor we have a lot of work before we have a lot of work left before we can make the jump. Fretwork will likely get full python 3 support first, and then the games. 
+We do not currently support Python 3.x but we have been slowly preparing for the transition.  3.x breaks compatibility with 2.x in many non-trivial ways. Therfor we have a lot of work before we can make the jump. Fretwork will likely get full python 3 support first, and then the games. 
 
 ----
 
