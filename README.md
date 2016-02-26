@@ -41,7 +41,7 @@ There's also [guide][] to accessing the Git repository and interacting with
 other development resources..
   [guide]: http://www.fretsonfire.net/forums/viewtopic.php?f=32&t=47966
 
-_As a warning when running from git, you will want keep a separate
+_As a warning when running from git, you will want to keep a separate
 folder containing the latest stable release.  New features and fixes that
 become available from git might cause other issues affecting playability._
 
