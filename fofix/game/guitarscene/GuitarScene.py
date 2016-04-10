@@ -3089,7 +3089,7 @@ class GuitarScene(BandPlayBaseScene):
                                     self.inUnison[i] = False
 
                     if (self.scoring[i].streak != 0 or not self.processedFirstNoteYet) and not instrument.playedNotes and len(missedNotes) > 0:
-                        self.screwUp(playerNum, self.controls)
+                        self.screwUp(playerNum)
 
             #myfingershurt: Capo's starpower claps on a user setting:
             if (self.starClaps or self.beatClaps) and len(self.beatTime) > 0:
@@ -3450,7 +3450,7 @@ class GuitarScene(BandPlayBaseScene):
         self.engine.view.setViewport(1,0)
 
 
-    def screwUp(self, num, controls, sounds=True):
+    def screwUp(self, sounds=True):
 
         if self.coOpType:
             scoreCard = self.coOpScoreCard
@@ -3490,12 +3490,72 @@ class GuitarScene(BandPlayBaseScene):
                 self.engine.data.screwUpSoundBass.play()
             elif self.instruments[num].isDrum:
                 if self.drumMisses > 0: #MFH's cleaned-up - Faaa Drum sound
-                    self.instruments[num].playDrumSounds(controls)
+                    self.instruments[num].playDrumSounds(self.controls)
                 else:
                     self.engine.data.screwUpSoundDrums.play()   #plays random drum sounds
             else:   #guitar
                 self.engine.data.screwUpSound.play()
 
+
+    def noteHit(self, num):
+
+        if self.coOpType:
+            scoreCard = self.coOpScoreCard
+        else:
+            scoreCard = self.scoring[num]
+
+        if self.instruments[num].isDrum:
+            self.drumStart = True
+
+        self.processedFirstNoteYet = True
+
+        self.song.setInstrumentVolume(1.0, self.players[num].part)
+        self.currentlyAnimating = True
+
+        isFirst = True
+        noteList = self.instruments[num].playedNotes
+        for tym, noat in noteList:
+            if noat.star and isFirst:
+                self.instruments[num].isStarPhrase = True
+            isFirst = False
+
+        scoreCard.streak += 1
+        self.notesHit[num] = True #QQstarS:Set [0] to [i]
+        scoreCard.notesHit += 1
+
+
+        #MFH - tell ScoreCard to update its totalStreak counter if we've just passed 100% for some reason:
+        if scoreCard.notesHit > scoreCard.totalStreakNotes:
+            scoreCard.totalStreakNotes = scoreCard.notesHit
+
+        tempScoreValue = len(self.instruments[num].playedNotes) * self.baseScore * self.multi[num]
+        if self.coOpType:
+            self.scoring[num].streak += 1 #needed in co-op GH for RF HO/PO
+            self.scoring[num].notesHit += 1
+
+            #MFH - tell ScoreCard to update its totalStreak counter if we've just passed 100% for some reason:
+            if self.scoring[num].notesHit > self.scoring[num].totalStreakNotes:
+                self.scoring[num].totalStreakNotes = self.scoring[num].notesHit
+
+            scoreCard.score += (tempScoreValue*self.scoring[num].getScoreMultiplier())
+        else:
+            self.scoring[num].addScore(tempScoreValue)
+
+        scoreCard.updateAvMult()
+        star = scoreCard.stars
+        a = scoreCard.getStarScores()
+        if a > star and ((self.inGameStars == 1 and self.theme == 2) or self.inGameStars == 2):
+            self.engine.data.starDingSound.play()
+
+        self.stage.triggerPick(self.songTime, [n[1].number for n in self.instruments[num].playedNotes])
+        if self.scoring[num].streak % 10 == 0:
+            self.lastMultTime[num] = self.songTime
+            self.instruments[num].setMultiplier(self.scoring[num].getScoreMultiplier())
+
+        #myfingershurt
+        if self.showAccuracy:
+            self.accuracy[num] = self.instruments[num].playedNotes[0][0] - self.songTime
+            self.dispAccuracy[num] = True
 
     def doPick(self, num):
         if not self.song:
@@ -3506,76 +3566,18 @@ class GuitarScene(BandPlayBaseScene):
 
         self.lastPickPos[num] = self.songTime
 
-        if self.coOpType:
-            scoreCard = self.coOpScoreCard
-        else:
-            scoreCard = self.scoring[num]
-
 
         # self.killswitchEngaged[num] = False   #always reset killswitch status when picking / tapping
 
         #volshebnyi - disable failing if BRE is active
         if self.instruments[num].startPick(self.song, self.songTime, self.controls):
-
-            if self.instruments[num].isDrum:
-                self.drumStart = True
-            self.song.setInstrumentVolume(1.0, self.players[num].part)
-            self.currentlyAnimating = True
-
-            self.notesHit[num] = True #QQstarS:Set [0] to [i]
-
-            tempScoreValue = len(self.instruments[num].playedNotes) * self.baseScore * self.multi[num]
-            if self.coOpType:
-                scoreCard.score += (tempScoreValue*self.scoring[num].getScoreMultiplier())
-            else:
-                self.scoring[num].addScore(tempScoreValue)
-
-            scoreCard.notesHit += 1
-            #MFH - tell ScoreCard to update its totalStreak counter if we've just passed 100% for some reason:
-            if scoreCard.notesHit > scoreCard.totalStreakNotes:
-                scoreCard.totalStreakNotes = scoreCard.notesHit
-
-
-            scoreCard.streak += 1
-            if self.coOpType:
-                self.scoring[num].notesHit += 1
-
-
-                #MFH - tell ScoreCard to update its totalStreak counter if we've just passed 100% for some reason:
-                if self.scoring[num].notesHit > self.scoring[num].totalStreakNotes:
-                    self.scoring[num].totalStreakNotes = self.scoring[num].notesHit
-
-
-                self.scoring[num].streak += 1
-            scoreCard.updateAvMult()
-            star = scoreCard.stars
-            a = scoreCard.getStarScores()
-            if a > star and ((self.inGameStars == 1 and self.theme == 2) or self.inGameStars == 2):
-                self.engine.data.starDingSound.play()
-
-            self.stage.triggerPick(self.songTime, [n[1].number for n in self.instruments[num].playedNotes])
-            if self.scoring[num].streak % 10 == 0:
-                self.lastMultTime[num] = self.songTime
-                self.instruments[num].setMultiplier(self.scoring[num].getScoreMultiplier())
-
-            #myfingershurt
-            if self.showAccuracy:
-                self.accuracy[num] = self.instruments[num].playedNotes[0][0] - self.songTime
-                self.dispAccuracy[num] = True
-
-            isFirst = True
-            noteList = self.instruments[num].playedNotes
-            for tym, noat in noteList:
-                if noat.star and isFirst:
-                    self.instruments[num].isStarPhrase = True
-                isFirst = False
-
+            self.noteHit(num)
         else:
             if self.instruments[num].isDrum and self.instruments[num].drumFillWasJustActive:
                 self.instruments[num].freestylePick(self.song, self.songTime, self.controls)    #MFH - to allow late drum fill SP activation
                 self.instruments[num].drumFillWasJustActive = False
             else:
-                self.screwUp(num, self.controls)
+                self.screwUp(num)
 
         #myfingershurt: bass drum sound play
         if self.instruments[num].isDrum and self.bassKickSoundEnabled:
@@ -3585,16 +3587,11 @@ class GuitarScene(BandPlayBaseScene):
         if not self.song:
             return
 
-        if self.coOpType:
-            scoreCard = self.coOpScoreCard
-        else:
-            scoreCard = self.scoring[num]
-
         missedNotes = self.instruments[num].getMissedNotes(self.song, self.songTime, catchup = True)
         if len(missedNotes) > 0:
             self.processedFirstNoteYet = True
 
-            self.screwUp(num, self.controls, sounds=False)
+            self.screwUp(num, sounds=False)
 
             if hopo == True:
                 return
@@ -3646,57 +3643,7 @@ class GuitarScene(BandPlayBaseScene):
 
         self.killswitchEngaged[num] = False   #always reset killswitch status when picking / tapping
         if self.instruments[num].startPick3(self.song, self.songTime, self.controls, hopo):
-            self.processedFirstNoteYet = True
-            self.song.setInstrumentVolume(1.0, self.players[num].part)
-
-            isFirst = True
-            noteList = self.instruments[num].playedNotes
-            for tym, noat in noteList:
-                if noat.star and isFirst:
-                    self.instruments[num].isStarPhrase = True
-                isFirst = False
-
-            scoreCard.streak += 1
-            self.notesHit[num] = True #QQstarS:Set [0] to [i]
-            self.currentlyAnimating = True
-
-            scoreCard.notesHit += 1  # glorandwarf: was len(self.guitars[num].playedNotes)
-
-            #MFH - tell ScoreCard to update its totalStreak counter if we've just passed 100% for some reason:
-            if scoreCard.notesHit > scoreCard.totalStreakNotes:
-                scoreCard.totalStreakNotes = scoreCard.notesHit
-
-
-            tempScoreValue = len(self.instruments[num].playedNotes) * self.baseScore * self.multi[num]
-
-            if self.coOpType:
-                self.scoring[num].streak += 1 #needed in co-op GH for RF HO/PO
-                self.scoring[num].notesHit += 1
-
-                #MFH - tell ScoreCard to update its totalStreak counter if we've just passed 100% for some reason:
-                if self.scoring[num].notesHit > self.scoring[num].totalStreakNotes:
-                    self.scoring[num].totalStreakNotes = self.scoring[num].notesHit
-
-                scoreCard.score += (tempScoreValue*self.scoring[num].getScoreMultiplier())
-            else:
-                scoreCard.addScore(tempScoreValue)
-
-            scoreCard.updateAvMult()
-            star = scoreCard.stars
-            a = scoreCard.getStarScores()
-
-            if a > star and ((self.inGameStars == 1 and self.theme == 2) or self.inGameStars == 2):
-                self.engine.data.starDingSound.play()
-
-            self.stage.triggerPick(self.songTime, [n[1].number for n in self.instruments[num].playedNotes])
-            if self.scoring[num].streak % 10 == 0:
-                self.lastMultTime[num] = self.songTime
-                self.instruments[num].setMultiplier(self.scoring[num].getScoreMultiplier())
-
-            if self.showAccuracy:
-                self.accuracy[num] = self.instruments[num].playedNotes[0][0] - self.songTime
-                self.dispAccuracy[num] = True
-
+            self.noteHit(num)
         else:
             ApplyPenalty = True
 
@@ -3730,7 +3677,7 @@ class GuitarScene(BandPlayBaseScene):
 
             if ApplyPenalty == True:
 
-                self.screwUp(num, self.controls)
+                self.screwUp(num)
 
         #myfingershurt: bass drum sound play
         if self.instruments[num].isDrum and self.bassKickSoundEnabled:
