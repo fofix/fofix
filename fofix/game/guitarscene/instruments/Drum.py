@@ -730,6 +730,12 @@ class Drum(Instrument):
         return numHits
 
 
+    def hitNote(self, time, note):
+        self.pickStartPos = max(self.pickStartPos, time)
+        self.playedNotes.append([time, note])
+        note.played       = True
+        return True
+
     def startPick(self, song, pos, controls, hopo = False):
         if not song:
             return False

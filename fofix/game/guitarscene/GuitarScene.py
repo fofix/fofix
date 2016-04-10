@@ -2667,10 +2667,7 @@ class GuitarScene(BandPlayBaseScene):
                             self.scoring[num].totalStreakNotes -= 1
 
             else:
-                if guitar.isDrum:
-                    self.doPick(i)
-                else:
-                    self.doPick3GH2(i, hopo, pullOff)
+                self.doPick3GH2(i, hopo, pullOff)
 
     def handleJurgen(self, pos):
         chordFudge = 1   #MFH - was 10 - #myfingershurt - needed to detect chords
@@ -3505,12 +3502,6 @@ class GuitarScene(BandPlayBaseScene):
             return
 
         if self.instruments[num].playedNotes:
-            # If all the played notes are tappable, there are no required notes and
-            # the last note was played recently enough, ignore this pick
-            if self.instruments[num].areNotesTappable(self.instruments[num].playedNotes) and \
-               not self.instruments[num].getRequiredNotes(self.song, self.songTime) and \
-               self.songTime - self.lastPickPos[num] <= self.song.period / 2:
-                return
             self.endPick(num)
 
         self.lastPickPos[num] = self.songTime
@@ -3521,7 +3512,7 @@ class GuitarScene(BandPlayBaseScene):
             scoreCard = self.scoring[num]
 
 
-        self.killswitchEngaged[num] = False   #always reset killswitch status when picking / tapping
+        # self.killswitchEngaged[num] = False   #always reset killswitch status when picking / tapping
 
         #volshebnyi - disable failing if BRE is active
         if self.instruments[num].startPick(self.song, self.songTime, self.controls):

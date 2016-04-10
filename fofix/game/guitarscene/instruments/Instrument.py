@@ -634,14 +634,6 @@ class Instrument(object):
 
         return sorted(notes, key=lambda x: x[0])
 
-    def areNotesTappable(self, notes):
-        if not notes:
-            return
-        for time, note in notes:
-            if note.tappable > 1:
-                return True
-        return False
-
     def getMissedNotes(self, song, pos, catchup = False):
         if not song and not song.readyToGo:
             return

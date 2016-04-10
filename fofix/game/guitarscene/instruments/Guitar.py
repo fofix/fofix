@@ -478,29 +478,6 @@ class Guitar(Instrument):
         return result
 
 
-    def startPick(self, song, pos, controls):
-        if not song:
-            return False
-        if not song.readyToGo:
-            return False
-
-        self.playedNotes = []
-
-        if self.controlsMatchNotes(controls, self.matchingNotes):
-            for time, note in self.matchingNotes:
-                if note.skipped == True:
-                    continue
-
-                self.pickStartPos = max(pos, time)
-
-                note.played       = True
-                self.playedNotes.append([time, note])
-                if self.guitarSolo:
-                    self.currentGuitarSoloHitNotes += 1
-            return True
-        return False
-
-
     def startPick3(self, song, pos, controls, hopo = False):
         if not song:
             return False
