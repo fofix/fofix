@@ -550,12 +550,6 @@ class Instrument(object):
         self.scoreMultiplier = multiplier
         self.neck.scoreMultiplier = multiplier
 
-    def hitNote(self, time, note):
-        self.pickStartPos = max(self.pickStartPos, time)
-        self.playedNotes.append([time, note])
-        note.played       = True
-        return True
-
     def endPick(self, pos):
         if not self.isDrum:
             for time, note in self.playedNotes:
@@ -666,15 +660,6 @@ class Instrument(object):
         self.coOpRescueTime  = pos
         self.starPower  = 0
         log.debug("Rescued at " + str(pos))
-
-    def noteBeingHeld(self):
-        noteHeld = False
-        if self.isDrum:
-            return noteHeld
-        for i in range(0,5):
-            if self.hit[i] == True:
-                noteHeld = True
-        return noteHeld
 
     def isKillswitchPossible(self):
         possible = False
