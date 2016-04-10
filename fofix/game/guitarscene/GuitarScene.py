@@ -3450,7 +3450,7 @@ class GuitarScene(BandPlayBaseScene):
         self.engine.view.setViewport(1,0)
 
 
-    def screwUp(self, sounds=True):
+    def screwUp(self, num, sounds=True):
 
         if self.coOpType:
             scoreCard = self.coOpScoreCard
