@@ -326,64 +326,6 @@ class Guitar(Instrument):
             if self.leftyMode:
                 gl.glScalef(-1, 1, 1)
 
-    def controlsMatchNotes(self, controls, notes):
-        # no notes?
-        if not notes:
-            return False
-
-        # check each valid chord
-        chords = {}
-        for time, note in notes:
-            if not time in chords:
-                chords[time] = []
-            chords[time].append((time, note))
-
-        #Make sure the notes are in the right time order
-        chordlist = chords.values()
-        chordlist.sort(lambda a, b: cmp(a[0][0], b[0][0]))
-
-        twochord = 0
-        for chord in chordlist:
-            # matching keys?
-            requiredKeys = [note.number for time, note in chord]
-            requiredKeys = self.uniqify(requiredKeys)
-
-            if len(requiredKeys) > 2 and self.twoChordMax == True:
-                twochord = 0
-                for k in self.keys:
-                    if controls.getState(k):
-                        twochord += 1
-                if twochord == 2:
-                    skipped = len(requiredKeys) - 2
-                    requiredKeys = [min(requiredKeys), max(requiredKeys)]
-                else:
-                    twochord = 0
-
-            for n in range(self.strings):
-                if n in requiredKeys and not (controls.getState(self.keys[n]) or controls.getState(self.keys[n+5])):
-                    return False
-                if not n in requiredKeys and (controls.getState(self.keys[n]) or controls.getState(self.keys[n+5])):
-                    # The lower frets can be held down
-                    if n > max(requiredKeys):
-                        return False
-            if twochord != 0:
-                if twochord != 2:
-                    for time, note in chord:
-                        note.played = True
-                else:
-                    self.twoChordApply = True
-                    for time, note in chord:
-                        note.skipped = True
-                    chord[0][1].skipped = False
-                    chord[-1][1].skipped = False
-                    chord[0][1].played = True
-                    chord[-1][1].played = True
-        if twochord == 2:
-            self.twoChord += skipped
-
-        return True
-
-
     def controlsMatchNotes3(self, controls, notes, hopo = False):
 
 
@@ -541,17 +483,6 @@ class Guitar(Instrument):
         if len(self.playedNotes) != 0:
             return True
         return False
-
-    def soloFreestylePick(self, song, pos, controls):
-        numHits = 0
-        for theFret in range(5):
-            self.freestyleHit[theFret] = controls.getState(self.keys[theFret+5])
-            if self.freestyleHit[theFret]:
-                if shaders.turnon:
-                    shaders.var["fret"][self.player][theFret]=shaders.time()
-                    shaders.var["fretpos"][self.player][theFret]=pos
-                numHits += 1
-        return numHits
 
     #MFH - TODO - handle freestyle picks here
     def freestylePick(self, song, pos, controls):
