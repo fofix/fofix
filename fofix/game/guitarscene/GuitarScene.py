@@ -33,7 +33,6 @@
 from __future__ import with_statement
 
 from math import degrees, atan
-import locale
 import os
 
 import OpenGL.GL as gl
@@ -97,9 +96,6 @@ class BandPlayBaseScene(Scene):
         self.numOfSingers    = 0
         self.firstGuitar     = None
         self.neckrender = []
-
-        #for number formatting with commas for Rock Band:
-        locale.setlocale(locale.LC_ALL, '')   #more compatible
 
         self.visibility       = 1.0
         self.libraryName      = libraryName
