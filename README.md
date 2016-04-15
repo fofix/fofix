@@ -1,4 +1,5 @@
-[![Code Health](https://landscape.io/github/fofix/fofix/master/landscape.svg?style=flat)](https://landscape.io/github/fofix/fofix/master)
+[![Code Health](https://landscape.io/github/fofix/fofix/master/landscape.svg?style=flat)](https://landscape.io/github/fofix/fofix/master) [![Gitter](https://badges.gitter.im/fofix/fofix.svg)](https://gitter.im/fofix/fofix?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=body_badge)
+
 
 Frets on Fire X - FoFiX
 =======================
@@ -9,7 +10,10 @@ Repository (GitHub): http://github.com/fofix/fofix
 
   $ git clone git://github.com/fofix/fofix.git
 
-Chat with us on IRC: #fofix on OFTC ([web interface](http://chat.mibbit.com/#fofix@OFTC))
+Chat with us on IRC: #fofix on oftc.net  ([web interface](https://webchat.oftc.net/))
+
+Chat with us on [Gitter](https://gitter.im/fofix/fofix)
+
 
 How to set yourself up to run from source
 =========================================
