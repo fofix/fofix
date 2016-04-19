@@ -203,20 +203,20 @@ got_all_headers:
         player->tex_buffer = g_malloc(player->tex_width * player->tex_height * 4);
         switch (player->tinfo.pixel_fmt) {
           case TH_PF_420:
-            pix_format = PIX_FMT_YUV420P;
+            pix_format = AV_PIX_FMT_YUV420P;
             break;
           case TH_PF_422:
-            pix_format = PIX_FMT_YUV422P;
+            pix_format = AV_PIX_FMT_YUV422P;
             break;
           case TH_PF_444:
-            pix_format = PIX_FMT_YUV444P;
+            pix_format = AV_PIX_FMT_YUV444P;
             break;
           default:
             g_set_error(err, VIDEO_PLAYER_ERROR, VIDEO_PLAYER_BAD_HEADERS,
               "Bad pixel format in Theora stream.");
             return FALSE;
         }
-        player->sws_context = sws_getContext(player->tinfo.pic_width, player->tinfo.pic_height, pix_format, player->tex_width, player->tex_height, PIX_FMT_RGBA, SWS_FAST_BILINEAR, NULL, NULL, NULL);
+        player->sws_context = sws_getContext(player->tinfo.pic_width, player->tinfo.pic_height, pix_format, player->tex_width, player->tex_height, AV_PIX_FMT_RGBA, SWS_FAST_BILINEAR, NULL, NULL, NULL);
 
         glBindTexture(GL_TEXTURE_2D, player->video_texture);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
