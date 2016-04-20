@@ -8,6 +8,8 @@ This is Frets on Fire X, a highly customizable rhythm game supporting many modes
 
 Repository (GitHub): http://github.com/fofix/fofix
 
+If you have the time please fill out our survey: https://goo.gl/4s2jjc
+
   $ git clone git://github.com/fofix/fofix.git
 
 Chat with us on IRC: #fofix on oftc.net  ([web interface](https://webchat.oftc.net/))
