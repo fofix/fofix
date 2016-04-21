@@ -103,7 +103,7 @@ args = cmd_args()
 
 #stump: disable pyOpenGL error checking if we are not asked for it.
 # This must be before *anything* that may import pyOpenGL!
-if args['gl_error_check']:
+if not args['gl_error_check']:
     disable_gl_checks()
 
 import traceback
