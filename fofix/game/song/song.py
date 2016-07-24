@@ -729,13 +729,14 @@ class LibraryInfo(object):
             return
         # Count the available songs
         libraryRoot = os.path.dirname(self.fileName)
-        for name in os.listdir(libraryRoot):
-            if not os.path.isdir(os.path.join(libraryRoot, name)) or name.startswith("."):
-                continue
-            if os.path.isfile(os.path.join(libraryRoot, name, "notes.mid")):
-                self.songCount += 1
-            elif os.path.isfile(os.path.join(libraryRoot, name, "notes-unedited.mid")):
-                self.songCount += 1
+        if os.path.isdir(libraryRoot):
+            for name in os.listdir(libraryRoot):
+                if not os.path.isdir(os.path.join(libraryRoot, name)) or name.startswith("."):
+                    continue
+                if os.path.isfile(os.path.join(libraryRoot, name, "notes.mid")):
+                    self.songCount += 1
+                elif os.path.isfile(os.path.join(libraryRoot, name, "notes-unedited.mid")):
+                    self.songCount += 1
 
 
     def _set(self, attr, value):
