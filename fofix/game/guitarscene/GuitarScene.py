@@ -1114,7 +1114,7 @@ class GuitarScene(BandPlayBaseScene):
 
 
         self.guitarSoloAccuracyDisplayMode = self.engine.config.get("game", "gsolo_accuracy_disp")
-        self.guitarSoloAccuracyDisplayPos = self.engine.config.get("game", "gsolo_acc_pos")
+        self.guitarSoloAccuracyDisplayPos = self.engine.config.get("game", "gsolo_accuracy_pos")
 
         #need a new flag for each player, showing whether or not they've missed a note during a solo section.
         #this way we have a backup detection of Perfect Solo in case a note got left out, picks up the other side of the solo slop
