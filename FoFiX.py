@@ -81,10 +81,10 @@ def cmd_args():
     # Where the name automatically assigned to the metavar option is to long i used x in its place.
     # Might go back and
     options = parser.add_argument_group('Options')
-    options.add_argument('-r', '--resolution', type=str,  metavar='x',    help='Force a specific resolution to be used.')
-    options.add_argument('-f', '--fullscreen',  action='store_true',       help='Force usage of full-screen mode.')
+    options.add_argument('-r', '--resolution', type=str,  metavar='x',    help='Force a specific resolution to be used.', default=None)
+    options.add_argument('-f', '--fullscreen',  action='store_true',       help='Force usage of full-screen mode.', default=None)
     options.add_argument('-c', '--config',     type=str,  metavar='x',     help='Use this configuration file instead of the fofix.ini in its default location.  Use "reset" to use the usual fofix.ini but clear it first.')
-    options.add_argument('-t', '--theme',      type=str,  metavar='x', help='Force the specified theme to be used. Remember to quote the theme name if it contains spaces (e.g. %(prog)s -t "Guitar Hero III")')
+    options.add_argument('-t', '--theme',      type=str,  metavar='x', help='Force the specified theme to be used. Remember to quote the theme name if it contains spaces (e.g. %(prog)s -t "Guitar Hero III")', default=None)
     options.add_argument('-s', '--song',       type=str,                  help='Play a song in one-shot mode. (See "One-shot mode options" below.)')
 
     osm = parser.add_argument_group('One-Shot Mode')
