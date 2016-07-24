@@ -769,7 +769,7 @@ class SettingsMenu(Menu.Menu):
           ConfigChoice(self.engine, self.engine.config, "engine", "highpriority", isQuickset = 1),
           ConfigChoice(self.engine, self.engine.config, "video",  "fps", isQuickset = 1),
           ConfigChoice(self.engine, self.engine.config, "game", "accuracy_pos", autoApply = True),
-          ConfigChoice(self.engine, self.engine.config, "game", "gsolo_acc_pos", autoApply = True, isQuickset = 1), #MFH
+          ConfigChoice(self.engine, self.engine.config, "game", "gsolo_accuracy_pos", autoApply = True, isQuickset = 1), #MFH
           ConfigChoice(self.engine, self.engine.config, "coffee", "noterotate", autoApply = True), #blazingamer
           ConfigChoice(self.engine, self.engine.config, "game", "gfx_version_tag", autoApply = True), #MFH
           ConfigChoice(self.engine, self.engine.config, "video",  "multisamples", isQuickset = 1),
@@ -1392,7 +1392,7 @@ def quickset(config):
         config.set("performance", "animated_notes", False)
         config.set("game", "rb_midi_lyrics", 0)
         config.set("game", "rb_midi_sections", 0)
-        config.set("game", "gsolo_acc_disp", 0)
+        config.set("game", "gsolo_accuracy_disp", 0)
         config.set("game", "incoming_neck_mode", 0)
         config.set("game", "midi_lyric_mode", 2)
         config.set("video", "fps", 60)
@@ -1417,13 +1417,12 @@ def quickset(config):
         config.set("performance", "animated_notes", False)
         config.set("game", "rb_midi_lyrics", 1)
         config.set("game", "rb_midi_sections", 1)
-        config.set("game", "gsolo_acc_disp", 1)
+        config.set("game", "gsolo_accuracy_disp", 1)
         config.set("game", "incoming_neck_mode", 1)
         config.set("game", "midi_lyric_mode", 2)
         config.set("video", "fps", 60)
         config.set("video", "multisamples", 2)
         config.set("coffee", "game_phrases", 1)
-        config.set("game", "partial_stars", 1)
         config.set("game", "stage_animate", 0)
         config.set("game", "lyric_mode", 2)
         config.set("game", "use_graphical_submenu", 0)
@@ -1442,13 +1441,12 @@ def quickset(config):
         config.set("performance", "animated_notes", True)
         config.set("game", "rb_midi_lyrics", 2)
         config.set("game", "rb_midi_sections", 2)
-        config.set("game", "gsolo_acc_disp", 1)
+        config.set("game", "gsolo_accuracy_disp", 1)
         config.set("game", "incoming_neck_mode", 2)
         config.set("game", "midi_lyric_mode", 2)
         config.set("video", "fps", 60)
         config.set("video", "multisamples", 4)
         config.set("coffee", "game_phrases", 2)
-        config.set("game", "partial_stars", 1)
         config.set("game", "lyric_mode", 2)
         config.set("game", "use_graphical_submenu", 1)
         config.set("audio", "enable_crowd_tracks", 1)
@@ -1466,14 +1464,13 @@ def quickset(config):
         config.set("performance", "animated_notes", True)
         config.set("game", "rb_midi_lyrics", 2)
         config.set("game", "rb_midi_sections", 2)
-        config.set("game", "gsolo_acc_disp", 2)
+        config.set("game", "gsolo_accuracy_disp", 2)
         config.set("game", "incoming_neck_mode", 2)
         config.set("game", "midi_lyric_mode", 0)
         config.set("video", "fps", 60)
         config.set("video", "multisamples", 4)
         config.set("video", "shader_use", True)
         config.set("coffee", "game_phrases", 2)
-        config.set("game", "partial_stars", 1)
         config.set("game", "lyric_mode", 2)
         config.set("game", "use_graphical_submenu", 1)
         config.set("audio", "enable_crowd_tracks", 1)
