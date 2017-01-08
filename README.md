@@ -83,7 +83,7 @@ time of this writing is 2.7.10 ([direct link][py2.7.10-win32]).  Again,
 _32-bit is recommended, even if you have a 64-bit system._  Install
 by double-clicking the .msi file, and be sure to remember which folder
 you install Python to, as you will need to know for the next step.
-(If you use default settings, Python should end up in: `C:\Python26`)
+(If you use default settings, Python should end up in: `C:\Python27`)
 
   [the Python download page]: https://www.python.org/downloads/
   [py2.7.10-win32]: https://www.python.org/ftp/python/2.7.10/python-2.7.10.msi
