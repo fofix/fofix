@@ -4,6 +4,8 @@
 Frets on Fire X - FoFiX
 =======================
 
+[![Join the chat at https://gitter.im/fofix/fofix](https://badges.gitter.im/fofix/fofix.svg)](https://gitter.im/fofix/fofix?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 This is Frets on Fire X, a highly customizable rhythm game supporting many modes of guitar, bass, drum, and vocal gameplay for up to four players. It is the continuation of a long succession of modifications to the original Frets on Fire by Unreal Voodoo.
 
 Repository (GitHub): http://github.com/fofix/fofix
