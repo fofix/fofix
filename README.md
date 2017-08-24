@@ -13,9 +13,6 @@ This is Frets on Fire X, a highly customizable rhythm game supporting many modes
 - unofficial forum: http://www.fretsonfire.net/forums/viewforum.php?f=32
 
 
-Status: active.
-
-
 Setup
 -----
 
@@ -23,30 +20,27 @@ Setup
 
 First, you will need **Python 2.7**.
 
-Python dependencies: see the `requirements.txt` file
+Python dependencies: run `pip install -r requirements.txt`.
 
 Optional dependencies:
 
-- pyopengl-accelerate: this will make PyOpenGL go a good bit faster
-- pyaudio: this provides support for microphone input, which is required for vocal play
-- gettext: for translations
+- `pyopengl-accelerate`: this will make PyOpenGL go a good bit faster
+- `pyaudio`: this provides support for microphone input, which is required for vocal play
+- `gettext`: for translations
 
 OS-specific dependencies:
 
 - Windows:
-    - pyWin32
+    - `pyWin32`
     - [win32 dependency pack](https://dl.dropboxusercontent.com/u/37405488/fofix-win32-deppack-20130304-updated.zip) (to unzip into the `win32` directory)
 
 - Unix:
     - a C++ compiler
-    - GLU
-    - OpenGL
-    - ffmpeg
-    - pkg-config
+    - `OpenGL`
+    - `ffmpeg`
+    - `pkg-config`
     - python's developpment headers
-    - and: OpenGL, GLU, GLib, SDL, SDL_mixer, libogg, libvorbisfile, libtheora, libsoundtouch, and libswscale (part of ffmpeg) development headers
-
-    Cerealizer and Fretwork should be installed via pip.
+    - and: `GLU`, `GLib`, `SDL`, `SDL_mixer`, `libogg`, `libvorbisfile`, `libtheora`, `libsoundtouch`, `libswscale` (part of `ffmpeg`) development headers
 
 
 ### Native modules
@@ -59,11 +53,5 @@ before you can start the game from source:
 
 Start the game
 --------------
-
-On Windows:
-
-    src/scripts/RunFofFromSources.bat
-
-On Unix:
 
     python FoFiX.py
