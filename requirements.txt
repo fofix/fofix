@@ -11,3 +11,4 @@ Pillow
 Cerealizer
 
 PyAudio
+https://github.com/fofix/fretwork/archive/0.2.0.tar.gz
