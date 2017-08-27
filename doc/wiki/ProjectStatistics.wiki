@@ -1,4 +1,0 @@
-#summary Project statistics by Ohloh
-#labels Featured
-<wiki:gadget url="http://www.ohloh.net/p/25819/widgets/project_basic_stats.xml" height="220"  border="1" />
-<wiki:gadget url="http://www.ohloh.net/p/25819/widgets/project_cocomo.xml" height="240"  border="0" />

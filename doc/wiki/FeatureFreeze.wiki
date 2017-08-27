@@ -1,6 +1,0 @@
-#summary What is a feature freeze.
-
-= Definition of Feature Freeze =
-A feature freeze is when developers agree not to add new features until a new release is done. The objective is to concentrate on stabilizing/improving the existing code base and most importantly fixing bugs.
-
-It's a normal step toward a new release, be it a Beta or a Final.
