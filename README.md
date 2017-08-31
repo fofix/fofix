@@ -32,7 +32,7 @@ OS-specific dependencies:
 
 - Windows:
     - `pyWin32`
-    - [win32 dependency pack](https://dl.dropboxusercontent.com/u/37405488/fofix-win32-deppack-20130304-updated.zip) (to unzip into the `win32` directory)
+    - [win32 dependency pack](https://storage.googleapis.com/google-code-archive-downloads/v2/code.google.com/fofix/fofix-win32-deppack-20130304.zip) (to unzip into the `win32` directory)
 
 - Unix:
     - a C++ compiler
