@@ -234,11 +234,6 @@ class GameEngine(object):
         bufferSize   = self.config.get("audio", "buffersize")
         self.audio.open(frequency = frequency, bits = bits, stereo = stereo, bufferSize = bufferSize)
 
-        self.cmdPlay           = 0
-        self.cmdMode           = None
-        self.cmdDiff           = None
-        self.cmdPart           = None
-
         self.gameStarted       = False
         self.world             = None
 

@@ -101,13 +101,6 @@ def cmd_args():
     options.add_argument('-f', '--fullscreen', action='store_true', help='Force usage of full-screen mode.', default=None)
     options.add_argument('-c', '--config', type=str, metavar='x', help='Use this configuration file instead of the fofix.ini in its default location.  Use "reset" to use the usual fofix.ini but clear it first.')
     options.add_argument('-t', '--theme', type=str, metavar='x', help='Force the specified theme to be used. Remember to quote the theme name if it contains spaces (e.g. %(prog)s -t "Guitar Hero III")', default=None)
-    options.add_argument('-s', '--song',       type=str,                  help='Play a song in one-shot mode. (See "One-shot mode options" below.)')
-
-    osm = parser.add_argument_group('One-Shot Mode')
-    osm.add_argument('-p', '--part',    type=int, help='0: Guitar, 1: Rhythm, 2: Bass, 3: Lead')
-    osm.add_argument('-d', '--diff',    type=int, help='0: Expert, 1: Hard, 2: Medium, 3: Easy (Only applies if "part" is set)')
-    osm.add_argument('-m', '--mode',    type=int, help='0: Quickplay, 1: Practice, 2: Career')
-    osm.add_argument('-n', '--players', type=int, help='Number of multiplayer players.')
 
     adv = parser.add_argument_group('Advanced')
     adv.add_argument('-v', '--verbose', action='store_true', help='Verbose messages')
@@ -156,15 +149,10 @@ class Main():
 
         # get args
         self.args = cmd_args()
-        self.playing = self.args['song']
         self.configFile = self.args['config']
         self.fullscreen = self.args['fullscreen']
         self.resolution = self.args['resolution']
         self.theme = self.args['theme']
-        self.diff = self.args['diff']
-        self.part = self.args['part']
-        self.mode = self.args['mode']
-        self.players = self.args['players']
 
         # disable pyOpenGL error checking if we are not asked for it.
         # This must be before *anything* that may import pyOpenGL!
@@ -187,8 +175,6 @@ class Main():
             Config.set("coffee", "themename", self.theme)
 
         self.engine = GameEngine(self.config)
-
-        self.init_oneshot()
 
         self.videoLayer = False
         self.restartRequested = False
@@ -215,74 +201,31 @@ class Main():
 
         return config
 
-    def init_oneshot(self):
-        ''' Determine if oneshot mode is valid. '''
-        # I think this code can be moved elsewhere...
-        self.engine.cmdPlay = 0
-
-        # Check for a valid invocation of one-shot mode.
-        if self.playing is not None:
-            log.debug('Validating song directory for one-shot mode.')
-
-            library = Config.get("setlist","base_library")
-            basefolder = os.path.join(Version.dataPath(),library,"songs",self.playing)
-
-
-            if not os.path.exists(os.path.join(basefolder, "song.ini")):
-
-                if not (os.path.exists(os.path.join(basefolder, "notes.mid")) or
-                        os.path.exists(os.path.join(basefolder, "notes-unedited.mid"))):
-
-                    if not (os.path.exists(os.path.join(basefolder, "song.ogg")) or
-                            os.path.exists(os.path.join(basefolder, "guitar.ogg"))):
-
-                        log.warn("Song directory provided ('%s') is not a valid song directory. Starting up FoFiX in standard mode." % self.playing)
-                        self.engine.startupMessages.append(_("Song directory provided ('%s') is not a valid song directory. Starting up FoFiX in standard mode.") % self.playing)
-                        return
-
-            # Set up one-shot mode
-            log.debug('Entering one-shot mode.')
-            Config.set("setlist", "selected_song", playing)
-
-            self.engine.cmdPlay = 1
-
-            if self.diff is not None:
-                self.engine.cmdDiff = int(self.diff)
-            if self.part is not None:
-                self.engine.cmdPart = int(self.part)
-
-            if self.players == 1:
-                self.engine.cmdMode = self.players, self.mode, 0
-            else:
-                self.engine.cmdMode = self.players, 0, self.mode
-
     def restart(self):
         log.notice("Restarting.")
         self.engine.audio.close()
         self.restartRequested = True
 
     def run(self):
-
         # Perhapse this could be implemented in a better way...
-        # Play the intro video if it is present, we have the capability, and
-        # we are not in one-shot mode.
-        if not self.engine.cmdPlay:
-            themename = Config.get("coffee", "themename")
-            vidSource = os.path.join(Version.dataPath(), 'themes', themename, 'menu', 'intro.ogv')
-            if os.path.isfile(vidSource):
-                try:
-                    vidPlayer = VideoLayer(self.engine, vidSource, cancellable=True)
-                except (IOError, VideoPlayerError):
-                    log.error("Error loading intro video:")
-                else:
-                    vidPlayer.play()
-                    self.engine.view.pushLayer(vidPlayer)
-                    self.videoLayer = True
-                    self.engine.ticksAtStart = pygame.time.get_ticks()
-                    while not vidPlayer.finished:
-                        self.engine.run()
-                    self.engine.view.popLayer(vidPlayer)
-                    self.engine.view.pushLayer(MainMenu(self.engine))
+        # Play the intro video if it is present, we have the capability
+        themename = Config.get("coffee", "themename")
+        vidSource = os.path.join(Version.dataPath(), 'themes', themename, 'menu', 'intro.ogv')
+        if os.path.isfile(vidSource):
+            try:
+                vidPlayer = VideoLayer(self.engine, vidSource, cancellable=True)
+            except (IOError, VideoPlayerError):
+                log.error("Error loading intro video:")
+            else:
+                vidPlayer.play()
+                self.engine.view.pushLayer(vidPlayer)
+                self.videoLayer = True
+                self.engine.ticksAtStart = pygame.time.get_ticks()
+                while not vidPlayer.finished:
+                    self.engine.run()
+                self.engine.view.popLayer(vidPlayer)
+                self.engine.view.pushLayer(MainMenu(self.engine))
+
         if not self.videoLayer:
             self.engine.setStartupLayer(MainMenu(self.engine))
 
