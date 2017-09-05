@@ -60,7 +60,8 @@ def run_command(command):
 
     return data
 
-pisSet = None
+
+apisSet = None
 # This prevents the following message being displayed on osx:
 # ApplePersistenceIgnoreState: Existing state will not be touched. New state will be written to *path*
 if 'Darwin' in platform.platform():
@@ -245,15 +246,15 @@ class Main():
 
             self.engine.cmdPlay = 1
 
-            if diff is not None:
-                self.engine.cmdDiff = int(diff)
-            if part is not None:
-                self.engine.cmdPart = int(part)
+            if self.diff is not None:
+                self.engine.cmdDiff = int(self.diff)
+            if self.part is not None:
+                self.engine.cmdPart = int(self.part)
 
-            if players == 1:
-                self.engine.cmdMode = players, mode, 0
+            if self.players == 1:
+                self.engine.cmdMode = self.players, self.mode, 0
             else:
-                self.engine.cmdMode = players, 0, mode
+                self.engine.cmdMode = self.players, 0, self.mode
 
     def restart(self):
         log.notice("Restarting.")
