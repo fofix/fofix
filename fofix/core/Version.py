@@ -1,8 +1,9 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
 #####################################################################
-# -*- coding: iso-8859-1 -*-                                        #
-#                                                                   #
 # Frets on Fire                                                     #
-# Copyright (C) 2006 Sami Kyöstilä                                  #
+# Copyright (C) 2006 Sami KyÃ¶stilÃ¤                                  #
 #                                                                   #
 # This program is free software; you can redistribute it and/or     #
 # modify it under the terms of the GNU General Public License       #
@@ -20,9 +21,10 @@
 # MA  02110-1301, USA.                                              #
 #####################################################################
 
-import sys
 import os
 import re
+import sys
+
 
 MAJOR_VERSION = 4
 MINOR_VERSION = 0
@@ -31,6 +33,7 @@ PROGRAM_NAME = 'FoFiX'
 PROGRAM_UNIXSTYLE_NAME = 'fofix'
 URL = 'http://fofix.googlecode.com'
 RELEASE_ID = 'alpha 2'
+
 
 def _getTagLine():
     from fofix.core import VFS  # can't be done at top level due to circular import issues...
@@ -71,14 +74,17 @@ def _getTagLine():
     else:
         return None
 
+
 def revision():
     rev = _getTagLine()
     if rev is None:
         rev = RELEASE_ID
     return rev
 
+
 def versionNum():
     return "%d.%d.%d" % (MAJOR_VERSION, MINOR_VERSION, MICRO_VERSION)
+
 
 def isWindowsExe():
     '''
@@ -86,6 +92,7 @@ def isWindowsExe():
     @return: boolean for whether this is the Windows executable
     '''
     return hasattr(sys, 'frozen') and sys.frozen == 'windows_exe'
+
 
 # evilynux: Returns version number w.r.t. frozen state
 def version():
@@ -97,6 +104,7 @@ def version():
     else:
         version = "%s %s" % (versionNum(), revision())
     return version
+
 
 #stump: VFS will take care of this
 def dataPath():

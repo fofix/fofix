@@ -1,6 +1,7 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 #####################################################################
-# -*- coding: iso-8859-1 -*-                                        #
-#                                                                   #
 # Frets on Fire                                                     #
 # Copyright (C) 2006 Sami Kyöstilä                                  #
 #               2008 myfingershurt                                  #
@@ -29,18 +30,16 @@ import random
 import math
 import os
 
+from fretwork import log
 import OpenGL.GL as gl
 
-from fretwork import log
-
-from fofix.core.VideoPlayer import VideoLayer, VideoPlayerError
-from fofix.core.LinedConfigParser import LinedConfigParser
-from fofix.game.guitarscene import Rockmeter
 from fofix.core.Image import drawImage
-from fofix.core.Shader import shaders
-from fofix.core.constants import *
 from fofix.core.Language import _
-
+from fofix.core.LinedConfigParser import LinedConfigParser
+from fofix.core.Shader import shaders
+from fofix.core.VideoPlayer import VideoLayer, VideoPlayerError
+from fofix.core.constants import *
+from fofix.game.guitarscene import Rockmeter
 
 
 class Layer(object):

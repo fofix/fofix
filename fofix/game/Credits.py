@@ -1,6 +1,7 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
 #####################################################################
-# -*- coding: iso-8859-1 -*-                                        #
-#                                                                   #
 # Frets on Fire                                                     #
 # Copyright (C) 2006 Sami Kyöstilä                                  #
 #               2008 myfingershurt                                  #
@@ -23,25 +24,22 @@
 #####################################################################
 
 from __future__ import with_statement
-
 import os
 import sys
-import pygame
 
 from OpenGL.GL import OpenGL, glColor4f, glTranslatef
-
 from fretwork import log
+import pygame
 
-from fofix.core.VideoPlayer import VideoLayer, VideoPlayerError
-from fofix.core.Input import KeyListener
-from fofix.core.Image import drawImage
-from fofix.core.constants import *
-from fofix.core.Language import _
-from fofix.core.View import Layer
-from fofix.core import Version
-from fofix.core import Player
 from fofix.core import Config
-
+from fofix.core import Player
+from fofix.core import Version
+from fofix.core.Image import drawImage
+from fofix.core.Input import KeyListener
+from fofix.core.Language import _
+from fofix.core.VideoPlayer import VideoLayer, VideoPlayerError
+from fofix.core.View import Layer
+from fofix.core.constants import *
 
 
 class Element:
@@ -57,6 +55,7 @@ class Element:
         @param offset: Offset in the Y direction in fractions of the screen height
         """
         pass
+
 
 class Text(Element):
     def __init__(self, font, scale, color, alignment, text):
@@ -81,6 +80,7 @@ class Text(Element):
         glColor4f(*self.color)
         self.font.render(self.text, (x, offset), scale = self.scale)
 
+
 class Picture(Element):
     def __init__(self, engine, fileName, height):
         self.height = height
@@ -96,6 +96,7 @@ class Picture(Element):
         w, h = self.engine.view.geometry[2:4]
         drawImage(self.drawing, scale = (1, -1),
                               coord = (.5 * w, h - (.5 * self.height + offset) * h * float(w) / float(h)))
+
 
 # evilynux - Updated to latest MFH-Alarian mod. Alot changed compared to upstream FoF.
 #            Removed song, our revamped MainMenu already provides songs.

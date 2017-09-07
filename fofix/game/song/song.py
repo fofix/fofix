@@ -1,6 +1,7 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 #####################################################################
-# -*- coding: iso-8859-1 -*-                                        #
-#                                                                   #
 # Frets on Fire                                                     #
 # Copyright (C) 2006 Sami Kyöstilä                                  #
 #               2008 myfingershurt                                  #
@@ -22,31 +23,32 @@
 # MA  02110-1301, USA.                                              #
 #####################################################################
 
-import os
-import re
-import copy
-import time
-import glob
 from collections import OrderedDict
-import random
-import urllib
-import cPickle  #stump: Cerealizer and sqlite3 don't seem to like each other that much...
-import hashlib
 import binascii
-import cerealizer
+import cPickle  # Cerealizer and sqlite3 don't seem to like each other that much...
+import copy
+import glob
+import hashlib
+import os
+import random
+import re
+import time
+import urllib
 
 from fretwork import log
 from fretwork import midi
 from fretwork.audio import StreamingSound
 from fretwork.unicode import utf8
+import cerealizer
 
-from fofix.core.Theme import hexToColor, colorToHex
+from fofix.core import Config
+from fofix.core import VFS
+from fofix.core import Version
 from fofix.core.Language import _
 from fofix.core.Theme import *
-from fofix.core import Config
-from fofix.core import Version
-from fofix.core import VFS
+from fofix.core.Theme import hexToColor, colorToHex
 from fofix.game.song.songconstants import *
+
 
 #code for adding tracks, inside song.py:
 #self.song.eventTracks[TK_SCRIPT].addEvent(self.abs_time(), event)  #MFH - add an event to the script.txt track
