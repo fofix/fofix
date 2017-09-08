@@ -10,7 +10,6 @@
 .pydevproject
 .settings
 fofix/html
-doc/epydoc
 fofix/*.ini
 fofix/*.log
 fofix/*.idb
