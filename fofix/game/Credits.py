@@ -221,11 +221,11 @@ class Credits(Layer, KeyListener):
           space,
           space,
           Text(nf, bs, c1, "center", _("Source Code available under the GNU General Public License")),
-          Text(nf, bs, c2, "center", "http://code.google.com/p/fofix"),
+          Text(nf, bs, c2, "center", "https://github.com/fofix/fofix"),
           space,
           space,
           Text(nf, bs, c1, "center", _("Copyright 2006, 2007 by Unreal Voodoo")),
-          Text(nf, bs, c1, "center", _("Copyright 2008-2013 by Team FoFiX")),
+          Text(nf, bs, c1, "center", _("Copyright 2008-2017 by Team FoFiX")),
           space,
           space
         ])

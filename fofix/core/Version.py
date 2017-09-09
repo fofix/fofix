@@ -31,7 +31,7 @@ MINOR_VERSION = 0
 MICRO_VERSION = 0
 PROGRAM_NAME = 'FoFiX'
 PROGRAM_UNIXSTYLE_NAME = 'fofix'
-URL = 'http://fofix.googlecode.com'
+URL = 'https://github.com/fofix/fofix'
 RELEASE_ID = 'alpha 2'
 
 
@@ -65,12 +65,6 @@ def _getTagLine():
 
         return 'development (git %s %s)' % (shortref or "(unknown)",
                                             headhash and headhash[:7] or "(unknown)")
-
-    # Look for the svn administrative directory.
-    elif VFS.isdir('/gameroot/src/.svn'):
-        revision = VFS.open('/gameroot/src/.svn/entries').readlines()[3].strip()
-        return 'development (svn r%s)' % revision
-
     else:
         return None
 

@@ -2952,7 +2952,8 @@ def getAvailableLibraries(engine, library = DEFAULT_LIBRARY):
         if not os.path.exists(songRoot):
             return libraries
         for libraryRoot in os.listdir(songRoot):
-            if libraryRoot == ".svn":   #MFH - filter out the hidden SVN control folder!
+            if libraryRoot == ".git":
+                # filter the git folder
                 continue
             libraryRoot = os.path.join(songRoot, libraryRoot)
             if not os.path.isdir(libraryRoot):
