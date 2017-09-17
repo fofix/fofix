@@ -1,6 +1,7 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
 #####################################################################
-# -*- coding: iso-8859-1 -*-                                        #
-#                                                                   #
 # Frets on Fire                                                     #
 # Copyright (C) 2006 Sami Kyöstilä                                  #
 #               2008 myfingershurt                                  #
@@ -23,11 +24,9 @@
 # MA  02110-1301, USA.                                              #
 #####################################################################
 
-
+import os
 import random
 import string
-import sys
-import os
 
 from fretwork import log
 from fretwork.audio import Music
@@ -42,8 +41,6 @@ from fofix.game.Menu import Menu
 from fofix.core import Config
 from fofix.game import Dialogs
 from fofix.core import Settings
-from fofix.core import Version
-from fofix.core import VFS
 
 
 class MainMenu(BackgroundLayer):
@@ -226,30 +223,6 @@ class MainMenu(BackgroundLayer):
     def shown(self):
         self.engine.view.pushLayer(self.menu)
         shaders.checkIfEnabled()
-        if not self.shownOnce:
-            self.shownOnce = True
-            if hasattr(sys, 'frozen'):
-                # Check whether this is a release binary being run from an svn/git
-                # working copy or whether this is an svn/git binary not being run
-                # from an corresponding working copy.
-                currentVcs, buildVcs = None, None
-                if VFS.isdir('/gameroot/.git'):
-                    currentVcs = 'git'
-                elif VFS.isdir('/gameroot/src/.svn'):
-                    currentVcs = 'Subversion'
-                if 'git' in Version.version():
-                    buildVcs = 'git'
-                elif 'svn' in Version.version():
-                    buildVcs = 'Subversion'
-                if currentVcs != buildVcs:
-                    if buildVcs is None:
-                        msg = _('This binary release is being run from a %(currentVcs)s working copy. This is not the correct way to run FoFiX from %(currentVcs)s. Please see one of the following web pages to set your %(currentVcs)s working copy up correctly:') + \
-                              '\n\nhttp://code.google.com/p/fofix/wiki/RunningUnderPython26' + \
-                              '\nhttp://code.google.com/p/fofix/wiki/RequiredSourceModules'
-                    else:
-                        msg = _('This binary was built from a %(buildVcs)s working copy but is not running from one. The FoFiX Team will not provide any support whatsoever for this binary. Please see the following site for official binary releases:') + \
-                              '\n\nhttp://code.google.com/p/fofix/'
-                    Dialogs.showMessage(self.engine, msg % {'buildVcs': buildVcs, 'currentVcs': currentVcs})
 
     def runMusic(self):
         if self.menumusic and not self.song.isPlaying():   #re-randomize

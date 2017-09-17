@@ -1,6 +1,7 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 #####################################################################
-# -*- coding: iso-8859-1 -*-                                        #
-#                                                                   #
 # Frets on Fire                                                     #
 # Copyright (C) 2006 Sami Kyöstilä                                  #
 #               2008 myfingershurt                                  #
@@ -29,18 +30,16 @@ import random
 import math
 import os
 
+from fretwork import log
 import OpenGL.GL as gl
 
-from fretwork import log
-
-from fofix.core.VideoPlayer import VideoLayer, VideoPlayerError
-from fofix.core.LinedConfigParser import LinedConfigParser
-from fofix.game.guitarscene import Rockmeter
 from fofix.core.Image import drawImage
-from fofix.core.Shader import shaders
-from fofix.core.constants import *
 from fofix.core.Language import _
-
+from fofix.core.LinedConfigParser import LinedConfigParser
+from fofix.core.Shader import shaders
+from fofix.core.VideoPlayer import VideoLayer, VideoPlayerError
+from fofix.core.constants import *
+from fofix.game.guitarscene import Rockmeter
 
 
 class Layer(object):
@@ -455,7 +454,7 @@ class Stage(object):
                 fileIndex = 0
                 allfiles = os.listdir(self.pathfull)
                 for name in allfiles:
-                    if os.path.splitext(name)[0].lower() != "practice" and os.path.splitext(name)[0].lower() != "practicedrum" and os.path.splitext(name)[0].lower() != "practicebass" and name != ".svn":
+                    if os.path.splitext(name)[0].lower() != "practice" and os.path.splitext(name)[0].lower() != "practicedrum" and os.path.splitext(name)[0].lower() != "practicebass" and name != ".git":
                         log.debug("Valid background found, index (" + str(fileIndex) + "): " + name)
                         files.append(name)
                         fileIndex += 1
