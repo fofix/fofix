@@ -34,8 +34,8 @@ Windows
 **Only 32 bit Python is supported**
 
 Install the following dependencies:
-    - `pyWin32 <https://sourceforge.net/projects/pywin32/files/pywin32/>`
-    - `win32 dependency pack <https://dl.dropboxusercontent.com/u/37405488/fofix-win32-deppack-20130304-updated.zip>` (to unzip into the ``win32`` directory)
+    - `pyWin32 <https://sourceforge.net/projects/pywin32/files/pywin32/>`_
+    - `win32 dependency pack <https://dl.dropboxusercontent.com/u/37405488/fofix-win32-deppack-20130304-updated.zip>`_ (to unzip into the ``win32`` directory)
     - fretwork - ``pip install https://github.com/fofix/fretwork/releases/download/0.2.0/fretwork-0.2.0-cp27-none-win32.whl``
 
 
