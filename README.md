@@ -33,6 +33,7 @@ OS-specific dependencies:
 - Windows:
     - [pyWin32](https://sourceforge.net/projects/pywin32/files/pywin32/)
     - [win32 dependency pack](https://www.dropbox.com/s/p8xv4pktq670q9i/fofix-win32-deppack-20130304-updated.zip?dl=0) (to unzip into the `win32` directory)
+    - fretwork - `pip install https://github.com/fofix/fretwork/releases/download/0.2.0/fretwork-0.2.0-cp27-none-win32.whl`
 
 - Unix:
     - a C++ compiler
