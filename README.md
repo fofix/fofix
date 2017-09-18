@@ -18,7 +18,7 @@ Setup
 
 ### Dependencies
 
-First, you will need **Python 2.7**.
+First, you will need **Python 2.7**. (32bit)
 
 Python dependencies: run `pip install -r requirements.txt`.
 
@@ -31,8 +31,8 @@ Optional dependencies:
 OS-specific dependencies:
 
 - Windows:
-    - `pyWin32`
-    - [win32 dependency pack](https://storage.googleapis.com/google-code-archive-downloads/v2/code.google.com/fofix/fofix-win32-deppack-20130304.zip) (to unzip into the `win32` directory)
+    - [pyWin32](https://sourceforge.net/projects/pywin32/files/pywin32/)
+    - [win32 dependency pack](https://www.dropbox.com/s/p8xv4pktq670q9i/fofix-win32-deppack-20130304-updated.zip?dl=0) (to unzip into the `win32` directory)
 
 - Unix:
     - a C++ compiler
