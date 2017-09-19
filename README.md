@@ -2,6 +2,7 @@ Frets on Fire X - FoFiX
 =======================
 
 [![Code Health](https://landscape.io/github/fofix/fofix/master/landscape.svg?style=flat)](https://landscape.io/github/fofix/fofix/master)
+[![Documentation Status](https://readthedocs.org/projects/fofix/badge/?version=latest)](http://fofix.readthedocs.io/en/latest/?badge=latest)
 [![Gitter](https://badges.gitter.im/fofix/fofix.svg)](https://gitter.im/fofix/fofix?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=body_badge)
 
 
