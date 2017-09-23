@@ -509,7 +509,7 @@ class SongChoosingScene(Scene):
                     Dialogs.changeLoadingSplashScreenText(self.engine, self.splash, _("Loading Album Artwork...") + " %d%%" % percent)
 
     def addToQueue(self, selectedSong): #FIXME: Queue system
-        self.engine.songQueue.addSong(selectedSong, library)
+        self.engine.songQueue.addSong(selectedSong, self.library)
 
     def removeFromQueue(self, selectedSong):
         self.engine.songQueue.removeSong(selectedSong)
@@ -517,6 +517,7 @@ class SongChoosingScene(Scene):
     def startGame(self, fromQueue = False): #note this is not refined.
         if len(self.engine.world.songQueue) == 0:
             return
+        self.songCanceled()  #stop preview playback
         showDialog = True
         if not fromQueue and self.queueFormat == 1 and len(self.engine.world.songQueue) > 1:
             self.engine.world.songQueue.setFullQueue()
@@ -655,7 +656,8 @@ class SongChoosingScene(Scene):
         return True
 
     def checkQueueParts(self):
-        parts = self.engine.world.songQueue.getParts()
+        #TODO: checkQueueParts
+        pass #parts = self.engine.world.songQueue.getParts()
 
 
     def freeResources(self):
@@ -709,9 +711,9 @@ class SongChoosingScene(Scene):
                 self.loadItemLabel(self.selectedIndex-i)
 
     def previewSong(self):
-        self.previewLoaded = True
         if isinstance(self.selectedItem, song.SongInfo):
-            song = self.selectedItem.songName #TODO: SongDB
+            self.previewLoaded = True
+            self.songName = self.selectedItem.songName #TODO: SongDB
         else:
             return
 
@@ -725,31 +727,40 @@ class SongChoosingScene(Scene):
             except:
                 self.songLoader = None
 
-        self.songLoader = self.engine.resource.load(self, None, lambda: song.loadSong(self.engine, song, playbackOnly = True, library = self.library), synch = True, onLoad = self.songLoaded, onCancel = self.songCanceled)
+        # synch MUST be True; database updates cannot run in background thread
+        # NOTE if synch == True, songLoaded is called BEFORE return
+        # self.songLoader =  ## assign to this if you can get synch=False to work
+        self.engine.resource.load(self, None,
+                                  lambda: song.loadSong(self.engine, self.songName, playbackOnly = True, library = self.library), 
+                                  synch = True,
+                                  onLoad = self.songLoaded, 
+                                  onCancel = self.songCanceled)
 
     def songCanceled(self):
-        self.songLoader = None
+        if self.songLoader:
+            self.songLoader.stop()
+            self.songLoader = None
         if self.song:
             self.song.stop()
-        self.song = None
+            self.song = None
 
-    def songLoaded(self, song):
+    def songLoaded(self, songObj):
         self.songLoader = None
 
         if self.song:
             self.song.stop()
 
-        song.crowdVolume = 0
-        song.activeAudioTracks = [song.GUITAR_TRACK, song.RHYTHM_TRACK, song.DRUM_TRACK, song.VOCAL_TRACK]
-        song.setAllTrackVolumes(1)
-        song.play()
-        self.song = song
+        self.song = songObj
+        self.song.crowdVolume = 0
+        self.song.activeAudioTracks = [song.GUITAR_TRACK, song.RHYTHM_TRACK, song.DRUM_TRACK, song.VOCAL_TRACK]
+        self.song.setAllTrackVolumes(1)
+        self.song.play()
 
     def quit(self):
         self.freeResources()
         self.engine.world.resetWorld()
 
-    def keyPressed(self, key, unicode):
+    def keyPressed(self, key, isUnicode):
         self.lastTime = self.time
         c = self.engine.input.controls.getMapping(key)
         if key == pygame.K_SLASH and not self.searching:
@@ -759,10 +770,10 @@ class SongChoosingScene(Scene):
                 if key == pygame.K_BACKSPACE:
                     self.searchText = self.searchText[:-1]
                 else:
-                    self.searchText += unicode
+                    self.searchText += isUnicode
                 return
             else:
-                if unicode:
+                if isUnicode:
                     for i, item in enumerate(self.items):
                         if isinstance(item, song.SongInfo):
                             if self.sortOrder in [0, 2, 5]:
@@ -781,7 +792,7 @@ class SongChoosingScene(Scene):
                                 sort = item.icon.lower()
                             else:
                                 sort = ""
-                            if sort.startswith(unicode):
+                            if sort.startswith(isUnicode):
                                 self.selectedIndex = i
                                 self.updateSelection()
                                 break
@@ -941,7 +952,7 @@ class SongChoosingScene(Scene):
 
         self.engine.theme.setlist.run(ticks)
 
-    def renderSetlist(self, visibility, topMost):
+    def renderSetlist(self): #, visibility, topMost):
         w, h = self.engine.view.geometry[2:4]
 
         #render the background (including the header and footer)
@@ -993,12 +1004,12 @@ class SongChoosingScene(Scene):
         #render the foreground stuff last
         self.engine.theme.setlist.renderForeground(self)
 
-    def render(self, visibility, topMost):
+    def render3D(self): #, visibility, topMost):
         if self.gameStarted:
             return
         if self.items == []:
             return
-        Scene.render(self, visibility, topMost)
+        #Scene.render(self, visibility, topMost)
         with self.engine.view.orthogonalProjection(normalize = True):
             self.engine.view.setViewport(1,0)
             w, h = self.engine.view.geometry[2:4]
@@ -1007,13 +1018,13 @@ class SongChoosingScene(Scene):
                 drawImage(self.img_background, scale = (1.0, -1.0), coord = (w/2,h/2), stretched = FULL_SCREEN)
 
             if self.mode == 0:
-                self.renderSetlist(visibility, topMost)
+                self.renderSetlist() #visibility, topMost)
                 if self.moreInfoTime > 0:
                     self.engine.theme.setlist.renderMoreInfo(self)
                 if self.miniLobbyTime > 0:
                     self.engine.theme.setlist.renderMiniLobby(self)
             # I am unsure how I want to handle this for now. Perhaps as dialogs, perhaps in SCS.
             elif self.mode == 1:
-                self.renderSpeedSelect(visibility, topMost)
+                pass #self.renderSpeedSelect(visibility, topMost)
             elif self.mode == 2:
-                self.renderTimeSelect(visibility, topMost)
+                pass #self.renderTimeSelect(visibility, topMost)

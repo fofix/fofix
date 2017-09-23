@@ -229,6 +229,19 @@ class Resource(Task):
         os.chmod(path, stat.S_IWRITE | stat.S_IREAD | stat.S_IEXEC)
 
     def load(self, target = None, name = None, function = lambda: None, synch = False, onLoad = None, onCancel = None):
+        """
+        Load a file into memory, as either a foreground or background operation.
+        
+        :param target: (unknown)
+        :param name: (unknown)
+        :param function: function to call to perform the loading
+        :param synch: True to do the loading now, False to return now and load the file in a background thread.
+        :param onLoad: function to call when loading is completed.
+        :param onCancel: function to call when loading is canceled.
+        
+        :return If sync == True then returns instance of fofix.core.Loader,
+          else returns the object returned by 'function'
+        """
 
         if self.logLoadings == 1:
             log.notice("Loading %s.%s %s" % (target.__class__.__name__, name, synch and "synchronously" or "asynchronously"))
