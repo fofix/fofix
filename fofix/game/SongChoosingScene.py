@@ -952,7 +952,7 @@ class SongChoosingScene(Scene):
 
         self.engine.theme.setlist.run(ticks)
 
-    def renderSetlist(self): #, visibility, topMost):
+    def renderSetlist(self):
         w, h = self.engine.view.geometry[2:4]
 
         #render the background (including the header and footer)
@@ -1004,12 +1004,12 @@ class SongChoosingScene(Scene):
         #render the foreground stuff last
         self.engine.theme.setlist.renderForeground(self)
 
-    def render3D(self): #, visibility, topMost):
+    def render3D(self):
         if self.gameStarted:
             return
         if self.items == []:
             return
-        #Scene.render(self, visibility, topMost)
+
         with self.engine.view.orthogonalProjection(normalize = True):
             self.engine.view.setViewport(1,0)
             w, h = self.engine.view.geometry[2:4]
@@ -1018,7 +1018,7 @@ class SongChoosingScene(Scene):
                 drawImage(self.img_background, scale = (1.0, -1.0), coord = (w/2,h/2), stretched = FULL_SCREEN)
 
             if self.mode == 0:
-                self.renderSetlist() #visibility, topMost)
+                self.renderSetlist()
                 if self.moreInfoTime > 0:
                     self.engine.theme.setlist.renderMoreInfo(self)
                 if self.miniLobbyTime > 0:
