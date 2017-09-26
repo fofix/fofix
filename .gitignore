@@ -19,6 +19,7 @@ fofix/core/VideoPlayer/_VideoPlayer.c
 fofix/core/pypitch/_pypitch.cpp
 bin
 build
+dist
 include
 lib
 lib64
@@ -43,3 +44,4 @@ win32/*
 !win32/*.patch
 !win32/README.deppack.stub
 !win32/*.ico
+/dist/
