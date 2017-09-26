@@ -6,7 +6,7 @@ From a package
 
 Here is a list of some packages available for Unix distributions.
 
-.. image https://repology.org/badge/vertical-allrepos/fofix.svg
+.. image:: https://repology.org/badge/vertical-allrepos/fofix.svg
     :target: https://repology.org/metapackage/fofix
     :alt: Packaging status
 
