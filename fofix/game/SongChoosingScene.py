@@ -875,6 +875,9 @@ class SongChoosingScene(Scene):
                 self.moreInfo = True
         elif c in Player.menuNo and c in Player.cancels:
             self.engine.view.pushLayer(self.menu)
+        elif c in Player.key5s:
+            """ exit song choosing screen """
+            self.quit()
     def scrollUp(self):
         if self.moreInfo:
             self.infoPage -= 1
