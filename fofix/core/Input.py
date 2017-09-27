@@ -24,13 +24,13 @@
 
 import pygame
 
+haveMidi = False
+
 try:
     import pygame.midi
     haveMidi = True
 except ImportError:
     haveMidi = False
-
-haveMidi = False
 
 from fretwork import log
 from fretwork.audio import Music
