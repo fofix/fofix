@@ -37,7 +37,7 @@ from fofix.core import Version
 from fofix.core.Image import drawImage
 from fofix.core.Input import KeyListener
 from fofix.core.Language import _
-from fofix.core.VideoPlayer import VideoLayer, VideoPlayerError
+from fofix.core.VideoPlayer import VideoLayer, VideoPlayerError  # @UnresolvedImport
 from fofix.core.View import Layer
 from fofix.core.constants import *
 
@@ -70,7 +70,6 @@ class Text(Element):
         return self.size[1]
 
     def render(self, offset):
-        offset = (offset*4.0)/3.0 # akedrou - font rendering fix
         if self.alignment == "left":
             x = .1
         elif self.alignment == "right":
@@ -92,10 +91,11 @@ class Picture(Element):
         return self.height
 
     def render(self, offset):
-        offset = (offset*4.0)/3.0  #stump: get it back into alignment...
+        # Font rendering is insane; offset of 0.5 is about 2/3 down the screen.
+        offset = offset*4/3   # Hack pos to match text
         w, h = self.engine.view.geometry[2:4]
         drawImage(self.drawing, scale = (1, -1),
-                              coord = (.5 * w, h - (.5 * self.height + offset) * h * float(w) / float(h)))
+                            coord = (.5 * w, (1-offset) * h))
 
 
 # evilynux - Updated to latest MFH-Alarian mod. Alot changed compared to upstream FoF.
@@ -196,10 +196,10 @@ class Credits(Layer, KeyListener):
           Text(nf, ns, c1, "center", "%s" % Version.version()), space]
 
         # evilynux: Main FoFiX credits (taken from CREDITS).
-        self.parseText("CREDITS")
+        self.parseFile("CREDITS")
         self.credits.extend([space, space, space])
         # evilynux: Theme credits (taken from data/themes/<theme name>/CREDITS).
-        self.parseText(os.path.join('data', 'themes', self.themename, 'CREDITS'))
+        self.parseFile(os.path.join('data', 'themes', self.themename, 'CREDITS'))
 
         self.credits.extend( [
           space, space,
@@ -231,7 +231,7 @@ class Credits(Layer, KeyListener):
         ])
 
     # evilynux - Text parsing method. Provides some style functionalities.
-    def parseText(self, filename):
+    def parseFile(self, filename):
         nf = self.engine.data.font
         ns = 0.002
         bs = 0.001
@@ -242,9 +242,10 @@ class Credits(Layer, KeyListener):
         scale = 1
 
         path = filename
-        if not hasattr(sys,"frozen"): #MFH - add ".." to path only if running from sources - not if running from EXE
-            path = os.path.join("..", path)
         if not os.path.exists(path):
+            err = "Credits file not found: " + path
+            log.error(err)
+            self.credits.append( Text(nf, bs*scale, c1, "left", "%s" % err) )
             return
 
         file = open(path)
@@ -316,22 +317,22 @@ class Credits(Layer, KeyListener):
             self.engine.view.popLayer(self.vidPlayer)
         self.engine.view.popLayer(self)
 
-    def keyPressed(self, key, unicode):
+    def keyPressed(self, key, isUnicode):
         if self.engine.input.controls.getMapping(key) in (Player.menuYes + Player.menuNo) or key == pygame.K_RETURN or key == pygame.K_ESCAPE:
             self.quit()
         elif self.engine.input.controls.getMapping(key) in (Player.menuDown) or key == pygame.K_DOWN: #akedrou: so I was bored.
-            if self.speedDiv > 1000.0:
-                self.speedDiv -= 1000.0
-                if self.speedDiv < 1000.0:
-                    self.speedDiv = 1000.0
+            if self.speedDiv > 2000.0:
+                self.speedDiv -= 2000.0
+                if self.speedDiv < 2000.0:
+                    self.speedDiv = 2000.0
         elif self.engine.input.controls.getMapping(key) in (Player.menuUp) or key == pygame.K_UP:
             if self.speedDiv < 30000.0:
-                self.speedDiv += 1000.0
+                self.speedDiv += 2000.0
                 if self.speedDiv > 30000.0:
                     self.speedDiv = 30000.0
         elif self.engine.input.controls.getMapping(key) in (Player.key3s):
             self.speedDir *= -1
-        elif self.engine.input.controls.getMapping(key) in (Player.key4s):
+        elif self.engine.input.controls.getMapping(key) in (Player.key4s) or key == pygame.K_SPACE:
             if self.speedDir != 0:
                 self.speedDir = 0
             else:
