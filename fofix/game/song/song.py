@@ -410,10 +410,18 @@ class SongInfo(object):
                     self._set("scores",        self.getObfuscatedScores(part))
                     self._set("scores_ext",    self.getObfuscatedScoresExt(part))
 
-        if os.access(os.path.dirname(self.fileName), os.W_OK):
+        try:
             f = open(self.fileName, "w")
+        except IOError as  e:
+            log.error("Cannot save high scores due to: " + str(e))
+        else:
             self.info.write(f)
             f.close()
+            
+#         if os.access(os.path.dirname(self.fileName), os.W_OK):
+#             f = open(self.fileName, "w")
+#             self.info.write(f)
+#             f.close()
 
     def _get(self, attr, type = None, default = ""):
         try:
