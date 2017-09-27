@@ -148,6 +148,7 @@ class SystemEventHandler(SystemEventListener):
 
 class GameEngine(object):
     """The main game engine."""
+
     def __init__(self, config = None):
 
         log.debug("GameEngine class init (GameEngine.py)...")
@@ -181,7 +182,7 @@ class GameEngine(object):
 
         self.tutorialFolder = "tutorials"
 
-        if not config:
+        if config is None:
             config = Config.load()
 
         self.config  = config
@@ -358,8 +359,9 @@ class GameEngine(object):
             log.warn("No stages\ folder found, forcing None setting for Animated Stage.")
             self.config.set("game","animated_stage_folder", "None") #MFH: force "None" when Stages folder can't be found
 
+        # Create theme manager
+        self.theme = None
         try:
-            self.theme = None
             fp, pathname, description = imp.find_module("CustomTheme",[themepath])
             try:
                 theme = imp.load_module("CustomTheme", fp, pathname, description)
@@ -367,12 +369,11 @@ class GameEngine(object):
             except ImportError as e:
                 # Unable to load module; log it, but continue with default Theme.
                 log.error("Failed to load CustomTheme.py from %s" % pathname)
-                #self.theme = Theme(themepath, themename)
         except ImportError:
-            # Not found; but that's OK. We'll use the default Theme class.
-            pass #self.theme = Theme(themepath, themename)
+            # CustomTheme is optional; no need to complain.
+            pass
 
-        if not self.theme:
+        if self.theme is None:
             self.theme = Theme(themepath, themename)
         self.task.addTask(self.theme)
 
@@ -482,7 +483,7 @@ class GameEngine(object):
         minScale = 0.02
         w = screenwidth
         h = screenheight
-        if not scale:
+        if scale is None:
             scale = minScale
         elif scale < minScale:
             scale = minScale

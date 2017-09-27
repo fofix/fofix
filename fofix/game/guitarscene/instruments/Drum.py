@@ -64,17 +64,17 @@ class Drum(Instrument):
         self.isBassGuitar = False
         self.isVocal = False
 
+        # Drum game has 4 lanes for the regular drums; bass is handled specially.
         self.strings        = 4
-        """Drum game has 4 lanes for the regular drums; bass is handled specially."""
+        # Undocumented; maybe total number of buttons?
         self.strings2       = 5
-        """Undocumented; maybe total number of buttons?"""
 
         self.lanenumber     = float(self.strings)
+        # (misnamed) Number of *rows* in the fret texture atlas
         self.fretImgColNumber = float(6)
-        """(misnamed) Number of *rows* in the fret texture atlas"""
 
+        # GuitarScene sets these to 100; we decrement them every tick.
         self.drumsHeldDown = [0, 0, 0, 0, 0]
-        """GuitarScene sets these to 100; we decrement them every tick."""
 
         self.gameMode2p = self.engine.world.multiMode
 
@@ -600,7 +600,6 @@ class Drum(Instrument):
 
                 else:   #MFH - flame count is done - reset it!
                     self.freestyleHitFlameCounts[fretNum] = 0    #MFH
-
 
 
     def render(self, visibility, song, pos, controls, killswitch):
