@@ -19,7 +19,7 @@ From sources
     - OS specific dependencies:
         - `Windows`_
         - `Unix`_
-    - Python dependencies: ``pip install -r requirements.txt``
+    - Python dependencies: ``pip install -r requirements.txt`` (see the `Cerealizer package`_ part too!)
     - optional dependencies:
         - ``pyopengl-accelerate``: this will make PyOpenGL go a good bit faster
         - ``pyaudio``: this provides support for microphone input, which is required for vocal play
@@ -50,3 +50,18 @@ Install the following dependencies:
     - ``pkg-config``
     - python's developpment headers
     - and: ``GLU``, ``GLib``, ``SDL``, ``SDL_mixer``, ``libogg``, ``libvorbisfile``, ``libtheora``, ``libsoundtouch``, ``libswscale`` (part of ``ffmpeg``) development headers
+
+
+`Cerealizer` package
+++++++++++++++++++++
+
+Due to a bug in the builder, the `cerealizer` package should be reinstalled in *Unix* environments. You have 2 solutions:
+    - by installing it from your package manager
+    - by installing it manually::
+
+        pip download cerealizer
+        tar jxf Cerealizer*.tar.bz2 -C /tmp/
+        cd /tmp/Cerealizer-*
+        pip install --upgrade .
+        cd -
+        rm -r /tmp/Cerealizer-* Cerealizer-*
