@@ -31,4 +31,4 @@ In the game
 - **Enter / Shift right**: pick
 - **Page down**: star power
 - **Page up**: whammy
-- **Alt + Enter**: switch to fullscreen.
+- **Alt + Enter**: switch to fullscreen (this will restart the game on Windows).
