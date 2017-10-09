@@ -116,10 +116,10 @@ instrumentDiff = {
 }
 
 class Part:
-    def __init__(self, id, text, trackName):
-        self.id   = id
-        self.text = text
-        self.trackName = trackName  #name of which the part is called in the midi
+    def __init__(self, uid, text, trackName):
+        self.id   = uid             #int uid for this instance
+        self.text = text            #str friendly name for this instance
+        self.trackName = trackName  #list(str) of names which the part is called in the midi
 
     def __cmp__(self, other):
         if isinstance(other, Part):
@@ -134,7 +134,7 @@ class Part:
         return self.text
 
 parts = {
-  GUITAR_PART: Part(GUITAR_PART, _("Guitar"), ["PART GUITAR", "T1 GEMS" "Click", "Midi Out"]),
+  GUITAR_PART: Part(GUITAR_PART, _("Guitar"), ["PART GUITAR", "T1 GEMS", "Click", "Midi Out"]),
   RHYTHM_PART: Part(RHYTHM_PART, _("Rhythm"), ["PART RHYTHM"]),
   BASS_PART:   Part(BASS_PART,   _("Bass"),   ["PART BASS"]),
   LEAD_PART:   Part(LEAD_PART,   _("Lead"),   ["PART LEAD"]),
@@ -148,8 +148,8 @@ parts = {
 }
 
 class Difficulty:
-    def __init__(self, id, text):
-        self.id   = id
+    def __init__(self, uid, text):
+        self.id   = uid
         self.text = text
 
     def __cmp__(self, other):
@@ -325,12 +325,23 @@ class SongInfo(object):
             scores = self._get("scores", str, "")
             scores_ext = self._get("scores_ext", str, "")
 
+        if scores:
+            try:
+                scores = cerealizer.loads(binascii.unhexlify(scores))
+            except:
+                log.error("High scores lost! Can't parse scores = %s" % scores)
+                scores = None
+
         if not scores:
             return
 
-        scores = cerealizer.loads(binascii.unhexlify(scores))
         if scores_ext:
-            scores_ext = cerealizer.loads(binascii.unhexlify(scores_ext))
+            try:
+                scores_ext = cerealizer.loads(binascii.unhexlify(scores_ext))
+            except:
+                log.error("High scores lost! Can't parse scores_ext = %s" % scores_ext)
+                scores_ext = None
+            
         for difficulty in scores.keys():
             try:
                 difficulty = difficulties[difficulty]
@@ -338,7 +349,7 @@ class SongInfo(object):
                 continue
             for i, base_scores in enumerate(scores[difficulty.id]):
                 score, stars, name, hash = base_scores
-                if scores_ext != "":
+                if scores_ext:
                     #Someone may have mixed extended and non extended
                     try:
                         if len(scores_ext[difficulty.id][i]) < 9:
@@ -353,7 +364,7 @@ class SongInfo(object):
                         hash_ext = 0
                         scoreExt = (0, 0, 0 , "RF-mod", 0, "None", 0)
                 if self.getScoreHash(difficulty, score, stars, name) == hash:
-                    if scores_ext != "" and hash == hash_ext:
+                    if scores_ext and hash == hash_ext:
                         self.addHighscore(difficulty, score, stars, name, part, scoreExt = scoreExt)
                     else:
                         self.addHighscore(difficulty, score, stars, name, part)
@@ -1067,7 +1078,7 @@ class Track:    #MFH - Changing Track class to a base class.  NoteTrack and Temp
 
 class VocalTrack(Track):
     def __init__(self, engine):
-        self.allNotes = {}
+        self.allNotes = {}      #dict(int -> tuple(num,Event)) -- basically a time -> Event map
         self.allWords = {}
         self.starTimes = []
         self.minPitch = 127
@@ -1994,11 +2005,12 @@ class Song(object):
                             track.setVolume(volume)
 
     def setInstrumentPitch(self, semitones, part):
-        for pitchPart in PITCH_SHIFTABLES:
-            if part == parts[pitchPart]:
-                trackName = TRACK_ID_NAME_MAP[pitchPart]
-                for track in self.songTracks[trackName]:
-                    track.setPitchBendSemitones(semitones)
+        if not self.singleTrackSong:
+            for pitchPart in PITCH_SHIFTABLES:
+                if part == parts[pitchPart]:
+                    trackName = TRACK_ID_NAME_MAP[pitchPart]
+                    for streamer in self.songTracks[trackName]:
+                        streamer.setPitchBendSemitones(semitones)
 
     def resetInstrumentPitch(self, part):
         self.setInstrumentPitch(0.0, part)
@@ -2125,6 +2137,8 @@ class ScriptReader:
             self.song.eventTracks[TK_SCRIPT].addEvent(time, event)  #MFH - add an event to the script.txt track
 
 class MidiReader(midi.MidiOutStream):
+    """ Fully parse and load a MIDI file for gameplay. """
+    
     def __init__(self, song):
         midi.MidiOutStream.__init__(self)
         self.song = song
@@ -2295,28 +2309,27 @@ class MidiReader(midi.MidiOutStream):
     def sequence_name(self, text):
         self.partnumber = None
 
-        tempText = "Found sequence_name in MIDI: " + text + ", recognized as "
-        tempText2 = ""
-
         for part in self.song.parts:
             if text in part.trackName:
                 if (part.id == VOCAL_PART):
                     self.vocalTrack = True
                     self.useVocalTrack = True
                 self.partnumber = part
-                if self.logSections == 1:
-                    tempText2 = text.replace(" ", "_")
                 break    #should only have one instance of an instrument
-                break    #end the searching
+                #break    #end the searching
 
-        if text in parts[VOCAL_PART].trackName and parts[VOCAL_PART] not in self.song.parts:
-            self.useVocalTrack = False
+        if self.logSections:
+            if self.partnumber:
+                log.debug("Found sequence_name in MIDI: %s, recognized as %s" % (text, self.partnumber))
+            else:
+                log.debug("Found sequence_name in MIDI: %s, unrecognized and skipped" % text)
 
-        if self.logSections == 1:
-            log.debug(tempText + tempText2)
-
-        self.guitarSoloIndex = 0
-        self.guitarSoloActive = False
+        if self.partnumber:
+            if text in parts[VOCAL_PART].trackName and parts[VOCAL_PART] not in self.song.parts:
+                self.useVocalTrack = False
+    
+            self.guitarSoloIndex = 0
+            self.guitarSoloActive = False
 
     def note_on(self, channel, note, velocity):
         if self.partnumber is None:
@@ -2350,9 +2363,6 @@ class MidiReader(midi.MidiOutStream):
             #MFH: use self.midiEventTracks to store all the special MIDI marker notes, keep the clutter out of the main notes lists
             #  also -- to make use of marker notes in real-time, must add a new attribute to MarkerNote class "endMarker"
             #     if this is == True, then the note is just an event to mark the end of the previous note (which has length and is used in other ways)
-
-
-
 
             elif note == OD_MARKING_NOTE:    #MFH
                 self.song.hasStarpowerPaths = True
@@ -2718,7 +2728,10 @@ class SongQueue:
         self.scores = []
 
 class MidiPartsDiffReader(midi.MidiOutStream):
-
+    """ Partially parse a MIDI file for the parts & difficulty.
+    To fully load the file, see MidiReader above.
+    """
+    
     def __init__(self, forceGuitar = False):
         midi.MidiOutStream.__init__(self)
         self.parts = []
@@ -2769,6 +2782,7 @@ class MidiPartsDiffReader(midi.MidiOutStream):
                 log.notice("This song has multiple tracks, none properly named. Behavior may be erratic.")
 
     def sequence_name(self, text):
+        """ Track name encountered in file, see if we can match it to an instrument part. """
 
         if self.logSections == 1:
             tempText = "MIDI sequence_name found: " + text + ", recognized and added to list as "
@@ -2800,6 +2814,8 @@ class MidiPartsDiffReader(midi.MidiOutStream):
         self.nextPart = None
 
     def note_on(self, channel, note, velocity):
+        """ Note found, register its difficulty. """
+        
         if self.currentPart == -1:
             return
         if note == OD_MARKING_NOTE:
@@ -2808,21 +2824,22 @@ class MidiPartsDiffReader(midi.MidiOutStream):
             self._SPNoteFound = True
         try:
             try:
+                # shortcut if we've already found all difficulty levels
                 if len(self.difficulties[self.currentPart]) == len(difficulties):
                     return
             except KeyError:
                 pass
-            track, number = NOTE_MAP[note]
-            self.notesFound[track] += 1
-            if self.notesFound[track] > 5:
+            diff, button = NOTE_MAP[note]
+            self.notesFound[diff] += 1
+            if self.notesFound[diff] > 5:
                 if self.nextPart is not None:
                     self.addPart()
-                diff = difficulties[track]
-                if diff not in self.difficulties[self.currentPart]:
-                    self.difficulties[self.currentPart].append(diff)
+                diffObj = difficulties[diff]
+                if diffObj not in self.difficulties[self.currentPart]:
+                    self.difficulties[self.currentPart].append(diffObj)
         except KeyError:
             pass
-
+        
 def loadSong(engine, name, library = DEFAULT_LIBRARY, playbackOnly = False, notesOnly = False, part = [parts[GUITAR_PART]], practiceMode = False, practiceSpeed = .5):
 
     log.debug("loadSong function call (song.py)...")

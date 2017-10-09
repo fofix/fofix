@@ -26,16 +26,82 @@
 import distutils.ccompiler
 from distutils.dep_util import newer
 from distutils.command.install import install as _install
-import sys, glob, os
+import sys, glob, os, fnmatch
 import subprocess
 import shlex
 
-import numpy as np
+import numpy
 
 from fofix.core import Version, SceneFactory
 
 from setuptools import setup, Extension, Command
 from Cython.Build import cythonize
+
+
+def glob_recursive(dir, file_pattern="*"):
+    """ Like glob, but recurses sub-dirs.
+    :param dir: directory from which to start searching
+    :param file_pattern: (default '*')
+        optional name pattern for desired files. Used to filter files at 
+        every level; NOT used to filter directories.
+    :return: list(str) of path to every file found.
+    """
+    matches = []
+    for subdir, dirnames, filenames in os.walk(dir):
+        for filename in fnmatch.filter(filenames, file_pattern):
+            matches.append(os.path.join(subdir, filename))
+    return matches
+
+def to_data_files(target, top, files):
+    """ Convert plain list of files to something data_files would like.
+    Each file's location will be computed relative to 'top'; the resulting sub-path
+    will be the location under 'target' where py2exe will place the file.
+    The result is effectively a set of directories inside of 'target'
+    that reproduce the structure of directories inside 'top'.
+    This lets you move a set of files from any location in your source tree
+    into any location in the distro.
+     
+    :param target: str - relative path inside of py2exe distro where files shall go
+    :param top: str - absolute (or relative to system current) path to remove from each of the paths in 'files'
+    :param files: list(str) of file paths to process
+    :return: list( (str, list(str)) ) - the structure required by py2exe.options.data_files
+    """
+    outs = {}
+    # normalize top
+    top = os.path.normpath(os.path.abspath(top))
+    for f in files:
+        # normalize each file
+        f = os.path.normpath(os.path.abspath(f))
+        # compute path relative to 'top'
+        rel = os.path.relpath(os.path.dirname(f), top)
+        subtarg = os.path.join(target, rel)
+        # save file under corresponding relative path
+        lst = outs.get(subtarg)
+        if not lst:
+            lst = list()
+            outs[subtarg] = lst
+        lst.append(f)
+    return [(k,outs[k]) for k in sorted(outs.keys())]
+
+
+# Hack to fix "No such file or directory: 'numpy-atlas.dll'".
+# https://stackoverflow.com/questions/36191770/py2exe-errno-2-no-such-file-or-directory-numpy-atlas-dll
+if os.name == 'nt':
+    paths = set()
+    np_path = numpy.__path__[0]
+    for dirpath, _, filenames in os.walk(np_path):
+        for item in filenames:
+            if item.endswith('.dll'):
+                paths.add(dirpath)
+    sys.path.append(*list(paths))
+#--end hack
+
+
+data_files = [
+    (".", ["./AUTHORS", "./COPYING", "./CREDITS", "./CHANGELOG"]),
+    #("doc", glob.glob("./doc/*")), #TODO run Makefile to build this first
+]
+data_files.extend( to_data_files("data", "./data", glob_recursive("./data")) )
 
 
 # Start setting up py2{exe,app} and building the argument set for setup().
@@ -63,25 +129,26 @@ if os.name == 'nt':
         py2exe.build_exe.isSystemDLL = isSystemDLL
 
         setup_args.update({
-          'zipfile': "data/library.zip",
-          'windows': [
-            {
-              "script":          "FoFiX.py",
-              "icon_resources":  [(1, "./win32/fofix.ico")],
-              "other_resources": [(RT_VERSION, 1, VersionResource(
-                #stump: the parameter below must consist only of up to four numerical fields separated by dots
-                Version.versionNum(),
-                file_description="Frets on Fire X",
-                legal_copyright=r"© 2008-2013 FoFiX Team.  GNU GPL v2 or later.",
-                company_name="FoFiX Team",
-                internal_name="FoFiX.exe",
-                original_filename="FoFiX.exe",
-                product_name=Version.PROGRAM_NAME,
-                #stump: when run from the exe, FoFiX will claim to be "FoFiX v" + product_version
-                product_version=Version.version()
-              ).resource_bytes())]
-            }
-          ]
+            'zipfile': "data/library.zip",
+            'windows': [
+                {
+                    "script":          "FoFiX.py",
+                    "icon_resources":  [(1, "./win32/fofix.ico")],
+                    "other_resources": [(RT_VERSION, 1, VersionResource(
+                        #stump: the parameter below must consist only of up to four numerical fields separated by dots
+                        Version.versionNum(),
+                        file_description="Frets on Fire X",
+                        legal_copyright=r"© 2008-2013 FoFiX Team.  GNU GPL v2 or later.",
+                        company_name="FoFiX Team",
+                        internal_name="FoFiX.exe",
+                        original_filename="FoFiX.exe",
+                        product_name=Version.PROGRAM_NAME,
+                        #stump: when run from the exe, FoFiX will claim to be "FoFiX v" + product_version
+                        product_version=Version.version()
+                        ).resource_bytes())]
+                }
+            ],
+            'data_files': data_files
         })
 elif sys.platform == 'darwin':
     try:
@@ -105,7 +172,7 @@ elif sys.platform == 'darwin':
       'version': Version.version(),
       'description': "Frets on Fire X",
       'name': "FoFiX",
-      'url': "http://code.google.com/p/fofix/",
+      'url': "https://github.com/fofix/fofix",
     })
 
 
@@ -113,6 +180,9 @@ elif sys.platform == 'darwin':
 extraIncludes = [
   "PIL.PngImagePlugin",
   "PIL.JpegImagePlugin",
+  "PIL.GimpPaletteFile",
+  "PIL.GimpGradientFile",
+  "PIL.PaletteFile"
 ]
 
 # Forced includes needed for pyOpenGL 3 and the accelerator.
@@ -313,7 +383,7 @@ else:
           'library_dirs': [],
         }
 # Build a similar info record for the numpy headers.
-numpy_info = {'include_dirs': [np.get_include()]}
+numpy_info = {'include_dirs': [numpy.get_include()]}
 
 
 def combine_info(*args):

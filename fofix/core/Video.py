@@ -92,7 +92,7 @@ class Video:
         # a bug in SDL, the alpha channel is lost and some parts of the image are
         # corrupted.  As a result, we go the long way and load and set the icon
         # by hand to work around the bug.
-        if os.name == 'nt':
+        if os.name == 'nt' and self.icon:
             import win32api
             import win32gui
             import win32con
