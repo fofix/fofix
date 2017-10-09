@@ -657,7 +657,8 @@ class SongChoosingScene(Scene):
 
     def checkQueueParts(self):
         #TODO: checkQueueParts
-        pass #parts = self.engine.world.songQueue.getParts()
+        #parts = self.engine.world.songQueue.getParts()
+        pass
 
 
     def freeResources(self):
@@ -731,9 +732,9 @@ class SongChoosingScene(Scene):
         # NOTE if synch == True, songLoaded is called BEFORE return
         # self.songLoader =  ## assign to this if you can get synch=False to work
         self.engine.resource.load(self, None,
-                                  lambda: song.loadSong(self.engine, self.songName, playbackOnly = True, library = self.library), 
+                                  lambda: song.loadSong(self.engine, self.songName, playbackOnly = True, library = self.library),
                                   synch = True,
-                                  onLoad = self.songLoaded, 
+                                  onLoad = self.songLoaded,
                                   onCancel = self.songCanceled)
 
     def songCanceled(self):
@@ -1025,6 +1026,8 @@ class SongChoosingScene(Scene):
                     self.engine.theme.setlist.renderMiniLobby(self)
             # I am unsure how I want to handle this for now. Perhaps as dialogs, perhaps in SCS.
             elif self.mode == 1:
-                pass #self.renderSpeedSelect(visibility, topMost)
+                #self.renderSpeedSelect(visibility, topMost)  ##undefined
+                pass
             elif self.mode == 2:
-                pass #self.renderTimeSelect(visibility, topMost)
+                #self.renderTimeSelect(visibility, topMost)   ##undefined
+                pass

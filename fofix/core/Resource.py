@@ -231,16 +231,24 @@ class Resource(Task):
     def load(self, target = None, name = None, function = lambda: None, synch = False, onLoad = None, onCancel = None):
         """
         Load a file into memory, as either a foreground or background operation.
-        
-        :param target: (unknown)
-        :param name: (unknown)
+        'function' is the user code that actually loads the file. 'synch' controls
+        how 'function' is called: if synch==True, then function is called immediately,
+        and whatever it returns is returned by this function. If sync==False, then a
+        Loader is created to call 'function' on another thread, and the Loader is
+        returned by this function.
+
+        After loading is complete, the loaded object will be assigned to (target).(name)
+        if both are defined.
+
+        :param target: None, or object to receive loaded file.
+        :param name: None, or name of attribute of 'target' to receive loaded file.
         :param function: function to call to perform the loading
         :param synch: True to do the loading now, False to return now and load the file in a background thread.
         :param onLoad: function to call when loading is completed.
         :param onCancel: function to call when loading is canceled.
-        
-        :return If sync == True then returns instance of fofix.core.Loader,
-          else returns the object returned by 'function'
+
+        :return: If synch == True, returns the object returned by 'function';
+                else returns an instance of fofix.core.Loader.
         """
 
         if self.logLoadings == 1:
