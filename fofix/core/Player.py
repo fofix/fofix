@@ -836,7 +836,7 @@ def setNewKeyMapping(engine, config, section, option, key):
     b = isKeyMappingOK(config, option)
     if b != 0:
         if keyCheckerMode > 0:
-            from fofix.game.Dialogs import Dialogs
+            from fofix.game import Dialogs
             Dialogs.showMessage(engine, _("This key conflicts with the following keys: %s") % str(b))
         if keyCheckerMode == 2:   #enforce no conflicts!
             config.set(section, option, oldKey)

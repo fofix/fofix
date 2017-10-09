@@ -1155,8 +1155,8 @@ class PartDiffChooser(MainDialog):
     def __init__(self, engine, parts, info, players, back = False):
         MainDialog.__init__(self, engine)
         self.parts   = parts
-        self.info    = info
-        self.players = players
+        self.info    = info     #SongInfo
+        self.players = players  #list of [fofix.core.Player.Player]
         self.theme   = engine.theme
 
         self.retVal  = None

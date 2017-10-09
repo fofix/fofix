@@ -421,16 +421,29 @@ class Data(object):
             else:
                 #find extension
                 fileName1 = os.path.splitext(fileName1)[0]
-                files = glob.glob('%s.*' % fileName1)
-                if openImage:
-                    for i in range(len(files)):
-                        try:
-                            imgDrawing = ImgDrawing(self.svg, files[i])
-                            return imgDrawing
-                        except IOError:
-                            log.warn("Unable to load image file: %s" % files[i])
-                elif len(files) > 0:
-                    return True
+                try:
+                    # glob parses [] but those are legal chars on Windows, so we must escape them.
+                    # it must be done like this so replacements are not mangled by other replacements.
+                    replacements = {
+                        "[": "[[]",
+                        "]": "[]]"
+                    }
+                    fileName1 = "".join([replacements.get(c,c) for c in fileName1])
+                    
+                    files = glob.glob('%s.*' % fileName1)  ##WRZ crash if [] in path
+                    if openImage:
+                        for i in range(len(files)):
+                            try:
+                                imgDrawing = ImgDrawing(self.svg, files[i])
+                                return imgDrawing
+                            except IOError:
+                                log.warn("Unable to load image file: %s" % files[i])
+                    elif len(files) > 0:
+                        return True
+                except:
+                    # above failed, pass thru to log&return below
+                    pass
+                
         #image not found
         if self.logImageNotFound:
             log.debug("Image not found: %s" % fileName)
