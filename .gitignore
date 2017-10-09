@@ -19,6 +19,7 @@ fofix/core/VideoPlayer/_VideoPlayer.c
 fofix/core/pypitch/_pypitch.cpp
 bin
 build
+dist
 include
 lib
 lib64
