@@ -162,13 +162,13 @@ class MainMenu(BackgroundLayer):
             strSettings = ""
             strQuit = ""
         else:
-            strCareer = "Career"
-            strQuickplay = "Quickplay"
-            strSolo = "Solo"
-            strMultiplayer = "Multiplayer"
-            strTraining = "Training"
-            strSettings = "Settings"
-            strQuit = "Quit"
+            strCareer = _("Career")
+            strQuickplay = _("Quickplay")
+            strSolo = _("Solo")
+            strMultiplayer = _("Multiplayer")
+            strTraining = _("Training")
+            strSettings = _("Settings")
+            strQuit = _("Quit")
 
         multPlayerMenu = [
             (_("Face-Off"),     lambda: self.newLocalGame(players = 2,             maxplayers = 4)),

@@ -248,9 +248,8 @@ class Drum(Instrument):
                         noteImage = self.noteButtons
                         texCoord = self.openTexCoord[y]
                 else:
-                    if not noteImage:
-                        noteImage = self.noteButtons
-                        texCoord = self.noteTexCoord[y]
+                    noteImage = self.noteButtons
+                    texCoord = self.noteTexCoord[y]
             else:
                 fret -= 1
                 vtx = self.noteVtx
@@ -688,22 +687,22 @@ class Drum(Instrument):
                         drumsJustHit[0] = True
                         if self.fretboardHop < 0.04:
                             self.fretboardHop = 0.04  #stump
-                if i == 1:
+                elif i == 1:
                     if not playBassDrumOnly and self.playedSound[i] == False:
                         self.engine.data.T1DrumSound.play()
                     self.playedSound[i] = True
                     drumsJustHit[i] = True
-                if i == 2:
+                elif i == 2:
                     if not playBassDrumOnly and self.playedSound[i] == False:
                         self.engine.data.T2DrumSound.play()
                     self.playedSound[i] = True
                     drumsJustHit[i] = True
-                if i == 3:
+                elif i == 3:
                     if not playBassDrumOnly and self.playedSound[i] == False:
                         self.engine.data.T3DrumSound.play()
                     self.playedSound[i] = True
                     drumsJustHit[i] = True
-                if i == 4:   #MFH - must actually activate starpower!
+                elif i == 4:   #MFH - must actually activate starpower!
                     if not playBassDrumOnly and self.playedSound[i] == False:
                         self.engine.data.CDrumSound.play()
                     self.playedSound[i] = True

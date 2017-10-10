@@ -1313,6 +1313,8 @@ class Setlist:
                 score = _("Nil")
                 stars = 0
                 name = ""
+                notesTotal = 0
+                
                 if not item.getLocked():
                     try:
                         difficulties = item.partDifficulties[scene.scorePart.id]
@@ -1708,6 +1710,8 @@ class Setlist:
                 score = _("Nil")
                 stars = 0
                 name = ""
+                notesTotal = 0
+                
                 if not item.getLocked():
                     try:
                         difficulties = item.partDifficulties[scene.scorePart.id]

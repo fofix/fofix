@@ -364,7 +364,8 @@ class GameEngine(object):
             fp, pathname, description = imp.find_module("CustomTheme",[themepath])
             theme = imp.load_module("CustomTheme", fp, pathname, description)
             self.theme = theme.CustomTheme(themepath, themename)
-        except ImportError:
+        except ImportError as e:
+            log.error("Failed to load CustomTheme.py from %s" % pathname)
             self.theme = Theme(themepath, themename)
 
         self.task.addTask(self.theme)
