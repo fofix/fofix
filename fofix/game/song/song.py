@@ -118,10 +118,10 @@ instrumentDiff = {
 
 
 class Part:
-    def __init__(self, id, text, trackName):
-        self.id = id
-        self.text = text
-        self.trackName = trackName  # list(str) of names which the part is called in the midi
+    def __init__(self, uid, text, trackName):
+        self.id   = uid             #int uid for this instance
+        self.text = text            #str friendly name for this instance
+        self.trackName = trackName  #list(str) of names which the part is called in the midi
 
     def __cmp__(self, other):
         if isinstance(other, Part):
@@ -153,8 +153,8 @@ parts = {
 
 
 class Difficulty:
-    def __init__(self, id, text):
-        self.id = id
+    def __init__(self, uid, text):
+        self.id   = uid
         self.text = text
 
     def __cmp__(self, other):
@@ -335,12 +335,23 @@ class SongInfo(object):
             scores = self._get("scores", str, "")
             scores_ext = self._get("scores_ext", str, "")
 
+        if scores:
+            try:
+                scores = cerealizer.loads(binascii.unhexlify(scores))
+            except:
+                log.error("High scores lost! Can't parse scores = %s" % scores)
+                scores = None
+
         if not scores:
             return
 
-        scores = cerealizer.loads(binascii.unhexlify(scores))
         if scores_ext:
-            scores_ext = cerealizer.loads(binascii.unhexlify(scores_ext))
+            try:
+                scores_ext = cerealizer.loads(binascii.unhexlify(scores_ext))
+            except:
+                log.error("High scores lost! Can't parse scores_ext = %s" % scores_ext)
+                scores_ext = None
+            
         for difficulty in scores.keys():
             try:
                 difficulty = difficulties[difficulty]
@@ -348,8 +359,8 @@ class SongInfo(object):
                 continue
             for i, base_scores in enumerate(scores[difficulty.id]):
                 score, stars, name, hash = base_scores
-                if scores_ext != "":
-                    # Someone may have mixed extended and non extended
+                if scores_ext:
+                    #Someone may have mixed extended and non extended
                     try:
                         if len(scores_ext[difficulty.id][i]) < 9:
                             hash_ext, stars2, notesHit, notesTotal, noteStreak, modVersion, oldInfo, oldInfo2 = scores_ext[
@@ -366,8 +377,8 @@ class SongInfo(object):
                         hash_ext = 0
                         scoreExt = (0, 0, 0, "RF-mod", 0, "None", 0)
                 if self.getScoreHash(difficulty, score, stars, name) == hash:
-                    if scores_ext != "" and hash == hash_ext:
-                        self.addHighscore(difficulty, score, stars, name, part, scoreExt=scoreExt)
+                    if scores_ext and hash == hash_ext:
+                        self.addHighscore(difficulty, score, stars, name, part, scoreExt = scoreExt)
                     else:
                         self.addHighscore(difficulty, score, stars, name, part)
                 else:
@@ -1091,7 +1102,7 @@ class Track:
 
 class VocalTrack(Track):
     def __init__(self, engine):
-        self.allNotes = {}
+        self.allNotes = {}      #dict(int -> tuple(num,Event)) -- basically a time -> Event map
         self.allWords = {}
         self.starTimes = []
         self.minPitch = 127
