@@ -64,7 +64,17 @@ class Drum(Instrument):
         self.isBassGuitar = False
         self.isVocal = False
 
+        self.strings        = 4
+        """Drum game has 4 lanes for the regular drums; bass is handled specially."""
+        self.strings2       = 5
+        """Undocumented; maybe total number of buttons?"""
+
+        self.lanenumber     = float(self.strings)
+        self.fretImgColNumber = float(6)
+        """(misnamed) Number of *rows* in the fret texture atlas"""
+
         self.drumsHeldDown = [0, 0, 0, 0, 0]
+        """GuitarScene sets these to 100; we decrement them every tick."""
 
         self.gameMode2p = self.engine.world.multiMode
 
@@ -73,7 +83,6 @@ class Drum(Instrument):
         self.lastFretWasT2 = False
         self.lastFretWasT3 = False
         self.lastFretWasC = False
-
 
         self.matchingNotes = []
 
@@ -92,22 +101,16 @@ class Drum(Instrument):
         self.drumFillEvents = []
         self.drumFillWasJustActive = False
 
-        self.strings        = 4
-        self.strings2       = 5
-        self.playedSound  = [True, True, True, True, True]
+        self.playedSound  = [True] * self.strings2
 
         self.openFretActivity = 0.0
         self.openFretColor  = self.fretColors[5]
 
-        self.lanenumber     = float(4)
-        self.fretImgColNumber = float(6)
-
-        self.logClassInits = self.engine.config.get("game", "log_class_inits")
+        self.logClassInits = self.engine.config.get("log", "log_class_inits")
         if self.logClassInits == 1:
             log.debug("Drum class initialization!")
 
-
-        self.freestyleHitFlameCounts = [0 for n in range(self.strings+1)]    #MFH
+        self.freestyleHitFlameCounts = [0] * self.strings2
 
         self.fretWeight     = [0.0] * self.strings
         self.fretActivity   = [0.0] * self.strings
@@ -115,7 +118,6 @@ class Drum(Instrument):
         self.drumFretButtons = None
 
         #blazingamer
-        self.opencolor = self.fretColors[5]
         self.rockLevel = 0.0
 
         self.bigMax = 1
@@ -343,48 +345,47 @@ class Drum(Instrument):
 
         gl.glEnable(gl.GL_DEPTH_TEST)
 
-        for n in range(self.strings2):
-            if n == 4:
-                keyNumb = 0
-            else:
-                keyNumb = n + 1
-            f = self.drumsHeldDown[keyNumb]/200.0
-            pressed = self.drumsHeldDown[keyNumb]
+        for i in range(self.strings2):
+            # Rearrange so bass is rendered last
+            n = i+1
+            if n == self.strings2:
+                n = 0
 
-            if n == 3: #Set colors of frets
-                c = list(self.fretColors[0])
-            elif not n == 4:
-                c = list(self.fretColors[n + 1])
+            # n==0 is bass; 1..4 is regular drums
 
-            if n == 4:
+            f = self.drumsHeldDown[n]/200.0
+            pressed = self.drumsHeldDown[n]
+
+            if n > 0:
+                c = list(self.fretColors[n-1])
+
+            if n == 0:
                 y = v + f / 6
                 x = 0
             else:
                 y = v / 6
-                x = (self.strings / 2 - .5 - n) * w
+                x = (self.strings / 2 - .5 - (n-1)) * w
 
             if self.twoDkeys == True or not self.keyMesh:
 
-                if n == 4: #Weirdpeople - so the drum bass fret can be seen with 2d frets
+                if n == 0: #Weirdpeople - so the drum bass fret can be seen with 2d frets
                     gl.glDisable(gl.GL_DEPTH_TEST)
                     size = (self.boardWidth/2, self.boardWidth/self.strings/2.4)
                     texSize = (0.0,1.0)
                 else:
                     size = (self.boardWidth / self.strings / 2, self.boardWidth / self.strings / 2.4)
-                    texSize = (n / self.lanenumber, n / self.lanenumber + 1 / self.lanenumber)
+                    texSize = ((n-1) / self.lanenumber, n / self.lanenumber)
 
                 fretColor = (1,1,1,1)
 
                 if self.drumFretButtons == None:
-                    if n == 4:
+                    if n == 0:
                         continue
-                    whichFret = n+1
-                    if whichFret == 4:
-                        whichFret = 0
-                        #reversing fret 0 since it's angled in Rock Band
-                        texSize = (whichFret/5.0+0.2,whichFret/5.0)
+                    if n == 1:
+                        #reversing fret 1 since it's angled in Rock Band
+                        texSize = (0.2, 0.0)
                     else:
-                        texSize = (whichFret/5.0,whichFret/5.0+0.2)
+                        texSize = (n/5.0, n/5.0+0.2)
 
                     texY = (0.0,1.0/3.0)
                     if pressed:
@@ -394,19 +395,19 @@ class Drum(Instrument):
 
                 else:
                     if controls.getState(self.keys[n]) or controls.getState(self.keys[n+5]) or pressed: #pressed
-                        if n == 4: #bass drum
+                        if n == 0: #bass drum
                             texY = (3.0 / self.fretImgColNumber, 4.0 / self.fretImgColNumber)
                         else:
                             texY = (2.0 / self.fretImgColNumber, 3.0 / self.fretImgColNumber)
 
                     elif self.hit[n]: #being hit - Currently broken
-                        if n == 4: #bass drum
+                        if n == 0: #bass drum
                             texY = (5.0 / self.fretImgColNumber, 1.0)
                         else:
                             texY = (4.0 / self.fretImgColNumber, 5.0 / self.fretImgColNumber)
 
                     else: #nothing being pressed or hit
-                        if n == 4: #bass drum
+                        if n == 0: #bass drum
                             texY = (1.0 / self.fretImgColNumber, 2.0 / self.fretImgColNumber)
                         else:
                             texY = (0.0, 1.0 / self.fretImgColNumber)
@@ -415,30 +416,33 @@ class Drum(Instrument):
                                         coord = (x,v,0), multiples = True,color = fretColor, depth = True)
 
             else:
+                #TODO finish 3d keys! keytex and friends are never defined so this block is completely undeveloped!
+
                 self.keypos = self.engine.theme.drumkeypos
                 self.keyrot = self.engine.theme.drumkeyrot
 
                 texture = None
                 model = self.keyMesh
                 if self.keytex:
-                    if n == 0:
-                        texture = self.keytexb.texture
-                    elif n == 1:
-                        texture = self.keytexc.texture
-                    elif n == 2:
-                        texture = self.keytexd.texture
-                    elif n == 3:
-                        texture = self.keytexa.texture
-                    elif n == 4 and self.keytexopen:
+                    if n == 0 and self.keytexopen:
                         texture = self.keytexopen.texture
+                    elif n == 1:
+                        texture = self.keytexa.texture
+                    elif n == 2:
+                        texture = self.keytexb.texture
+                    elif n == 3:
+                        texture = self.keytexc.texture
+                    elif n == 4:
+                        texture = self.keytexd.texture
 
-                if n == 4:
+                if n == 0:
                     model = self.keyMeshOpen
 
                 c = [.1 + .8 * c[0] + f, .1 + .8 * c[1] + f, .1 + .8 * c[2] + f, v]
                 self.render3DKey(texture, model, x, y, c, n, f)
 
         gl.glDisable(gl.GL_DEPTH_TEST)
+
 
     def renderFreestyleFlames(self, visibility, controls):
         if self.flameColors[0][0] == -1:
