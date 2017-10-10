@@ -34,7 +34,12 @@ EAS_GEM_4 = 0x40
 
 
 
-# translating / marking the common MIDI notes:
+##
+## One MIDI track is divided into four 'zones' representing the four difficulty
+## levels.  This dict maps the MIDI notes to difficulty/button pairs.  The
+## specific notes listed above must be used to indicate which button should be
+## pressed.
+##
 NOTE_MAP = {     # difficulty, note
   EXP_GEM_0: (EXP_DIF, 0), #======== #0x60 = 96 = C 8
   EXP_GEM_1: (EXP_DIF, 1),           #0x61 = 97 = Db8
@@ -90,6 +95,9 @@ EAS_REAL_GTR_G3 = 0x1b
 EAS_REAL_GTR_B3 = 0x1c
 EAS_REAL_GTR_E4 = 0x1d
 
+##
+## As above for NOTE_MAP, but for the "real" guitar (whatever that is.)
+##
 REAL_GTR_NOTE_MAP = {                # difficulty, note
   EXP_REAL_GTR_E2: (EXP_DIF, 0),
   EXP_REAL_GTR_A2: (EXP_DIF, 1), 
@@ -122,11 +130,14 @@ REAL_GTR_NOTE_MAP = {                # difficulty, note
 
 
 #MFH - special note numbers
+# Star Power
 SP_MARKING_NOTE = 0x67     #note 103 = G 8
+# Overdrive
 OD_MARKING_NOTE = 0x74     #note 116 = G#9
+# Hammer-On / Pull-Off
 HOPO_MARKING_NOTES = []
 PRO_HOPO_MARKING_NOTES = [0x1e, 0x36, 0x4e, 0x66]
-
+# Free Style
 FREESTYLE_MARKING_NOTE = 0x7c      #notes 120 - 124 = drum fills & BREs - always all 5 notes present
 
 
