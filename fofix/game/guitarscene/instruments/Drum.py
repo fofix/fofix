@@ -249,7 +249,7 @@ class Drum(Instrument):
                         texCoord = self.openTexCoord[y]
                 else:
                     noteImage = self.noteButtons
-                    texCoord = self.noteTexCoord[y]
+                    texCoord = self.openTexCoord[y]
             else:
                 fret -= 1
                 vtx = self.noteVtx
