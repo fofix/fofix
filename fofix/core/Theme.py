@@ -191,7 +191,7 @@ class Theme(Task):
         #since the original Frets on Fire.  What glow_color allows you to do is set it so
         #the glow is either the color of the fret it's over or it can be the color the image
         #actually is (if the image is white then no matter what key is hit the glow will be white)
-        
+
         self.hitGlowColor   = get("hit_glow_color", str, "frets")
         if not self.hitGlowColor == "frets":
             self.hitGlowColor = hexToColor(self.hitGlowColor)
@@ -207,7 +207,7 @@ class Theme(Task):
             self.flamesColor = hexToColor(self.flamesColor)
 
         #Note Colors (this applies to frets and notes)
-        #default is green, red, yellow, blue, orange, purple (I don't know why there's a 6th color)
+        #default is green, red, yellow, blue, orange, purple (6th color is for open frets)
         default_color = ["#22FF22", "#FF2222", "#FFFF22", "#3333FF", "#FF9933", "#CC22CC"]
         self.noteColors  = [get("fret%d_color" % i, "color", default_color[i]) for i in range(6)]
         self.spNoteColor =  get("fretS_color",      "color", "#4CB2E5")
@@ -1054,7 +1054,7 @@ class Setlist:
         pass
 
     def renderUnselectedItem(self, scene, i, n):
-        
+
         from fofix.game import song
 
         w, h = scene.geometry
@@ -1314,7 +1314,7 @@ class Setlist:
                 stars = 0
                 name = ""
                 notesTotal = 0
-                
+
                 if not item.getLocked():
                     try:
                         difficulties = item.partDifficulties[scene.scorePart.id]
@@ -1362,7 +1362,7 @@ class Setlist:
                     font.render(text, (.92, .0413*(n+1)+.15), scale=scale, align = 2)
 
     def renderSelectedItem(self, scene, n):
-        
+
         from fofix.game import song
 
         w, h = scene.geometry
@@ -1711,7 +1711,7 @@ class Setlist:
                 stars = 0
                 name = ""
                 notesTotal = 0
-                
+
                 if not item.getLocked():
                     try:
                         difficulties = item.partDifficulties[scene.scorePart.id]
@@ -1759,7 +1759,7 @@ class Setlist:
                     font.render(text, (.92, .0413*(n+1)+.15), scale=scale, align = 2)
 
     def renderItem(self, scene, color, label):
-        
+
         from fofix.game import song
 
         if not scene.itemMesh:
@@ -1877,7 +1877,7 @@ class Setlist:
         glDisable(GL_NORMALIZE)
 
     def renderAlbumArt(self, scene):
-        
+
         from fofix.game import song
 
         if not scene.itemLabels:
@@ -2148,7 +2148,7 @@ class Setlist:
             drawImage(scene.img_list_fg, scale = (1.0, -1.0), coord = (w/2,h/2), stretched = FULL_SCREEN)
 
     def renderSelectedInfo(self, scene):
-        
+
         from fofix.game import song
 
         if self.setlist_type == 0: #note... clean this up. this was a rush job.
