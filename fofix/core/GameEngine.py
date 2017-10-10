@@ -172,7 +172,7 @@ class GameEngine(object):
             import win32api
             log.debug("win32api.GetVersionEx(1): " + repr(win32api.GetVersionEx(1)))
         elif os.name == 'posix':
-            log.debug("os.uname(): " + repr(os.uname()))
+            log.debug("os.uname(): " + repr(os.uname()))  # @UndefinedVariable
 
         """
         Constructor.
@@ -262,7 +262,7 @@ class GameEngine(object):
             self.config.set("video", "resolution", "800x600")
 
         if self.config.get("video", "shader_use"):
-            shaders.set(os.path.join(Version.dataPath(), "shaders"))
+            shaders.set(os.path.join(Version.dataPath(), "shaders"))  # @UndefinedVariable
 
         # Enable the high priority timer if configured
         if self.priority:
@@ -598,5 +598,5 @@ class GameEngine(object):
         # Move tick and fps limiting here, the old location did not work well.
         self.tickDelta = self.clock.tick()
         rtn = self.mainloop()
-        self.clock.delay(self.fps)
+#         self.clock.delay(self.fps)
         return rtn
