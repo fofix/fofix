@@ -358,18 +358,23 @@ class GameEngine(object):
             log.warn("No stages\ folder found, forcing None setting for Animated Stage.")
             self.config.set("game","animated_stage_folder", "None") #MFH: force "None" when Stages folder can't be found
 
-
-
         try:
+            self.theme = None
             fp, pathname, description = imp.find_module("CustomTheme",[themepath])
-            theme = imp.load_module("CustomTheme", fp, pathname, description)
-            self.theme = theme.CustomTheme(themepath, themename)
-        except ImportError as e:
-            log.error("Failed to load CustomTheme.py from %s" % pathname)
+            try:
+                theme = imp.load_module("CustomTheme", fp, pathname, description)
+                self.theme = theme.CustomTheme(themepath, themename)
+            except ImportError as e:
+                # Unable to load module; log it, but continue with default Theme.
+                log.error("Failed to load CustomTheme.py from %s" % pathname)
+                #self.theme = Theme(themepath, themename)
+        except ImportError:
+            # Not found; but that's OK. We'll use the default Theme class.
+            pass #self.theme = Theme(themepath, themename)
+
+        if not self.theme:
             self.theme = Theme(themepath, themename)
-
         self.task.addTask(self.theme)
-
 
         self.input.addKeyListener(FullScreenSwitcher(self), priority = True)
         self.input.addSystemEventListener(SystemEventHandler(self))
