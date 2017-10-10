@@ -88,10 +88,10 @@ def cmd_args():
     options.add_argument('-s', '--song',       type=str,                  help='Play a song in one-shot mode. (See "One-shot mode options" below.)')
 
     osm = parser.add_argument_group('One-Shot Mode')
-    osm.add_argument('-p', '--part',    type=int, help='0: Guitar, 1: Rhythm, 2: Bass, 3: Lead')
-    osm.add_argument('-d', '--diff',    type=int, help='0: Expert, 1: Hard, 2: Medium, 3: Easy (Only applies if "part" is set)')
-    osm.add_argument('-m', '--mode',    type=int, help='0: Quickplay, 1: Practice, 2: Career')
-    osm.add_argument('-n', '--players', type=int, help='Number of multiplayer players.')
+    osm.add_argument('-p', '--part',    type=int, help='0: Guitar, 1: Rhythm, 2: Bass, 3: Lead', default=0)
+    osm.add_argument('-d', '--diff',    type=int, help='0: Expert, 1: Hard, 2: Medium, 3: Easy (Only applies if "part" is set)', default=2)
+    osm.add_argument('-m', '--mode',    type=int, help='0: Quickplay, 1: Practice, 2: Career', default=0)
+    osm.add_argument('-n', '--players', type=int, help='Number of multiplayer players.', default=1)
 
     adv = parser.add_argument_group('Advanced')
     adv.add_argument('-v', '--verbose',        action='store_true', help='Verbose messages')
@@ -121,7 +121,7 @@ from fofix.core import VFS
 # File object representing the logfile.
 if os.name == "posix": # evilynux - logfile in ~/.fofix/ for GNU/Linux and MacOS X
     # evilynux - Under MacOS X, put the logs in ~/Library/Logs
-    if os.uname()[0] == "Darwin":
+    if os.uname()[0] == "Darwin":  # @UndefinedVariable
         logFile = open(os.path.expanduser('~/Library/Logs/%s.log' % Version.PROGRAM_UNIXSTYLE_NAME), 'w')
     else: # GNU/Linux et al.
         logFile = VFS.open('/userdata/%s.log' % Version.PROGRAM_UNIXSTYLE_NAME, 'w')
@@ -219,12 +219,16 @@ class Main():
 
     def init_oneshot(self):
         ''' Determine if oneshot mode is valid. '''
+
+        raise NotImplementedError("Sorry, one-shot mode has not been finished!")
+        #TODO: Finish one-shot mode!
+
         # I think this code can be moved elsewhere...
         self.engine.cmdPlay = 0
 
         # Check for a valid invocation of one-shot mode.
         if self.playing is not None:
-            log.debug('Validating song directory for one-shot mode.')
+            log.debug('Validating song directory for one-shot mode ...')
 
             library = Config.get("setlist","base_library")
             basefolder = os.path.join(Version.dataPath(),library,"songs",self.playing)
@@ -244,19 +248,19 @@ class Main():
 
             # Set up one-shot mode
             log.debug('Entering one-shot mode.')
-            Config.set("setlist", "selected_song", playing)
-
             self.engine.cmdPlay = 1
 
-            if diff is not None:
-                self.engine.cmdDiff = int(diff)
-            if part is not None:
-                self.engine.cmdPart = int(part)
+            #Config.set("setlist", "selected_song", self.playing) #no, don't user's regular game!
 
-            if players == 1:
-                self.engine.cmdMode = players, mode, 0
+            if self.diff is not None:
+                self.engine.cmdDiff = int(self.diff)
+            if self.part is not None:
+                self.engine.cmdPart = int(self.part)
+
+            if self.players == 1:
+                self.engine.cmdMode = self.players, self.mode, 0
             else:
-                self.engine.cmdMode = players, 0, mode
+                self.engine.cmdMode = self.players, 0, self.mode
 
     def restart(self):
         log.notice("Restarting.")
