@@ -153,6 +153,18 @@ else:
     fwErrStr = fretworkErrorStr.format(version, reqVerStr)
     raise RuntimeError(fwErrStr)
 
+# PIL doesn't init correctly when inside py2exe, so here we kick it in butt.
+# Web search results all point to this solution:
+# http://www.py2exe.org/index.cgi/py2exeAndPIL
+import PIL.Image
+import PIL.BmpImagePlugin
+import PIL.GifImagePlugin
+import PIL.JpegImagePlugin
+import PIL.MpoImagePlugin
+import PIL.PpmImagePlugin
+import PIL.TiffImagePlugin
+import PIL.PngImagePlugin
+
 from fofix.core.VideoPlayer import VideoLayer, VideoPlayerError
 from fofix.core.GameEngine import GameEngine
 from fofix.game.MainMenu import MainMenu
