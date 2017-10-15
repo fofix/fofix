@@ -1,0 +1,39 @@
+language: python
+python:
+    - 2.7
+
+before_install:
+    - sudo apt-get -qq update
+    - sudo apt-get install -y
+        libogg-dev
+        libportmidi-dev
+        libsdl-image1.2-dev
+        libsdl-mixer1.2-dev
+        libsdl-ttf2.0-dev
+        libsdl1.2-dev
+        libsoundtouch-dev
+        libswscale-dev
+        libtheora-dev
+        libvorbis-dev
+        mesa-utils
+        portaudio19-dev
+
+install:
+    - pip install pytest
+    - pip install cython
+    - pip install -r requirements.txt
+    # hack: cerealizer
+    - export PY_PACKAGES=`pip --version | cut -d' ' -f4`
+    - wget https://bitbucket.org/jibalamy/cerealizer/raw/ffbb9283c507c2bb7191bb413722a316e9c0718b/__init__.py2 -O $PY_PACKAGES/cerealizer/__init__.py2
+    # build ext
+    - python setup.py build_ext --inplace --force
+
+before_script:
+    # hack: GUI tests
+    - export DISPLAY=:99.0
+    - sh -e /etc/init.d/xvfb start
+    - sleep 3   # give xvfb some time to start
+    - export SDL_AUDIODRIVER=disk
+
+script:
+    - pytest fofix
