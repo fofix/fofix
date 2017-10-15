@@ -94,6 +94,12 @@ For more information about those community standards, take a look at:
 - Thoughtbot's [5 Useful Tips For A Better Commit Message](https://robots.thoughtbot.com/5-useful-tips-for-a-better-commit-message).
 
 
+Coding style
+------------
+
+Since most of the code is written in Python, please, follow the [PEP 8](https://www.python.org/dev/peps/pep-0008/).
+
+
 Get in touch
 ------------
 
