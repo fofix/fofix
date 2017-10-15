@@ -7,3 +7,4 @@ Quickstart
    features
    installation
    quickstart
+   play
