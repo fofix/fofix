@@ -1,10 +1,7 @@
 numpy
 Cython
 
-# If this experiences a problem because Mercurial isn't installed...
-#    ...just pip install it first!
-hg+http://bitbucket.org/pygame/pygame#egg=pygame
-
+pygame
 PyOpenGL
 PyOpenGL-accelerate
 Pillow
