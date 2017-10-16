@@ -203,15 +203,9 @@ class GameEngine(object):
         self.title             = self.versionString
         self.restartRequested  = False
 
-        # evilynux - Check if theme icon exists first, then fallback on FoFiX icon.
-        themename = self.config.get("coffee", "themename")
-        themeicon = os.path.join(Version.dataPath(), "themes", themename, "icon.png")
+        # Find window icon
         fofixicon = os.path.join(Version.dataPath(), "fofix_icon.png")
-        icon = None
-        if os.path.exists(themeicon):
-            icon = themeicon
-        elif os.path.exists(fofixicon):
-            icon = fofixicon
+        icon = fofixicon
 
         self.video             = Video(self.title, icon)
         if self.config.get("video", "disable_screensaver"):
@@ -293,89 +287,19 @@ class GameEngine(object):
 
         self.setlistMsg = None
 
+        # Init theme system
+        themename = self.config.get("coffee", "themename")
+        themepath  = os.path.join(Version.dataPath(), "themes", themename)
+        self._initTheme(themename, themepath)
 
         # Load game modifications
         Mod.init(self)
+
         self.task.addTask(self.input, synced = False)
-
         self.task.addTask(self.view, synced = False)
-
         self.task.addTask(self.resource, synced = False)
 
         self.data = Data(self.resource, self.svg)
-
-        ##MFH: Animated stage folder selection option
-        #<themename>\Stages still contains the backgrounds for when stage rotation is off, and practice.png
-        #subfolders under Stages\ will each be treated as a separate animated stage set
-
-        self.stageFolders = []
-        currentTheme = themename
-
-        stagespath = os.path.join(Version.dataPath(), "themes", currentTheme, "backgrounds")
-        themepath  = os.path.join(Version.dataPath(), "themes", currentTheme)
-        if os.path.exists(stagespath):
-            self.stageFolders = []
-            allFolders = os.listdir(stagespath)   #this also includes all the stage files - so check to see if there is at least one .png file inside each folder to be sure it's an animated stage folder
-            for name in allFolders:
-                aniStageFolderListing = []
-                thisIsAnAnimatedStageFolder = False
-                try:
-                    aniStageFolderListing = os.listdir(os.path.join(stagespath,name))
-                except Exception:
-                    thisIsAnAnimatedStageFolder = False
-                for aniFile in aniStageFolderListing:
-                    if os.path.splitext(aniFile)[1] in [".png", ".jpg", ".jpeg"]:
-                        # we've found at least one .png file here, chances are this is a valid animated stage folder
-                        thisIsAnAnimatedStageFolder = True
-                if thisIsAnAnimatedStageFolder:
-                    self.stageFolders.append(name)
-
-
-            i = len(self.stageFolders)
-            if i > 0: #only set default to first animated subfolder if one exists - otherwise use Normal!
-                defaultAniStage = str(self.stageFolders[0])
-            else:
-                defaultAniStage = "Normal"
-            log.debug("Default animated stage for " + currentTheme + " theme = " + defaultAniStage)
-            aniStageOptions = dict([(str(self.stageFolders[n]),self.stageFolders[n]) for n in range(0, i)])
-            aniStageOptions.update({"Normal":_("Slideshow")})
-            if i > 1:   #only add Random setting if more than one animated stage exists
-                aniStageOptions.update({"Random":_("Random")})
-            Config.define("game", "animated_stage_folder", str, defaultAniStage, text = _("Animated Stage"), options = aniStageOptions )
-
-            #MFH: here, need to track and check a new ini entry for last theme - so when theme changes we can re-default animated stage to first found
-            lastTheme = self.config.get("game","last_theme")
-            if lastTheme == "" or lastTheme != currentTheme:   #MFH - no last theme, and theme just changed:
-                self.config.set("game","animated_stage_folder",defaultAniStage)   #force defaultAniStage
-            self.config.set("game","last_theme",currentTheme)
-
-            selectedAnimatedStage = self.config.get("game", "animated_stage_folder")
-            if selectedAnimatedStage != "Normal" and selectedAnimatedStage != "Random":
-                if not os.path.exists(os.path.join(stagespath,selectedAnimatedStage)):
-                    log.warn("Selected animated stage folder " + selectedAnimatedStage + " does not exist, forcing Normal.")
-                    self.config.set("game","animated_stage_folder","Normal") #MFH: force "Standard" currently selected animated stage folder is invalid
-        else:
-            Config.define("game", "animated_stage_folder", str, "None", text = _("Animated Stage"), options = ["None",_("None")])
-            log.warn("No stages\ folder found, forcing None setting for Animated Stage.")
-            self.config.set("game","animated_stage_folder", "None") #MFH: force "None" when Stages folder can't be found
-
-        # Create theme manager
-        self.theme = None
-        try:
-            fp, pathname, description = imp.find_module("CustomTheme",[themepath])
-            try:
-                theme = imp.load_module("CustomTheme", fp, pathname, description)
-                self.theme = theme.CustomTheme(themepath, themename)
-            except ImportError as e:
-                # Unable to load module; log it, but continue with default Theme.
-                log.error("Failed to load CustomTheme.py from %s" % pathname)
-        except ImportError:
-            # CustomTheme is optional; no need to complain.
-            pass
-
-        if self.theme is None:
-            self.theme = Theme(themepath, themename)
-        self.task.addTask(self.theme)
 
         self.input.addKeyListener(FullScreenSwitcher(self), priority = True)
         self.input.addSystemEventListener(SystemEventHandler(self))
@@ -397,6 +321,106 @@ class GameEngine(object):
         for taskData in list(self.task.tasks):
             self.task.removeTask(taskData['task'])
         self.running = False
+
+
+    def _initTheme(self, themename, themepath):
+        '''
+        Select the source of graphics for the game.
+        Note that currently this can only be called GameEngine on startup.
+
+        :param themename: what to call this theme
+        :type themename: str
+        :param themepath: absolute path to theme folder
+        :type themepath: str
+        '''
+
+        log.notice( 'Setting theme %s from "%s"' % (themename,themepath) )
+
+        self.theme = None
+        try:
+            # Look for "CustomTheme.py" inside theme dir
+            fp, pathname, description = imp.find_module("CustomTheme",[themepath])
+            try:
+                # Found it! Load it.
+                theme = imp.load_module("CustomTheme", fp, pathname, description)
+                self.theme = theme.CustomTheme(themepath, themename)
+                log.notice('Theme activated using custom class "%s"' % pathname)
+            except ImportError as e:
+                # Unable to load module; log it, but continue with default Theme.
+                log.error('Failed to load CustomTheme.py from "%s"' % pathname)
+            finally:
+                fp.close()
+        except ImportError:
+            # CustomTheme is optional; no need to complain.
+            pass
+
+        if self.theme is None:
+            self.theme = Theme(themepath, themename)
+            log.notice("Theme activated using built-in Theme class")
+        self.task.addTask(self.theme)
+
+        ## ------------------------------ ##
+
+        ##MFH: Animated stage folder selection option
+        # <themename>\Stages still contains the backgrounds for when stage rotation is off, and practice.png
+        # subfolders under Stages\ will each be treated as a separate animated stage set
+
+        self.stageFolders = []
+        currentTheme = themename
+
+        stagespath = os.path.join(themepath, "backgrounds")
+        if os.path.exists(stagespath):
+            self.stageFolders = []
+            allFolders = os.listdir(stagespath)
+            # this also includes all the stage files - so check to see if there
+            # is at least one .png file inside each folder to be sure it's an
+            # animated stage folder
+            for name in allFolders:
+                aniStageFolderListing = []
+                thisIsAnAnimatedStageFolder = False
+                try:
+                    aniStageFolderListing = os.listdir(os.path.join(stagespath,name))
+                except Exception:
+                    thisIsAnAnimatedStageFolder = False
+                for aniFile in aniStageFolderListing:
+                    if os.path.splitext(aniFile)[1] in [".png", ".jpg", ".jpeg"]:
+                        # we've found at least one .png file here, chances are this is a valid animated stage folder
+                        thisIsAnAnimatedStageFolder = True
+                if thisIsAnAnimatedStageFolder:
+                    self.stageFolders.append(name)
+
+            i = len(self.stageFolders)
+            if i > 0:
+                # only set default to first animated subfolder if one exists - otherwise use Normal!
+                defaultAniStage = str(self.stageFolders[0])
+            else:
+                defaultAniStage = "Normal"
+            log.debug("Default animated stage for " + currentTheme + " theme = " + defaultAniStage)
+            aniStageOptions = dict([(str(self.stageFolders[n]),self.stageFolders[n]) for n in range(0, i)])
+            aniStageOptions.update({"Normal":_("Slideshow")})
+            if i > 1:
+                # only add Random setting if more than one animated stage exists
+                aniStageOptions.update({"Random":_("Random")})
+            Config.define("game", "animated_stage_folder", str, defaultAniStage, text = _("Animated Stage"), options = aniStageOptions )
+
+            #MFH: here, need to track and check a new ini entry for last theme - so when theme changes we can re-default animated stage to first found
+            lastTheme = self.config.get("game","last_theme")
+            if lastTheme == "" or lastTheme != currentTheme:
+                #MFH - no last theme, and theme just changed:
+                # force defaultAniStage
+                self.config.set("game","animated_stage_folder",defaultAniStage)
+            self.config.set("game","last_theme",currentTheme)
+
+            selectedAnimatedStage = self.config.get("game", "animated_stage_folder")
+            if selectedAnimatedStage != "Normal" and selectedAnimatedStage != "Random":
+                if not os.path.exists(os.path.join(stagespath,selectedAnimatedStage)):
+                    log.warn("Selected animated stage folder " + selectedAnimatedStage + " does not exist, forcing Normal.")
+                    self.config.set("game","animated_stage_folder","Normal") #MFH: force "Standard" currently selected animated stage folder is invalid
+        else:
+            Config.define("game", "animated_stage_folder", str, "None", text = _("Animated Stage"), options = ["None",_("None")])
+            log.warn("No stages\ folder found, forcing None setting for Animated Stage.")
+            self.config.set("game","animated_stage_folder", "None") #MFH: force "None" when Stages folder can't be found
+
 
     def setStartupLayer(self, startupLayer):
         """
