@@ -2,21 +2,31 @@ language: python
 python:
     - 2.7
 
-before_install:
-    - sudo apt-get -qq update
-    - sudo apt-get install -y
-        libogg-dev
-        libportmidi-dev
-        libsdl-image1.2-dev
-        libsdl-mixer1.2-dev
-        libsdl-ttf2.0-dev
-        libsdl1.2-dev
-        libsoundtouch-dev
-        libswscale-dev
-        libtheora-dev
-        libvorbis-dev
-        mesa-utils
-        portaudio19-dev
+matrix:
+    include:
+        - env:
+              - GIT_COMMIT=1
+          install:
+              - pip install gitlint
+          script:
+              - gitlint --commits origin..HEAD
+        - env:
+            - GIT_COMMIT=0
+          before_install:
+              - sudo apt-get -qq update
+              - sudo apt-get install -y
+                  libogg-dev
+                  libportmidi-dev
+                  libsdl-image1.2-dev
+                  libsdl-mixer1.2-dev
+                  libsdl-ttf2.0-dev
+                  libsdl1.2-dev
+                  libsoundtouch-dev
+                  libswscale-dev
+                  libtheora-dev
+                  libvorbis-dev
+                  mesa-utils
+                  portaudio19-dev
 
 install:
     - pip install pytest
