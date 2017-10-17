@@ -203,10 +203,7 @@ class GameEngine(object):
         self.title             = self.versionString
         self.restartRequested  = False
 
-        # Find window icon
-        #WRZ Note that in the past, we used the theme icon if present.
-        #  This is wrong IMO; the window icon should match the thing
-        #  that the user clicks in their OS to start FoFiX.
+        # Load window icon
         icon = os.path.join(Version.dataPath(), "fofix_icon.png")
 
         self.video             = Video(self.title, icon)
