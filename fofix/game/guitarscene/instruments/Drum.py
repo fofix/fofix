@@ -337,7 +337,6 @@ class Drum(Instrument):
             gl.glPopMatrix()
             gl.glDisable(gl.GL_DEPTH_TEST)
 
-
     def renderFrets(self, visibility, song, controls):
         w = self.boardWidth / self.strings
         size = (.22, .22)
@@ -443,7 +442,6 @@ class Drum(Instrument):
 
         gl.glDisable(gl.GL_DEPTH_TEST)
 
-
     def renderFreestyleFlames(self, visibility, controls):
         if self.flameColors[0][0] == -1:
             return
@@ -451,7 +449,6 @@ class Drum(Instrument):
         w = self.boardWidth / self.strings
 
         v = 1.0 - visibility
-
 
         flameLimit = 10.0
         flameLimitHalf = round(flameLimit/2.0)
@@ -601,7 +598,6 @@ class Drum(Instrument):
                 else:   #MFH - flame count is done - reset it!
                     self.freestyleHitFlameCounts[fretNum] = 0    #MFH
 
-
     def render(self, visibility, song, pos, controls, killswitch):
 
         if shaders.turnon:
@@ -674,7 +670,6 @@ class Drum(Instrument):
                 self.renderAnimatedFlames(song, pos)
                 self.renderFlames(song, pos)    #MFH - only when freestyle inactive!
 
-
     def playDrumSounds(self, controls, playBassDrumOnly = False):   #MFH - handles playing of drum sounds.
         #Returns list of drums that were just hit (including logic for detecting a held bass pedal)
         #pass playBassDrumOnly = True (optional paramater) to only play the bass drum sound, but still
@@ -713,7 +708,6 @@ class Drum(Instrument):
 
         return drumsJustHit
 
-
     #volshebnyi - handle freestyle picks here
     def freestylePick(self, song, pos, controls):
         drumsJustHit = self.playDrumSounds(controls)
@@ -730,7 +724,6 @@ class Drum(Instrument):
                             self.freestyleSP = True
 
         return numHits
-
 
     def hitNote(self, time, note):
         self.pickStartPos = max(self.pickStartPos, time)
@@ -799,7 +792,6 @@ class Drum(Instrument):
                     self.drumsHeldDown[i] = 0
 
         activeFrets = [(note.number - 1) for time, note in self.playedNotes]
-
 
         if -1 in activeFrets:
             self.openFretActivity = min(self.openFretActivity + ticks / 24.0, 0.6)

@@ -293,6 +293,7 @@ class GameEngine(object):
         themename = self.config.get("coffee", "themename")
         themepath  = os.path.join(Version.dataPath(), "themes", themename)
         self._initTheme(themename, themepath)
+        self._initStages()
 
         # Load game modifications
         Mod.init(self)
@@ -313,7 +314,6 @@ class GameEngine(object):
 
         log.debug("Ready.")
 
-
     # evilynux - This stops the crowd cheers if they're still playing (issue 317).
     def quit(self):
         # evilynux - self.audio.close() crashes when we attempt to restart
@@ -324,9 +324,8 @@ class GameEngine(object):
             self.task.removeTask(taskData['task'])
         self.running = False
 
-
     def _initTheme(self, themename, themepath):
-        '''
+        """
         Select the source of graphics for the game.
         Note that currently this can only be called GameEngine on startup.
 
@@ -334,7 +333,7 @@ class GameEngine(object):
         :type themename: str
         :param themepath: absolute path to theme folder
         :type themepath: str
-        '''
+        """
 
         log.notice( 'Setting theme %s from "%s"' % (themename,themepath) )
 
@@ -361,14 +360,17 @@ class GameEngine(object):
             log.notice("Theme activated using built-in Theme class")
         self.task.addTask(self.theme)
 
-        ## ------------------------------ ##
+    def _initStages(self):
+        """
+        Setup animated stages from already-setup theme.
+        Only call this after _initTheme().
 
-        ##MFH: Animated stage folder selection option
         # <themename>\Stages still contains the backgrounds for when stage rotation is off, and practice.png
         # subfolders under Stages\ will each be treated as a separate animated stage set
+        """
 
         self.stageFolders = []
-        currentTheme = themename
+        currentTheme = self.theme.name
 
         stagespath = os.path.join(themepath, "backgrounds")
         if os.path.exists(stagespath):
@@ -422,7 +424,6 @@ class GameEngine(object):
             Config.define("game", "animated_stage_folder", str, "None", text = _("Animated Stage"), options = ["None",_("None")])
             log.warn("No stages\ folder found, forcing None setting for Animated Stage.")
             self.config.set("game","animated_stage_folder", "None") #MFH: force "None" when Stages folder can't be found
-
 
     def setStartupLayer(self, startupLayer):
         """
