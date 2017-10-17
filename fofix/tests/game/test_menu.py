@@ -19,10 +19,7 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 
-import tempfile
 import unittest
-
-from fretwork import log
 
 from fofix.core import Config
 from fofix.core import Version
@@ -37,10 +34,6 @@ def my_callback():
 class MenuTest(unittest.TestCase):
 
     def setUp(self):
-        # set log file
-        fp = tempfile.TemporaryFile()
-        log.setLogfile(fp)
-
         # set config file
         config_file = Version.PROGRAM_UNIXSTYLE_NAME + ".ini"
         self.config = Config.load(config_file, setAsDefault=True)
