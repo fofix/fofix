@@ -86,6 +86,10 @@ This will look like this:
     Ref #2345
 
 
+You can test your commit with [gitlint](http://jorisroovers.github.io/gitlint/)
+before pushing your code.
+
+
 For more information about those community standards, take a look at:
 - Tim Pope's [A Note About Git Commit Messages](http://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html)
 - Chris Beams's summary: [How to Write a Git Commit Message](https://chris.beams.io/posts/git-commit/)
