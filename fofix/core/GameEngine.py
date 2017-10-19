@@ -70,36 +70,38 @@ from fofix.game.Debug import DebugLayer
 # evilynux - Grab name and version from Version class.
 version = "%s v%s" % ( Version.PROGRAM_NAME, Version.version() )
 
-##Alarian: Get unlimited themes by foldername
-themepath = os.path.join(Version.dataPath(), "themes")
-themes = []
-defaultTheme = None           #myfingershurt
-allthemes = os.listdir(themepath)
-for name in allthemes:
-    if os.path.exists(os.path.join(themepath,name,"notes","notes.png")):
-        themes.append(name)
-        if name == "MegaLight V4":
-            defaultTheme = name
+def _init_allthemes():
+    """ Alarian: Get unlimited themes by foldername """
+    # this global code is in a function to hide vars from rest of file
 
-i = len(themes)
-if i == 0:
-    if os.name == 'posix':
-        log.error("No valid theme found!\n" +
-                  "Make sure theme files are properly cased " +
-                  "e.g. notes.png works, Notes.png doesn't\n")
-    else:
-        log.error("No valid theme found!")
-    sys.exit(1)
+    themepath = os.path.join(Version.dataPath(), "themes")
+    themes = []
+    defaultTheme = None           #myfingershurt
+    allthemes = os.listdir(themepath)
+    for name in allthemes:
+        if os.path.exists(os.path.join(themepath,name,"notes","notes.png")):
+            themes.append(name)
+            if name == "MegaLight V4":
+                defaultTheme = name
 
-if defaultTheme is None:
-    defaultTheme = themes[0]    #myfingershurt
+    i = len(themes)
+    if i == 0:
+        if os.name == 'posix':
+            log.error("No valid theme found!\n" +
+                      "Make sure theme files are properly cased " +
+                      "e.g. notes.png works, Notes.png doesn't\n")
+        else:
+            log.error("No valid theme found!")
+        sys.exit(1)
 
-#myfingershurt: default theme must be an existing one!
-Config.define("coffee", "themename",           str,   defaultTheme,      text = _("Theme"),                options = dict([(str(themes[n]),themes[n]) for n in range(0, i)]), tipText = _("Sets the overall graphical feel of the game. You can find and download many more at fretsonfire.net"))
+    if defaultTheme is None:
+        defaultTheme = themes[0]    #myfingershurt
 
-##Alarian: End Get unlimited themes by foldername
+    #myfingershurt: default theme must be an existing one!
+    Config.define("coffee", "themename",           str,   defaultTheme,      text = _("Theme"),                options = dict([(str(themes[n]),themes[n]) for n in range(0, i)]), tipText = _("Sets the overall graphical feel of the game. You can find and download many more at fretsonfire.net"))
+_init_allthemes()
+
 Player.loadControls()
-
 
 
 class FullScreenSwitcher(KeyListener):
@@ -349,7 +351,8 @@ class GameEngine(object):
             finally:
                 fp.close()
         except ImportError:
-            # CustomTheme is optional; no need to complain.
+            # CustomTheme.py file is optional, but notify developer anyway.
+            log.notice("No CustomTheme.py found in theme")
             pass
 
         if self.theme is None:
@@ -368,6 +371,7 @@ class GameEngine(object):
 
         self.stageFolders = []
         currentTheme = self.theme.name
+        themepath = self.theme.path
 
         stagespath = os.path.join(themepath, "backgrounds")
         if os.path.exists(stagespath):
