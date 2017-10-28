@@ -1060,6 +1060,7 @@ class Setlist:
         w, h = scene.geometry
         font = scene.fontDict['songListFont']
         lfont = scene.fontDict['songListFont']
+        notesTotal, notesHit, noteStreak = -1, 0, 0
         if self.setlist_type == 0:
             return
         elif self.setlist_type == 1:
@@ -1368,6 +1369,7 @@ class Setlist:
         lfont = scene.fontDict['songListFont']
         sfont = scene.fontDict['shadowFont']
         item = scene.selectedItem
+        notesTotal, notesHit, noteStreak = -1, 0, 0
         if not item:
             return
         if isinstance(item, song.BlankSpaceInfo):
