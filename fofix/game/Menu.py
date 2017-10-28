@@ -37,6 +37,7 @@ from fofix.core.Image import drawImage
 from fofix.core.View import Layer
 from fofix.core import Player
 from fofix.core import Data
+from fofix.core.constants import *
 
 class Choice:
     def __init__(self, text, callback, name = None, values = None, valueIndex = 0, append_submenu_char = True, tipText = None):
