@@ -25,7 +25,6 @@ import os
 import glob
 
 from fretwork import log
-from fretwork.unicode import unicodify
 
 from fofix.core import Version
 from fofix.core import Config
@@ -35,23 +34,20 @@ Config.define("game", "language", str, "")
 def getAvailableLanguages():
     return [os.path.basename(l).capitalize().replace(".mo", "").replace("_", " ") for l in glob.glob(os.path.join(Version.dataPath(), "translations", "*.mo"))]
 
-def dummyTranslator(string):
-    return unicodify(string)
 
 language = Config.load(Version.PROGRAM_UNIXSTYLE_NAME + ".ini").get("game", "language")
-_ = dummyTranslator
+catalog = gettext.NullTranslations()
 
 if language:
     try:
         trFile = os.path.join(Version.dataPath(), "translations", "%s.mo" % language.lower().replace(" ", "_"))
         catalog = gettext.GNUTranslations(open(trFile, "rb"))
-        def translate(m):
-            return catalog.ugettext(m)
-        _ = translate
     except Exception as x:
         log.warn("Unable to select language '%s': %s" % (language, x))
         language = None
         Config.set("game", "language", "")
+
+_ = catalog.ugettext
 
 # Define the config key again now that we have some options for it
 langOptions = {"": "English"}
