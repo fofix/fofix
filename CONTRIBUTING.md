@@ -17,7 +17,11 @@ Patches submission
 ------------------
 
 Patches are welcome either as [pull requests on GitHub](https://github.com/fofix/fofix/pulls).
-Please avoid duplicated patches.
+Please avoid duplicated patches, and make small PR.
+
+To avoid duplicated work:
+- if there is no issue about your bug, create one
+- tell people that you're working on a patch.
 
 Here are some guidelines:
 - fork the repo
