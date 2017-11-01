@@ -19,21 +19,25 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,        #
 # MA  02110-1301, USA.                                              #
 #####################################################################
+from __future__ import print_function
+from __future__ import division
+from __future__ import absolute_import
 
 import gettext
-import os
 import glob
+import os
 
 from fretwork import log
 
 from fofix.core import Version
 from fofix.core import Config
 
-Config.define("game", "language", str, "")
 
 def getAvailableLanguages():
     return [os.path.basename(l).capitalize().replace(".mo", "").replace("_", " ") for l in glob.glob(os.path.join(Version.dataPath(), "translations", "*.mo"))]
 
+
+Config.define("game", "language", str, "")
 
 language = Config.load(Version.PROGRAM_UNIXSTYLE_NAME + ".ini").get("game", "language")
 catalog = gettext.NullTranslations()
@@ -53,4 +57,4 @@ _ = catalog.ugettext
 langOptions = {"": "English"}
 for lang in getAvailableLanguages():
     langOptions[lang] = _(lang)
-Config.define("game", "language", str, "", _("Language"), langOptions, tipText = _("Change the game language!"))
+Config.define("game", "language", str, "", _("Language"), langOptions, tipText=_("Change the game language!"))
