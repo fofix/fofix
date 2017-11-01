@@ -70,36 +70,38 @@ from fofix.game.Debug import DebugLayer
 # evilynux - Grab name and version from Version class.
 version = "%s v%s" % ( Version.PROGRAM_NAME, Version.version() )
 
-##Alarian: Get unlimited themes by foldername
-themepath = os.path.join(Version.dataPath(), "themes")
-themes = []
-defaultTheme = None           #myfingershurt
-allthemes = os.listdir(themepath)
-for name in allthemes:
-    if os.path.exists(os.path.join(themepath,name,"notes","notes.png")):
-        themes.append(name)
-        if name == "MegaLight V4":
-            defaultTheme = name
+def _init_allthemes():
+    """ Alarian: Get unlimited themes by foldername """
+    # this global code is in a function to hide vars from rest of file
 
-i = len(themes)
-if i == 0:
-    if os.name == 'posix':
-        log.error("No valid theme found!\n" +
-                  "Make sure theme files are properly cased " +
-                  "e.g. notes.png works, Notes.png doesn't\n")
-    else:
-        log.error("No valid theme found!")
-    sys.exit(1)
+    themepath = os.path.join(Version.dataPath(), "themes")
+    themes = []
+    defaultTheme = None           #myfingershurt
+    allthemes = os.listdir(themepath)
+    for name in allthemes:
+        if os.path.exists(os.path.join(themepath,name,"notes","notes.png")):
+            themes.append(name)
+            if name == "MegaLight V4":
+                defaultTheme = name
 
-if defaultTheme is None:
-    defaultTheme = themes[0]    #myfingershurt
+    i = len(themes)
+    if i == 0:
+        if os.name == 'posix':
+            log.error("No valid theme found!\n" +
+                      "Make sure theme files are properly cased " +
+                      "e.g. notes.png works, Notes.png doesn't\n")
+        else:
+            log.error("No valid theme found!")
+        sys.exit(1)
 
-#myfingershurt: default theme must be an existing one!
-Config.define("coffee", "themename",           str,   defaultTheme,      text = _("Theme"),                options = dict([(str(themes[n]),themes[n]) for n in range(0, i)]), tipText = _("Sets the overall graphical feel of the game. You can find and download many more at fretsonfire.net"))
+    if defaultTheme is None:
+        defaultTheme = themes[0]    #myfingershurt
 
-##Alarian: End Get unlimited themes by foldername
+    #myfingershurt: default theme must be an existing one!
+    Config.define("coffee", "themename",           str,   defaultTheme,      text = _("Theme"),                options = dict([(str(themes[n]),themes[n]) for n in range(0, i)]), tipText = _("Sets the overall graphical feel of the game. You can find and download many more at fretsonfire.net"))
+_init_allthemes()
+
 Player.loadControls()
-
 
 
 class FullScreenSwitcher(KeyListener):
@@ -148,6 +150,7 @@ class SystemEventHandler(SystemEventListener):
 
 class GameEngine(object):
     """The main game engine."""
+
     def __init__(self, config = None):
 
         log.debug("GameEngine class init (GameEngine.py)...")
@@ -181,7 +184,7 @@ class GameEngine(object):
 
         self.tutorialFolder = "tutorials"
 
-        if not config:
+        if config is None:
             config = Config.load()
 
         self.config  = config
@@ -202,15 +205,8 @@ class GameEngine(object):
         self.title             = self.versionString
         self.restartRequested  = False
 
-        # evilynux - Check if theme icon exists first, then fallback on FoFiX icon.
-        themename = self.config.get("coffee", "themename")
-        themeicon = os.path.join(Version.dataPath(), "themes", themename, "icon.png")
-        fofixicon = os.path.join(Version.dataPath(), "fofix_icon.png")
-        icon = None
-        if os.path.exists(themeicon):
-            icon = themeicon
-        elif os.path.exists(fofixicon):
-            icon = fofixicon
+        # Load window icon
+        icon = os.path.join(Version.dataPath(), "fofix_icon.png")
 
         self.video             = Video(self.title, icon)
         if self.config.get("video", "disable_screensaver"):
@@ -292,29 +288,98 @@ class GameEngine(object):
 
         self.setlistMsg = None
 
+        # Init theme system
+        themename = self.config.get("coffee", "themename")
+        themepath  = os.path.join(Version.dataPath(), "themes", themename)
+        self._initTheme(themename, themepath)
+        self._initStages()
 
         # Load game modifications
         Mod.init(self)
+
         self.task.addTask(self.input, synced = False)
-
         self.task.addTask(self.view, synced = False)
-
         self.task.addTask(self.resource, synced = False)
 
         self.data = Data(self.resource, self.svg)
 
-        ##MFH: Animated stage folder selection option
-        #<themename>\Stages still contains the backgrounds for when stage rotation is off, and practice.png
-        #subfolders under Stages\ will each be treated as a separate animated stage set
+        self.input.addKeyListener(FullScreenSwitcher(self), priority = True)
+        self.input.addSystemEventListener(SystemEventHandler(self))
+
+        self.debugLayer         = None
+        self.startupLayer       = None
+        self.loadingScreenShown = False
+        self.graphicMenuShown   = False
+
+        log.debug("Ready.")
+
+    # evilynux - This stops the crowd cheers if they're still playing (issue 317).
+    def quit(self):
+        # evilynux - self.audio.close() crashes when we attempt to restart
+        if not self.restartRequested:
+            self.audio.close()
+        Player.savePlayers()
+        for taskData in list(self.task.tasks):
+            self.task.removeTask(taskData['task'])
+        self.running = False
+
+    def _initTheme(self, themename, themepath):
+        """
+        Select the source of graphics for the game.
+        Note that currently this can only be called GameEngine on startup.
+
+        :param themename: what to call this theme
+        :type themename: str
+        :param themepath: absolute path to theme folder
+        :type themepath: str
+        """
+
+        log.notice( 'Setting theme %s from "%s"' % (themename,themepath) )
+
+        self.theme = None
+        try:
+            # Look for "CustomTheme.py" inside theme dir
+            fp, pathname, description = imp.find_module("CustomTheme",[themepath])
+            try:
+                # Found it! Load it.
+                theme = imp.load_module("CustomTheme", fp, pathname, description)
+                self.theme = theme.CustomTheme(themepath, themename)
+                log.notice('Theme activated using custom class "%s"' % pathname)
+            except ImportError as e:
+                # Unable to load module; log it, but continue with default Theme.
+                log.error('Failed to load CustomTheme.py from "%s"' % pathname)
+            finally:
+                fp.close()
+        except ImportError:
+            # CustomTheme.py file is optional, but notify developer anyway.
+            log.notice("No CustomTheme.py found in theme")
+            pass
+
+        if self.theme is None:
+            self.theme = Theme(themepath, themename)
+            log.notice("Theme activated using built-in Theme class")
+        self.task.addTask(self.theme)
+
+    def _initStages(self):
+        """
+        Setup animated stages from already-setup theme.
+        Only call this after _initTheme().
+
+        # <themename>\Stages still contains the backgrounds for when stage rotation is off, and practice.png
+        # subfolders under Stages\ will each be treated as a separate animated stage set
+        """
 
         self.stageFolders = []
-        currentTheme = themename
+        currentTheme = self.theme.name
+        themepath = self.theme.path
 
-        stagespath = os.path.join(Version.dataPath(), "themes", currentTheme, "backgrounds")
-        themepath  = os.path.join(Version.dataPath(), "themes", currentTheme)
+        stagespath = os.path.join(themepath, "backgrounds")
         if os.path.exists(stagespath):
             self.stageFolders = []
-            allFolders = os.listdir(stagespath)   #this also includes all the stage files - so check to see if there is at least one .png file inside each folder to be sure it's an animated stage folder
+            allFolders = os.listdir(stagespath)
+            # this also includes all the stage files - so check to see if there
+            # is at least one .png file inside each folder to be sure it's an
+            # animated stage folder
             for name in allFolders:
                 aniStageFolderListing = []
                 thisIsAnAnimatedStageFolder = False
@@ -329,23 +394,26 @@ class GameEngine(object):
                 if thisIsAnAnimatedStageFolder:
                     self.stageFolders.append(name)
 
-
             i = len(self.stageFolders)
-            if i > 0: #only set default to first animated subfolder if one exists - otherwise use Normal!
+            if i > 0:
+                # only set default to first animated subfolder if one exists - otherwise use Normal!
                 defaultAniStage = str(self.stageFolders[0])
             else:
                 defaultAniStage = "Normal"
             log.debug("Default animated stage for " + currentTheme + " theme = " + defaultAniStage)
             aniStageOptions = dict([(str(self.stageFolders[n]),self.stageFolders[n]) for n in range(0, i)])
             aniStageOptions.update({"Normal":_("Slideshow")})
-            if i > 1:   #only add Random setting if more than one animated stage exists
+            if i > 1:
+                # only add Random setting if more than one animated stage exists
                 aniStageOptions.update({"Random":_("Random")})
             Config.define("game", "animated_stage_folder", str, defaultAniStage, text = _("Animated Stage"), options = aniStageOptions )
 
             #MFH: here, need to track and check a new ini entry for last theme - so when theme changes we can re-default animated stage to first found
             lastTheme = self.config.get("game","last_theme")
-            if lastTheme == "" or lastTheme != currentTheme:   #MFH - no last theme, and theme just changed:
-                self.config.set("game","animated_stage_folder",defaultAniStage)   #force defaultAniStage
+            if lastTheme == "" or lastTheme != currentTheme:
+                #MFH - no last theme, and theme just changed:
+                # force defaultAniStage
+                self.config.set("game","animated_stage_folder",defaultAniStage)
             self.config.set("game","last_theme",currentTheme)
 
             selectedAnimatedStage = self.config.get("game", "animated_stage_folder")
@@ -357,39 +425,6 @@ class GameEngine(object):
             Config.define("game", "animated_stage_folder", str, "None", text = _("Animated Stage"), options = ["None",_("None")])
             log.warn("No stages\ folder found, forcing None setting for Animated Stage.")
             self.config.set("game","animated_stage_folder", "None") #MFH: force "None" when Stages folder can't be found
-
-
-
-        try:
-            fp, pathname, description = imp.find_module("CustomTheme",[themepath])
-            theme = imp.load_module("CustomTheme", fp, pathname, description)
-            self.theme = theme.CustomTheme(themepath, themename)
-        except ImportError:
-            self.theme = Theme(themepath, themename)
-
-        self.task.addTask(self.theme)
-
-
-        self.input.addKeyListener(FullScreenSwitcher(self), priority = True)
-        self.input.addSystemEventListener(SystemEventHandler(self))
-
-        self.debugLayer         = None
-        self.startupLayer       = None
-        self.loadingScreenShown = False
-        self.graphicMenuShown   = False
-
-        log.debug("Ready.")
-
-
-    # evilynux - This stops the crowd cheers if they're still playing (issue 317).
-    def quit(self):
-        # evilynux - self.audio.close() crashes when we attempt to restart
-        if not self.restartRequested:
-            self.audio.close()
-        Player.savePlayers()
-        for taskData in list(self.task.tasks):
-            self.task.removeTask(taskData['task'])
-        self.running = False
 
     def setStartupLayer(self, startupLayer):
         """
@@ -476,7 +511,7 @@ class GameEngine(object):
         minScale = 0.02
         w = screenwidth
         h = screenheight
-        if not scale:
+        if scale is None:
             scale = minScale
         elif scale < minScale:
             scale = minScale
