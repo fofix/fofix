@@ -37,7 +37,7 @@ from fofix.core import Version
 from fofix.core.Image import drawImage
 from fofix.core.Input import KeyListener
 from fofix.core.Language import _
-from fofix.core.VideoPlayer import VideoLayer, VideoPlayerError  # @UnresolvedImport
+from fofix.core.VideoPlayer import VideoLayer, VideoPlayerError
 from fofix.core.View import Layer
 from fofix.core.constants import *
 
@@ -98,14 +98,12 @@ class Picture(Element):
                             coord = (.5 * w, (1-offset) * h))
 
 
-# evilynux - Updated to latest MFH-Alarian mod. Alot changed compared to upstream FoF.
-#            Removed song, our revamped MainMenu already provides songs.
 class Credits(Layer, KeyListener):
     """Credits scroller."""
     def __init__(self, engine, songName = None):
         self.engine      = engine
         self.time        = 0.0
-        self.offset      = 0.5 # akedrou - this seems to fix the delay issue, but I'm not sure why. Return here!
+        self.offset      = 0.5  # this seems to fix the delay issue, but I'm not sure why
         self.speedDiv    = 20000.0
         self.speedDir    = 1.0
         self.doneList    = []
@@ -119,7 +117,7 @@ class Credits(Layer, KeyListener):
         c2 = (1, .75, 0, 1)
         self.text_size = nf.getLineSpacing(scale = hs)
 
-        #akedrou - Translatable Strings:
+        # Translatable Strings:
         self.bank = {}
         self.bank['intro']      = [_("Frets on Fire X is a progression of MFH-mod,"),
                                    _("which was built on Alarian's mod,"),
@@ -154,7 +152,7 @@ class Credits(Layer, KeyListener):
                                    _("credit every single person who contributed; if your name is"),
                                    _("not included, it was not meant to slight you."),
                                    _("It was an oversight.")]
-        # evilynux - Theme strings
+        # Theme strings
         self.bank['themeCreators'] = [_("%s theme credits:") % self.themename]
         self.bank['themeThanks']   = [_("%s theme specific thanks:") % self.themename]
         # Languages
@@ -195,10 +193,10 @@ class Credits(Layer, KeyListener):
           Picture(self.engine, "fofix_logo.png", .10),
           Text(nf, ns, c1, "center", "%s" % Version.version()), space]
 
-        # evilynux: Main FoFiX credits (taken from CREDITS).
+        # Main FoFiX credits (taken from CREDITS file).
         self.parseFile("CREDITS")
         self.credits.extend([space, space, space])
-        # evilynux: Theme credits (taken from data/themes/<theme name>/CREDITS).
+        # Theme credits (taken from data/themes/<theme name>/CREDITS).
         self.parseFile(os.path.join('data', 'themes', self.themename, 'CREDITS'))
 
         self.credits.extend( [
@@ -210,7 +208,7 @@ class Credits(Layer, KeyListener):
           Text(nf, ns, c2, "right",  "PyGame " + pygame.version.ver.replace('release', '')),  #stump: the version that's actually in use
           Text(nf, bs, c2, "right",  "http://www.pygame.org"),
           space,
-          Text(nf, ns, c2, "right",  "PyOpenGL " + OpenGL.__version__), #evilynux: the version that's actually in use
+          Text(nf, ns, c2, "right",  "PyOpenGL " + OpenGL.__version__),
           Text(nf, bs, c2, "right",  "http://pyopengl.sourceforge.net"),
           space,
           Text(nf, ns, c2, "right",  "Illusoft Collada module 0.3.159"),
@@ -230,7 +228,7 @@ class Credits(Layer, KeyListener):
           space
         ])
 
-    # evilynux - Text parsing method. Provides some style functionalities.
+    # Text parsing method. Provides some style functionalities.
     def parseFile(self, filename):
         nf = self.engine.data.font
         ns = 0.002
@@ -310,7 +308,7 @@ class Credits(Layer, KeyListener):
 
     def hidden(self):
         self.engine.input.removeKeyListener(self)
-        self.engine.view.pushLayer(self.engine.mainMenu)    #rchiav: use already-existing MainMenu instance
+        self.engine.view.pushLayer(self.engine.mainMenu)    # use already-existing MainMenu instance
 
     def quit(self):
         if self.videoLayer:
@@ -320,7 +318,7 @@ class Credits(Layer, KeyListener):
     def keyPressed(self, key, isUnicode):
         if self.engine.input.controls.getMapping(key) in (Player.menuYes + Player.menuNo) or key == pygame.K_RETURN or key == pygame.K_ESCAPE:
             self.quit()
-        elif self.engine.input.controls.getMapping(key) in (Player.menuDown) or key == pygame.K_DOWN: #akedrou: so I was bored.
+        elif self.engine.input.controls.getMapping(key) in (Player.menuDown) or key == pygame.K_DOWN:
             if self.speedDiv > 2000.0:
                 self.speedDiv -= 2000.0
                 if self.speedDiv < 2000.0:
@@ -341,14 +339,13 @@ class Credits(Layer, KeyListener):
 
     def run(self, ticks):
         self.time   += ticks / 50.0
-        #self.offset -= ticks / 7500.0 # evilynux - corresponds to scroll speed
-        #self.offset -= ticks / 15000.0 #MFH - slowin it down - # evilynux - corresponds to scroll speed
-        self.offset -= (ticks / self.speedDiv) * self.speedDir #akedrou - some credits fun.
+        self.offset -= (ticks / self.speedDiv) * self.speedDir
 
-        # evilynux - approximating the end of the list from the (mostly used font size * lines)
-        if self.offset < -( self.text_size * len(self.credits) ) or self.offset > 1.5:    #(MFH - adding 5% to estimated font height) undone: using larger scale for estimation.
+        # approximating the end of the list from the (mostly used font size * lines)
+        if self.offset < -( self.text_size * len(self.credits) ) or self.offset > 1.5:
             self.quit()
-        if len(self.credits) == len(self.doneList): #akedrou - goofy workaround for string size glitch.
+        if len(self.credits) == len(self.doneList):
+            # workaround for string size glitch.
             self.quit()
 
     def render(self, visibility, topMost):
