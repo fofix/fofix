@@ -119,9 +119,10 @@ from fofix.core import VFS
 
 # setup the logfile
 # File object representing the logfile.
-if os.name == "posix": # evilynux - logfile in ~/.fofix/ for GNU/Linux and MacOS X
-    # evilynux - Under MacOS X, put the logs in ~/Library/Logs
-    if os.uname()[0] == "Darwin":  # @UndefinedVariable
+if os.name == "posix":
+    # logfile in ~/.fofix/ for GNU/Linux
+    # Under MacOS X, put the logs in ~/Library/Logs
+    if os.uname()[0] == "Darwin":
         logFile = open(os.path.expanduser('~/Library/Logs/%s.log' % Version.PROGRAM_UNIXSTYLE_NAME), 'w')
     else: # GNU/Linux et al.
         logFile = VFS.open('/userdata/%s.log' % Version.PROGRAM_UNIXSTYLE_NAME, 'w')
@@ -221,7 +222,7 @@ class Main():
         ''' Determine if oneshot mode is valid. '''
 
         raise NotImplementedError("Sorry, one-shot mode has not been finished!")
-        #TODO: Finish one-shot mode!
+        #TODO: Finish one-shot mode! Many bugs exist deeper in the system.
 
         # I think this code can be moved elsewhere...
         self.engine.cmdPlay = 0
@@ -269,7 +270,7 @@ class Main():
 
     def run(self):
 
-        # Perhapse this could be implemented in a better way...
+        # Perhaps this could be implemented in a better way...
         # Play the intro video if it is present, we have the capability, and
         # we are not in one-shot mode.
         if not self.engine.cmdPlay:
@@ -305,7 +306,7 @@ class Main():
         if self.engine.restartRequested:
             self.restart()
 
-        # evilynux - MainMenu class already calls this - useless?
+        # MainMenu class already calls this - useless?
         self.engine.quit()
 
 if __name__ == '__main__':
