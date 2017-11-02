@@ -1,4 +1,27 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
+#####################################################################
+# Frets on Fire                                                     #
+# Copyright (C) 2006 Sami Kyöstilä                                  #
+#               2008 myfingershurt                                  #
+#               2009 Pascal Giard                                   #
+#                                                                   #
+# This program is free software; you can redistribute it and/or     #
+# modify it under the terms of the GNU General Public License       #
+# as published by the Free Software Foundation; either version 2    #
+# of the License, or (at your option) any later version.            #
+#                                                                   #
+# This program is distributed in the hope that it will be useful,   #
+# but WITHOUT ANY WARRANTY; without even the implied warranty of    #
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the     #
+# GNU General Public License for more details.                      #
+#                                                                   #
+# You should have received a copy of the GNU General Public License #
+# along with this program; if not, write to the Free Software       #
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,        #
+# MA  02110-1301, USA.                                              #
+#####################################################################
 
 
 # Song difficulties
@@ -32,14 +55,12 @@ EAS_GEM_2 = 0x3e
 EAS_GEM_3 = 0x3f
 EAS_GEM_4 = 0x40
 
-
-
-##
-## One MIDI track is divided into four 'zones' representing the four difficulty
-## levels.  This dict maps the MIDI notes to difficulty/button pairs.  The
-## specific notes listed above must be used to indicate which button should be
-## pressed.
-##
+#
+# One MIDI track is divided into four 'zones' representing the four difficulty
+# levels.  This dict maps the MIDI notes to difficulty/button pairs.  The
+# specific notes listed above must be used to indicate which button should be
+# pressed.
+#
 NOTE_MAP = {     # difficulty, note
   EXP_GEM_0: (EXP_DIF, 0), #======== #0x60 = 96 = C 8
   EXP_GEM_1: (EXP_DIF, 1),           #0x61 = 97 = Db8
@@ -95,9 +116,9 @@ EAS_REAL_GTR_G3 = 0x1b
 EAS_REAL_GTR_B3 = 0x1c
 EAS_REAL_GTR_E4 = 0x1d
 
-##
-## As above for NOTE_MAP, but for the "real" guitar (whatever that is.)
-##
+#
+# As above for NOTE_MAP, but for the "real" guitar (whatever that is.)
+#
 REAL_GTR_NOTE_MAP = {                # difficulty, note
   EXP_REAL_GTR_E2: (EXP_DIF, 0),
   EXP_REAL_GTR_A2: (EXP_DIF, 1), 
@@ -129,7 +150,7 @@ REAL_GTR_NOTE_MAP = {                # difficulty, note
 }
 
 
-#MFH - special note numbers
+# -- special note numbers -- #
 # Star Power
 SP_MARKING_NOTE = 0x67     #note 103 = G 8
 # Overdrive
@@ -143,26 +164,24 @@ FREESTYLE_MARKING_NOTE = 0x7c      #notes 120 - 124 = drum fills & BREs - always
 
 
 DEFAULT_BPM = 120.0
-DEFAULT_LIBRARY         = "songs"
+DEFAULT_LIBRARY = "songs"
 
-#MFH - special / global text-event tracks for the separated text-event list variable
+# special / global text-event tracks for the separated text-event list variable
 TK_SCRIPT = 0         #script.txt events
 TK_SECTIONS = 1       #Section events
 TK_GUITAR_SOLOS = 2   #Guitar Solo start/stop events
 TK_LYRICS = 3         #RB MIDI Lyric events
 TK_UNUSED_TEXT = 4    #Unused / other text events
 
-GUITAR_TRACK             = 0
-RHYTHM_TRACK             = 1
-DRUM_TRACK               = 2
-VOCAL_TRACK              = 3
+GUITAR_TRACK            = 0
+RHYTHM_TRACK            = 1
+DRUM_TRACK              = 2
+VOCAL_TRACK             = 3
 
-#MFH
 MIDI_TYPE_GH            = 0       #GH type MIDIs have starpower phrases marked with a long G8 note on that instrument's track
 MIDI_TYPE_RB            = 1       #RB type MIDIs have overdrive phrases marked with a long G#9 note on that instrument's track
 MIDI_TYPE_WT            = 2       #WT type MIDIs have six notes and HOPOs marked on F# of the track
 
-#MFH
 EARLY_HIT_WINDOW_NONE   = 1       #GH1/RB1/RB2 = NONE
 EARLY_HIT_WINDOW_HALF   = 2       #GH2/GH3/GHA/GH80's = HALF
 EARLY_HIT_WINDOW_FULL   = 3       #FoF = FULL
