@@ -22,12 +22,15 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,        #
 # MA  02110-1301, USA.                                              #
 #####################################################################
+from __future__ import print_function
+from __future__ import division
+from __future__ import absolute_import
 
 from collections import MutableMapping, namedtuple
+from ConfigParser import RawConfigParser
 import os
 import StringIO
 import sys
-from ConfigParser import RawConfigParser
 
 from fretwork import log
 from fretwork.unicode import utf8, unicodify
@@ -43,7 +46,7 @@ class MyConfigParser(RawConfigParser):
                 fp.write("%s = %s\n" % (key, str(value).replace('\n', '\n\t')))
         fp.write("\n")
 
-    def write(self, fp, type = 0):
+    def write(self, fp, type=0):
         if type == 1:
             return self.writeController(fp)
         elif type == 2:
@@ -54,7 +57,7 @@ class MyConfigParser(RawConfigParser):
                 self._writeSection(fp, section, self.items(section))
 
     def read(self, filenames):
-        if isinstance(filenames, str) or isinstance(filenames, unicode):
+        if isinstance(filenames, basestring):
             filenames = [filenames]
 
         read_ok = []
@@ -68,7 +71,7 @@ class MyConfigParser(RawConfigParser):
                                    if line.strip()[0:2] != '//']
                 configData = '\n'.join(configLines)
                 strFp = StringIO.StringIO(configData)
-                self._read(strFp, filename)
+                self.readfp(strFp, filename)
             except IOError:
                 continue
             read_ok.append(filename)
