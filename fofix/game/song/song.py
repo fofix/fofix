@@ -206,7 +206,7 @@ try:
     else:
         _mustReinitialize = True
         log.debug('Song cache has incompatible schema version; forcing reinitialization.')
-except:
+except Exception:
     _mustReinitialize = True
 if _mustReinitialize:
     log.debug('Initializing song cache.')
@@ -241,10 +241,7 @@ class SongInfo(object):
 
         self.name = _("NoName")
 
-        try:
-            self.info.read(infoFileName)
-        except:
-            pass
+        self.info.read(infoFileName)
 
         self.logClassInits = Config.get("game", "log_class_inits")
         if self.logClassInits == 1:
@@ -291,7 +288,7 @@ class SongInfo(object):
                     _songDB.execute('UPDATE `songinfo` SET `seen` = 1 WHERE `hash` = ?', [songhash])
                     log.debug('Song %s successfully loaded from cache.' % infoFileName)
                     return
-                except:
+                except Exception:
                     # The entry is there but could not be loaded.
                     # Nuke it and let it be rebuilt.
                     log.error('Song %s has invalid cache data (will rebuild): ' % infoFileName)
@@ -338,7 +335,7 @@ class SongInfo(object):
         if scores:
             try:
                 scores = cerealizer.loads(binascii.unhexlify(scores))
-            except:
+            except Exception:
                 log.error("High scores lost! Can't parse scores = %s" % scores)
                 scores = None
 
@@ -348,7 +345,7 @@ class SongInfo(object):
         if scores_ext:
             try:
                 scores_ext = cerealizer.loads(binascii.unhexlify(scores_ext))
-            except:
+            except Exception:
                 log.error("High scores lost! Can't parse scores_ext = %s" % scores_ext)
                 scores_ext = None
             
@@ -373,7 +370,7 @@ class SongInfo(object):
                                 difficulty.id][i]
                         scoreExt = (notesHit, notesTotal, noteStreak, modVersion,
                                     handicapValue, longHandicap, originalScore)
-                    except:
+                    except Exception:
                         hash_ext = 0
                         scoreExt = (0, 0, 0, "RF-mod", 0, "None", 0)
                 if self.getScoreHash(difficulty, score, stars, name) == hash:
@@ -436,7 +433,7 @@ class SongInfo(object):
     def _get(self, attr, type=None, default=""):
         try:
             v = self.info.get("song", attr)
-        except:
+        except Exception:
             v = default
         if v == "":  # key found, but empty - need to catch as int("") will burn.
             v = default
@@ -478,8 +475,7 @@ class SongInfo(object):
                 midiIn = midi.MidiInFile(info, noteFileName)
                 midiIn.read()
             if info.parts == []:
-                log.warn("No tracks found!")
-                raise Exception
+                raise Exception("No tracks found in %s" % noteFileName)
             self._midiStyle = info.midiStyle
             info.parts.sort(lambda b, a: cmp(b.id, a.id))
             self._parts = info.parts
@@ -489,7 +485,7 @@ class SongInfo(object):
                     continue
                 info.difficulties[part.id].sort(lambda a, b: cmp(a.id, b.id))
                 self._partDifficulties[part.id] = info.difficulties[part.id]
-        except:
+        except Exception:
             log.warn("Note file not parsed correctly. Selected part and/or difficulty may not be available.")
             self._parts = parts.values()
             for part in self._parts:
@@ -751,7 +747,7 @@ class LibraryInfo(object):
 
         try:
             self.info.read(infoFileName)
-        except:
+        except Exception:
             pass
 
         # Set a default name
@@ -784,7 +780,7 @@ class LibraryInfo(object):
     def _get(self, attr, type=None, default=""):
         try:
             v = self.info.get("library", attr)
-        except:
+        except Exception:
             v = default
         if v is not None and type:
             v = type(v)
@@ -864,7 +860,7 @@ class TitleInfo(object):
     def _get(self, attr, type=None, default=""):
         try:
             v = self.info.get(self.section, attr)
-        except:
+        except Exception:
             v = default
         if v is not None and type:
             v = type(v)
@@ -3270,7 +3266,7 @@ def getAvailableTitles(engine, library=DEFAULT_LIBRARY):
         if gameMode1p == 2:
             titles.append(BlankSpaceInfo(_("End of Career")))
 
-    except:
+    except Exception:
         log.debug("titles.ini could not be read (song.py)")
         return []
 
