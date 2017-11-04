@@ -111,4 +111,6 @@ Since most of the code is written in Python, please, follow the [PEP 8](https://
 Get in touch
 ------------
 
-You can also drop by the #fofix channel on oftc.net ([web interface](https://webchat.oftc.net/)).
+You can also drop by:
+- the #fofix channel on oftc.net ([web interface](https://webchat.oftc.net/))
+- the fofix mailing list: fofix@lists.stump.io ([web interface](https://stump.io/mailman/listinfo/fofix)).
