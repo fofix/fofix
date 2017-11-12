@@ -87,8 +87,8 @@ class SongChoosingScene(Scene):
         self.gameStarted = False
 
         self.gamePlayers = len(self.playerList)
-        self.parts = [None for i in self.playerList]
-        self.diffs = [None for i in self.playerList]
+        self.parts = [None] * self.gamePlayers
+        self.diffs = [None] * self.gamePlayers
 
         self.time       = 0
         self.lastTime   = 0
@@ -805,6 +805,9 @@ class SongChoosingScene(Scene):
                 self.moreInfo = True
         elif c in Player.menuNo and c in Player.cancels:
             self.engine.view.pushLayer(self.menu)
+        elif c in Player.key5s:
+            """ exit song choosing screen """
+            self.quit()
     def scrollUp(self):
         if self.moreInfo:
             self.infoPage -= 1
