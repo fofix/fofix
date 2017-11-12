@@ -1,11 +1,11 @@
 #!/usr/bin/python
-# -*- coding: iso-8859-1 -*-
+# -*- coding: utf-8 -*-
+
 #####################################################################
 # Frets on Fire X (FoFiX)                                           #
 # Copyright (C) 2006 Sami Kyöstilä                                  #
 #               2008 evilynux <evilynux@gmail.com>                  #
-#               2012 FoFiX Team                                     #
-#               2009 akedrou                                        #
+#               2009-2017 FoFiX Team                                #
 #                                                                   #
 # This program is free software; you can redistribute it and/or     #
 # modify it under the terms of the GNU General Public License       #
@@ -28,11 +28,25 @@ Main game executable.
 '''
 
 import argparse
-import sys
+import atexit
 import os
 import platform
 import subprocess
-import atexit
+import sys
+import traceback
+
+import pygame
+import fretwork
+from fretwork import log
+
+from fofix.core import Config
+from fofix.core import VFS
+from fofix.core import Version
+from fofix.core.GameEngine import GameEngine
+from fofix.core.Language import _
+from fofix.core.VideoPlayer import VideoLayer, VideoPlayerError
+from fofix.game.MainMenu import MainMenu
+
 
 def run_command(command):
     command = command.split(' ')
@@ -46,7 +60,8 @@ def run_command(command):
 
     return data
 
-pisSet = None
+
+apisSet = None
 # This prevents the following message being displayed on osx:
 # ApplePersistenceIgnoreState: Existing state will not be touched. New state will be written to *path*
 if 'Darwin' in platform.platform():
@@ -76,61 +91,36 @@ def disable_gl_checks():
         OpenGL.SIZE_1_ARRAY_UNPACK = False
         OpenGL.STORE_POINTERS = False
 
+
 def cmd_args():
     parser = argparse.ArgumentParser(description='Frets On Fire X (FoFiX)')
     # Where the name automatically assigned to the metavar option is to long i used x in its place.
     # Might go back and
     options = parser.add_argument_group('Options')
-    options.add_argument('-r', '--resolution', type=str,  metavar='x',    help='Force a specific resolution to be used.', default=None)
-    options.add_argument('-f', '--fullscreen',  action='store_true',       help='Force usage of full-screen mode.', default=None)
-    options.add_argument('-c', '--config',     type=str,  metavar='x',     help='Use this configuration file instead of the fofix.ini in its default location.  Use "reset" to use the usual fofix.ini but clear it first.')
-    options.add_argument('-t', '--theme',      type=str,  metavar='x', help='Force the specified theme to be used. Remember to quote the theme name if it contains spaces (e.g. %(prog)s -t "Guitar Hero III")', default=None)
-    options.add_argument('-s', '--song',       type=str,                  help='Play a song in one-shot mode. (See "One-shot mode options" below.)')
-
-    osm = parser.add_argument_group('One-Shot Mode')
-    osm.add_argument('-p', '--part',    type=int, help='0: Guitar, 1: Rhythm, 2: Bass, 3: Lead')
-    osm.add_argument('-d', '--diff',    type=int, help='0: Expert, 1: Hard, 2: Medium, 3: Easy (Only applies if "part" is set)')
-    osm.add_argument('-m', '--mode',    type=int, help='0: Quickplay, 1: Practice, 2: Career')
-    osm.add_argument('-n', '--players', type=int, help='Number of multiplayer players.')
+    options.add_argument('-r', '--resolution', type=str, metavar='x', help='Force a specific resolution to be used.', default=None)
+    options.add_argument('-f', '--fullscreen', action='store_true', help='Force usage of full-screen mode.', default=None)
+    options.add_argument('-c', '--config', type=str, metavar='x', help='Use this configuration file instead of the fofix.ini in its default location.  Use "reset" to use the usual fofix.ini but clear it first.')
+    options.add_argument('-t', '--theme', type=str, metavar='x', help='Force the specified theme to be used. Remember to quote the theme name if it contains spaces (e.g. %(prog)s -t "Guitar Hero III")', default=None)
 
     adv = parser.add_argument_group('Advanced')
-    adv.add_argument('-v', '--verbose',        action='store_true', help='Verbose messages')
+    adv.add_argument('-v', '--verbose', action='store_true', help='Verbose messages')
     adv.add_argument('-g', '--gl-error-check', action='store_true', help='Enable OpenGL error checking.')
 
     return vars(parser.parse_args())
 
-args = cmd_args()
-
-#stump: disable pyOpenGL error checking if we are not asked for it.
-# This must be before *anything* that may import pyOpenGL!
-if not args['gl_error_check']:
-    disable_gl_checks()
-
-import traceback
-
-import pygame
-
-import fretwork
-
-from fretwork import log
-
-from fofix.core import Version
-from fofix.core import VFS
 
 # setup the logfile
-# File object representing the logfile.
-if os.name == "posix": # evilynux - logfile in ~/.fofix/ for GNU/Linux and MacOS X
-    # evilynux - Under MacOS X, put the logs in ~/Library/Logs
+# logfile in ~/.fofix/ for GNU/Linux and MacOS X
+if os.name == "posix":
+    # Under MacOS X, put the logs in ~/Library/Logs
     if os.uname()[0] == "Darwin":
         logFile = open(os.path.expanduser('~/Library/Logs/%s.log' % Version.PROGRAM_UNIXSTYLE_NAME), 'w')
     else: # GNU/Linux et al.
         logFile = VFS.open('/userdata/%s.log' % Version.PROGRAM_UNIXSTYLE_NAME, 'w')
 else:
     logFile = VFS.open('/userdata/%s.log' % Version.PROGRAM_UNIXSTYLE_NAME, 'w')
-
 log.setLogfile(logFile)
 
-import fretwork
 fretworkRequired = (0, 2, 0)
 reqVerStr = '.'.join([str(i) for i in fretworkRequired])
 fretworkErrorStr = '''
@@ -140,57 +130,51 @@ https://github.com/fofix/fretwork/releases/
 Installed: {0}
 Required: {1}
 '''
-if hasattr(fretwork, '__version__'): # The first version of fretwork didnt have __version__
+# The first version of fretwork didnt have __version__
+if hasattr(fretwork, '__version__'):
     version = fretwork.__version__.split('-')[0] # remove 'dev' from ver
     version = tuple([int(i) for i in version.split('.')])
 
     if version < fretworkRequired:
         fwErrStr = fretworkErrorStr.format(fretwork.__version__, reqVerStr)
         raise RuntimeError(fwErrStr)
-
 else:
     version = '0.1.0'
     fwErrStr = fretworkErrorStr.format(version, reqVerStr)
     raise RuntimeError(fwErrStr)
 
-from fofix.core.VideoPlayer import VideoLayer, VideoPlayerError
-from fofix.core.GameEngine import GameEngine
-from fofix.game.MainMenu import MainMenu
-from fofix.core.Language import _
-from fofix.core import Config
 
 class Main():
     def __init__(self):
-        global args
-        self.args = args
 
-        self.playing = self.args['song']
+        # get args
+        self.args = cmd_args()
         self.configFile = self.args['config']
         self.fullscreen = self.args['fullscreen']
         self.resolution = self.args['resolution']
         self.theme = self.args['theme']
-        self.diff = self.args['diff']
-        self.part = self.args['part']
-        self.mode = self.args['mode']
-        self.players = self.args['players']
 
+        # disable pyOpenGL error checking if we are not asked for it.
+        # This must be before *anything* that may import pyOpenGL!
+        if not self.args['gl_error_check']:
+            disable_gl_checks()
+
+        # load config
         self.config = self.load_config(self.configFile)
 
-        #Lysdestic - Allow support for manipulating fullscreen via CLI
+        # allow support for manipulating fullscreen via CLI
         if self.fullscreen is not None:
             Config.set("video", "fullscreen", self.fullscreen)
 
-        #Lysdestic - Change resolution from CLI
+        # change resolution from CLI
         if self.resolution is not None:
             Config.set("video", "resolution", self.resolution)
 
-        #Lysdestic - Alter theme from CLI
+        # alter theme from CLI
         if self.theme is not None:
             Config.set("coffee", "themename", self.theme)
 
         self.engine = GameEngine(self.config)
-
-        self.init_oneshot()
 
         self.videoLayer = False
         self.restartRequested = False
@@ -206,57 +190,16 @@ class Main():
                 os.remove(fileName)
 
                 # Recreate it
-                config = Config.load(Version.PROGRAM_UNIXSTYLE_NAME + ".ini", setAsDefault = True)
+                config = Config.load(Version.PROGRAM_UNIXSTYLE_NAME + ".ini", setAsDefault=True)
 
             else:
                 # Load specified config file
-                config = Config.load(configPath, setAsDefault = True)
+                config = Config.load(configPath, setAsDefault=True)
         else:
             # Use default configuration file
-            config = Config.load(Version.PROGRAM_UNIXSTYLE_NAME + ".ini", setAsDefault = True)
+            config = Config.load(Version.PROGRAM_UNIXSTYLE_NAME + ".ini", setAsDefault=True)
 
         return config
-
-    def init_oneshot(self):
-        ''' Determine if oneshot mode is valid. '''
-        # I think this code can be moved elsewhere...
-        self.engine.cmdPlay = 0
-
-        # Check for a valid invocation of one-shot mode.
-        if self.playing is not None:
-            log.debug('Validating song directory for one-shot mode.')
-
-            library = Config.get("setlist","base_library")
-            basefolder = os.path.join(Version.dataPath(),library,"songs",self.playing)
-
-
-            if not os.path.exists(os.path.join(basefolder, "song.ini")):
-
-                if not (os.path.exists(os.path.join(basefolder, "notes.mid")) or
-                        os.path.exists(os.path.join(basefolder, "notes-unedited.mid"))):
-
-                    if not (os.path.exists(os.path.join(basefolder, "song.ogg")) or
-                            os.path.exists(os.path.join(basefolder, "guitar.ogg"))):
-
-                        log.warn("Song directory provided ('%s') is not a valid song directory. Starting up FoFiX in standard mode." % self.playing)
-                        self.engine.startupMessages.append(_("Song directory provided ('%s') is not a valid song directory. Starting up FoFiX in standard mode.") % self.playing)
-                        return
-
-            # Set up one-shot mode
-            log.debug('Entering one-shot mode.')
-            Config.set("setlist", "selected_song", playing)
-
-            self.engine.cmdPlay = 1
-
-            if diff is not None:
-                self.engine.cmdDiff = int(diff)
-            if part is not None:
-                self.engine.cmdPart = int(part)
-
-            if players == 1:
-                self.engine.cmdMode = players, mode, 0
-            else:
-                self.engine.cmdMode = players, 0, mode
 
     def restart(self):
         log.notice("Restarting.")
@@ -264,27 +207,25 @@ class Main():
         self.restartRequested = True
 
     def run(self):
-
         # Perhapse this could be implemented in a better way...
-        # Play the intro video if it is present, we have the capability, and
-        # we are not in one-shot mode.
-        if not self.engine.cmdPlay:
-            themename = Config.get("coffee", "themename")
-            vidSource = os.path.join(Version.dataPath(), 'themes', themename, 'menu', 'intro.ogv')
-            if os.path.isfile(vidSource):
-                try:
-                    vidPlayer = VideoLayer(self.engine, vidSource, cancellable=True)
-                except (IOError, VideoPlayerError):
-                    log.error("Error loading intro video:")
-                else:
-                    vidPlayer.play()
-                    self.engine.view.pushLayer(vidPlayer)
-                    self.videoLayer = True
-                    self.engine.ticksAtStart = pygame.time.get_ticks()
-                    while not vidPlayer.finished:
-                        self.engine.run()
-                    self.engine.view.popLayer(vidPlayer)
-                    self.engine.view.pushLayer(MainMenu(self.engine))
+        # Play the intro video if it is present, we have the capability
+        themename = Config.get("coffee", "themename")
+        vidSource = os.path.join(Version.dataPath(), 'themes', themename, 'menu', 'intro.ogv')
+        if os.path.isfile(vidSource):
+            try:
+                vidPlayer = VideoLayer(self.engine, vidSource, cancellable=True)
+            except (IOError, VideoPlayerError):
+                log.error("Error loading intro video:")
+            else:
+                vidPlayer.play()
+                self.engine.view.pushLayer(vidPlayer)
+                self.videoLayer = True
+                self.engine.ticksAtStart = pygame.time.get_ticks()
+                while not vidPlayer.finished:
+                    self.engine.run()
+                self.engine.view.popLayer(vidPlayer)
+                self.engine.view.pushLayer(MainMenu(self.engine))
+
         if not self.videoLayer:
             self.engine.setStartupLayer(MainMenu(self.engine))
 
@@ -304,6 +245,7 @@ class Main():
         # evilynux - MainMenu class already calls this - useless?
         self.engine.quit()
 
+
 if __name__ == '__main__':
     try:
         # This loop restarts the game if a restart is requested
@@ -315,7 +257,7 @@ if __name__ == '__main__':
 
     except (KeyboardInterrupt, SystemExit):
         raise
-    except:
+    except Exception:
         log.error("Terminating due to unhandled exception: ")
         _logname = os.path.abspath(log.logFile.name)
         _errmsg = "%s\n\n%s\n%s\n%s\n%s" % (

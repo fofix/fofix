@@ -303,16 +303,6 @@ class MainMenu(BackgroundLayer):
         if len(self.engine.startupMessages) > 0:
             self.showStartupMessages = True
 
-        if self.engine.cmdPlay == 1:
-            self.engine.cmdPlay = 4
-        elif self.engine.cmdPlay == 4: #this frame runs the engine an extra loop to allow the font to load...
-            #evilynux - improve cmdline support
-            self.engine.cmdPlay = 2
-            players, mode1p, mode2p = self.engine.cmdMode
-            self.newLocalGame(players = players, mode1p = mode1p, mode2p = mode2p)
-        elif self.engine.cmdPlay == 3:
-            self.quit()
-
         if (not self.engine.world) or (not self.engine.world.scene):  #MFH
             self.runMusic()
 
@@ -341,7 +331,7 @@ class MainMenu(BackgroundLayer):
             else:
                 drawImage(self.engine.data.loadingImage, (1.0,-1.0), (w/2, h/2), stretched = FULL_SCREEN)
 
-        if self.menu.active and self.engine.cmdPlay == 0:
+        if self.menu.active:
             if self.background is not None:
                 #MFH - auto-scaling
                 drawImage(self.background, (1.0,-1.0), (w/2, h/2), stretched = FULL_SCREEN)
