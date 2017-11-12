@@ -253,8 +253,10 @@ class Credits(Layer, KeyListener):
             self.credits.append(Text(nf, bs * scale, c1, "left", "%s" % err))
             return
 
-        file = open(path)
-        for line in file:
+        with open(path) as f:
+            filelines = f.readlines()
+
+        for line in filelines:
             line = line.strip("\n")
             if line.startswith("=====") or line.startswith("-----"):
                 continue
