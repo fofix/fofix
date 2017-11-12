@@ -2929,7 +2929,7 @@ def loadSong(engine, name, library=DEFAULT_LIBRARY, playbackOnly=False, notesOnl
         # escape all characters that cause the problem. For now the change dir
         # method is a cleaner work around than reimpplementing that function here.
         orgpath = os.path.abspath('.')
-        os.chdir("{1}{0}{2}{0}".format(os.path.sep, library, name))
+        os.chdir(engine.resource.fileName(library, name))
         songOggFiles = glob.glob('*.ogg')
 
         os.chdir(orgpath)
