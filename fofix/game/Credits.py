@@ -44,27 +44,32 @@ from fofix.core.constants import *
 
 class Element:
     """A basic element in the credits scroller."""
+
     def getHeight(self):
-        """@return: The height of this element in fractions of the screen height"""
+        """
+        Get the height of the element.
+
+        :return: The height of this element in fractions of the screen height
+        """
         return 0
 
     def render(self, offset):
         """
         Render this element.
 
-        @param offset: Offset in the Y direction in fractions of the screen height
+        :param offset: Offset in the Y direction in fractions of the screen height
         """
         pass
 
 
 class Text(Element):
     def __init__(self, font, scale, color, alignment, text):
-        self.text      = text
-        self.font      = font
-        self.color     = color
+        self.text = text
+        self.font = font
+        self.color = color
         self.alignment = alignment
-        self.scale     = scale
-        self.size      = self.font.getStringSize(self.text, scale = scale)
+        self.scale = scale
+        self.size = self.font.getStringSize(self.text, scale=scale)
 
     def getHeight(self):
         return self.size[1]
@@ -77,7 +82,7 @@ class Text(Element):
         elif self.alignment == "center":
             x = .5 - self.size[0] / 2
         glColor4f(*self.color)
-        self.font.render(self.text, (x, offset), scale = self.scale)
+        self.font.render(self.text, (x, offset), scale=self.scale)
 
 
 class Picture(Element):
@@ -92,15 +97,15 @@ class Picture(Element):
 
     def render(self, offset):
         # Font rendering is insane; offset of 0.5 is about 2/3 down the screen.
-        offset = offset*4/3   # Hack pos to match text
+        offset = offset * 4 / 3   # Hack pos to match text
         w, h = self.engine.view.geometry[2:4]
-        drawImage(self.drawing, scale = (1, -1),
-                            coord = (.5 * w, (1-offset) * h))
+        drawImage(self.drawing, scale=(1, -1), coord=(.5 * w, (1-offset) * h))
 
 
 class Credits(Layer, KeyListener):
     """Credits scroller."""
-    def __init__(self, engine, songName = None):
+
+    def __init__(self, engine, songName=None):
         self.engine      = engine
         self.time        = 0.0
         self.offset      = 0.5  # this seems to fix the delay issue, but I'm not sure why
@@ -115,9 +120,9 @@ class Credits(Layer, KeyListener):
         hs = 0.003
         c1 = (1, 1, .5, 1)
         c2 = (1, .75, 0, 1)
-        self.text_size = nf.getLineSpacing(scale = hs)
+        self.text_size = nf.getLineSpacing(scale=hs)
 
-        # Translatable Strings:
+        # Translatable strings:
         self.bank = {}
         self.bank['intro']      = [_("Frets on Fire X is a progression of MFH-mod,"),
                                    _("which was built on Alarian's mod,"),
@@ -126,9 +131,9 @@ class Credits(Layer, KeyListener):
                                    _("which was, of course, built on Frets on Fire 1.2.451,"),
                                    _("which was created by Unreal Voodoo")]
         self.bank['noOrder']    = [_("No particular order")]
-        self.bank['accessOrder']= [_("In order of project commit access")]
+        self.bank['accessOrder'] = [_("In order of project commit access")]
         self.bank['coders']     = [_("Active Coders")]
-        self.bank['otherCoding']= [_("Programming")]
+        self.bank['otherCoding'] = [_("Programming")]
         self.bank['graphics']   = [_("Graphic Design")]
         self.bank['3d']         = [_("3D Textures")]
         self.bank['logo']       = [_("FoFiX Logo Design")]
@@ -136,7 +141,7 @@ class Credits(Layer, KeyListener):
         self.bank['themes']     = [_("Included Themes")]
         self.bank['shaders']    = [_("Shaders")]
         self.bank['sounds']     = [_("Sound Design")]
-        self.bank['translators']= [_("Translators")]
+        self.bank['translators'] = [_("Translators")]
         self.bank['honorary']   = [_("Honorary Credits")]
         self.bank['codeHonor']  = [_("Without whom this game would not exist")]
         self.bank['giveThanks'] = [_("Special Thanks to")]
@@ -173,7 +178,7 @@ class Credits(Layer, KeyListener):
                                  'menu', 'credits.ogv')
         if os.path.isfile(vidSource):
             try:
-                self.vidPlayer = VideoLayer(self.engine, vidSource, mute = True, loop = True)
+                self.vidPlayer = VideoLayer(self.engine, vidSource, mute=True, loop=True)
             except (IOError, VideoPlayerError):
                 log.error('Error loading credits video:')
             else:
@@ -190,8 +195,10 @@ class Credits(Layer, KeyListener):
 
         space = Text(nf, hs, c1, "center", " ")
         self.credits = [
-          Picture(self.engine, "fofix_logo.png", .10),
-          Text(nf, ns, c1, "center", "%s" % Version.version()), space]
+            Picture(self.engine, "fofix_logo.png", .10),
+            Text(nf, ns, c1, "center", "%s" % Version.version()),
+            space
+        ]
 
         # Main FoFiX credits (taken from CREDITS file).
         self.parseFile("CREDITS")
@@ -199,37 +206,37 @@ class Credits(Layer, KeyListener):
         # Theme credits (taken from data/themes/<theme name>/CREDITS).
         self.parseFile(os.path.join('data', 'themes', self.themename, 'CREDITS'))
 
-        self.credits.extend( [
-          space, space,
-          Text(nf, ns, c1, "left",   _("Made with:")),
-          Text(nf, ns, c2, "right",  "Python " + sys.version.split(' ')[0]),  #stump: the version that's actually in use
-          Text(nf, bs, c2, "right",  "http://www.python.org"),
-          space,
-          Text(nf, ns, c2, "right",  "PyGame " + pygame.version.ver.replace('release', '')),  #stump: the version that's actually in use
-          Text(nf, bs, c2, "right",  "http://www.pygame.org"),
-          space,
-          Text(nf, ns, c2, "right",  "PyOpenGL " + OpenGL.__version__),
-          Text(nf, bs, c2, "right",  "http://pyopengl.sourceforge.net"),
-          space,
-          Text(nf, ns, c2, "right",  "Illusoft Collada module 0.3.159"),
-          Text(nf, bs, c2, "right",  "http://colladablender.illusoft.com"),
-          space,
-          Text(nf, ns, c2, "right",  "MXM Python Midi Package 0.1.4"),
-          Text(nf, bs, c2, "right",  "http://www.mxm.dk/products/public/pythonmidi"),
-          space,
-          space,
-          Text(nf, bs, c1, "center", _("Source Code available under the GNU General Public License")),
-          Text(nf, bs, c2, "center", "https://github.com/fofix/fofix"),
-          space,
-          space,
-          Text(nf, bs, c1, "center", _("Copyright 2006, 2007 by Unreal Voodoo")),
-          Text(nf, bs, c1, "center", _("Copyright 2008-2017 by Team FoFiX")),
-          space,
-          space
+        self.credits.extend([
+            space, space,
+            Text(nf, ns, c1, "left",   _("Made with:")),
+            Text(nf, ns, c2, "right",  "Python " + sys.version.split(' ')[0]),
+            Text(nf, bs, c2, "right",  "http://www.python.org"),
+            space,
+            Text(nf, ns, c2, "right",  "PyGame " + pygame.version.ver.replace('release', '')),
+            Text(nf, bs, c2, "right",  "http://www.pygame.org"),
+            space,
+            Text(nf, ns, c2, "right",  "PyOpenGL " + OpenGL.__version__),
+            Text(nf, bs, c2, "right",  "http://pyopengl.sourceforge.net"),
+            space,
+            Text(nf, ns, c2, "right",  "Illusoft Collada module 0.3.159"),
+            Text(nf, bs, c2, "right",  "http://colladablender.illusoft.com"),
+            space,
+            Text(nf, ns, c2, "right",  "MXM Python Midi Package 0.1.4"),
+            Text(nf, bs, c2, "right",  "http://www.mxm.dk/products/public/pythonmidi"),
+            space,
+            space,
+            Text(nf, bs, c1, "center", _("Source Code available under the GNU General Public License")),
+            Text(nf, bs, c2, "center", "https://github.com/fofix/fofix"),
+            space,
+            space,
+            Text(nf, bs, c1, "center", _("Copyright 2006, 2007 by Unreal Voodoo")),
+            Text(nf, bs, c1, "center", _("Copyright 2008-2017 by Team FoFiX")),
+            space,
+            space
         ])
 
-    # Text parsing method. Provides some style functionalities.
     def parseFile(self, filename):
+        """Text parsing method. Provides some style functionalities."""
         nf = self.engine.data.font
         ns = 0.002
         bs = 0.001
@@ -243,7 +250,7 @@ class Credits(Layer, KeyListener):
         if not os.path.exists(path):
             err = "Credits file not found: " + path
             log.error(err)
-            self.credits.append( Text(nf, bs*scale, c1, "left", "%s" % err) )
+            self.credits.append(Text(nf, bs * scale, c1, "left", "%s" % err))
             return
 
         file = open(path)
@@ -265,50 +272,50 @@ class Credits(Layer, KeyListener):
                     line = line.strip("%")
                     try:
                         for text in self.bank[line]:
-                            self.credits.append( Text(nf, bs*scale, c1, "left", "%s" % text) )
+                            self.credits.append(Text(nf, bs * scale, c1, "left", "%s" % text))
                     except KeyError:
-                        self.credits.append( Text(nf, bs*scale, c1, "left", "%s" % line) )
+                        self.credits.append(Text(nf, bs * scale, c1, "left", "%s" % line))
                 else:
-                    self.credits.append( Text(nf, bs*scale, c1, "left", "%s" % line) )
+                    self.credits.append(Text(nf, bs * scale, c1, "left", "%s" % line))
             elif line.startswith("_") and line.endswith("_"):
                 line = line.strip("_")
                 if line.startswith("%") and line.endswith("%"):
                     line = line.strip("%")
                     try:
                         for text in self.bank[line]:
-                            self.credits.append( Text(nf, ns*scale, c2, "center", "%s" % text) )
+                            self.credits.append(Text(nf, ns * scale, c2, "center", "%s" % text))
                     except KeyError:
-                        self.credits.append( Text(nf, ns*scale, c2, "center", "%s" % line) )
+                        self.credits.append(Text(nf, ns * scale, c2, "center", "%s" % line))
                 else:
-                    self.credits.append( Text(nf, ns*scale, c2, "center", "%s" % line) )
+                    self.credits.append(Text(nf, ns * scale, c2, "center", "%s" % line))
             elif line.startswith("=") and line.endswith("="):
                 line = line.strip("=")
                 if line.startswith("%") and line.endswith("%"):
                     line = line.strip("%")
                     try:
                         for text in self.bank[line]:
-                            self.credits.append( Text(nf, ns*scale, c1, "left", "%s" % text) )
+                            self.credits.append(Text(nf, ns * scale, c1, "left", "%s" % text))
                     except KeyError:
-                        self.credits.append( Text(nf, ns*scale, c1, "left", "%s" % line) )
+                        self.credits.append(Text(nf, ns * scale, c1, "left", "%s" % line))
                 else:
-                    self.credits.append( Text(nf, ns*scale, c1, "left", "%s" % line) )
+                    self.credits.append(Text(nf, ns * scale, c1, "left", "%s" % line))
             else:
                 if line.startswith("%") and line.endswith("%"):
                     line = line.strip("%")
                     try:
                         for text in self.bank[line]:
-                            self.credits.append( Text(nf, ns*scale, c2, "right", "%s" % text) )
+                            self.credits.append(Text(nf, ns * scale, c2, "right", "%s" % text))
                     except KeyError:
-                        self.credits.append( Text(nf, ns*scale, c2, "right", "%s" % line) )
+                        self.credits.append(Text(nf, ns * scale, c2, "right", "%s" % line))
                 else:
-                    self.credits.append( Text(nf, ns*scale, c2, "right", "%s" % line) )
+                    self.credits.append(Text(nf, ns * scale, c2, "right", "%s" % line))
 
     def shown(self):
         self.engine.input.addKeyListener(self)
 
     def hidden(self):
         self.engine.input.removeKeyListener(self)
-        self.engine.view.pushLayer(self.engine.mainMenu)    # use already-existing MainMenu instance
+        self.engine.view.pushLayer(self.engine.mainMenu)  # use already-existing MainMenu instance
 
     def quit(self):
         if self.videoLayer:
@@ -338,11 +345,11 @@ class Credits(Layer, KeyListener):
         return True
 
     def run(self, ticks):
-        self.time   += ticks / 50.0
+        self.time += ticks / 50.0
         self.offset -= (ticks / self.speedDiv) * self.speedDir
 
         # approximating the end of the list from the (mostly used font size * lines)
-        if self.offset < -( self.text_size * len(self.credits) ) or self.offset > 1.5:
+        if self.offset < -(self.text_size * len(self.credits)) or self.offset > 1.5:
             self.quit()
         if len(self.credits) == len(self.doneList):
             # workaround for string size glitch.
@@ -354,9 +361,9 @@ class Credits(Layer, KeyListener):
         # render the background
         w, h = self.engine.view.geometry[2:4]
 
-        with self.engine.view.orthogonalProjection(normalize = True):
+        with self.engine.view.orthogonalProjection(normalize=True):
             if self.background:
-                drawImage(self.background, scale = (1.0,-1.0), coord = (w/2,h/2), stretched = FULL_SCREEN)
+                drawImage(self.background, scale=(1.0, -1.0), coord=(w/2, h/2), stretched=FULL_SCREEN)
             else:
                 self.engine.fadeScreen(.4)
             self.doneList = []
@@ -374,8 +381,8 @@ class Credits(Layer, KeyListener):
                 if y > 1.0:
                     break
             if self.topLayer:
-                wFactor = 640.000/self.topLayer.width1()
-                hPos = h - ((self.topLayer.height1() * wFactor)*.75)
+                wFactor = 640.000 / self.topLayer.width1()
+                hPos = h - ((self.topLayer.height1() * wFactor) * .75)
                 if hPos < h * .6:
                     hPos = h * .6
-                drawImage(self.topLayer, scale = (wFactor,-wFactor), coord = (w/2,hPos))
+                drawImage(self.topLayer, scale=(wFactor, -wFactor), coord=(w/2, hPos))
