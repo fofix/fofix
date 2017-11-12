@@ -103,15 +103,12 @@ class SongChoosingScene(Scene):
         self.songLoader = None
         self.loaded     = False
         text            = _("Initializing Setlist...")
-        if self.engine.cmdPlay == 2:
-            text = _("Checking Command-Line Settings...")
-        elif len(self.engine.world.songQueue) > 0:
+        if len(self.engine.world.songQueue) > 0:
             text = _("Checking Setlist Settings...")
         elif len(self.engine.world.songQueue) == 0:
             self.engine.world.playingQueue = False
         self.splash     = Dialogs.showLoadingSplashScreen(self.engine, text)
         self.items      = []
-        self.cmdPlay    = False
         self.queued     = True
 
         self.loadStartTime = time.time()
@@ -162,14 +159,7 @@ class SongChoosingScene(Scene):
         self.showSortTiers     = self.engine.theme.setlist.showSortTiers   #whether or not to show sorting tiers - career tiers take precedence.
         self.selectTiers       = self.engine.theme.setlist.selectTiers     #whether or not tiers should be selectable as a quick setlist.
 
-        if self.engine.cmdPlay == 2:
-            self.songName = Config.get("setlist", "selected_song")
-            self.libraryName = Config.get("setlist", "selected_library")
-            self.cmdPlay = self.checkCmdPlay()
-            if self.cmdPlay:
-                Dialogs.hideLoadingSplashScreen(self.engine, self.splash)
-                return
-        elif len(self.engine.world.songQueue) > 0:
+        if len(self.engine.world.songQueue) > 0:
             Dialogs.hideLoadingSplashScreen(self.engine, self.splash)
             return
 
@@ -407,70 +397,6 @@ class SongChoosingScene(Scene):
         Dialogs.hideLoadingSplashScreen(self.engine, self.splash)
         self.splash = None
 
-    def checkCmdPlay(self):
-        info = song.loadSongInfo(self.engine, self.songName, library = self.libraryName)
-        guitars = []
-        drums = []
-        vocals = []
-        autoPart = None
-        for part in info.parts:
-            if part.id == 4 or part.id == 7:
-                drums.append(part)
-            elif part.id == 5:
-                vocals.append(part)
-            else:
-                guitars.append(part)
-            if self.engine.cmdPlay == 2 and self.engine.cmdPart is not None and len(self.playerList) == 1:
-                if self.engine.cmdPart == part.id:
-                    log.debug("Command-line mode: Part found!")
-                    if part.id == 4 and self.engine.input.gameDrums > 0:
-                        autoPart = part.id
-                    elif part.id == 5 and self.engine.input.gameMics > 0:
-                        autoPart = part.id
-                    elif self.engine.input.gameGuitars > 0:
-                        autoPart = part.id
-        if autoPart is None:
-            if len(drums) == 0 and self.engine.input.gameDrums > 0:
-                if self.splash:
-                    Dialogs.hideLoadingSplashScreen(self.engine, self.splash)
-                    self.splash = None
-                Dialogs.showMessage(self.engine, _("There are no drum parts in this song. Change your controllers to play."))
-                if self.engine.cmdPlay == 2:
-                    self.engine.cmdPlay = 0
-                    return False
-            if len(guitars) == 0 and self.engine.input.gameGuitars > 0:
-                if self.splash:
-                    Dialogs.hideLoadingSplashScreen(self.engine, self.splash)
-                    self.splash = None
-                Dialogs.showMessage(self.engine, _("There are no guitar parts in this song. Change your controllers to play."))
-                if self.engine.cmdPlay == 2:
-                    self.engine.cmdPlay = 0
-                    return False
-            if len(vocals) == 0 and self.engine.input.gameMics > 0:
-                if self.splash:
-                    Dialogs.hideLoadingSplashScreen(self.engine, self.splash)
-                    self.splash = None
-                Dialogs.showMessage(self.engine, _("There are no vocal parts in this song. Change your controllers to play."))
-                if self.engine.cmdPlay == 2:
-                    self.engine.cmdPlay = 0
-                    return False
-        # Make sure the difficulty we chose is available
-        p = self.playerList[0].part
-        player = self.playerList[0]
-        if self.engine.cmdDiff is not None:
-            diff = song.difficulties[self.engine.cmdDiff]
-            if diff in info.partDifficulties[p.id]:
-                self.playerList[0].difficulty = diff
-            else:
-                self.playerList[0].difficulty = info.partDifficulties[p.id][0]
-        else:
-            if self.splash:
-                Dialogs.hideLoadingSplashScreen(self.engine, self.splash)
-                self.splash = None
-            self.playerList[0].difficulty = Dialogs.chooseItem(self.engine, info.partDifficulties[p.id],
-                                  "%s \n %s" % (song.removeSongOrderPrefixFromName(info.name), _("%s Choose a difficulty:") % player.name), selected = player.difficulty)
-        return True
-
     def loadItemLabel(self, i, preload = False):
         # Load the item label if it isn't yet loaded
         item = self.items[i]
@@ -624,10 +550,8 @@ class SongChoosingScene(Scene):
             ready = False
             while not ready:
                 ready = Dialogs.choosePartDiffs(self.engine, choose, info, self.players)
-                if not ready and not self.queued and not self.engine.cmdPlay:
+                if not ready and not self.queued:
                     return False
-        if self.engine.cmdPlay > 0:
-            self.engine.cmdPlay = 3
         self.freeResources()
         self.engine.world.createScene("GuitarScene", libraryName = self.libraryName, songName = self.songName)
         self.gameStarted = True
@@ -915,9 +839,6 @@ class SongChoosingScene(Scene):
         self.scrolling = 0
 
     def run(self, ticks):
-        if self.cmdPlay:
-            self.startGame()
-            return
         if len(self.engine.world.songQueue) > 0 and self.queued:
             self.startGame(fromQueue = True)
             return
