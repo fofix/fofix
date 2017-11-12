@@ -1,5 +1,5 @@
 #####################################################################
-# -*- coding: iso-8859-1 -*-                                        #
+# -*- coding: utf-8 -*-                                             #
 #                                                                   #
 # Frets on Fire                                                     #
 # Copyright (C) 2006 Sami Kyöstilä                                  #
@@ -41,7 +41,6 @@ from fofix.core.Language import _
 from fofix.core import Player
 from fofix.game import Dialogs
 from fofix.game import song
-from fofix.core import Config
 from fofix.core import Version
 from fofix.game.Menu import Menu
 from fofix.core.constants import *
@@ -50,16 +49,17 @@ PRACTICE = 1
 CAREER = 2
 
 instrumentDiff = {
-  0 : (lambda a: a.diffGuitar),
-  1 : (lambda a: a.diffGuitar),
-  2 : (lambda a: a.diffBass),
-  3 : (lambda a: a.diffGuitar),
-  4 : (lambda a: a.diffDrums),
-  5 : (lambda a: a.diffVocals)
+    0: (lambda a: a.diffGuitar),
+    1: (lambda a: a.diffGuitar),
+    2: (lambda a: a.diffBass),
+    3: (lambda a: a.diffGuitar),
+    4: (lambda a: a.diffDrums),
+    5: (lambda a: a.diffVocals)
 }
 
+
 class SongChoosingScene(Scene):
-    def __init__(self, engine, libraryName = None, songName = None):
+    def __init__(self, engine, libraryName=None, songName=None):
         Scene.__init__(self, engine)
 
         self.engine.world.sceneName = "SongChoosingScene"
@@ -67,8 +67,8 @@ class SongChoosingScene(Scene):
         song.updateSongDatabase(self.engine)
 
         self.wizardStarted = False
-        self.libraryName   = libraryName
-        self.songName      = songName
+        self.libraryName = libraryName
+        self.songName = songName
         if not self.libraryName:
             self.libraryName = self.engine.config.get("setlist", "selected_library")
             if not self.libraryName:
@@ -80,9 +80,9 @@ class SongChoosingScene(Scene):
         self.practiceMode = (self.gameMode == PRACTICE)
         self.gameMode2p = self.engine.world.multiMode
         self.autoPreview = not self.engine.config.get("audio", "disable_preview")
-        self.sortOrder   = self.engine.config.get("game", "sort_order")
+        self.sortOrder = self.engine.config.get("game", "sort_order")
         self.tut = self.engine.world.tutorial
-        self.playerList  = self.players
+        self.playerList = self.players
 
         self.gameStarted = False
 
@@ -90,171 +90,173 @@ class SongChoosingScene(Scene):
         self.parts = [None] * self.gamePlayers
         self.diffs = [None] * self.gamePlayers
 
-        self.time       = 0
-        self.lastTime   = 0
-        self.mode       = 0
-        self.moreInfo   = False
+        self.time = 0
+        self.lastTime = 0
+        self.mode = 0
+        self.moreInfo = False
         self.moreInfoTime = 0
         self.miniLobbyTime = 0
-        self.selected   = 0
-        self.camera     = Camera()
+        self.selected = 0
+        self.camera = Camera()
         self.cameraOffset = 0.0
-        self.song       = None
+        self.song = None
         self.songLoader = None
-        self.loaded     = False
-        text            = _("Initializing Setlist...")
+        self.loaded = False
+        text = _("Initializing Setlist...")
         if len(self.engine.world.songQueue) > 0:
             text = _("Checking Setlist Settings...")
         elif len(self.engine.world.songQueue) == 0:
             self.engine.world.playingQueue = False
-        self.splash     = Dialogs.showLoadingSplashScreen(self.engine, text)
-        self.items      = []
-        self.queued     = True
+        self.splash = Dialogs.showLoadingSplashScreen(self.engine, text)
+        self.items = []
+        self.queued = True
 
         self.loadStartTime = time.time()
 
-        if self.tut == True:
+        if self.tut:
             self.library = self.engine.tutorialFolder
         else:
-            self.library    = os.path.join(self.engine.config.get("setlist", "base_library"), self.libraryName)
+            self.library = os.path.join(self.engine.config.get("setlist", "base_library"), self.libraryName)
             if not os.path.isdir(self.engine.resource.fileName(self.library)):
                 self.library = self.engine.resource.fileName(os.path.join(self.engine.config.get("setlist", "base_library"), song.DEFAULT_LIBRARY))
 
         self.searchText = ""
 
-        #user configurables and input management
-        self.listingMode       = 0     #with libraries or List All
+        # user configurables and input management
+        self.listingMode = 0  # with libraries or List All
         self.preloadSongLabels = False
-        self.showCareerTiers   = 1+(self.careerMode and 1 or 0) #0-Never; 1-Career Only; 2-Always
-        self.scrolling        = 0
-        self.scrollDelay      = self.engine.config.get("game", "scroll_delay")
-        self.scrollRate       = self.engine.config.get("game", "scroll_rate")
-        self.scrollTime       = 0
-        self.scroller         = [lambda: None, self.scrollUp, self.scrollDown]
-        self.scoreDifficulty  = song.difficulties[self.engine.config.get("game", "songlist_difficulty")]
-        self.scorePart        = song.parts[self.engine.config.get("game", "songlist_instrument")]
-        self.sortOrder        = self.engine.config.get("game", "sort_order")
-        self.queueFormat      = self.engine.config.get("game", "queue_format")
-        self.queueOrder       = self.engine.config.get("game", "queue_order")
-        self.queueParts       = self.engine.config.get("game", "queue_parts")
-        self.queueDiffs       = self.engine.config.get("game", "queue_diff")
-        self.nilShowNextScore = self.engine.config.get("songlist",  "nil_show_next_score")
+        self.showCareerTiers = 1 + (self.careerMode and 1 or 0)  # 0-Never; 1-Career Only; 2-Always
+        self.scrolling = 0
+        self.scrollDelay = self.engine.config.get("game", "scroll_delay")
+        self.scrollRate = self.engine.config.get("game", "scroll_rate")
+        self.scrollTime = 0
+        self.scroller = [lambda: None, self.scrollUp, self.scrollDown]
+        self.scoreDifficulty = song.difficulties[self.engine.config.get("game", "songlist_difficulty")]
+        self.scorePart = song.parts[self.engine.config.get("game", "songlist_instrument")]
+        self.sortOrder = self.engine.config.get("game", "sort_order")
+        self.queueFormat = self.engine.config.get("game", "queue_format")
+        self.queueOrder = self.engine.config.get("game", "queue_order")
+        self.queueParts = self.engine.config.get("game", "queue_parts")
+        self.queueDiffs = self.engine.config.get("game", "queue_diff")
+        self.nilShowNextScore = self.engine.config.get("songlist", "nil_show_next_score")
 
-        #theme information
+        # theme information
         self.themename = self.engine.data.themeLabel
         self.theme = self.engine.data.theme
 
-        #theme configurables
-        self.setlistStyle      = self.engine.theme.setlist.setlistStyle    #0 = Normal; 1 = List; 2 = Circular
-        self.headerSkip        = self.engine.theme.setlist.headerSkip      #items taken up by header (non-static only)
-        self.footerSkip        = self.engine.theme.setlist.footerSkip      #items taken up by footer (non-static only)
-        self.itemSize          = self.engine.theme.setlist.itemSize        #delta (X, Y) (0..1) for each item (non-static only)
-        self.labelType         = self.engine.theme.setlist.labelType       #Album covers (0) or CD labels (1)
-        self.labelDistance     = self.engine.theme.setlist.labelDistance   #number of labels away to preload
-        self.showMoreLabels    = self.engine.theme.setlist.showMoreLabels  #whether or not additional unselected labels are rendered on-screen
-        self.texturedLabels    = self.engine.theme.setlist.texturedLabels  #render the art as a texture?
-        self.itemsPerPage      = self.engine.theme.setlist.itemsPerPage    #number of items to show on screen
-        self.followItemPos     = (self.itemsPerPage+1)/2
-        self.showLockedSongs   = self.engine.theme.setlist.showLockedSongs #whether or not to even show locked songs
-        self.showSortTiers     = self.engine.theme.setlist.showSortTiers   #whether or not to show sorting tiers - career tiers take precedence.
-        self.selectTiers       = self.engine.theme.setlist.selectTiers     #whether or not tiers should be selectable as a quick setlist.
+        # theme configurables
+        self.setlistStyle = self.engine.theme.setlist.setlistStyle  # 0 = Normal; 1 = List; 2 = Circular
+        self.headerSkip = self.engine.theme.setlist.headerSkip  # items taken up by header (non-static only)
+        self.footerSkip = self.engine.theme.setlist.footerSkip  # items taken up by footer (non-static only)
+        self.itemSize = self.engine.theme.setlist.itemSize  # delta (X, Y) (0..1) for each item (non-static only)
+        self.labelType = self.engine.theme.setlist.labelType  # Album covers (0) or CD labels (1)
+        self.labelDistance = self.engine.theme.setlist.labelDistance  # number of labels away to preload
+        self.showMoreLabels = self.engine.theme.setlist.showMoreLabels  # whether or not additional unselected labels are rendered on-screen
+        self.texturedLabels = self.engine.theme.setlist.texturedLabels  # render the art as a texture?
+        self.itemsPerPage = self.engine.theme.setlist.itemsPerPage  # number of items to show on screen
+        self.followItemPos = (self.itemsPerPage + 1) / 2
+        self.showLockedSongs = self.engine.theme.setlist.showLockedSongs  # whether or not to even show locked songs
+        self.showSortTiers = self.engine.theme.setlist.showSortTiers  # whether or not to show sorting tiers - career tiers take precedence.
+        self.selectTiers = self.engine.theme.setlist.selectTiers  # whether or not tiers should be selectable as a quick setlist.
 
         if len(self.engine.world.songQueue) > 0:
             Dialogs.hideLoadingSplashScreen(self.engine, self.splash)
             return
 
-        #variables for setlist management (Not that this is necessary here - just to see what exists.)
-        self.songLoader       = None #preview handling
-        self.tiersPresent     = False
+        # variables for setlist management (Not that this is necessary here - just to see what exists.)
+        self.songLoader = None  # preview handling
+        self.tiersPresent = False
         self.startingSelected = self.songName
-        self.selectedIndex    = 0
-        self.selectedItem     = None
-        self.selectedOffset   = 0.0
-        self.previewDelay     = 1000
-        self.previewLoaded    = False
+        self.selectedIndex = 0
+        self.selectedItem = None
+        self.selectedOffset = 0.0
+        self.previewDelay = 1000
+        self.previewLoaded = False
         self.itemRenderAngles = [0.0]
-        self.itemLabels       = [None]
-        self.xPos             = 0
-        self.yPos             = 0
-        self.pos              = 0
+        self.itemLabels = [None]
+        self.xPos = 0
+        self.yPos = 0
+        self.pos = 0
 
-        self.infoPage         = 0
+        self.infoPage = 0
 
-        self.menu_force_reload   = False
-        self.menu_text_color     = (1, 1, 1)
+        self.menu_force_reload = False
+        self.menu_text_color = (1, 1, 1)
         self.menu_selected_color = (.66, .66, 0)
-        self.menu_text_pos       = (.2, .31)
-        self.menu = Menu(self.engine, [ConfigChoice(self.engine, self.engine.config, "game", "queue_format", autoApply = True),
-                                       ConfigChoice(self.engine, self.engine.config, "game", "queue_order", autoApply = True),
-                                       ConfigChoice(self.engine, self.engine.config, "game", "queue_parts", autoApply = True),
-                                       ConfigChoice(self.engine, self.engine.config, "game", "queue_diff", autoApply = True),
-                                       ActiveConfigChoice(self.engine, self.engine.config, "game", "sort_order", onChange = self.forceReload),
-                                       ActiveConfigChoice(self.engine, self.engine.config, "game", "sort_direction", onChange = self.forceReload),
-                                       ActiveConfigChoice(self.engine, self.engine.config, "game", "songlist_instrument", onChange = self.forceReload),
-                                       ActiveConfigChoice(self.engine, self.engine.config, "game", "songlist_difficulty", onChange = self.forceReload),
-                                       ], name = "setlist", fadeScreen = False, onClose = self.resetQueueVars, font = self.engine.data.pauseFont, \
-                         pos = self.menu_text_pos, textColor = self.menu_text_color, selectedColor = self.menu_selected_color)
+        self.menu_text_pos = (.2, .31)
+        self.menu = Menu(
+            self.engine, [
+                ConfigChoice(self.engine, self.engine.config, "game", "queue_format", autoApply=True),
+                ConfigChoice(self.engine, self.engine.config, "game", "queue_order", autoApply=True),
+                ConfigChoice(self.engine, self.engine.config, "game", "queue_parts", autoApply=True),
+                ConfigChoice(self.engine, self.engine.config, "game", "queue_diff", autoApply=True),
+                ActiveConfigChoice(self.engine, self.engine.config, "game", "sort_order", onChange=self.forceReload),
+                ActiveConfigChoice(self.engine, self.engine.config, "game", "sort_direction", onChange=self.forceReload),
+                ActiveConfigChoice(self.engine, self.engine.config, "game", "songlist_instrument", onChange=self.forceReload),
+                ActiveConfigChoice(self.engine, self.engine.config, "game", "songlist_difficulty", onChange=self.forceReload),
+            ],
+            name="setlist", fadeScreen=False, onClose=self.resetQueueVars,
+            font=self.engine.data.pauseFont, pos=self.menu_text_pos,
+            textColor=self.menu_text_color,
+            selectedColor=self.menu_selected_color)
 
-        #now, load the first library
+        # now, load the first library
         self.loadLibrary()
 
-        #load the images
+        # load the images
         self.loadImages()
 
-    #blazingamer - by adding this method it makes it much easier for a person
-    #     to add custom images to the CustomSetlist.py
-    #
     def loadImages(self):
+        """Make it easy to add custom images to ``CustomSetList.py``"""
 
         self.loadIcons()
 
-        #mesh...
-        if os.path.exists(os.path.join(Version.dataPath(),"themes",self.themename,"setlist","item.dae")):
-            self.engine.resource.load(self, "itemMesh", lambda: Mesh(self.engine.resource.fileName("themes",self.themename,"setlist","item.dae")), synch = True)
+        # mesh
+        if os.path.exists(os.path.join(Version.dataPath(), "themes", self.themename, "setlist", "item.dae")):
+            self.engine.resource.load(self, "itemMesh", lambda: Mesh(self.engine.resource.fileName("themes", self.themename, "setlist", "item.dae")), synch=True)
         else:
             self.itemMesh = None
-        if os.path.exists(os.path.join(Version.dataPath(),"themes",self.themename,"setlist","library.dae")):
-            self.engine.resource.load(self, "libraryMesh", lambda: Mesh(self.engine.resource.fileName("themes",self.themename,"setlist","library.dae")), synch = True)
+        if os.path.exists(os.path.join(Version.dataPath(), "themes", self.themename, "setlist", "library.dae")):
+            self.engine.resource.load(self, "libraryMesh", lambda: Mesh(self.engine.resource.fileName("themes", self.themename, "setlist", "library.dae")), synch=True)
         else:
             self.libraryMesh = None
-        if os.path.exists(os.path.join(Version.dataPath(),"themes",self.themename,"setlist","label.dae")):
-            self.engine.resource.load(self, "label", lambda: Mesh(self.engine.resource.fileName("themes",self.themename,"setlist","label.dae")), synch = True)
+        if os.path.exists(os.path.join(Version.dataPath(), "themes", self.themename, "setlist", "label.dae")):
+            self.engine.resource.load(self, "label", lambda: Mesh(self.engine.resource.fileName("themes", self.themename, "setlist", "label.dae")), synch=True)
         else:
             self.label = None
-        if os.path.exists(os.path.join(Version.dataPath(),"themes",self.themename,"setlist","library_label.dae")):
-            self.engine.resource.load(self, "libraryLabel", lambda: Mesh(self.engine.resource.fileName("themes",self.themename,"setlist","library_label.dae")), synch = True)
+        if os.path.exists(os.path.join(Version.dataPath(), "themes", self.themename, "setlist", "library_label.dae")):
+            self.engine.resource.load(self, "libraryLabel", lambda: Mesh(self.engine.resource.fileName("themes", self.themename, "setlist", "library_label.dae")), synch=True)
         else:
             self.libraryLabel = None
-        if os.path.exists(os.path.join(Version.dataPath(),"themes",self.themename,"setlist","tier.dae")):
-            self.engine.resource.load(self, "tierMesh", lambda: Mesh(self.engine.resource.fileName("themes",self.themename,"setlist","tier.dae")), synch = True)
+        if os.path.exists(os.path.join(Version.dataPath(), "themes", self.themename, "setlist", "tier.dae")):
+            self.engine.resource.load(self, "tierMesh", lambda: Mesh(self.engine.resource.fileName("themes", self.themename, "setlist", "tier.dae")), synch=True)
         else:
             self.tierMesh = self.libraryMesh
-        if os.path.exists(os.path.join(Version.dataPath(),"themes",self.themename,"setlist","list.dae")):
-            self.engine.resource.load(self, "listMesh", lambda: Mesh(self.engine.resource.fileName("themes",self.themename,"setlist","list.dae")), synch = True)
+        if os.path.exists(os.path.join(Version.dataPath(), "themes", self.themename, "setlist", "list.dae")):
+            self.engine.resource.load(self, "listMesh", lambda: Mesh(self.engine.resource.fileName("themes", self.themename, "setlist", "list.dae")), synch=True)
         else:
             self.listMesh = self.libraryMesh
 
-    #blazingamer - if someone wishes to load the song icons to use in their setlist they do not have to
-    #              rewrite it into the CustomSetlist.py if we make it a separate method
+    # if someone wishes to load the song icons to use in their setlist they do not have to
+    # rewrite it into the CustomSetlist.py if we make it a separate method
     def loadIcons(self):
-        #begin to load images...
         self.itemIcons = {}
-        if os.path.isdir(os.path.join(Version.dataPath(),"themes",self.themename,"setlist")):
-            self.engine.data.loadAllImages(self, os.path.join("themes",self.themename,"setlist"))
-            if os.path.isdir(os.path.join(Version.dataPath(),"themes",self.themename,"setlist","icon")):
-                self.itemIcons = self.engine.data.loadAllImages(None, os.path.join("themes",self.themename,"setlist","icon"), prefix="")
+        if os.path.isdir(os.path.join(Version.dataPath(), "themes", self.themename, "setlist")):
+            self.engine.data.loadAllImages(self, os.path.join("themes", self.themename, "setlist"))
+            if os.path.isdir(os.path.join(Version.dataPath(), "themes", self.themename, "setlist", "icon")):
+                self.itemIcons = self.engine.data.loadAllImages(None, os.path.join("themes", self.themename, "setlist", "icon"), prefix="")
 
     def forceReload(self):
         self.menu_force_reload = True
 
     def resetQueueVars(self):
-        self.scoreDifficulty  = song.difficulties[self.engine.config.get("game", "songlist_difficulty")]
-        self.scorePart        = song.parts[self.engine.config.get("game", "songlist_instrument")]
-        self.sortOrder        = self.engine.config.get("game", "sort_order")
-        self.queueFormat      = self.engine.config.get("game", "queue_format")
-        self.queueOrder       = self.engine.config.get("game", "queue_order")
-        self.queueParts       = self.engine.config.get("game", "queue_parts")
-        self.queueDiffs       = self.engine.config.get("game", "queue_diff")
+        self.scoreDifficulty = song.difficulties[self.engine.config.get("game", "songlist_difficulty")]
+        self.scorePart = song.parts[self.engine.config.get("game", "songlist_instrument")]
+        self.sortOrder = self.engine.config.get("game", "sort_order")
+        self.queueFormat = self.engine.config.get("game", "queue_format")
+        self.queueOrder = self.engine.config.get("game", "queue_order")
+        self.queueParts = self.engine.config.get("game", "queue_parts")
+        self.queueDiffs = self.engine.config.get("game", "queue_diff")
         if self.queueFormat == 0:
             self.engine.world.songQueue.reset()
         if self.menu_force_reload:
@@ -270,15 +272,15 @@ class SongChoosingScene(Scene):
         else:
             self.splash = Dialogs.showLoadingSplashScreen(self.engine, _("Browsing Collection..."))
             self.loadStartTime = time.time()
-        self.engine.resource.load(self, "libraries", lambda: song.getAvailableLibraries(self.engine, self.library), onLoad = self.loadSongs, synch = True)
+        self.engine.resource.load(self, "libraries", lambda: song.getAvailableLibraries(self.engine, self.library), onLoad=self.loadSongs, synch=True)
 
     def loadSongs(self, libraries):
         log.debug("Loading songs in %s" % self.library)
-        self.engine.resource.load(self, "songs", lambda: song.getAvailableSongsAndTitles(self.engine, self.library, progressCallback=self.progressCallback), onLoad = self.prepareSetlist, synch = True)
+        self.engine.resource.load(self, "songs", lambda: song.getAvailableSongsAndTitles(self.engine, self.library, progressCallback=self.progressCallback), onLoad=self.prepareSetlist, synch=True)
 
     def progressCallback(self, percent):
         if time.time() - self.loadStartTime > 7:
-            Dialogs.changeLoadingSplashScreenText(self.engine, self.splash, _("Browsing Collection...") + ' (%d%%)' % (percent*100))
+            Dialogs.changeLoadingSplashScreenText(self.engine, self.splash, _("Browsing Collection...") + ' (%d%%)' % (percent * 100))
 
     def prepareSetlist(self, songs):
         if self.songLoader:
@@ -290,13 +292,14 @@ class SongChoosingScene(Scene):
             self.items = self.libraries + self.songs
         else:
             self.items = self.songs
-        self.itemRenderAngles = [0.0]  * len(self.items)
-        self.itemLabels       = [None] * len(self.items)
-        self.searching        = False
-        self.searchText       = ""
+        self.itemRenderAngles = [0.0] * len(self.items)
+        self.itemLabels = [None] * len(self.items)
+        self.searching = False
+        self.searchText = ""
 
         shownItems = []
-        for item in self.items: #remove things we don't want to see. Some redundancy, but that's okay.
+        # remove things we don't want to see. Some redundancy, but that's okay.
+        for item in self.items:
             if isinstance(item, song.TitleInfo) or isinstance(item, song.SortTitleInfo):
                 if self.showCareerTiers == 2:
                     if isinstance(item, song.TitleInfo):
@@ -335,7 +338,7 @@ class SongChoosingScene(Scene):
         elif len(shownItems) > 0:
             for item in shownItems:
                 if isinstance(item, song.SongInfo) or isinstance(item, song.LibraryInfo):
-                    self.items = shownItems #make sure at least one item is selectable
+                    self.items = shownItems  # make sure at least one item is selectable
                     break
             else:
                 msg = _("No songs in this setlist are available to play!")
@@ -344,19 +347,20 @@ class SongChoosingScene(Scene):
                 Dialogs.showMessage(self.engine, msg)
                 self.items = []
 
-        if self.items == []:    #MFH: Catch when there ain't a damn thing in the current folder - back out!
+        # Catch when there ain't a damn thing in the current folder - back out!
+        if self.items == []:
             if self.library != song.DEFAULT_LIBRARY:
                 Dialogs.hideLoadingSplashScreen(self.engine, self.splash)
                 self.splash = None
                 self.startingSelected = self.library
-                self.library     = os.path.dirname(self.library)
+                self.library = os.path.dirname(self.library)
                 self.selectedItem = None
                 self.loadLibrary()
                 return
 
         log.debug("Setlist loaded.")
 
-        self.loaded           = True
+        self.loaded = True
 
         if self.setlistStyle == 1:
             for i in range(self.headerSkip):
@@ -366,16 +370,16 @@ class SongChoosingScene(Scene):
 
         if self.startingSelected is not None:
             for i, item in enumerate(self.items):
-                if isinstance(item, song.SongInfo) and self.startingSelected == item.songName: #TODO: SongDB
-                    self.selectedIndex =  i
+                if isinstance(item, song.SongInfo) and self.startingSelected == item.songName:  # TODO: SongDB
+                    self.selectedIndex = i
                     break
                 elif isinstance(item, song.LibraryInfo) and self.startingSelected == item.libraryName:
-                    self.selectedIndex =  i
+                    self.selectedIndex = i
                     break
 
         for item in self.items:
             if isinstance(item, song.SongInfo):
-                item.name = song.removeSongOrderPrefixFromName(item.name) #TODO: I don't like this.
+                item.name = song.removeSongOrderPrefixFromName(item.name)
             elif not self.tiersPresent and (isinstance(item, song.TitleInfo) or isinstance(item, song.SortTitleInfo)):
                 self.tiersPresent = True
 
@@ -384,25 +388,26 @@ class SongChoosingScene(Scene):
             if self.selectedIndex >= len(self.items):
                 self.selectedIndex = 0
 
-        self.itemRenderAngles = [0.0]  * len(self.items)
-        self.itemLabels       = [None] * len(self.items)
+        self.itemRenderAngles = [0.0] * len(self.items)
+        self.itemLabels = [None] * len(self.items)
 
         if self.preloadSongLabels:
             for i in range(len(self.items)):
                 self.loadStartTime = time.time()
                 Dialogs.changeLoadingSplashScreenText(self.engine, self.splash, _("Loading Album Artwork..."))
-                self.loadItemLabel(i, preload = True)
+                self.loadItemLabel(i, preload=True)
 
         self.updateSelection()
         Dialogs.hideLoadingSplashScreen(self.engine, self.splash)
         self.splash = None
 
-    def loadItemLabel(self, i, preload = False):
+    def loadItemLabel(self, i, preload=False):
         # Load the item label if it isn't yet loaded
         item = self.items[i]
         if self.itemLabels[i] is None:
             if isinstance(item, song.SongInfo):
-                if self.labelType == 1: #CD covers
+                # CD covers
+                if self.labelType == 1:
                     f = "label.png"
                 else:
                     f = "album.png"
@@ -431,19 +436,20 @@ class SongChoosingScene(Scene):
             if preload:
                 if time.time() - self.loadStartTime > 3:
                     self.loadStartTime = time.time()
-                    percent = (i*100)/len(self.items)
+                    percent = (i * 100) / len(self.items)
                     Dialogs.changeLoadingSplashScreenText(self.engine, self.splash, _("Loading Album Artwork...") + " %d%%" % percent)
 
-    def addToQueue(self, selectedSong): #FIXME: Queue system
+    # FIXME: Queue system
+    def addToQueue(self, selectedSong):
         self.engine.songQueue.addSong(selectedSong, self.library)
 
     def removeFromQueue(self, selectedSong):
         self.engine.songQueue.removeSong(selectedSong)
 
-    def startGame(self, fromQueue = False): #note this is not refined.
+    def startGame(self, fromQueue=False):
         if len(self.engine.world.songQueue) == 0:
             return
-        self.songCanceled()  #stop preview playback
+        self.songCanceled()  # stop preview playback
         showDialog = True
         if not fromQueue and self.queueFormat == 1 and len(self.engine.world.songQueue) > 1:
             self.engine.world.songQueue.setFullQueue()
@@ -452,7 +458,7 @@ class SongChoosingScene(Scene):
             self.songName, self.libraryName = self.engine.world.songQueue.getRandomSong()
         else:
             self.songName, self.libraryName = self.engine.world.songQueue.getSong()
-        info = song.loadSongInfo(self.engine, self.songName, library = self.libraryName)
+        info = song.loadSongInfo(self.engine, self.songName, library=self.libraryName)
         guitars = []
         drums = []
         vocals = []
@@ -503,13 +509,13 @@ class SongChoosingScene(Scene):
                     d = song.difficulties[j]
                 elif self.queueDiffs == 0:
                     if j == 0:
-                        for k in range(1,4):
+                        for k in range(1, 4):
                             if song.difficulties[k] in info.partDifficulties[p.id]:
                                 d = song.difficulties[k]
                     elif j == 1:
-                        for k in range(2,5):
-                            if song.difficulties[k%4] in info.partDifficulties[p.id]:
-                                d = song.difficulties[k%4]
+                        for k in range(2, 5):
+                            if song.difficulties[k % 4] in info.partDifficulties[p.id]:
+                                d = song.difficulties[k % 4]
                     elif j == 2:
                         if song.difficulties[3] in info.partDifficulties[p.id]:
                             d = song.difficulties[3]
@@ -523,22 +529,22 @@ class SongChoosingScene(Scene):
                                 d = song.difficulties[k]
                 elif self.queueDiffs == 1:
                     if j == 3:
-                        for k in range(2,-1, -1):
+                        for k in range(2, -1, -1):
                             if song.difficulties[k] in info.partDifficulties[p.id]:
                                 d = song.difficulties[k]
                     elif j == 2:
-                        for k in range(1,-2,-1):
-                            if song.difficulties[k%4] in info.partDifficulties[p.id]:
-                                d = song.difficulties[k%4]
+                        for k in range(1, -2, -1):
+                            if song.difficulties[k % 4] in info.partDifficulties[p.id]:
+                                d = song.difficulties[k % 4]
                     elif j == 1:
                         if song.difficulties[0] in info.partDifficulties[p.id]:
                             d = song.difficulties[0]
                         else:
-                            for k in range(2,4):
+                            for k in range(2, 4):
                                 if song.difficulties[k] in info.partDifficulties[p.id]:
                                     d = song.difficulties[k]
                     else:
-                        for k in range(1,4):
+                        for k in range(1, 4):
                             if song.difficulties[k] in info.partDifficulties[p.id]:
                                 d = song.difficulties[k]
                 if p and d:
@@ -553,11 +559,11 @@ class SongChoosingScene(Scene):
                 if not ready and not self.queued:
                     return False
         self.freeResources()
-        self.engine.world.createScene("GuitarScene", libraryName = self.libraryName, songName = self.songName)
+        self.engine.world.createScene("GuitarScene", libraryName=self.libraryName, songName=self.songName)
         self.gameStarted = True
 
     def checkParts(self):
-        info = song.loadSongInfo(self.engine, self.songName, library = self.libraryName)
+        info = song.loadSongInfo(self.engine, self.songName, library=self.libraryName)
         guitars = []
         drums = []
         vocals = []
@@ -580,10 +586,9 @@ class SongChoosingScene(Scene):
         return True
 
     def checkQueueParts(self):
-        #TODO: checkQueueParts
-        #parts = self.engine.world.songQueue.getParts()
+        # TODO: checkQueueParts
+        # parts = self.engine.world.songQueue.getParts()
         pass
-
 
     def freeResources(self):
         self.songs = None
@@ -609,8 +614,8 @@ class SongChoosingScene(Scene):
             self.songLoader = None
 
     def updateSelection(self):
-        self.selectedItem  = self.items[self.selectedIndex]
-        self.previewDelay  = 1000
+        self.selectedItem = self.items[self.selectedIndex]
+        self.previewDelay = 1000
         self.previewLoaded = False
 
         if self.setlistStyle == 2:
@@ -625,41 +630,41 @@ class SongChoosingScene(Scene):
                 elif self.pos < 0:
                     self.pos = 0
         w, h = self.engine.view.geometry[2:4]
-        self.xPos = self.pos*(self.itemSize[0]*w)
-        self.yPos = self.pos*(self.itemSize[1]*h)
+        self.xPos = self.pos * (self.itemSize[0] * w)
+        self.yPos = self.pos * (self.itemSize[1] * h)
 
         self.loadItemLabel(self.selectedIndex)
-        for i in range(1,1+self.labelDistance):
-            if self.selectedIndex+i < len(self.items):
-                self.loadItemLabel(self.selectedIndex+i)
-            if self.selectedIndex-i >= 0:
-                self.loadItemLabel(self.selectedIndex-i)
+        for i in range(1, 1 + self.labelDistance):
+            if self.selectedIndex + i < len(self.items):
+                self.loadItemLabel(self.selectedIndex + i)
+            if self.selectedIndex - i >= 0:
+                self.loadItemLabel(self.selectedIndex - i)
 
     def previewSong(self):
         if isinstance(self.selectedItem, song.SongInfo):
             self.previewLoaded = True
-            self.songName = self.selectedItem.songName #TODO: SongDB
+            self.songName = self.selectedItem.songName  # TODO: SongDB
         else:
             return
 
-        if self.careerMode and self.selectedItem.getLocked(): #TODO: SongDB
+        if self.careerMode and self.selectedItem.getLocked():  # TODO: SongDB
             if self.song:
                 self.song.fadeout(1000)
             return
         if self.songLoader:
             try:
                 self.songLoader.stop()
-            except:
+            except Exception:
                 self.songLoader = None
 
         # synch MUST be True; database updates cannot run in background thread
         # NOTE if synch == True, songLoaded is called BEFORE return
         # self.songLoader =  ## assign to this if you can get synch=False to work
         self.engine.resource.load(self, None,
-                                  lambda: song.loadSong(self.engine, self.songName, playbackOnly = True, library = self.library),
-                                  synch = True,
-                                  onLoad = self.songLoaded,
-                                  onCancel = self.songCanceled)
+                                  lambda: song.loadSong(self.engine, self.songName, playbackOnly=True, library=self.library),
+                                  synch=True,
+                                  onLoad=self.songLoaded,
+                                  onCancel=self.songCanceled)
 
     def songCanceled(self):
         if self.songLoader:
@@ -690,7 +695,7 @@ class SongChoosingScene(Scene):
         c = self.engine.input.controls.getMapping(key)
         if key == pygame.K_SLASH and not self.searching:
             self.searching = True
-        elif (key in range(30,123) or key == pygame.K_BACKSPACE) and not self.moreInfo:
+        elif (key in range(30, 123) or key == pygame.K_BACKSPACE) and not self.moreInfo:
             if self.searching:
                 if key == pygame.K_BACKSPACE:
                     self.searchText = self.searchText[:-1]
@@ -721,7 +726,7 @@ class SongChoosingScene(Scene):
                                 self.selectedIndex = i
                                 self.updateSelection()
                                 break
-        elif (c in Player.menuNo and not c in Player.cancels) or key == pygame.K_ESCAPE:
+        elif (c in Player.menuNo and c not in Player.cancels) or key == pygame.K_ESCAPE:
             # Cancel button (stop song preview, go up a dir, quit selection menu)
             self.engine.data.cancelSound.play()
             if self.searching:
@@ -751,7 +756,7 @@ class SongChoosingScene(Scene):
                 self.loadLibrary()
             else:
                 self.quit()
-        elif (c in Player.menuYes and not c in Player.starts) or key == pygame.K_RETURN:
+        elif (c in Player.menuYes and c not in Player.starts) or key == pygame.K_RETURN:
             # Start game with selected song.
             if self.searching:
                 self.searching = False
@@ -768,15 +773,15 @@ class SongChoosingScene(Scene):
             if isinstance(self.selectedItem, song.LibraryInfo):
                 self.library = self.selectedItem.libraryName
                 self.startingSelected = None
-                log.debug("New library selected: " + str(self.library) )
+                log.debug("New library selected: " + str(self.library))
                 self.loadLibrary()
             elif isinstance(self.selectedItem, song.SongInfo) and not self.selectedItem.getLocked():
                 if self.listingMode == 1 and not self.careerMode:
-                    self.library = self.selectedItem.libraryNam #TODO: SongDB
+                    self.library = self.selectedItem.libraryNam  # TODO: SongDB
                 self.libraryName = self.selectedItem.libraryNam
                 self.songName = self.selectedItem.songName
                 self.engine.config.set("setlist", "selected_library", self.libraryName)
-                self.engine.config.set("setlist", "selected_song",    self.songName)
+                self.engine.config.set("setlist", "selected_song", self.songName)
                 if self.checkParts():
                     if self.queueFormat == 0:
                         self.engine.world.songQueue.addSong(self.songName, self.libraryName)
@@ -806,8 +811,9 @@ class SongChoosingScene(Scene):
         elif c in Player.menuNo and c in Player.cancels:
             self.engine.view.pushLayer(self.menu)
         elif c in Player.key5s:
-            """ exit song choosing screen """
+            # exit song choosing screen
             self.quit()
+
     def scrollUp(self):
         if self.moreInfo:
             self.infoPage -= 1
@@ -843,7 +849,7 @@ class SongChoosingScene(Scene):
 
     def run(self, ticks):
         if len(self.engine.world.songQueue) > 0 and self.queued:
-            self.startGame(fromQueue = True)
+            self.startGame(fromQueue=True)
             return
         if self.gameStarted or self.items == []:
             return
@@ -871,7 +877,7 @@ class SongChoosingScene(Scene):
                 if i == self.selectedIndex:
                     self.itemRenderAngles[i] = min(90, self.itemRenderAngles[i] + ticks / 2.0)
                 else:
-                    self.itemRenderAngles[i] = max(0,  self.itemRenderAngles[i] - ticks / 2.0)
+                    self.itemRenderAngles[i] = max(0, self.itemRenderAngles[i] - ticks / 2.0)
 
             if self.moreInfo:
                 self.moreInfoTime += ticks
@@ -885,36 +891,36 @@ class SongChoosingScene(Scene):
     def renderSetlist(self):
         w, h = self.engine.view.geometry[2:4]
 
-        #render the background (including the header and footer)
+        # render the background (including the header and footer)
         if self.setlistStyle == 1 and self.img_list_bg:
-            drawImage(self.img_list_bg, scale = (1.0, -1.0), coord = (w/2,h/2), stretched = KEEP_ASPECT | FIT_WIDTH)
+            drawImage(self.img_list_bg, scale=(1.0, -1.0), coord=(w / 2, h / 2), stretched=KEEP_ASPECT | FIT_WIDTH)
         elif self.img_list_bg:
-            drawImage(self.img_list_bg, scale = (1.0, -1.0), coord = (w/2,h/2), stretched = FULL_SCREEN)
+            drawImage(self.img_list_bg, scale=(1.0, -1.0), coord=(w / 2, h / 2), stretched=FULL_SCREEN)
         if self.img_list_head:
             o = 0
             if self.setlistStyle == 1:
                 o = self.yPos
-            drawImage(self.img_list_head, scale = (1.0, -1.0), coord = (w/2,h+o), stretched = KEEP_ASPECT | FIT_WIDTH, fit = TOP)
+            drawImage(self.img_list_head, scale=(1.0, -1.0), coord=(w / 2, h + o), stretched=KEEP_ASPECT | FIT_WIDTH, fit=TOP)
         if self.setlistStyle in [0, 2] and self.img_list_foot:
-            drawImage(self.img_list_foot, scale = (1.0, -1.0), coord = (w/2,0), stretched = FULL_SCREEN, fit = BOTTOM)
+            drawImage(self.img_list_foot, scale=(1.0, -1.0), coord=(w / 2, 0), stretched=FULL_SCREEN, fit=BOTTOM)
         elif self.img_list_foot:
             maxPos = max(len(self.items) - self.itemsPerPage, 0)
-            o = (-self.itemSize[1]*h*maxPos) + self.yPos
-            drawImage(self.img_list_foot, scale = (1.0, -1.0), coord = (w/2,o), stretched = KEEP_ASPECT | FIT_WIDTH, fit = BOTTOM)
+            o = (-self.itemSize[1] * h * maxPos) + self.yPos
+            drawImage(self.img_list_foot, scale=(1.0, -1.0), coord=(w / 2, o), stretched=KEEP_ASPECT | FIT_WIDTH, fit=BOTTOM)
 
         self.engine.theme.setlist.renderHeader(self)
 
-        #render the artwork
+        # render the artwork
         self.engine.theme.setlist.renderAlbumArt(self)
 
-        #render the item list itself
-        ns = 0   #the n value of the selectedItem
+        # render the item list itself
+        ns = 0   # the n value of the selectedItem
         if self.setlistStyle == 2:
             for n, i in enumerate(range(self.pos-self.itemsPerPage+self.followItemPos, self.pos+self.itemsPerPage)):
                 if i == self.selectedIndex:
                     ns = n
                     continue
-                i = i%len(self.items)
+                i = i % len(self.items)
                 self.engine.theme.setlist.renderUnselectedItem(self, i, n)
         else:
             for n, i in enumerate(range(self.pos, self.pos+self.itemsPerPage)):
@@ -926,12 +932,12 @@ class SongChoosingScene(Scene):
                 if isinstance(self.items[i], song.BlankSpaceInfo):
                     continue
                 self.engine.theme.setlist.renderUnselectedItem(self, i, n)
-        self.engine.theme.setlist.renderSelectedItem(self, ns) #we render this last to allow overlapping effects.
+        self.engine.theme.setlist.renderSelectedItem(self, ns)  # we render this last to allow overlapping effects.
 
-        #render the additional information for the selected item
+        # render the additional information for the selected item
         self.engine.theme.setlist.renderSelectedInfo(self)
 
-        #render the foreground stuff last
+        # render the foreground stuff last
         self.engine.theme.setlist.renderForeground(self)
 
     def render3D(self):
@@ -940,12 +946,12 @@ class SongChoosingScene(Scene):
         if self.items == []:
             return
 
-        with self.engine.view.orthogonalProjection(normalize = True):
-            self.engine.view.setViewport(1,0)
+        with self.engine.view.orthogonalProjection(normalize=True):
+            self.engine.view.setViewport(1, 0)
             w, h = self.engine.view.geometry[2:4]
 
             if self.img_background:
-                drawImage(self.img_background, scale = (1.0, -1.0), coord = (w/2,h/2), stretched = FULL_SCREEN)
+                drawImage(self.img_background, scale=(1.0, -1.0), coord=(w/2, h/2), stretched=FULL_SCREEN)
 
             if self.mode == 0:
                 self.renderSetlist()
@@ -955,8 +961,8 @@ class SongChoosingScene(Scene):
                     self.engine.theme.setlist.renderMiniLobby(self)
             # I am unsure how I want to handle this for now. Perhaps as dialogs, perhaps in SCS.
             elif self.mode == 1:
-                #self.renderSpeedSelect(visibility, topMost)  ##undefined
+                # self.renderSpeedSelect(visibility, topMost)  ##undefined
                 pass
             elif self.mode == 2:
-                #self.renderTimeSelect(visibility, topMost)   ##undefined
+                # self.renderTimeSelect(visibility, topMost)   ##undefined
                 pass
