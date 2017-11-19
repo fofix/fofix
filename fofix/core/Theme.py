@@ -1932,10 +1932,14 @@ class Setlist:
                     glPushMatrix()
                     if abs(d) < 1.2:
                         label = scene.itemLabels[i]
-                        if label == "Random":
-                            label = scene.img_random_label
+                        liblabel = label
                         if not label:
                             label = scene.img_empty_label
+                            liblabel = scene.img_empty_library
+                        elif label == "Random":
+                            label = scene.img_random_label
+                            liblabel = scene.img_empty_library
+                        
                         if isinstance(item, song.SongInfo):
                             glRotate(scene.itemRenderAngles[i], 0, 0, 1)
                             self.renderItem(scene, item.cassetteColor, label)
@@ -1946,7 +1950,7 @@ class Setlist:
                             glRotate(-scene.itemRenderAngles[i], 0, 0, 1)    #bring cd case up for viewing
                             if i == scene.selectedIndex:
                                 glRotate(((scene.time - scene.lastTime) * 4 % 360) - 90, 1, 0, 0)
-                            self.renderLibrary(scene, item.color, label)
+                            self.renderLibrary(scene, item.color, liblabel)
                         elif isinstance(item, song.TitleInfo):
                             #myfingershurt: cd cases are backwards
                             glRotate(-scene.itemRenderAngles[i], 0, 0.5, 0)    #spin 90 degrees around y axis
@@ -1954,7 +1958,7 @@ class Setlist:
                             glRotate(-scene.itemRenderAngles[i], 0, 0, 0.5)    #bring cd case up for viewing
                             if i == scene.selectedIndex:
                                 glRotate(((scene.time - scene.lastTime) * 4 % 360) - 90, 1, 0, 0)
-                            self.renderTitle(scene, item.color, label)
+                            self.renderTitle(scene, item.color, liblabel)
                         elif isinstance(item, song.RandomSongInfo):
                             #myfingershurt: cd cases are backwards
                             glRotate(scene.itemRenderAngles[i], 0, 0, 1)
