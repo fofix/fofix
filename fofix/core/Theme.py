@@ -1776,7 +1776,7 @@ class Setlist:
         scene.itemMesh.render("Mesh")
         if label and scene.label:
             glEnable(GL_TEXTURE_2D)
-            label.texture.bind()
+            label.bind()
             glColor3f(1, 1, 1)
             glMatrixMode(GL_TEXTURE)
             glScalef(1, -1, 1)
@@ -1809,7 +1809,7 @@ class Setlist:
         # Draw the label if there is one
         if label and scene.libraryLabel:
             glEnable(GL_TEXTURE_2D)
-            label.texture.bind()
+            label.bind()
             glColor3f(1, 1, 1)
             glMatrixMode(GL_TEXTURE)
             glScalef(1, -1, 1)
@@ -1837,7 +1837,7 @@ class Setlist:
         # Draw the label if there is one
         if label:
             glEnable(GL_TEXTURE_2D)
-            label.texture.bind()
+            label.bind()
             glColor3f(1, 1, 1)
             glMatrixMode(GL_TEXTURE)
             glScalef(1, -1, 1)
@@ -1866,7 +1866,7 @@ class Setlist:
         # Draw the label if there is one
         if label:
             glEnable(GL_TEXTURE_2D)
-            label.texture.bind()
+            label.bind()
             glColor3f(1, 1, 1)
             glMatrixMode(GL_TEXTURE)
             glScalef(1, -1, 1)
@@ -1933,9 +1933,9 @@ class Setlist:
                     if abs(d) < 1.2:
                         label = scene.itemLabels[i]
                         if label == "Random":
-                            label = scene.img_random_label
+                            label = scene.img_random_label.texture
                         if not label:
-                            label = scene.img_empty_label
+                            label = scene.img_empty_label.texture
                         if isinstance(item, song.SongInfo):
                             glRotate(scene.itemRenderAngles[i], 0, 0, 1)
                             self.renderItem(scene, item.cassetteColor, label)
@@ -2006,9 +2006,9 @@ class Setlist:
                 i = scene.selectedIndex
                 label = scene.itemLabels[i]
                 if label == "Random":
-                    label = scene.img_random_label
+                    label = scene.img_random_label.texture
                 if not label:
-                    label = scene.img_empty_label
+                    label = scene.img_empty_label.texture
                 if isinstance(item, song.SongInfo):
                     if scene.labelType:
                         self.renderItem(scene, item.cassetteColor, label)
