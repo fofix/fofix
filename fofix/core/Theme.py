@@ -1763,9 +1763,6 @@ class Setlist:
                     font.render(text, (.92, .0413*(n+1)+.15), scale=scale, align = 2)
 
     def renderItem(self, scene, color, label):
-
-        from fofix.game import song
-
         if not scene.itemMesh:
             return
         if color:
@@ -1779,7 +1776,7 @@ class Setlist:
         scene.itemMesh.render("Mesh")
         if label and scene.label:
             glEnable(GL_TEXTURE_2D)
-            label.bind()
+            label.texture.bind()
             glColor3f(1, 1, 1)
             glMatrixMode(GL_TEXTURE)
             glScalef(1, -1, 1)
@@ -1812,7 +1809,7 @@ class Setlist:
         # Draw the label if there is one
         if label and scene.libraryLabel:
             glEnable(GL_TEXTURE_2D)
-            label.bind()
+            label.texture.bind()
             glColor3f(1, 1, 1)
             glMatrixMode(GL_TEXTURE)
             glScalef(1, -1, 1)
@@ -1840,7 +1837,7 @@ class Setlist:
         # Draw the label if there is one
         if label:
             glEnable(GL_TEXTURE_2D)
-            label.bind()
+            label.texture.bind()
             glColor3f(1, 1, 1)
             glMatrixMode(GL_TEXTURE)
             glScalef(1, -1, 1)
@@ -1859,8 +1856,9 @@ class Setlist:
         if color:
             glColor3f(*color)
 
-        glEnable(GL_NORMALIZE)
         glEnable(GL_COLOR_MATERIAL)
+        if self.setlist_type == 2:
+            glRotate(90, 0, 0, 1)
         scene.itemMesh.render("Mesh_001")
         glColor3f(.1, .1, .1)
         scene.itemMesh.render("Mesh")
@@ -1868,17 +1866,16 @@ class Setlist:
         # Draw the label if there is one
         if label:
             glEnable(GL_TEXTURE_2D)
-            label.bind()
+            label.texture.bind()
             glColor3f(1, 1, 1)
             glMatrixMode(GL_TEXTURE)
             glScalef(1, -1, 1)
             glMatrixMode(GL_MODELVIEW)
-            scene.libraryLabel.render()
+            scene.label.render("Mesh_001")
             glMatrixMode(GL_TEXTURE)
             glLoadIdentity()
             glMatrixMode(GL_MODELVIEW)
             glDisable(GL_TEXTURE_2D)
-        glDisable(GL_NORMALIZE)
 
     def renderAlbumArt(self, scene):
 
@@ -1887,6 +1884,7 @@ class Setlist:
         if not scene.itemLabels:
             return
         if self.setlist_type == 0:
+            # CD mode
             w, h = scene.geometry
             try:
                 glMatrixMode(GL_PROJECTION)
@@ -1974,8 +1972,10 @@ class Setlist:
                 glMatrixMode(GL_MODELVIEW)
 
         elif self.setlist_type == 1:
+            # List mode
             return
         elif self.setlist_type == 2:
+            # List/CD mode
             w, h = scene.geometry
             try:
                 glMatrixMode(GL_PROJECTION)
@@ -2050,6 +2050,7 @@ class Setlist:
             glEnable(GL_COLOR_MATERIAL)
             self.theme.setBaseColor(1)
         elif self.setlist_type == 3:
+            # RB2 mode
             w, h = scene.geometry
             item  = scene.items[scene.selectedIndex]
             i = scene.selectedIndex
