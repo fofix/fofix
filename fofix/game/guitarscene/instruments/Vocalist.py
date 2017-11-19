@@ -31,7 +31,7 @@ import numpy as np
 from fretwork import log
 
 from fofix.core.Microphone import Microphone
-from fofix.core.Image import ImgDrawing
+from fofix.core.Image import ImgDrawing, drawImage
 from fofix.game.song import VocalNote
 from fofix.core.constants import *
 from fofix.core.Language import _
