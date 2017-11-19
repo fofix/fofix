@@ -27,26 +27,15 @@
 Main game executable.
 '''
 
+# DO NOT GROUP IMPORTS!
+# Imports are sprinkled throughout this file, and they must stay where they are!
+
 import argparse
-import atexit
+import sys
 import os
 import platform
 import subprocess
-import sys
-import traceback
-
-import pygame
-import fretwork
-from fretwork import log
-
-from fofix.core import Config
-from fofix.core import VFS
-from fofix.core import Version
-from fofix.core.GameEngine import GameEngine
-from fofix.core.Language import _
-from fofix.core.VideoPlayer import VideoLayer, VideoPlayerError
-from fofix.game.MainMenu import MainMenu
-
+import atexit
 
 def run_command(command):
     command = command.split(' ')
@@ -108,6 +97,23 @@ def cmd_args():
 
     return vars(parser.parse_args())
 
+_cmd_args = cmd_args()
+
+# Disable pyOpenGL error checking if we are not asked for it.
+# This must be before *anything* that may import pyOpenGL!
+if not _cmd_args['gl_error_check']:
+    disable_gl_checks()
+
+import traceback
+
+import pygame
+
+import fretwork
+
+from fretwork import log
+
+from fofix.core import Version
+from fofix.core import VFS
 
 # setup the logfile
 # logfile in ~/.fofix/ for GNU/Linux and MacOS X
@@ -143,6 +149,12 @@ else:
     fwErrStr = fretworkErrorStr.format(version, reqVerStr)
     raise RuntimeError(fwErrStr)
 
+from fofix.core.VideoPlayer import VideoLayer, VideoPlayerError
+from fofix.core.GameEngine import GameEngine
+from fofix.game.MainMenu import MainMenu
+from fofix.core.Language import _
+from fofix.core import Config
+
 # PIL doesn't init correctly when inside py2exe, so here we kick it in butt.
 # Web search results all point to this solution:
 # http://www.py2exe.org/index.cgi/py2exeAndPIL
@@ -159,16 +171,11 @@ class Main():
     def __init__(self):
 
         # get args
-        self.args = cmd_args()
+        self.args = _cmd_args
         self.configFile = self.args['config']
         self.fullscreen = self.args['fullscreen']
         self.resolution = self.args['resolution']
         self.theme = self.args['theme']
-
-        # disable pyOpenGL error checking if we are not asked for it.
-        # This must be before *anything* that may import pyOpenGL!
-        if not self.args['gl_error_check']:
-            disable_gl_checks()
 
         # load config
         self.config = self.load_config(self.configFile)
