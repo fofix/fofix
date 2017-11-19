@@ -1934,11 +1934,11 @@ class Setlist:
                         label = scene.itemLabels[i]
                         liblabel = label
                         if not label:
-                            label = scene.img_empty_label
-                            liblabel = scene.img_empty_library
+                            label = scene.img_empty_label.texture
+                            liblabel = scene.img_empty_library.texture
                         elif label == "Random":
-                            label = scene.img_random_label
-                            liblabel = scene.img_empty_library
+                            label = scene.img_random_label.texture
+                            liblabel = scene.img_empty_library.texture
                         
                         if isinstance(item, song.SongInfo):
                             glRotate(scene.itemRenderAngles[i], 0, 0, 1)
@@ -2008,9 +2008,9 @@ class Setlist:
                 i = scene.selectedIndex
                 label = scene.itemLabels[i]
                 if label == "Random":
-                    label = scene.img_random_label
+                    label = scene.img_random_label.texture
                 if not label:
-                    label = scene.img_empty_label
+                    label = scene.img_empty_label.texture
                 if isinstance(item, song.SongInfo):
                     if scene.labelType:
                         self.renderItem(scene, item.cassetteColor, label)
