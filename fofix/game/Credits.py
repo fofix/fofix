@@ -105,7 +105,7 @@ class Picture(Element):
 class Credits(Layer, KeyListener):
     """Credits scroller."""
 
-    def __init__(self, engine, songName=None):
+    def __init__(self, engine):
         self.engine      = engine
         self.time        = 0.0
         self.offset      = 0.5  # this seems to fix the delay issue, but I'm not sure why
