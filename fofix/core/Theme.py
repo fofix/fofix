@@ -1,5 +1,5 @@
 #####################################################################
-# -*- coding: iso-8859-1 -*-                                        #
+# -*- coding: utf-8 -*-                                             #
 #                                                                   #
 # Frets on Fire X (FoFiX)                                           #
 # Copyright (C) 2006 Sami Kyöstilä                                  #
