@@ -220,7 +220,7 @@ class Main():
         return config
 
     def restart(self):
-        log.notice("Restarting.")
+        log.info("Restarting.")
         self.engine.audio.close()
         self.restartRequested = True
 
@@ -253,7 +253,7 @@ class Main():
             while self.engine.run():
                 pass
         except KeyboardInterrupt:
-            log.notice("Left mainloop due to KeyboardInterrupt.")
+            log.info("Left mainloop due to KeyboardInterrupt.")
             # don't reraise
 
         # Restart the program if the engine is asking that we do so.

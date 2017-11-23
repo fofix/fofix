@@ -2850,7 +2850,7 @@ class MidiPartsDiffReader(midi.MidiOutStream):
                         log.debug(tempText + tempText2)
                 self.firstTrack = True
             else:
-                log.notice("This song has multiple tracks, none properly named. Behavior may be erratic.")
+                log.info("This song has multiple tracks, none properly named. Behavior may be erratic.")
 
     def sequence_name(self, text):
         """ Track name encountered in file, see if we can match it to an instrument part. """

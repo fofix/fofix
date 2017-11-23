@@ -329,7 +329,7 @@ class GameEngine(object):
         :type themepath: str
         """
 
-        log.notice( 'Setting theme %s from "%s"' % (themename,themepath) )
+        log.info('Setting theme %s from "%s"' % (themename,themepath))
 
         self.theme = None
         try:
@@ -339,7 +339,7 @@ class GameEngine(object):
                 # Found it! Load it.
                 theme = imp.load_module("CustomTheme", fp, pathname, description)
                 self.theme = theme.CustomTheme(themepath, themename)
-                log.notice('Theme activated using custom class "%s"' % pathname)
+                log.info('Theme activated using custom class "%s"' % pathname)
             except ImportError as e:
                 # Unable to load module; log it, but continue with default Theme.
                 log.error('Failed to load CustomTheme.py from "%s"' % pathname)
@@ -347,12 +347,12 @@ class GameEngine(object):
                 fp.close()
         except ImportError:
             # CustomTheme.py file is optional, but notify developer anyway.
-            log.notice("No CustomTheme.py found in theme")
+            log.info("No CustomTheme.py found in theme")
             pass
 
         if self.theme is None:
             self.theme = Theme(themepath, themename)
-            log.notice("Theme activated using built-in Theme class")
+            log.info("Theme activated using built-in Theme class")
         self.task.addTask(self.theme)
 
     def _initStages(self):
@@ -481,7 +481,7 @@ class GameEngine(object):
 
     def finishGame(self):
         if not self.world:
-            log.notice("GameEngine.finishGame called before World created.")
+            log.info("GameEngine.finishGame called before World created.")
             return
         self.world.finishGame()
         self.world = None

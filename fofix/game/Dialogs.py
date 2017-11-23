@@ -1990,10 +1990,10 @@ def showMessage(engine, text):
     """
     Show a message to the user.
 
-    @param engine:  Game engine
-    @param text:    Message text
+    :param engine: Game engine
+    :param text: Message text
     """
-    log.notice("%s" % text)
+    log.info(text)
     d = MessageScreen(engine, text)
     _runDialog(engine, d)
 

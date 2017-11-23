@@ -908,7 +908,7 @@ class Rockmeter(ConfigGetMixin):
             self.customRMLayers = imp.load_module("CustomRMLayers", fp, pathname, description)
         except ImportError:
             self.customRMLayers = None
-            log.notice("Custom Rockmeter layers are not available")
+            log.info("Custom Rockmeter layers are not available")
 
         # Build the layers
         for i in range(Rockmeter._layerLimit):

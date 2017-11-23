@@ -430,7 +430,7 @@ class Stage(object):
         elif self.songStage == 1:    #check for song-specific background
             test = True
             if not self.engine.loadImgDrawing(self, "background", os.path.join(libraryName, songName, "background")):
-                log.notice("No song-specific stage found") # evilynux
+                log.info("No song-specific stage found")
                 test = False
             if test:  #does a song-specific background exist?
                 self.rotationMode = 0

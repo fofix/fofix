@@ -123,7 +123,7 @@ class Loader(Thread):
             return
 
         if self.logLoadings == 1:
-            log.notice("Loaded %s.%s in %.3f seconds" % (self.target.__class__.__name__, self.name, self.time))
+            log.info("Loaded %s.%s in %.3f seconds" % (self.target.__class__.__name__, self.name, self.time))
 
         if self.exception:
             raise self.exception[0], self.exception[1], self.exception[2]
@@ -210,7 +210,7 @@ class Resource(Task):
                 # read-write path.
                 readWritePath = os.path.join(getWritableResourcePath(), *name)
                 if not os.path.isfile(readWritePath) and os.path.isfile(readOnlyPath):
-                    log.notice("Copying '%s' to writable data directory." % "/".join(name))
+                    log.info("Copying '%s' to writable data directory." % "/".join(name))
                     try:
                         os.makedirs(os.path.dirname(readWritePath))
                     except:
@@ -219,7 +219,7 @@ class Resource(Task):
                     self.makeWritable(readWritePath)
                 # Create directories if needed
                 if not os.path.isdir(readWritePath) and os.path.isdir(readOnlyPath):
-                    log.notice("Creating writable directory '%s'." % "/".join(name))
+                    log.info("Creating writable directory '%s'." % "/".join(name))
                     os.makedirs(readWritePath)
                     self.makeWritable(readWritePath)
                 return readWritePath
@@ -252,7 +252,7 @@ class Resource(Task):
         """
 
         if self.logLoadings == 1:
-            log.notice("Loading %s.%s %s" % (target.__class__.__name__, name, synch and "synchronously" or "asynchronously"))
+            log.info("Loading %s.%s %s" % (target.__class__.__name__, name, synch and "synchronously" or "asynchronously"))
 
         l = Loader(target, name, function, self.resultQueue, self.loaderSemaphore, onLoad = onLoad, onCancel = onCancel)
         if synch:

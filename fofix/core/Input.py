@@ -142,7 +142,7 @@ class Input(Task):
             if len(self.midi) == 0:
                 log.debug("No MIDI input ports found.")
         else:
-            log.notice("MIDI input support is not available; install at least pygame 1.9 to get it.")
+            log.info("MIDI input support is not available; install at least pygame 1.9 to get it.")
 
     def showMouse(self):
         pygame.mouse.set_visible(True)

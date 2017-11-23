@@ -440,9 +440,9 @@ class Data(object):
             fileName1 = os.path.join(dataPath, fileName)
             if self.logLoadings == 1:
                 if openImage:
-                    log.notice("Trying to load image: %s" % fileName1)
+                    log.info("Trying to load image: %s" % fileName1)
                 else:
-                    log.notice("Checking image: %s" % fileName1)
+                    log.info("Checking image: %s" % fileName1)
             # check if fileName1 exists (has extension)
             if os.path.exists(fileName1):
                 if openImage:
@@ -458,7 +458,7 @@ class Data(object):
             else:
                 # find extension
                 fileName1 = os.path.splitext(fileName1)[0]
-                
+
                 # glob parses [] but those are legal chars on Windows, so we must escape them.
                 # it must be done like this so replacements are not mangled
                 # by other replacements.

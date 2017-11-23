@@ -114,7 +114,7 @@ if supported:
                     chunk = self.mic.read(1024)
                 except IOError as e:
                     if e.args[1] == pyaudio.paInputOverflowed:
-                        log.notice('Microphone: ignoring input buffer overflow')
+                        log.info('Microphone: ignoring input buffer overflow')
                         chunk = '\x00' * 4096
                     else:
                         raise
