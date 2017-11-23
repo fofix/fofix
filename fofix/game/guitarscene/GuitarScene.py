@@ -4792,7 +4792,7 @@ class GuitarScene(BandPlayBaseScene):
 
                                     try:
                                         picture = event.picture
-                                    except:
+                                    except Exception:
                                         self.engine.loadImgDrawing(event, "picture", os.path.join(self.libraryName, self.songName, event.fileName))
                                         picture = event.picture
 

@@ -215,7 +215,7 @@ class Vocalist:
                                  outline=(0, 0, 0, 0), fill=(0, 0, 0, 0))
                     dispOverlay = ImgDrawing(self.engine.data.svg, overlay)
                     self.drawnVocalOverlays[degrees] = dispOverlay
-            except:
+            except Exception:
                 log.error('Could not prebuild vocal overlay textures: ')
                 self.vocalContinuousAvailable = False
 

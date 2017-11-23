@@ -148,7 +148,7 @@ def _convertValue(value, type, default=False):
     else:
         try:
             return type(value)
-        except:
+        except Exception:
             return None
 
 class Config(object):

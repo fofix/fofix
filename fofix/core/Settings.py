@@ -178,7 +178,7 @@ class KeyConfigChoice(Menu.Choice):
         def keycode(k):
             try:
                 return int(k)
-            except:
+            except Exception:
                 return getattr(pygame, k)
 
         if self.shift:
@@ -198,7 +198,7 @@ class KeyConfigChoice(Menu.Choice):
         def keycode(k):
             try:
                 return int(k)
-            except:
+            except Exception:
                 return getattr(pygame, k)
         o = self.config.prototype[self.section][self.option]
         v = self.config.get(self.section, self.option)

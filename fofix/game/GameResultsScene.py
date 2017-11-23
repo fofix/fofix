@@ -533,7 +533,7 @@ class GameResultsScene(Scene):
             data = urllib.urlopen(url + "?" + urllib.urlencode(d)).read()
             log.debug("Score upload result: %s" % data)
             return data   #MFH - want to return the actual result data.
-        except Exception, e:
+        except Exception as e:
             log.error("Score upload error: %s" % e)
             return False
         return True
@@ -810,7 +810,7 @@ class GameResultsScene(Scene):
                 self.engine.theme.setBaseColor(1-v)
             try:
                 font = self.engine.data.fontDict[self.engine.theme.result_song[4]]
-            except:
+            except Exception:
                 font = defFont
             if self.scaleTitle == 1:
                 if self.centerTitle == 1:
@@ -845,7 +845,7 @@ class GameResultsScene(Scene):
                     self.engine.theme.setBaseColor(1-v)
                 try:
                     font = self.engine.data.fontDict[self.engine.theme.result_stats_notes[4]]
-                except:
+                except Exception:
                     font = defFont
                 wText, hText = font.getStringSize(text, scale = float(self.engine.theme.result_stats_notes[2]))
                 Dialogs.wrapText(font, (float(self.engine.theme.result_stats_notes[0]) - wText/2, float(self.engine.theme.result_stats_notes[1]) + v), text, 0.9, float(self.engine.theme.result_stats_notes[2]))
@@ -857,7 +857,7 @@ class GameResultsScene(Scene):
                     self.engine.theme.setBaseColor(1-v)
                 try:
                     font = self.engine.data.fontDict[self.engine.theme.result_score[4]]
-                except:
+                except Exception:
                     font = bigFont
                 text = "%d" % self.currentScore[i]
                 wText, hText = font.getStringSize(text, scale = float(self.engine.theme.result_score[2]))
@@ -883,7 +883,7 @@ class GameResultsScene(Scene):
 
                 try:
                     font = self.engine.data.fontDict[self.engine.theme.result_stats_accuracy[4]]
-                except:
+                except Exception:
                     font = defFont
                 text = _(self.engine.theme.result_stats_accuracy_text) % scoreCard.hitAccuracy
                 wText, hText = font.getStringSize(text)
@@ -896,7 +896,7 @@ class GameResultsScene(Scene):
 
                 try:
                     font = self.engine.data.fontDict[self.engine.theme.result_stats_streak[4]]
-                except:
+                except Exception:
                     font = defFont
                 text = _(self.engine.theme.result_stats_streak_text) % scoreCard.hiStreak
                 wText, hText = font.getStringSize(text)
@@ -909,7 +909,7 @@ class GameResultsScene(Scene):
 
                 try:
                     font = self.engine.data.fontDict[self.engine.theme.result_stats_diff[4]]
-                except:
+                except Exception:
                     font = defFont
                 text = _(self.engine.theme.result_stats_diff_text) % self.playerList[i].difficulty
                 wText, hText = font.getStringSize(text)
@@ -922,7 +922,7 @@ class GameResultsScene(Scene):
 
                 try:
                     font = self.engine.data.fontDict[self.engine.theme.result_stats_name[4]]
-                except:
+                except Exception:
                     font = defFont
                 text = self.playerList[i].name
                 wText, hText = font.getStringSize(text)
@@ -940,7 +940,7 @@ class GameResultsScene(Scene):
 
                 try:
                     font = self.engine.data.fontDict[self.engine.theme.result_stats_part[4]]
-                except:
+                except Exception:
                     font = defFont
                 if text == "$icon$" and self.partImage:
                     drawImage(self.part[i], scale = (float(self.engine.theme.result_stats_part[2]),-float(self.engine.theme.result_stats_part[2])), coord = (w*float(self.engine.theme.result_stats_part[0]),h*float(self.engine.theme.result_stats_part[1])))
@@ -978,7 +978,7 @@ class GameResultsScene(Scene):
                 self.engine.theme.setBaseColor(1-v)
             try:
                 font = self.engine.data.fontDict[self.engine.theme.result_song[4]]
-            except:
+            except Exception:
                 font = defFont
             wText, hText = font.getStringSize(text, scale = float(self.engine.theme.result_song[2]))
             if self.scaleTitle == 1:
@@ -1010,7 +1010,7 @@ class GameResultsScene(Scene):
             text = "%d" % self.currentScore[i]
             try:
                 font = self.engine.data.fontDict[self.engine.theme.result_score[4]]
-            except:
+            except Exception:
                 font = bigFont
             wText, hText = font.getStringSize(text, scale = float(self.engine.theme.result_score[2]))
             font.render(text, (float(self.engine.theme.result_score[0]) - wText / 2, float(self.engine.theme.result_score[1]) + v), scale = float(self.engine.theme.result_score[2]))
@@ -1036,7 +1036,7 @@ class GameResultsScene(Scene):
             if self.coOpType == 2:
                 try:
                     font = self.engine.data.fontDict[self.engine.theme.result_stats_streak[4]]
-                except:
+                except Exception:
                     font = defFont
                 text = _(self.engine.theme.result_stats_streak_text) % scoreCard.hiStreak
                 wText, hText = font.getStringSize(text)
@@ -1062,7 +1062,7 @@ class GameResultsScene(Scene):
                     self.engine.theme.setBaseColor(1-v)
                 try:
                     font = self.engine.data.fontDict[self.engine.theme.result_stats_notes[4]]
-                except:
+                except Exception:
                     font = defFont
                 wText, hText = font.getStringSize(text, scale = float(self.engine.theme.result_stats_notes[2]))
                 Dialogs.wrapText(font, (float(self.engine.theme.result_stats_notes[0]) - wText/2, float(self.engine.theme.result_stats_notes[1]) + v), text, 0.9, float(self.engine.theme.result_stats_notes[2]))
@@ -1070,7 +1070,7 @@ class GameResultsScene(Scene):
                 text = _(self.engine.theme.result_stats_accuracy_text) % scoreCard.hitAccuracy
                 try:
                     font = self.engine.data.fontDict[self.engine.theme.result_stats_accuracy[4]]
-                except:
+                except Exception:
                     font = defFont
                 wText, hText = font.getStringSize(text)
                 try:
@@ -1083,7 +1083,7 @@ class GameResultsScene(Scene):
                 text = _(self.engine.theme.result_stats_streak_text) % scoreCard.hiStreak
                 try:
                     font = self.engine.data.fontDict[self.engine.theme.result_stats_streak[4]]
-                except:
+                except Exception:
                     font = defFont
                 wText, hText = font.getStringSize(text)
                 try:
@@ -1096,7 +1096,7 @@ class GameResultsScene(Scene):
                 text = _(self.engine.theme.result_stats_diff_text) % self.playerList[i].difficulty
                 try:
                     font = self.engine.data.fontDict[self.engine.theme.result_stats_diff[4]]
-                except:
+                except Exception:
                     font = defFont
                 wText, hText = font.getStringSize(text)
                 try:
@@ -1109,7 +1109,7 @@ class GameResultsScene(Scene):
                 text = self.playerList[i].name
                 try:
                     font = self.engine.data.fontDict[self.engine.theme.result_stats_name[4]]
-                except:
+                except Exception:
                     font = defFont
                 wText, hText = font.getStringSize(text)
                 try:
@@ -1133,7 +1133,7 @@ class GameResultsScene(Scene):
                         text = "%s %s" % (text, self.playerList[i].part)
                     try:
                         font = self.engine.data.fontDict[self.engine.theme.result_stats_part[4]]
-                    except:
+                    except Exception:
                         font = defFont
                     wText, hText = font.getStringSize(text)
                     try:

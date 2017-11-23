@@ -264,7 +264,7 @@ class GameEngine(object):
         #            GNU/Linux) as the Viewport was not set yet.
         try:
             viewport = glGetIntegerv(GL_VIEWPORT)
-        except:
+        except Exception:
             viewport = [0, 0, width, height]
         h = viewport[3] - viewport[1]
         w = viewport[2] - viewport[0]

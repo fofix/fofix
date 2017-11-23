@@ -54,7 +54,7 @@ class Video:
 
         try:
             pygame.display.quit()
-        except:
+        except Exception:
             pass
 
         pygame.display.init()
@@ -140,7 +140,7 @@ class Video:
         if multisamples:
             try:
                 glEnable(GL_MULTISAMPLE_ARB)
-            except:
+            except Exception:
                 pass
 
         return bool(self.screen)

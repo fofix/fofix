@@ -113,7 +113,7 @@ class Loader(Thread):
             start = time.time()
             self.result = self.function()
             self.time = time.time() - start
-        except:
+        except Exception:
             self.exception = sys.exc_info()
 
     def finish(self):
@@ -204,7 +204,7 @@ class Resource(Task):
                     # If the original file does not exist, see if we can write to its directory
                     if not os.path.isfile(readOnlyPath) and os.access(os.path.dirname(readOnlyPath), os.W_OK):
                         pass
-                except:
+                except Exception:
                     raise
                 # If the resource exists in the read-only path, make a copy to the
                 # read-write path.
@@ -213,7 +213,7 @@ class Resource(Task):
                     log.info("Copying '%s' to writable data directory." % "/".join(name))
                     try:
                         os.makedirs(os.path.dirname(readWritePath))
-                    except:
+                    except Exception:
                         pass
                     shutil.copy(readOnlyPath, readWritePath)
                     self.makeWritable(readWritePath)

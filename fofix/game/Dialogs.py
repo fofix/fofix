@@ -1142,7 +1142,7 @@ class AvatarChooser(Layer, KeyListener):
 
             try:
                 font = self.engine.data.fontDict[self.engine.theme.avatarSelectFont]
-            except:
+            except Exception:
                 font = self.engine.data.font
             if self.avText:
                 drawImage(self.avText, scale = (self.engine.theme.avatarSelectTextScale, -self.engine.theme.avatarSelectTextScale), coord = (self.engine.theme.avatarSelectTextX, self.engine.theme.avatarSelectTextY - v))

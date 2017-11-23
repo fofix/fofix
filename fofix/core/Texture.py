@@ -88,7 +88,7 @@ class Texture:
                 log.warn("Unsupported image mode '%s' converted to 'RGB'. May have unexpected results." % image.mode)
                 string = image.tobytes('raw', 'RGB', 0, -1)
                 self.loadRaw(image.size, string, GL_RGB, 3)
-            except:
+            except Exception:
                 raise TextureException("Unsupported image mode '%s'" % image.mode)
 
     def nextPowerOfTwo(self, n):

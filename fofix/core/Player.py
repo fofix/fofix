@@ -53,7 +53,7 @@ class ConfigOption:
                 return 0
             else:
                 return -1
-        except:
+        except Exception:
             return -1
 
 def sortOptionsByKey(dict):
@@ -248,7 +248,7 @@ try:
     v = _playerDB.execute("SELECT `value` FROM `config` WHERE `key` = 'version'").fetchone()[0]
     if int(v) != _SCHEMA_VERSION:
         _updateTables = 2 #an old version. We don't want to just burn old tables.
-except:
+except Exception:
     _updateTables = 1 #no good table
 if _updateTables > 0: #needs to handle old versions eventually.
     for tbl in _playerDB.execute("SELECT `name` FROM `sqlite_master` WHERE `type` = 'table'").fetchall():
@@ -325,7 +325,7 @@ def savePlayers():
             c.set("player","controller",int(pref[11]))
             del c
             _playerDB.execute('UPDATE `players` SET `changed` = 0 WHERE `name` = ?', [pref[0]])
-        except:
+        except Exception:
             c = VFS.open(_makePlayerIniName(str(pref[0])), "w")
             c.close()
             c = Config.load(VFS.resolveWrite(_makePlayerIniName(str(pref[0]))), type = 2)
@@ -349,7 +349,7 @@ def updatePlayer(player, pref):
     a = _playerDB.execute('SELECT * FROM `players` WHERE `name` = ?', [player]).fetchone()
     try:
         a = a[0]
-    except:
+    except Exception:
         a = None
     if a is not None:
         _playerDB.execute('UPDATE `players` SET `name` = ?, `lefty` = ?, `drumflip` = ?, `autokick` = ?, `assist` = ?, `twochord` = ?, `necktype` = ?, `neck` = ?, \
@@ -556,7 +556,7 @@ class Controls:
                 return "None"
             try:
                 return int(k)
-            except:
+            except Exception:
                 return getattr(pygame, k)
 
         self.controlMapping = {}
@@ -806,7 +806,7 @@ def isKeyMappingOK(config, start):
             return None
         try:
             return int(k)
-        except:
+        except Exception:
             return getattr(pygame, k)
 
     # list of keys to look for
