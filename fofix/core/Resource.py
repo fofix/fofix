@@ -22,6 +22,7 @@
 # MA  02110-1301, USA.                                              #
 #####################################################################
 
+import logging
 import os
 import sys
 import time
@@ -30,12 +31,15 @@ import stat
 from Queue import Queue, Empty
 from threading import Thread, BoundedSemaphore
 
-from fretwork import log
 from fretwork.task import Task
 
 from fofix.core.VFS import getWritableResourcePath
 from fofix.core import Version
 from fofix.core import Config
+
+
+log = logging.getLogger(__name__)
+
 
 class Loader(Thread):
     def __init__(self, target, name, function, resultQueue, loaderSemaphore, onLoad = None, onCancel = None):

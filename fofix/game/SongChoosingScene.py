@@ -24,12 +24,11 @@
 
 from __future__ import with_statement
 
+import logging
 import os
 import time
+
 import pygame
-
-from fretwork import log
-
 from fofix.core.Scene import Scene
 
 from fofix.core.Settings import ConfigChoice, ActiveConfigChoice
@@ -44,6 +43,9 @@ from fofix.game import song
 from fofix.core import Version
 from fofix.game.Menu import Menu
 from fofix.core.constants import *
+
+
+log = logging.getLogger(__name__)
 
 PRACTICE = 1
 CAREER = 2

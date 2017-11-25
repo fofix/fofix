@@ -31,13 +31,12 @@
 from __future__ import with_statement
 
 import fnmatch
+import logging
 import math
 import os
 
 import pygame
 from OpenGL.GL import *
-
-from fretwork import log
 from fretwork.unicode import unicodify
 
 from fofix.core.View import Layer, BackgroundLayer
@@ -51,7 +50,11 @@ from fofix.core import Microphone
 from fofix.core import Player
 from fofix.core import Config
 
-#MFH - for loading phrases
+
+log = logging.getLogger(__name__)
+
+
+# for loading phrases
 def wrapCenteredText(font, pos, text, rightMargin = 1.0, scale = 0.002, visibility = 0.0, linespace = 1.0, allowshadowoffset = False, shadowoffset = (.0022, .0005)):
     """
     Wrap a piece of text inside given margins.

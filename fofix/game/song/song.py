@@ -29,13 +29,13 @@ import cPickle  # Cerealizer and sqlite3 don't seem to like each other that much
 import copy
 import glob
 import hashlib
+import logging
 import os
 import random
 import re
 import time
 import urllib
 
-from fretwork import log
 from fretwork import midi
 from fretwork.audio import StreamingSound
 from fretwork.unicode import utf8
@@ -48,6 +48,9 @@ from fofix.core.Language import _
 from fofix.core.Theme import *
 from fofix.core.Theme import hexToColor, colorToHex
 from fofix.game.song.songconstants import *
+
+
+log = logging.getLogger(__name__)
 
 
 # code for adding tracks, inside song.py:

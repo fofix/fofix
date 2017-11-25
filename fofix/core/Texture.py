@@ -21,13 +21,15 @@
 #####################################################################
 
 from __future__ import division
+import logging
 
 import pygame
 from PIL import Image
 from OpenGL.GL import *
 from OpenGL.GLU import *
 
-from fretwork import log
+
+log = logging.getLogger(__name__)
 
 
 class TextureException(Exception):

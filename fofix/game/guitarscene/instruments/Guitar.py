@@ -28,13 +28,12 @@
 #####################################################################
 
 from copy import deepcopy
+import logging
 import math
 import os
 
 import OpenGL.GL as gl
 import numpy as np
-
-from fretwork import log
 
 from fofix.game.guitarscene.instruments.Instrument import Instrument
 from fofix.game.guitarscene.Neck import Neck
@@ -43,6 +42,10 @@ from fofix.core.Image import draw3Dtex
 from fofix.core.Shader import shaders
 from fofix.core.Mesh import Mesh
 from fofix.core import cmgl
+
+
+log = logging.getLogger(__name__)
+
 
 class Guitar(Instrument):
     def __init__(self, engine, playerObj, scene, player = 0, bass = False):

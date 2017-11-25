@@ -23,15 +23,17 @@
 # MA  02110-1301, USA.                                              #
 #####################################################################
 
+import logging
 import os
 import StringIO
 from ConfigParser import RawConfigParser
 
-from fretwork import log
 from fretwork.unicode import utf8, unicodify
 
 from fofix.core import VFS
 
+
+log = logging.getLogger(__name__)
 config    = None
 prototype = {}
 

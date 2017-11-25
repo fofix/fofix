@@ -29,11 +29,10 @@
 # MA  02110-1301, USA.                                              #
 #####################################################################
 
+import logging
 import os
 
 import pygame
-
-from fretwork import log
 
 from fofix.core.Language import _
 from fofix.core.View import BackgroundLayer
@@ -46,6 +45,10 @@ from fofix.core import Config
 from fofix.core import Player
 from fofix.core import Mod
 from fofix.core import VFS
+
+
+log = logging.getLogger(__name__)
+
 
 class ConfigChoice(Menu.Choice):
     def __init__(self, engine, config, section, option, autoApply = False, isQuickset = 0):

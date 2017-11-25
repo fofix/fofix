@@ -22,8 +22,11 @@
 # MA  02110-1301, USA.                                              #
 #####################################################################
 
+import logging
 import pygame
 
+
+log = logging.getLogger(__name__)
 haveMidi = False
 
 try:
@@ -32,13 +35,13 @@ try:
 except ImportError:
     haveMidi = False
 
-from fretwork import log
 from fretwork.audio import Music
 from fretwork.task import Task
 
 from fofix.core.Player import Controls
 from fofix.core import Player
 from fofix.core import Config
+
 
 class KeyListener(object):
     def keyPressed(self, key, unicode):
@@ -53,6 +56,7 @@ class KeyListener(object):
     def exitRequested(self):
         pass
 
+
 class MouseListener(object):
     def mouseButtonPressed(self, button, pos):
         pass
@@ -62,6 +66,7 @@ class MouseListener(object):
 
     def mouseMoved(self, pos, rel):
         pass
+
 
 class SystemEventListener(object):
     def screenResized(self, size):
@@ -76,7 +81,9 @@ class SystemEventListener(object):
     def quit(self):
         pass
 
+
 MusicFinished = pygame.USEREVENT
+
 
 class Input(Task):
     def __init__(self):

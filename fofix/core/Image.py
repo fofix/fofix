@@ -21,17 +21,20 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,        #
 # MA  02110-1301, USA.                                              #
 #####################################################################
+
 from __future__ import with_statement
+import logging
 
 import numpy as np
 from PIL import Image
 from OpenGL.GL import *
 
-from fretwork import log
-
 from fofix.core.Texture import Texture
 from fofix.core.constants import *
 from fofix.core import cmgl
+
+
+log = logging.getLogger(__name__)
 
 #stump: the last few stubs of DummyAmanith.py are inlined here since this
 # is the only place in the whole program that uses it now that we've pruned

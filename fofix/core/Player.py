@@ -24,15 +24,19 @@
 # MA  02110-1301, USA.                                              #
 #####################################################################
 
-import pygame
+import logging
 
-from fretwork import log
+import pygame
 
 from fofix.core.Language import _
 from fofix.core import Microphone  #stump
 from fofix.core import Config
 from fofix.game import song
 from fofix.core import VFS
+
+
+log = logging.getLogger(__name__)
+
 
 class ConfigOption:
     def __init__(self, id, text):

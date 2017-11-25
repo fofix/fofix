@@ -31,20 +31,18 @@ from __future__ import with_statement
 
 import binascii
 import hashlib
-import pygame
+import logging
 import random
 import urllib
 import os
-import cerealizer
 
 from OpenGL.GL import *
-
-from fretwork import log
 from fretwork.audio import Sound
+import cerealizer
+import pygame
 
 from fofix.core.Image import drawImage
 from fofix.core.Scene import Scene
-
 from fofix.core.constants import *
 from fofix.core.Language import _
 from fofix.game.Menu import Menu
@@ -53,6 +51,8 @@ from fofix.game import Dialogs
 from fofix.game import song
 from fofix.core import VFS
 
+
+log = logging.getLogger(__name__)
 
 
 class GameResultsScene(Scene):

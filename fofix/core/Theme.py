@@ -23,6 +23,7 @@
 # MA  02110-1301, USA.                                              #
 #####################################################################
 
+import logging
 import os
 import sys
 import imp
@@ -31,8 +32,6 @@ import math
 
 from OpenGL.GL import *
 from OpenGL.GLU import *
-
-from fretwork import log
 from fretwork.task import Task
 
 from fofix.core import Version
@@ -41,6 +40,9 @@ from fofix.core.Language import _
 from fofix.core.Shader import shaders
 from fofix.core.Image import drawImage
 from fofix.core.constants import *
+
+
+log = logging.getLogger(__name__)
 
 #Theme Constants.
 GUITARTYPES = [0, 1, 4]

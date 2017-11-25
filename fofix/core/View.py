@@ -22,14 +22,15 @@
 #####################################################################
 
 from __future__ import division
+import logging
 
 from OpenGL.GL import *
 from contextlib import contextmanager
-
 import numpy as np
-
-from fretwork import log
 from fretwork.task import Task
+
+
+log = logging.getLogger(__name__)
 
 
 class Layer(Task):

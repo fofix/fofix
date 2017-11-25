@@ -20,6 +20,7 @@
 # MA  02110-1301, USA.                                              #
 #####################################################################
 
+import logging
 import os
 import sys
 import time
@@ -34,19 +35,23 @@ from OpenGL.GL.ARB.fragment_shader import *
 from OpenGL.GL.ARB.multitexture import *
 from OpenGL.GL.EXT.texture3D import *
 
-from fretwork import log
-
 from fofix.core.constants import isTrue
 from fofix.core import Config
 from fofix.core import Version
 
+
+log = logging.getLogger(__name__)
+
+
 class ShaderCompilationError(Exception):
     pass
+
 
 if sys.platform == 'darwin':
     GL_TEXTURE_3D_EXT = GL_TEXTURE_3D
     GL_TEXTURE_WRAP_R_EXT = GL_TEXTURE_WRAP_R
     glTexImage3DEXT = glTexImage3D
+
 
 # main class for shaders library
 class ShaderList:

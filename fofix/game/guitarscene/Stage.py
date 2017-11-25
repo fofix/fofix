@@ -26,11 +26,11 @@
 
 from __future__ import with_statement
 
+import logging
 import random
 import math
 import os
 
-from fretwork import log
 import OpenGL.GL as gl
 
 from fofix.core.Image import drawImage
@@ -40,6 +40,9 @@ from fofix.core.Shader import shaders
 from fofix.core.VideoPlayer import VideoLayer, VideoPlayerError
 from fofix.core.constants import *
 from fofix.game.guitarscene import Rockmeter
+
+
+log = logging.getLogger(__name__)
 
 
 class Layer(object):

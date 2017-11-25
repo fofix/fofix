@@ -37,15 +37,14 @@ import gc
 import os
 import sys
 import imp
+import logging
 
-from fretwork import log
 from fretwork.audio import Audio
 from fretwork.task import TaskEngine
 from fretwork.timer import FpsTimer
 
 from fofix.core.constants import *
 from fofix.core.Video import Video
-
 from fofix.core.View import View
 from fofix.core.Input import Input, KeyListener, SystemEventListener
 from fofix.core.Resource import Resource
@@ -55,7 +54,6 @@ from fofix.core.Language import _
 from fofix.core.Theme import Theme
 from fofix.core.Shader import shaders
 from fofix.core.Image import drawImage
-
 from fofix.core import cmgl
 from fofix.core import Config
 from fofix.core import ConfigDefs
@@ -63,9 +61,11 @@ from fofix.core import Version
 from fofix.core import Player
 from fofix.core import Mod
 from fofix.game import Dialogs
-
 from fofix.game.World import World
 from fofix.game.Debug import DebugLayer
+
+
+log = logging.getLogger(__name__)
 
 # evilynux - Grab name and version from Version class.
 version = "%s v%s" % ( Version.PROGRAM_NAME, Version.version() )

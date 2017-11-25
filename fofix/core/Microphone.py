@@ -21,14 +21,16 @@
 # MA  02110-1301, USA.                                              #
 #####################################################################
 
+import logging
 import math
-import numpy as np
 
-from fretwork import log
+import numpy as np
 from fretwork.task import Task
 from fretwork.audio import MicrophonePassthroughStream
 
 from fofix.core.Language import _
+
+log = logging.getLogger(__name__)
 
 try:
     import pyaudio

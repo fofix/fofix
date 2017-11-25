@@ -24,11 +24,11 @@
 # MA  02110-1301, USA.                                              #
 #####################################################################
 
+import logging
 import os
 import random
 import string
 
-from fretwork import log
 from fretwork.audio import Music
 
 from fofix.core.View import BackgroundLayer
@@ -41,6 +41,9 @@ from fofix.game.Menu import Menu
 from fofix.core import Config
 from fofix.game import Dialogs
 from fofix.core import Settings
+
+
+log = logging.getLogger(__name__)
 
 
 class MainMenu(BackgroundLayer):

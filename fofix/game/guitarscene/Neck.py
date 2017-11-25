@@ -21,18 +21,21 @@
 # MA  02110-1301, USA.                                              #
 #####################################################################
 
+import logging
 import os
 import random
 
 import OpenGL.GL as gl
 import numpy as np
 
-from fretwork import log
-
 from fofix.core.Shader import shaders, mixColors
 from fofix.game.song import Bars, \
     MarkerNote, SP_MARKING_NOTE, TK_GUITAR_SOLOS
 from fofix.core import cmgl
+
+
+log = logging.getLogger(__name__)
+
 
 class Neck:
     def __init__(self, engine, instrument, playerObj):

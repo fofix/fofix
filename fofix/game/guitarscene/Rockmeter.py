@@ -30,13 +30,12 @@ FUTURE_DIVISION = __future__.division.compiler_flag
 
 from math import *
 import locale
+import logging
 import imp
 import os
 
 from PIL import Image, ImageDraw
 import OpenGL.GL as gl
-
-from fretwork import log
 
 from fofix.core.LinedConfigParser import LinedConfigParser
 from fofix.core.Theme import halign, valign
@@ -46,6 +45,9 @@ from fofix.core.Image import drawImage
 from fofix.core.constants import *
 from fofix.core import Version
 from fofix.core import cmgl
+
+
+log = logging.getLogger(__name__)
 
 #these are the variables for setting the alignment of text and images
 #when setting them up in the rockmeter.ini you do not have

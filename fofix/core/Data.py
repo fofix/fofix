@@ -23,19 +23,22 @@
 # MA  02110-1301, USA.                                              #
 #####################################################################
 
+import logging
 import os
 import glob
 import random
 
-from fretwork import log
 from fretwork.audio import Sound
 
 from fofix.core.Font import Font
 from fofix.core.Image import ImgDrawing
-
 from fofix.core import Config
 from fofix.core import Version
 from fofix.core import Player
+
+
+log = logging.getLogger(__name__)
+
 
 # these constants define a few customized letters in the default font
 # MFH - with the new simplified Font.py, no more custom glyphs... let's do

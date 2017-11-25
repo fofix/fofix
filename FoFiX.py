@@ -36,6 +36,8 @@ import os
 import platform
 import subprocess
 import atexit
+import logging
+
 
 def run_command(command):
     command = command.split(' ')
@@ -120,12 +122,13 @@ from fofix.core import VFS
 if os.name == "posix":
     # Under MacOS X, put the logs in ~/Library/Logs
     if os.uname()[0] == "Darwin":
-        logFile = open(os.path.expanduser('~/Library/Logs/%s.log' % Version.PROGRAM_UNIXSTYLE_NAME), 'w')
+        logfile = os.path.expanduser('~/Library/Logs/%s.log' % Version.PROGRAM_UNIXSTYLE_NAME)
     else: # GNU/Linux et al.
-        logFile = VFS.open('/userdata/%s.log' % Version.PROGRAM_UNIXSTYLE_NAME, 'w')
+        logfile = VFS.resolveWrite('/userdata/%s.log' % Version.PROGRAM_UNIXSTYLE_NAME)
 else:
-    logFile = VFS.open('/userdata/%s.log' % Version.PROGRAM_UNIXSTYLE_NAME, 'w')
-log.setLogfile(logFile)
+    logfile = VFS.resolveWrite('/userdata/%s.log' % Version.PROGRAM_UNIXSTYLE_NAME)
+log.configure(logfile)
+logger = logging.getLogger(__name__)
 
 fretworkRequired = (0, 2, 0)
 reqVerStr = '.'.join([str(i) for i in fretworkRequired])
@@ -220,7 +223,7 @@ class Main():
         return config
 
     def restart(self):
-        log.info("Restarting.")
+        logger.info("Restarting.")
         self.engine.audio.close()
         self.restartRequested = True
 
@@ -233,7 +236,7 @@ class Main():
             try:
                 vidPlayer = VideoLayer(self.engine, vidSource, cancellable=True)
             except (IOError, VideoPlayerError):
-                log.error("Error loading intro video:")
+                logger.error("Error loading intro video:")
             else:
                 vidPlayer.play()
                 self.engine.view.pushLayer(vidPlayer)
@@ -253,7 +256,7 @@ class Main():
             while self.engine.run():
                 pass
         except KeyboardInterrupt:
-            log.info("Left mainloop due to KeyboardInterrupt.")
+            logger.info("Left mainloop due to KeyboardInterrupt.")
             # don't reraise
 
         # Restart the program if the engine is asking that we do so.
@@ -276,8 +279,8 @@ if __name__ == '__main__':
     except (KeyboardInterrupt, SystemExit):
         raise
     except Exception:
-        log.error("Terminating due to unhandled exception: ")
-        _logname = os.path.abspath(log.logFile.name)
+        logger.error("Terminating due to unhandled exception: ")
+        _logname = os.path.abspath(logfile)
         _errmsg = "%s\n\n%s\n%s\n%s\n%s" % (
           _("Terminating due to unhandled exception:"),
           traceback.format_exc(),
@@ -290,10 +293,9 @@ if __name__ == '__main__':
             import win32api
             import win32con
             if win32api.MessageBox(0, "%s\n\n%s" % (_errmsg, _("Open the logfile now?")), "%s %s" % (Version.PROGRAM_NAME, Version.version()), win32con.MB_YESNO|win32con.MB_ICONSTOP) == win32con.IDYES:
-                log.logFile.close()
                 os.startfile(_logname)
             if hasattr(sys, 'frozen'):
                 sys.exit(1)  # don't reraise if py2exe'd so the "Errors occurred" box won't appear after this and confuse the user as to which logfile we actually want
         else:
-            print >>sys.stderr, _errmsg
+            logger.error(_errmsg)
         raise
