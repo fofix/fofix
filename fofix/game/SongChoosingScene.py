@@ -264,6 +264,7 @@ class SongChoosingScene(Scene):
             self.loadLibrary()
 
     def loadLibrary(self):
+        # self.libraries receives a list[LibraryInfo]
         log.debug("Loading libraries in %s" % self.library)
         self.loaded = False
         self.tiersPresent = False
@@ -275,6 +276,7 @@ class SongChoosingScene(Scene):
         self.engine.resource.load(self, "libraries", lambda: song.getAvailableLibraries(self.engine, self.library), onLoad=self.loadSongs, synch=True)
 
     def loadSongs(self, libraries):
+        # self.songs receives a list[SongInfo]
         log.debug("Loading songs in %s" % self.library)
         self.engine.resource.load(self, "songs", lambda: song.getAvailableSongsAndTitles(self.engine, self.library, progressCallback=self.progressCallback), onLoad=self.prepareSetlist, synch=True)
 
@@ -373,7 +375,7 @@ class SongChoosingScene(Scene):
                 if isinstance(item, song.SongInfo) and self.startingSelected == item.songName:  # TODO: SongDB
                     self.selectedIndex = i
                     break
-                elif isinstance(item, song.LibraryInfo) and self.startingSelected == item.libraryName:
+                elif isinstance(item, song.LibraryInfo) and self.startingSelected == item.name:
                     self.selectedIndex = i
                     break
 
@@ -387,6 +389,7 @@ class SongChoosingScene(Scene):
             self.selectedIndex += 1
             if self.selectedIndex >= len(self.items):
                 self.selectedIndex = 0
+                break
 
         self.itemRenderAngles = [0.0] * len(self.items)
         self.itemLabels = [None] * len(self.items)
@@ -751,9 +754,9 @@ class SongChoosingScene(Scene):
                     return
                 else:
                     # else go up a directory
-                    self.library = os.path.dirname(self.library)
-                self.selectedItem = None
-                self.loadLibrary()
+                    self.library,self.startingSelected = os.path.split(self.library)
+                    self.selectedItem = None
+                    self.loadLibrary()
             else:
                 self.quit()
         elif (c in Player.menuYes and c not in Player.starts) or key == pygame.K_RETURN:

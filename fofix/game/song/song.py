@@ -3032,6 +3032,11 @@ def getDefaultLibrary(engine):
 
 
 def getAvailableLibraries(engine, library=DEFAULT_LIBRARY):
+    """ Find libraries (i.e. sub-directories of songs) inside a directory.
+    
+    :param library: directory to search
+    :return: list[LibraryInfo]
+    """
     log.debug("Song.getAvailableLibraries function call...library = " + str(library))
     # Search for libraries in both the read-write and read-only directories
     songRoots = [engine.resource.fileName(library),
