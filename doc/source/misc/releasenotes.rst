@@ -1,6 +1,61 @@
 Release notes
 =============
 
+4.0.0 (unreleased)
+------------------
+
+Stages:
+
+- alpha1: 2010-11-27
+- alpha2: 2011-09-30
+
+Notes:
+
+- Will break compatibility with FoFiX v3
+
+- Themes:
+
+  - added possibility to customize hitflames (location, rotation, whether or not black is auto removed from the images)
+  - added possibility to customize the POV
+  - added possibility to customize the fps display location
+  - added possibility to customize the pause menu text style
+  - added support for a neck which shows when the multiplier reaches "4x"
+  - added support for solo sidebars
+  - added theme settings for control over how the color of tails and flames behave with sp/od
+  - implemented a separate hitflames animation image for when starpower/overdrive is active
+  - made all notes be able to be animated
+  - made almost all images optional (see the *Uberlight* theme)
+  - moved tons of images to folders
+  - removed ``editor.png`` from themes as its no longer of any use
+  - renamed ``backgrounds`` folder to ``stages``
+  - render the main menu to plain text by default if ``main_text.png`` is not detected
+  - rockmeter: added a new layer grouping system
+  - rockmeter: added a new layer: circle layer (very handy for star fillup)
+  - rockmeter: added new effects: scale, fade, animate
+  - rockmeter: fixed some sliding effect issues
+  - rockmeter: improved speed
+
+  - *MLv4*: new theme
+  - *ML GH3*: recreated the rockmeter with ``rockmeter.ini``
+  - *Uberlight*: cleaned up to be the absolute minimum allowed by the engin.
+
+- Game:
+
+  - cleaned up the code to simplify it
+  - made the solo neck scroll in to the very end of the neck instead of stopping at the frets
+  - simplified hitflames: any supported hitflame image can now be rendered at the same time
+
+- Other:
+
+  - changed default frame limit to 60 FPS
+  - fixed a rotation bug in image rendering
+  - fixed menu text, optionsPanel, and BRE/Solo frame scaling issues
+  - implemented song specific loading screen images
+  - shared more code between the guitar and drums
+  - added ``CMGL`` as a faster OpenGL binding
+  - added the ``pypitch`` module
+
+
 3.121 (2009-12-06)
 ------------------
 
