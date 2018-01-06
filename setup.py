@@ -1,9 +1,9 @@
 #!/usr/bin/env python
-# -*- coding: iso-8859-1 -*-                                        #
+# -*- coding: utf-8 -*-
 #####################################################################
 #                                                                   #
 # Frets on Fire X                                                   #
-# Copyright (C) 2009-2011 FoFiX Team                                #
+# Copyright (C) 2009-2018 FoFiX Team                                #
 #               2006 Sami Kyöstilä                                  #
 #                                                                   #
 # This program is free software; you can redistribute it and/or     #
