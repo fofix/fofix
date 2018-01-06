@@ -38,16 +38,16 @@ from setuptools import setup, Extension, Command
 from Cython.Build import cythonize
 
 
-def glob_recursive(dir, file_pattern="*"):
+def glob_recursive(directory, file_pattern="*"):
     """ Like glob, but recurses sub-dirs.
-    :param dir: directory from which to start searching
+    :param directory: directory from which to start searching
     :param file_pattern: (default '*')
         optional name pattern for desired files. Used to filter files at 
         every level; NOT used to filter directories.
     :return: list(str) of path to every file found.
     """
     matches = []
-    for subdir, dirnames, filenames in os.walk(dir):
+    for subdir, dirnames, filenames in os.walk(directory):
         for filename in fnmatch.filter(filenames, file_pattern):
             matches.append(os.path.join(subdir, filename))
     return matches
@@ -424,8 +424,8 @@ class msgfmt(Command):
 
     def run(self):
         msgfmt_cmd = find_command('msgfmt')
-        for pofile in glob.glob(os.path.join('..', 'data', 'po', '*.po')):
-            mofile = os.path.join('..', 'data', 'translations', os.path.basename(pofile)[:-3]+'.mo')
+        for pofile in glob.glob(os.path.join('data', 'po', '*.po')):
+            mofile = os.path.join('data', 'translations', os.path.basename(pofile)[:-3] + '.mo')
             if newer(pofile, mofile):
                 self.mkpath(os.path.dirname(mofile))
                 self.spawn([msgfmt_cmd, '-c', '-o', mofile, pofile])
@@ -446,15 +446,18 @@ class xgettext(Command):
         pass
 
     def run(self):
+        py_files = glob_recursive('.', '*.py')
         xgettext_cmd = find_command('xgettext')
-        potfile = os.path.join('..', 'data', 'po', 'messages.pot')
+        potfile = os.path.join('data', 'po', 'messages.pot')
         self.spawn([xgettext_cmd,
-          '--package-name='+Version.PROGRAM_NAME,
-          '--package-version='+Version.version(),
+          '--package-name=' + Version.PROGRAM_NAME,
+          '--package-version=' + Version.version(),
           '--copyright-holder=FoFiX Team',
+          ' --sort-output',
           '-o', potfile] +
-         ['-k' + funcname for funcname in self.FUNCNAMES] +
-          glob.glob('*.py'))
+          ['-k' + funcname for funcname in self.FUNCNAMES] +
+          py_files)
+
 
 if os.name == 'nt':
     vidInclude = ['.', 'win32/deps/include/msinttypes']
