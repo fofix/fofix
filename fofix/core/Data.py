@@ -38,8 +38,7 @@ from fofix.core import Version
 from fofix.core import Player
 
 # these constants define a few customized letters in the default font
-# MFH - with the new simplified Font.py, no more custom glyphs... let's do
-# a simple replacement here for now...
+# MFH - with the new simplified Font.py
 STAR1 = ' '
 STAR2 = '*'
 LEFT = '<'
@@ -47,12 +46,12 @@ RIGHT = '>'
 STAR3 = STAR1
 STAR4 = STAR2
 
-#-STAR1 = unicode('\x10')
-#-STAR2 = unicode('\x11')
-#-LEFT  = unicode('\x12')
-#-RIGHT = unicode('\x13')
-#-STAR3 = unicode('\x14')  #Worldrave - Added new Star3
-#-STAR4 = unicode('\x15')  #Worldrave - Added new Star4
+# STAR1 = unicode('\x10')
+# STAR2 = unicode('\x11')
+# LEFT  = unicode('\x12')
+# RIGHT = unicode('\x13')
+# STAR3 = unicode('\x14')
+# STAR4 = unicode('\x15')
 
 
 class Data(object):
@@ -60,51 +59,47 @@ class Data(object):
 
     def __init__(self, resource, svg):
 
-        self.logClassInits = Config.get("game", "log_class_inits")
-        if self.logClassInits == 1:
+        # logs
+        logClassInits = Config.get("game", "log_class_inits")
+        if logClassInits == 1:
             log.debug("Data class init (Data.py)...")
         self.logLoadings = Config.get("game", "log_loadings")
-
         self.logImageNotFound = Config.get("log", "log_image_not_found")
 
+        # init vars
         self.resource = resource
         self.svg = svg
-
         self.sfxVolume = Config.get("audio", "SFX_volume")
         self.crowdVolume = Config.get("audio", "crowd_volume")
+        self.players = Player.loadPlayers()
 
         # Get theme
+        self.path = Version.dataPath()
+        themepath = os.path.join(self.path, "themes")
         themename = Config.get("coffee", "themename")
         self.themeLabel = themename
         self.themeCoOp = False
 
-        self.players = None
-        self.players = Player.loadPlayers()
-
-        # myfingershurt: check for existence of theme path
-        themepath = os.path.join(Version.dataPath(), "themes")
-        self.themepath = themepath
-        self.path = Version.dataPath()
-
+        # check for existence of theme path
         if not self.checkImgDrawing(os.path.join("themes", themename, "notes", "notes.png")):
-            # myfingershurt: here need to ensure an existing theme is selected
+            # here need to ensure an existing theme is selected
             themes = []
-            defaultTheme = None  # myfingershurt
+            defaultTheme = None
             allthemes = os.listdir(themepath)
             for name in allthemes:
                 if self.checkImgDrawing(os.path.join("themes", name, "notes", "notes.png")):
                     themes.append(name)
-                    if name == "MegaLight V4":  # myfingershurt
-                        defaultTheme = name  # myfingershurt
-            if defaultTheme != "MegaLight V4":  # myfingershurt
-                defaultTheme = themes[0]  # myfingershurt
+                    if name == "MegaLight V4":
+                        defaultTheme = name
+            if defaultTheme != "MegaLight V4":
+                defaultTheme = themes[0]
             # not a valid theme if notes.png isn't there!  Force default theme:
             Config.set("coffee", "themename", defaultTheme)
             # re-init Data with new default
             themename = defaultTheme
             self.themeLabel = themename
 
-        if not os.path.exists(os.path.join(Version.dataPath(), "themes", themename, "vocals")):
+        if not os.path.exists(os.path.join(themepath, themename, "vocals")):
             self.vocalPath = "vocals"
         else:
             self.vocalPath = os.path.join("themes", themename, "vocals")
@@ -116,22 +111,16 @@ class Data(object):
         # always stretched to fill the video resolution)
         self.fontScreenBottom = 0.75
 
+        # load part images
         self.loadPartImages()
-        # myfingershurt: multi-OS compatibility file access fixes using os.path.join()
-        # load font customization images
 
-        # Worldrave - Use new defined Star3 and star4. Using star1 and star2 as
-        # a fallback.
-
-        # MFH - no more custom glyphs, these are wasting memory.
-        # MFH - but we do need these star1-4 images anyway.  Leaving them
-        # loaded here in the Data object.
+        # load stars 1 and 2
         self.loadImgDrawing(self, "star1", os.path.join(
             "themes", themename, "star1.png"), textureSize=(128, 128))
         self.loadImgDrawing(self, "star2", os.path.join(
             "themes", themename, "star2.png"), textureSize=(128, 128))
 
-        # MFH - let's not rely on errors here if we don't have to...
+        # use starN+2 as a fallback of starN
         if not self.loadImgDrawing(self, "star3", os.path.join("themes", themename, "star3.png"), textureSize=(128, 128)):
             self.star3 = self.star1
         if not self.loadImgDrawing(self, "star4", os.path.join("themes", themename, "star4.png"), textureSize=(128, 128)):
@@ -169,14 +158,14 @@ class Data(object):
             self.loadImgDrawing(self, "submenuSelect", os.path.join(
                 "themes", themename, "menu", "selected.png"))
             self.subSelectWFactor = 0
-        # load all the data in parallel
+
+        # load fonts in parallel
         # asciiOnly = not bool(Language.language) or Language.language == "Custom"
         # reversed  = _("__lefttoright__") == "__righttoleft__" and True or False
         asciiOnly = True
         reversed = False
         scale = 1
-        # evilynux - Load bigger fonts so they're nicer when scaled, scaling
-        # readjusted
+        # Load bigger fonts so they're nicer when scaled, scaling readjusted
         fontSize = [44, 132, 34, 32, 30]
         w, h = [int(s) for s in Config.get("video", "resolution").split("x")]
         aspectRatio = float(w) / float(h)
@@ -215,11 +204,18 @@ class Data(object):
                                     systemFont=not asciiOnly, outline=False, aspectRatio=aspectRatio)
                 resource.load(self, f[1], f[0], synch=True)
 
-        self.fontDict = {"font": self.font, "bigFont": self.bigFont, "pauseFont": self.pauseFont, "scoreFont": self.scoreFont,
-                         "streakFont": self.streakFont, "songFont": self.songFont, "streakFont2": self.streakFont2,
-                         "songListFont": self.songListFont, "shadowFont": self.shadowFont, "loadingFont": self.loadingFont}
-
-        assert self.fontDict['font'] == self.font
+        self.fontDict = {
+            "font": self.font,
+            "bigFont": self.bigFont,
+            "pauseFont": self.pauseFont,
+            "scoreFont": self.scoreFont,
+            "streakFont": self.streakFont,
+            "songFont": self.songFont,
+            "streakFont2": self.streakFont2,
+            "songListFont": self.songListFont,
+            "shadowFont": self.shadowFont,
+            "loadingFont": self.loadingFont
+        }
 
         # load sounds asynchronously
         resource.load(self, "screwUpsounds", self.loadScrewUpsounds)
@@ -268,7 +264,7 @@ class Data(object):
                     self, self.sounds[0], os.path.join("sounds", "default.ogg"))
 
         # TODO: Simplify crowdSound stuff so it can join the rest of us.
-        # MFH - fallback on sounds/crowdcheers.ogg, and then starpower.ogg.
+        # Fallback on sounds/crowdcheers.ogg, and then starpower.ogg.
         # Note if the fallback crowdcheers was used or not.
         if self.fileExists(os.path.join("themes", themename, "sounds", "crowdcheers.ogg")):
             self.loadSoundEffect(self, "crowdSound", os.path.join(
@@ -285,6 +281,7 @@ class Data(object):
             log.warn("crowdcheers.ogg not found -- no crowd cheering.")
 
     def loadPartImages(self):
+        """Load part images."""
         self.partImages = []
         self.partImages.append(self.loadImgDrawing(None, "guitar", os.path.join(
             "themes", self.themeLabel, "common", "guitar.png")))
@@ -299,9 +296,13 @@ class Data(object):
         self.partImages.append(self.loadImgDrawing(None, "vocal", os.path.join(
             "themes", self.themeLabel, "common", "vocal.png")))
 
-    # MFH - single function to go through all screwup sound objects and set
-    # object volume to the given volume
     def SetAllScrewUpSoundFxObjectVolumes(self, volume):
+        """
+        Go through all screw up ``Sound`` objects and set object volume to the
+        given volume.
+
+        :param volume: set this volume to the sound object
+        """
         for s in self.screwUpsounds:
             s.setVolume(volume)
         for s in self.screwUpsoundsBass:
@@ -309,10 +310,13 @@ class Data(object):
         for s in self.screwUpsoundsDrums:
             s.setVolume(volume)
 
-    # MFH - single function to go through all sound objects (and iterate
-    # through all sound lists) and set object volume to the given volume
     def SetAllSoundFxObjectVolumes(self, volume=None):
-        # MFH TODO - set every sound object's volume here...
+        """
+        Go through all ``Sound`` objects and set object volume to the given
+        volume.
+
+        :param volume: set this volume to the sound object
+        """
         if volume is None:
             self.sfxVolume = Config.get("audio", "SFX_volume")
             self.crowdVolume = Config.get("audio", "crowd_volume")
@@ -344,6 +348,9 @@ class Data(object):
         self.selectSound3.setVolume(volume)
 
     def loadSoundEffect(self, target, name, fileName, crowd=False):
+        """
+        Load sound effects.
+        """
         volume = self.sfxVolume
         if crowd:
             volume = self.crowdVolume
@@ -351,14 +358,32 @@ class Data(object):
         self.resource.load(target, name, lambda: Sound(
             fileName), onLoad=lambda s: s.setVolume(volume))
 
-    # MFH - auto random sound enumeration
     def determineNumSounds(self, soundPath, soundPrefix, soundExtension=".ogg"):
+        """
+        Determine how many sounds exist with the following pattern:
+        <prefix><int><extension>.
+
+        :param soundPath: path of sounds
+        :param soundPrefix: prefix of sounds
+        :param soundExtension: extension of sounds (default: ogg)
+        :return: number of sounds found
+        """
         soundNum = 1
         while self.fileExists(os.path.join(soundPath, "%s%d%s" % (soundPrefix, soundNum, soundExtension))):
             soundNum += 1
         return soundNum - 1
 
-    def getSoundObjectList(self, soundPath, soundPrefix, numSounds, soundExtension=".ogg"):  # MFH
+    def getSoundObjectList(self, soundPath, soundPrefix, numSounds, soundExtension=".ogg"):
+        """
+        Get ``Sound`` objects for sounds with the following pattern:
+        <prefix><int><extension>.
+
+        :param soundPath: path of sounds
+        :param soundPrefix: prefix of sounds
+        :param numSounds: number of sounds
+        :param soundExtension: extension of sounds (default: ogg)
+        :return: the list of ``Sound`` objets found
+        """
         log.debug("{0}1{2} - {0}{1}{2} found in {3}".format(soundPrefix,
                                                             numSounds, soundExtension, soundPath))
 
@@ -371,8 +396,12 @@ class Data(object):
 
         return sounds
 
-    # MFH - adding optional support for random choice between two back sounds
     def loadBackSounds(self):
+        """
+        Load back sounds (prefix: back).
+
+        :return: list of ``Sound`` objects
+        """
         soundPathTheme = os.path.join("themes", self.themeLabel, "sounds")
         soundPath = soundPathTheme
         soundPrefix = "back"
@@ -383,6 +412,11 @@ class Data(object):
             return [Sound(self.resource.fileName(os.path.join("themes", self.themeLabel, "sounds", "out.ogg")))]
 
     def loadAcceptSounds(self):
+        """
+        Load accept sounds (prefix: accept).
+
+        :return: list of ``Sound`` objects
+        """
         soundPathTheme = os.path.join("themes", self.themeLabel, "sounds")
         soundPath = soundPathTheme
         soundPrefix = "accept"
@@ -396,6 +430,11 @@ class Data(object):
                 return [Sound(self.resource.fileName(os.path.join("themes", self.themeLabel, "sounds", "action.ogg")))]
 
     def loadScrewUpsounds(self):
+        """
+        Load screw up sounds (prefix: guitscw).
+
+        :return: list of ``Sound`` objects
+        """
         soundPathTheme = os.path.join("themes", self.themeLabel, "sounds")
         soundPathData = "sounds"
         soundPath = soundPathTheme
@@ -407,6 +446,11 @@ class Data(object):
         return self.getSoundObjectList(soundPath, soundPrefix, numSounds)
 
     def loadScrewUpsoundsBass(self):
+        """
+        Load screw up sounds (prefix: bassscw).
+
+        :return: list of ``Sound`` objects
+        """
         soundPathTheme = os.path.join("themes", self.themeLabel, "sounds")
         soundPathData = "sounds"
         soundPath = soundPathTheme
@@ -418,6 +462,11 @@ class Data(object):
         return self.getSoundObjectList(soundPath, soundPrefix, numSounds)
 
     def loadScrewUpsoundsDrums(self):
+        """
+        Load screw up sounds (prefix: drumscw).
+
+        :return: list of ``Sound`` objects
+        """
         soundPathTheme = os.path.join("themes", self.themeLabel, "sounds")
         soundPathData = "sounds"
         soundPath = soundPathTheme
@@ -429,6 +478,11 @@ class Data(object):
         return self.getSoundObjectList(soundPath, soundPrefix, numSounds)
 
     def loadSyncsounds(self):
+        """
+        Load sync sounds
+
+        ..deprecated:: 4.0.0
+        """
         return [Sound(self.resource.fileName("sync%d.ogg" % i)) for i in range(1, 2)]
 
     def checkImgDrawing(self, fileName):
@@ -489,12 +543,12 @@ class Data(object):
         """
         Load an SVG drawing synchronously.
 
-        @param target:      An object that will own the drawing
-        @param name:        The name of the attribute the drawing will be assigned to
-        @param fileName:    The name of the file in the data directory
-        @param textureSize: Either None or (x, y), in which case the file will
+        :param target: An object that will own the drawing
+        :param name: The name of the attribute the drawing will be assigned to
+        :param fileName: The name of the file in the data directory
+        :param textureSize: Either None or (x, y), in which case the file will
                             be rendered to an x by y texture
-        @return:            L{ImgDrawing} instance
+        return: ``ImgDrawing`` instance
         """
         imgDrawing = self.getImgDrawing(fileName)
         if not imgDrawing:
@@ -511,86 +565,84 @@ class Data(object):
             drawing = imgDrawing
         return drawing
 
-    def loadAllImages(self, target, directory, prefix="img_", textureSize=None):  # akedrou
+    def loadAllImages(self, target, directory, prefix="img_", textureSize=None):
         """
         Loads all images found in a folder to a given target.
 
-        @param target:      An object that will own the drawings
-        @param directory:   The directory that will be searched for image files.
-        @param textureSize: Either None or (x, y), in which case the files will
+        :param target: An object that will own the drawings
+        :param directory: The directory that will be searched for image files.
+        :param textureSize: Either None or (x, y), in which case the files will
                             be rendered to an x by y texture
         """
         if not os.path.isdir(os.path.join(self.path, directory)):
             return None
+
         imgDict = {}
-        for file in os.listdir(os.path.join(self.path, directory)):
-            if file == "thumbs.db" or file == "Thumbs.db":
+        for filename in os.listdir(os.path.join(self.path, directory)):
+            # avoid some files
+            if filename in ["thumbs.db", "Thumbs.db"]:
                 continue
-            elif file[0] == ".":
+            elif filename[0] == ".":
                 continue
-            elif os.path.isdir(os.path.join(self.path, directory, file)):
+            elif os.path.isdir(os.path.join(self.path, directory, filename)):
                 continue
-            name = os.path.splitext(file)[0]
+
+            name = os.path.splitext(filename)[0]
             name = prefix + name
             img = self.loadImgDrawing(
-                target, name, os.path.join(directory, file), textureSize)
+                target, name, os.path.join(directory, filename), textureSize)
             if img and target is None:
                 imgDict[name] = img
         if target is None and len(imgDict) > 0:
             return imgDict
 
-    # glorandwarf: changed name to getPath
     def getPath(self, fileName):
         return self.resource.fileName(fileName)
 
-    # myfingershurt: still need this fileexists function:
     def fileExists(self, fileName):
         fileName = self.resource.fileName(fileName)
         return os.path.exists(fileName)
 
-
-# MFH - acceptSound and selectSound will now be merged into either 10
-# random sounds or just the acceptSound as a fallback:
+    # acceptSound and selectSound will now be merged into either 10 random
+    # sounds or just the acceptSound as a fallback
     def getAcceptSound(self):
-        """@return: A randomly chosen selection sound."""
+        """Return a randomly chosen selection sound."""
         return random.choice(self.acceptSounds)
 
     acceptSound = property(getAcceptSound)
 
     def getBackSound(self):
-        """@return: A randomly chosen selection sound."""
+        """Return a randomly chosen selection sound."""
         return random.choice(self.cancelSounds)
 
     cancelSound = property(getBackSound)
 
     def getSelectSound(self):
-        """@return: A randomly chosen selection sound."""
+        """Return a randomly chosen selection sound."""
         return random.choice([self.selectSound1, self.selectSound2, self.selectSound3])
 
     selectSound = property(getSelectSound)
 
     def getScrewUpSound(self):
-        """@return: A randomly chosen screw-up sound."""
+        """Return a randomly chosen screw-up sound."""
         return random.choice(self.screwUpsounds)
 
     def getScrewUpSoundBass(self):
-        """@return: A randomly chosen screw-up sound."""
+        """Return a randomly chosen screw-up sound (bass)."""
         return random.choice(self.screwUpsoundsBass)
 
-    # myfingershurt: drums screw up sounds
     def getScrewUpSoundDrums(self):
-        """@return: A randomly chosen screw-up sound."""
+        """Return a randomly chosen screw-up sound (drums)."""
         return random.choice(self.screwUpsoundsDrums)
 
     screwUpSound = property(getScrewUpSound)
     screwUpSoundBass = property(getScrewUpSoundBass)
-    # myfingershurt: drum screw up sounds
     screwUpSoundDrums = property(getScrewUpSoundDrums)
 
     def essentialResourcesLoaded(self):
-        """return: True if essential resources such as the font have been loaded."""
+        """Return True if essential resources such as the font have been loaded."""
         return bool(self.font and self.bigFont)
 
     def resourcesLoaded(self):
-        """return: True if all the resources have been loaded."""
+        """Return True if all the resources have been loaded."""
         return None not in self.__dict__.values()
