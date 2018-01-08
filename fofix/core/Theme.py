@@ -872,10 +872,10 @@ class ThemeLobby:
                 drawImage(lobby.img_panel, scale = (self.theme.lobbyPanelSize[0], -self.theme.lobbyPanelSize[1]), coord = (wP*.5+w*x,hP*.5+h*y), stretched = FULL_SCREEN)
             if i == lobby.keyControl and lobby.img_keyboard:
                 drawImage(lobby.img_keyboard, scale = (self.theme.lobbyKeyboardImgScale, -self.theme.lobbyKeyboardImgScale), coord = (wP*self.theme.lobbyKeyboardImgPos[0]+w*x, hP*self.theme.lobbyKeyboardImgPos[1]+h*y))
-            controlFont.render(lobby.controls[j], (self.theme.lobbyPanelSize[0]*self.theme.lobbyControlPos[0]+x, self.theme.lobbyPanelSize[1]*self.theme.lobbyControlPos[1]+y), scale = self.theme.lobbyControlScale, align = self.theme.lobbyControlAlign, new = True)
+            controlFont.render(lobby.controls[j], (self.theme.lobbyPanelSize[0]*self.theme.lobbyControlPos[0]+x, self.theme.lobbyPanelSize[1]*self.theme.lobbyControlPos[1]+y), scale = self.theme.lobbyControlScale, align = self.theme.lobbyControlAlign)
             self.drawPartImage(lobby, lobby.types[j], scale = (self.theme.lobbyPartScale, -self.theme.lobbyPartScale), coord = (wP*self.theme.lobbyPartPos[0]+w*x, hP*self.theme.lobbyPartPos[1]+h*y))
             #self.drawControlImage(lobby, lobby.types[j], scale = (self.theme.lobbyControlImgScale, -self.theme.lobbyControlImgScale), coord = (wP*self.theme.lobbyControlImgPos[0]+w*x, hP*self.theme.lobbyControlImgPos[1]+h*y))
-            panelNameFont.render(lobby.options[lobby.selected[j]].lower(), (x+w*self.theme.lobbyPanelNamePos[0], y+h*self.theme.lobbyPanelNamePos[1]), scale = self.theme.lobbyPanelNameScale, align = self.theme.lobbyPanelNameAlign, new = True)
+            panelNameFont.render(lobby.options[lobby.selected[j]].lower(), (x+w*self.theme.lobbyPanelNamePos[0], y+h*self.theme.lobbyPanelNamePos[1]), scale = self.theme.lobbyPanelNameScale, align = self.theme.lobbyPanelNameAlign)
             for l, k in enumerate(range(lobby.pos[j][0], lobby.pos[j][1]+1)):
                 if k >= len(lobby.options):
                     break
@@ -898,9 +898,9 @@ class ThemeLobby:
                         drawImage(lobby.img_save_char, scale = (.5, -.5), coord = (wP*.5+w*x, hP*(.46*.75)+h*y-(h*.04*l)/.75))
                     else:
                         glColor3f(*self.theme.lobbySaveCharColor)
-                        lobby.fontDict[self.theme.lobbySaveCharFont].render(lobby.options[k], (self.theme.lobbyPanelSize[0]*self.theme.lobbyOptionPos[0]+x,self.theme.lobbyPanelSize[1]*self.theme.lobbyOptionPos[1]+y+self.theme.lobbyOptionSpace*l), scale = self.theme.lobbySaveCharScale, align = self.theme.lobbySaveCharAlign, new = True)
+                        lobby.fontDict[self.theme.lobbySaveCharFont].render(lobby.options[k], (self.theme.lobbyPanelSize[0]*self.theme.lobbyOptionPos[0]+x,self.theme.lobbyPanelSize[1]*self.theme.lobbyOptionPos[1]+y+self.theme.lobbyOptionSpace*l), scale = self.theme.lobbySaveCharScale, align = self.theme.lobbySaveCharAlign)
                 else:
-                    optionFont.render(lobby.options[k], (self.theme.lobbyPanelSize[0]*self.theme.lobbyOptionPos[0]+x,self.theme.lobbyPanelSize[1]*self.theme.lobbyOptionPos[1]+y+self.theme.lobbyOptionSpace*l), scale = self.theme.lobbyOptionScale, align = self.theme.lobbyOptionAlign, new = True)
+                    optionFont.render(lobby.options[k], (self.theme.lobbyPanelSize[0]*self.theme.lobbyOptionPos[0]+x,self.theme.lobbyPanelSize[1]*self.theme.lobbyOptionPos[1]+y+self.theme.lobbyOptionSpace*l), scale = self.theme.lobbyOptionScale, align = self.theme.lobbyOptionAlign)
             x += self.theme.lobbyPanelSpacing
 
 class ThemeParts:
@@ -942,8 +942,8 @@ class ThemeParts:
                 drawImage(dialog.img_panel, scale = (self.theme.partDiffPanelSize[0], -self.theme.partDiffPanelSize[1]), coord = (wP*.5+w*x,hP*.5+h*y), stretched = FULL_SCREEN)
             if i == dialog.keyControl and dialog.img_keyboard:
                 drawImage(dialog.img_keyboard, scale = (self.theme.partDiffKeyboardImgScale, -self.theme.partDiffKeyboardImgScale), coord = (wP*self.theme.partDiffKeyboardImgPos[0]+w*x, hP*self.theme.partDiffKeyboardImgPos[1]+h*y))
-            controlFont.render(dialog.players[i].name, (self.theme.partDiffPanelSize[0]*self.theme.partDiffControlPos[0]+x, self.theme.partDiffPanelSize[1]*self.theme.partDiffControlPos[1]+y), scale = self.theme.partDiffControlScale, align = self.theme.partDiffControlAlign, new = True)
-            panelNameFont.render(dialog.players[i].name.lower(), (x+w*self.theme.partDiffPanelNamePos[0], y+h*self.theme.partDiffPanelNamePos[1]), scale = self.theme.partDiffPanelNameScale, align = self.theme.partDiffPanelNameAlign, new = True)
+            controlFont.render(dialog.players[i].name, (self.theme.partDiffPanelSize[0]*self.theme.partDiffControlPos[0]+x, self.theme.partDiffPanelSize[1]*self.theme.partDiffControlPos[1]+y), scale = self.theme.partDiffControlScale, align = self.theme.partDiffControlAlign)
+            panelNameFont.render(dialog.players[i].name.lower(), (x+w*self.theme.partDiffPanelNamePos[0], y+h*self.theme.partDiffPanelNamePos[1]), scale = self.theme.partDiffPanelNameScale, align = self.theme.partDiffPanelNameAlign)
             if dialog.mode[i] == 0:
                 self.drawPartImage(dialog, dialog.parts[i][dialog.selected[i]].id, scale = (self.theme.partDiffPartScale, -self.theme.partDiffPartScale), coord = (wP*self.theme.partDiffPartPos[0]+w*x, hP*self.theme.partDiffPartPos[1]+h*y))
                 for p in range(len(dialog.parts[i])):
@@ -953,7 +953,7 @@ class ThemeParts:
                         glColor3f(*self.theme.partDiffSelectedColor)
                     else:
                         glColor3f(*self.theme.partDiffOptionColor)
-                    font.render(str(dialog.parts[i][p]), (.2*.5+x,.8*.46+y+.04*p), scale = .001, align = 1, new = True)
+                    font.render(str(dialog.parts[i][p]), (.2*.5+x,.8*.46+y+.04*p), scale = .001, align = 1)
             elif dialog.mode[i] == 1:
                 self.drawPartImage(dialog, dialog.players[i].part.id, scale = (self.theme.partDiffPartScale, -self.theme.partDiffPartScale), coord = (wP*self.theme.partDiffPartPos[0]+w*x, hP*self.theme.partDiffPartPos[1]+h*y))
                 for d in range(len(dialog.info.partDifficulties[dialog.players[i].part.id])):
@@ -963,7 +963,7 @@ class ThemeParts:
                         glColor3f(*self.theme.partDiffSelectedColor)
                     else:
                         glColor3f(*self.theme.partDiffOptionColor)
-                    font.render(str(dialog.info.partDifficulties[dialog.players[i].part.id][d]), (.2*.5+x,.8*.46+y+.04*d), scale = .001, align = 1, new = True)
+                    font.render(str(dialog.info.partDifficulties[dialog.players[i].part.id][d]), (.2*.5+x,.8*.46+y+.04*d), scale = .001, align = 1)
                 if i in dialog.readyPlayers:
                     if dialog.img_ready:
                         drawImage(dialog.img_ready, scale = (.5, -.5), coord = (wP*.5+w*x,hP*(.75*.46)+h*y))

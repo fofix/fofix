@@ -112,9 +112,6 @@ class Font:
 
         return (w * scale * self.aspectRatioFactor, h * scale)
 
-    def loadCache(self):
-        pass
-
     def scaleText(self, text, maxwidth, scale=DEFAULT_SCALE):
         """
         Return scaling factor needed to fit text within maxwidth
@@ -153,15 +150,6 @@ class Font:
         """
         return self.font.get_descent() * self.scale * scale
 
-    def setCustomGlyph(self, character, texture):
-        """
-        Replace a character with a texture.
-
-        @param character:   Character to replace
-        @param texture:     L{Texture} instance
-        """
-        pass
-
     def drawSquare(self, w, h, tw, th):
         """
         New drawing relaying only on pygame.font.render
@@ -178,7 +166,7 @@ class Font:
         self.square_tex[1, 0] = self.square_tex[3, 0] = tw
         cmgl.drawArrays(GL_TRIANGLE_STRIP, vertices=self.square_prim, texcoords=self.square_tex)
 
-    def render(self, text, pos=(0, 0), rotate=0, scale=DEFAULT_SCALE, shadowoffset=(.0022, .0005), align=LEFT, new=False, shadow=False, outline=False, shadowOpacity=1.0):
+    def render(self, text, pos=(0, 0), rotate=0, scale=DEFAULT_SCALE, shadowoffset=(.0022, .0005), align=LEFT, shadow=False, outline=False, shadowOpacity=1.0):
         """
         Draw some text.
 
