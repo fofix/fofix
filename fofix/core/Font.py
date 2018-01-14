@@ -20,9 +20,8 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,        #
 # MA  02110-1301, USA.                                              #
 #####################################################################
-from __future__ import with_statement
 
-import sys
+from __future__ import with_statement
 
 from OpenGL.GL import *
 import numpy as np
@@ -80,14 +79,10 @@ class Font:
         self.aspectRatioFactor = (4.0 / 3.0) / aspectRatio
 
         # Try loading a system font first if one was requested
-        self.font           = None
-        if systemFont and sys.platform != "win32":
-            try:
-                self.font       = pygame.font.SysFont(None, size)
-            except:
-                pass
-        if not self.font:
-            self.font         = pygame.font.Font(fileName, size)
+        if systemFont:
+            self.font = pygame.font.SysFont(None, size)
+        else:
+            self.font = pygame.font.Font(fileName, size)
         self.font.set_bold(bold)
         self.font.set_italic(italic)
         self.font.set_underline(underline)
