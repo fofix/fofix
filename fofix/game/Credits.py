@@ -145,7 +145,7 @@ class Credits(Layer, KeyListener):
         self.bank['honorary']   = [_("Honorary Credits")]
         self.bank['codeHonor']  = [_("Without whom this game would not exist")]
         self.bank['giveThanks'] = [_("Special Thanks to")]
-        self.bank['community']  = [_("nwru and all of the community at fretsonfire.net")]
+        self.bank['community']  = [_("nwru and all of the community at https://fretsonfire.org")]
         self.bank['other']      = [_("Other Contributors:")]
         self.bank['tutorial']   = [_("Jurgen FoF tutorial inspired by adam02"),
                                    _("Drum test song tutorial by Heka"),

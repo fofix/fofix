@@ -98,7 +98,7 @@ def _init_allthemes():
         defaultTheme = themes[0]    #myfingershurt
 
     #myfingershurt: default theme must be an existing one!
-    Config.define("coffee", "themename",           str,   defaultTheme,      text = _("Theme"),                options = dict([(str(themes[n]),themes[n]) for n in range(0, i)]), tipText = _("Sets the overall graphical feel of the game. You can find and download many more at fretsonfire.net"))
+    Config.define("coffee", "themename",           str,   defaultTheme,      text = _("Theme"),                options = dict([(str(themes[n]),themes[n]) for n in range(0, i)]), tipText = _("Sets the overall graphical feel of the game. You can find and download many more at https://fretsonfire.org"))
 _init_allthemes()
 
 Player.loadControls()

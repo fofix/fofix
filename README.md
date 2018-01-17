@@ -12,7 +12,7 @@ This is Frets on Fire X, a highly customizable rhythm game supporting many modes
 - repository: http://github.com/fofix/fofix
 - IRC: #fofix on oftc.net ([web interface](https://webchat.oftc.net/))
 - Gitter: [web interface](https://gitter.im/fofix/fofix)
-- unofficial forum: http://www.fretsonfire.net/forums/viewforum.php?f=32
+- unofficial forum: https://www.fretsonfire.org/forums/viewforum.php?f=32
 
 
 Setup

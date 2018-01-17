@@ -4,7 +4,7 @@ Themes
 Additional themes
 -----------------
 
-You can find a list of additional themes for FoFiX on the `forum <http://www.fretsonfire.net/forums/viewtopic.php?f=32&t=24976>`_.
+You can find a list of additional themes for FoFiX on the `forum <https://www.fretsonfire.org/forums/viewtopic.php?f=32&t=24976>`_.
 
 
 Installation
