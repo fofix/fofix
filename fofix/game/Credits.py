@@ -24,11 +24,11 @@
 #####################################################################
 
 from __future__ import with_statement
+import logging
 import os
 import sys
 
 from OpenGL.GL import OpenGL, glColor4f, glTranslatef
-from fretwork import log
 import pygame
 
 from fofix.core import Config
@@ -40,6 +40,9 @@ from fofix.core.Language import _
 from fofix.core.VideoPlayer import VideoLayer, VideoPlayerError
 from fofix.core.View import Layer
 from fofix.core.constants import *
+
+
+log = logging.getLogger(__name__)
 
 
 class Element:

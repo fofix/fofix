@@ -1,5 +1,5 @@
 #####################################################################
-# -*- coding: iso-8859-1 -*-                                        #
+# -*- coding: utf-8 -*-                                             #
 #                                                                   #
 # Frets on Fire                                                     #
 # Copyright (C) 2006 Sami Kyöstilä                                  #
@@ -21,13 +21,15 @@
 #####################################################################
 
 from __future__ import division
+import logging
 
 import pygame
 from PIL import Image
 from OpenGL.GL import *
 from OpenGL.GLU import *
 
-from fretwork import log
+
+log = logging.getLogger(__name__)
 
 
 class TextureException(Exception):
@@ -88,7 +90,7 @@ class Texture:
                 log.warn("Unsupported image mode '%s' converted to 'RGB'. May have unexpected results." % image.mode)
                 string = image.tobytes('raw', 'RGB', 0, -1)
                 self.loadRaw(image.size, string, GL_RGB, 3)
-            except:
+            except Exception:
                 raise TextureException("Unsupported image mode '%s'" % image.mode)
 
     def nextPowerOfTwo(self, n):

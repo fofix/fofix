@@ -23,17 +23,16 @@
 #####################################################################
 
 from __future__ import with_statement
-
 import gc
+import logging
 import threading
 
 from OpenGL.GL import glColor3f
 
-from fretwork import log
-
 from fofix.core.View import Layer
 
 
+log = logging.getLogger(__name__)
 
 
 class DebugLayer(Layer):

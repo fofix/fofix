@@ -1,5 +1,5 @@
 #####################################################################
-# -*- coding: iso-8859-1 -*-                                        #
+# -*- coding: utf-8 -*-                                             #
 #                                                                   #
 # Frets on Fire                                                     #
 # Copyright (C) 2006 Sami Kyöstilä                                  #
@@ -24,15 +24,19 @@
 # MA  02110-1301, USA.                                              #
 #####################################################################
 
-import pygame
+import logging
 
-from fretwork import log
+import pygame
 
 from fofix.core.Language import _
 from fofix.core import Microphone  #stump
 from fofix.core import Config
 from fofix.game import song
 from fofix.core import VFS
+
+
+log = logging.getLogger(__name__)
+
 
 class ConfigOption:
     def __init__(self, id, text):
@@ -53,7 +57,7 @@ class ConfigOption:
                 return 0
             else:
                 return -1
-        except:
+        except Exception:
             return -1
 
 def sortOptionsByKey(dict):
@@ -248,7 +252,7 @@ try:
     v = _playerDB.execute("SELECT `value` FROM `config` WHERE `key` = 'version'").fetchone()[0]
     if int(v) != _SCHEMA_VERSION:
         _updateTables = 2 #an old version. We don't want to just burn old tables.
-except:
+except Exception:
     _updateTables = 1 #no good table
 if _updateTables > 0: #needs to handle old versions eventually.
     for tbl in _playerDB.execute("SELECT `name` FROM `sqlite_master` WHERE `type` = 'table'").fetchall():
@@ -325,7 +329,7 @@ def savePlayers():
             c.set("player","controller",int(pref[11]))
             del c
             _playerDB.execute('UPDATE `players` SET `changed` = 0 WHERE `name` = ?', [pref[0]])
-        except:
+        except Exception:
             c = VFS.open(_makePlayerIniName(str(pref[0])), "w")
             c.close()
             c = Config.load(VFS.resolveWrite(_makePlayerIniName(str(pref[0]))), type = 2)
@@ -349,7 +353,7 @@ def updatePlayer(player, pref):
     a = _playerDB.execute('SELECT * FROM `players` WHERE `name` = ?', [player]).fetchone()
     try:
         a = a[0]
-    except:
+    except Exception:
         a = None
     if a is not None:
         _playerDB.execute('UPDATE `players` SET `name` = ?, `lefty` = ?, `drumflip` = ?, `autokick` = ?, `assist` = ?, `twochord` = ?, `necktype` = ?, `neck` = ?, \
@@ -556,7 +560,7 @@ class Controls:
                 return "None"
             try:
                 return int(k)
-            except:
+            except Exception:
                 return getattr(pygame, k)
 
         self.controlMapping = {}
@@ -738,7 +742,7 @@ class Controls:
                     else:
                         return name + " " + guitarkeynames[j]
             else:
-                log.notice("Key value not found.")
+                log.info("Key value not found.")
                 return "Error"
 
         if self.keyCheckerMode == 0:
@@ -806,7 +810,7 @@ def isKeyMappingOK(config, start):
             return None
         try:
             return int(k)
-        except:
+        except Exception:
             return getattr(pygame, k)
 
     # list of keys to look for

@@ -23,19 +23,22 @@
 # MA  02110-1301, USA.                                              #
 #####################################################################
 
+import logging
 import os
 import glob
 import random
 
-from fretwork import log
 from fretwork.audio import Sound
 
 from fofix.core.Font import Font
 from fofix.core.Image import ImgDrawing
-
 from fofix.core import Config
 from fofix.core import Version
 from fofix.core import Player
+
+
+log = logging.getLogger(__name__)
+
 
 # these constants define a few customized letters in the default font
 # MFH - with the new simplified Font.py, no more custom glyphs... let's do
@@ -440,9 +443,9 @@ class Data(object):
             fileName1 = os.path.join(dataPath, fileName)
             if self.logLoadings == 1:
                 if openImage:
-                    log.notice("Trying to load image: %s" % fileName1)
+                    log.info("Trying to load image: %s" % fileName1)
                 else:
-                    log.notice("Checking image: %s" % fileName1)
+                    log.info("Checking image: %s" % fileName1)
             # check if fileName1 exists (has extension)
             if os.path.exists(fileName1):
                 if openImage:
@@ -458,7 +461,7 @@ class Data(object):
             else:
                 # find extension
                 fileName1 = os.path.splitext(fileName1)[0]
-                
+
                 # glob parses [] but those are legal chars on Windows, so we must escape them.
                 # it must be done like this so replacements are not mangled
                 # by other replacements.

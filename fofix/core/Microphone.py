@@ -1,5 +1,5 @@
 #####################################################################
-# -*- coding: iso-8859-1 -*-                                        #
+# -*- coding: utf-8 -*-                                             #
 #                                                                   #
 # Frets on Fire X (FoFiX)                                           #
 # Copyright (C) 2009 Team FoFiX                                     #
@@ -21,14 +21,16 @@
 # MA  02110-1301, USA.                                              #
 #####################################################################
 
+import logging
 import math
-import numpy as np
 
-from fretwork import log
+import numpy as np
 from fretwork.task import Task
 from fretwork.audio import MicrophonePassthroughStream
 
 from fofix.core.Language import _
+
+log = logging.getLogger(__name__)
 
 try:
     import pyaudio
@@ -114,7 +116,7 @@ if supported:
                     chunk = self.mic.read(1024)
                 except IOError as e:
                     if e.args[1] == pyaudio.paInputOverflowed:
-                        log.notice('Microphone: ignoring input buffer overflow')
+                        log.info('Microphone: ignoring input buffer overflow')
                         chunk = '\x00' * 4096
                     else:
                         raise

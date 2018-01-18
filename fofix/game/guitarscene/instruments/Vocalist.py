@@ -1,5 +1,5 @@
 #####################################################################
-# -*- coding: iso-8859-1 -*-                                        #
+# -*- coding: utf-8 -*-                                             #
 #                                                                   #
 # Frets on Fire X (FoFiX)                                           #
 # Copyright (C) 2009 Team FoFiX                                     #
@@ -22,13 +22,12 @@
 #####################################################################
 
 from random import random
+import logging
 import os
 
 from PIL import Image, ImageDraw
 import OpenGL.GL as gl
 import numpy as np
-
-from fretwork import log
 
 from fofix.core.Microphone import Microphone
 from fofix.core.Image import ImgDrawing, drawImage
@@ -36,8 +35,12 @@ from fofix.game.song import VocalNote
 from fofix.core.constants import *
 from fofix.core.Language import _
 from fofix.core import cmgl
+
+
+log = logging.getLogger(__name__)
 diffMod    = {0: 1.4, 1: 1.6, 2: 1.75, 3: 1.9}
 baseScores = {0: 1000, 1: 800, 2: 400, 3: 200}
+
 
 class Vocalist:
     def __init__(self, engine, playerObj, scene, player = 0):
@@ -215,7 +218,7 @@ class Vocalist:
                                  outline=(0, 0, 0, 0), fill=(0, 0, 0, 0))
                     dispOverlay = ImgDrawing(self.engine.data.svg, overlay)
                     self.drawnVocalOverlays[degrees] = dispOverlay
-            except:
+            except Exception:
                 log.error('Could not prebuild vocal overlay textures: ')
                 self.vocalContinuousAvailable = False
 

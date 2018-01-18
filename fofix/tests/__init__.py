@@ -4,5 +4,5 @@ from fretwork import log
 
 
 # set log file
-fp = tempfile.TemporaryFile()
-log.setLogfile(fp)
+fp = tempfile.NamedTemporaryFile(delete=True)
+log.configure(fp.name)

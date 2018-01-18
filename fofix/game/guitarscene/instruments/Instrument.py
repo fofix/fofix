@@ -1,5 +1,5 @@
 #####################################################################
-# -*- coding: iso-8859-1 -*-                                        #
+# -*- coding: utf-8 -*-                                             #
 #                                                                   #
 # Frets on Fire                                                     #
 # Copyright (C) 2009 Blazingamer                                    #
@@ -20,13 +20,12 @@
 # MA  02110-1301, USA.                                              #
 #####################################################################
 
+import logging
 import math
 import os
 
 import OpenGL.GL as gl
 import numpy as np
-
-from fretwork import log
 
 from fofix.game.song import Note, Tempo, \
     MarkerNote, FREESTYLE_MARKING_NOTE
@@ -34,6 +33,9 @@ from fofix.core.Image import draw3Dtex
 from fofix.core.Shader import shaders
 from fofix.core.Mesh import Mesh
 from fofix.core import cmgl
+
+
+log = logging.getLogger(__name__)
 
 
 class Instrument(object):

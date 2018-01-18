@@ -1,5 +1,5 @@
 #####################################################################
-# -*- coding: iso-8859-1 -*-                                        #
+# -*- coding: utf-8 -*-                                             #
 #                                                                   #
 # Frets on Fire X (FoFiX)                                           #
 # Copyright (C) 2006 Sami Kyöstilä                                  #
@@ -23,6 +23,7 @@
 # MA  02110-1301, USA.                                              #
 #####################################################################
 
+import logging
 import os
 import sys
 import imp
@@ -31,8 +32,6 @@ import math
 
 from OpenGL.GL import *
 from OpenGL.GLU import *
-
-from fretwork import log
 from fretwork.task import Task
 
 from fofix.core import Version
@@ -41,6 +40,9 @@ from fofix.core.Language import _
 from fofix.core.Shader import shaders
 from fofix.core.Image import drawImage
 from fofix.core.constants import *
+
+
+log = logging.getLogger(__name__)
 
 #Theme Constants.
 GUITARTYPES = [0, 1, 4]
@@ -62,7 +64,7 @@ def halign(value, default='center'):
 def valign(value, default='middle'):
     try:
         if value.lower() == 'center':
-            log.notice('Use of "center" for vertical alignment is deprecated. Use "middle" instead.')
+            log.info('Use of "center" for vertical alignment is deprecated. Use "middle" instead.')
         return {'top':    TOP,
                 'middle': MIDDLE,  # for consistency with HTML/CSS terminology
                 'center': MIDDLE,  # for temporary backward compatibility
@@ -124,7 +126,7 @@ class Theme(Task):
         if not os.path.exists(self.themePath):
             log.warn("Theme: %s does not exist!\n" % self.themePath)
             name = Config.get("coffee", "themename")
-            log.notice("Theme: Attempting fallback to default theme \"%s\"." % name)
+            log.info("Theme: Attempting fallback to default theme \"%s\"." % name)
             self.themePath = os.path.join(Version.dataPath(),"themes", name)
             if not os.path.exists(self.themePath):
                 log.error("Theme: %s does not exist!\nExiting.\n" % self.themePath)

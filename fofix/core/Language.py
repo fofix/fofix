@@ -1,5 +1,5 @@
 #####################################################################
-# -*- coding: iso-8859-1 -*-                                        #
+# -*- coding: utf-8 -*-                                             #
 #                                                                   #
 # Frets on Fire                                                     #
 # Copyright (C) 2006 Sami Kyöstilä                                  #
@@ -19,18 +19,21 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,        #
 # MA  02110-1301, USA.                                              #
 #####################################################################
+
 from __future__ import print_function
 from __future__ import division
 from __future__ import absolute_import
 
 import gettext
 import glob
+import logging
 import os
-
-from fretwork import log
 
 from fofix.core import Version
 from fofix.core import Config
+
+
+log = logging.getLogger(__name__)
 
 
 def getAvailableLanguages():
