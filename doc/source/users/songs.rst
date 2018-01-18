@@ -36,7 +36,7 @@ Tools
 
 Some tools will help you creating a song for FoFiX:
 
-- `EOF <http://www.t3-i.com/pages/project.php?id=eof>`_ - `unofficial guide <http://www.fretsonfire.net/forums/viewtopic.php?t=1938>`_
+- `EOF <http://www.t3-i.com/pages/project.php?id=eof>`_ - `unofficial guide <https://www.fretsonfire.org/forums/viewtopic.php?f=34&t=1938>`_
 
 
 INI file
