@@ -27,8 +27,9 @@
 Main game executable.
 '''
 
-# DO NOT GROUP IMPORTS!
+# DO NOT GROUP IMPORTS!  DO NOT REORGANIZE THIS FILE!
 # Imports are sprinkled throughout this file, and they must stay where they are!
+# Everything in this file has been carefully arranged to init the system properly.
 
 import argparse
 import sys
@@ -70,19 +71,10 @@ if 'Darwin' in platform.platform():
 if os.name == 'nt' and not hasattr(sys, 'frozen'):
     os.environ['PATH'] = os.path.abspath(os.path.join('.', 'win32', 'deps', 'bin')) + os.pathsep + os.environ['PATH']
 
-def disable_gl_checks():
-    assert 'OpenGL' not in sys.modules
 
-    import OpenGL
-    if OpenGL.__version__ >= '3':
-        OpenGL.ERROR_CHECKING = False
-        OpenGL.ARRAY_SIZE_CHECKING = False
-        OpenGL.ERROR_ON_COPY = True
-        OpenGL.FORWARD_COMPATIBLE_ONLY = True
-        OpenGL.SIZE_1_ARRAY_UNPACK = False
-        OpenGL.STORE_POINTERS = False
-
-
+## 
+## Parse command-line args
+##
 def cmd_args():
     parser = argparse.ArgumentParser(description='Frets On Fire X (FoFiX)')
     # Where the name automatically assigned to the metavar option is to long i used x in its place.
@@ -101,24 +93,37 @@ def cmd_args():
 
 _cmd_args = cmd_args()
 
-# Disable pyOpenGL error checking if we are not asked for it.
-# This must be before *anything* that may import pyOpenGL!
+
+##
+## Disable pyOpenGL error checking if we are not asked for it.
+## This must be before *anything* that may import pyOpenGL!
+##
+def disable_gl_checks():
+    assert 'OpenGL' not in sys.modules
+
+    import OpenGL
+    if OpenGL.__version__ >= '3':
+        OpenGL.ERROR_CHECKING = False
+        OpenGL.ARRAY_SIZE_CHECKING = False
+        OpenGL.ERROR_ON_COPY = True
+        OpenGL.FORWARD_COMPATIBLE_ONLY = True
+        OpenGL.SIZE_1_ARRAY_UNPACK = False
+        OpenGL.STORE_POINTERS = False
+
 if not _cmd_args['gl_error_check']:
     disable_gl_checks()
 
-import traceback
-
-import pygame
 
 import fretwork
-
 from fretwork import log
 
 from fofix.core import Version
 from fofix.core import VFS
 
-# setup the logfile
-# logfile in ~/.fofix/ for GNU/Linux and MacOS X
+
+##
+## Init logging system.
+##
 if os.name == "posix":
     # Under MacOS X, put the logs in ~/Library/Logs
     if os.uname()[0] == "Darwin":
@@ -130,6 +135,10 @@ else:
 log.configure(logfile)
 logger = logging.getLogger(__name__)
 
+
+##
+## Verify lib fretwork is available.
+##
 fretworkRequired = (0, 3, 0)
 reqVerStr = '.'.join([str(i) for i in fretworkRequired])
 fretworkErrorStr = '''
@@ -152,15 +161,35 @@ else:
     fwErrStr = fretworkErrorStr.format(version, reqVerStr)
     raise RuntimeError(fwErrStr)
 
-from fofix.core.VideoPlayer import VideoLayer, VideoPlayerError
-from fofix.core.GameEngine import GameEngine
-from fofix.game.MainMenu import MainMenu
-from fofix.core.Language import _
+
+##
+## Load global app config
+##
 from fofix.core import Config
 
-# PIL doesn't init correctly when inside py2exe, so here we kick it in butt.
-# Web search results all point to this solution:
-# http://www.py2exe.org/index.cgi/py2exeAndPIL
+def load_config(configPath=None):
+    ''' Load the global configuration file. '''
+    if configPath is None:
+        # Use default configuration file
+        configPath = os.path.join(VFS.getWritableResourcePath(), Version.PROGRAM_UNIXSTYLE_NAME + ".ini")
+    else:
+        if configPath.lower() == "reset":
+            # 'reset' can be passed in from command line
+            configPath = os.path.join(VFS.getWritableResourcePath(), Version.PROGRAM_UNIXSTYLE_NAME + ".ini")
+    
+            # Get os specific location of config file, and remove it.
+            os.remove(configPath)
+
+    Config.load(configPath, setAsDefault=True)
+
+load_config()
+
+
+##
+## Hack to fix PIL.
+## PIL doesn't init correctly when inside py2exe, so here we force load it.
+## http://www.py2exe.org/index.cgi/py2exeAndPIL
+##
 import PIL.Image
 import PIL.BmpImagePlugin
 import PIL.GifImagePlugin
@@ -169,6 +198,19 @@ import PIL.MpoImagePlugin
 import PIL.PpmImagePlugin
 import PIL.TiffImagePlugin
 import PIL.PngImagePlugin
+
+
+## --------------------------------------------------------- ##
+
+
+import traceback
+import pygame
+
+from fofix.core.VideoPlayer import VideoLayer, VideoPlayerError
+from fofix.core.GameEngine import GameEngine
+from fofix.game.MainMenu import MainMenu
+from fofix.core.Language import _
+
 
 class Main():
     def __init__(self):
@@ -181,56 +223,29 @@ class Main():
         self.theme = self.args['theme']
 
         # load config
-        self.config = self.load_config(self.configFile)
+        self.config = Config.config
 
         # allow support for manipulating fullscreen via CLI
         if self.fullscreen is not None:
-            Config.set("video", "fullscreen", self.fullscreen)
+            self.config.set("video", "fullscreen", self.fullscreen)
 
         # change resolution from CLI
         if self.resolution is not None:
-            Config.set("video", "resolution", self.resolution)
+            self.config.set("video", "resolution", self.resolution)
 
         # alter theme from CLI
         if self.theme is not None:
-            Config.set("coffee", "themename", self.theme)
+            self.config.set("coffee", "themename", self.theme)
 
         self.engine = GameEngine(self.config)
 
         self.videoLayer = False
         self.restartRequested = False
 
-    @staticmethod
-    def load_config(configPath):
-        ''' Load the configuration file. '''
-        if configPath is not None:
-            if configPath.lower() == "reset":
-
-                # Get os specific location of config file, and remove it.
-                fileName = os.path.join(VFS.getWritableResourcePath(), Version.PROGRAM_UNIXSTYLE_NAME + ".ini")
-                os.remove(fileName)
-
-                # Recreate it
-                config = Config.load(Version.PROGRAM_UNIXSTYLE_NAME + ".ini", setAsDefault=True)
-
-            else:
-                # Load specified config file
-                config = Config.load(configPath, setAsDefault=True)
-        else:
-            # Use default configuration file
-            config = Config.load(Version.PROGRAM_UNIXSTYLE_NAME + ".ini", setAsDefault=True)
-
-        return config
-
-    def restart(self):
-        logger.info("Restarting.")
-        self.engine.audio.close()
-        self.restartRequested = True
-
     def run(self):
         # Perhapse this could be implemented in a better way...
         # Play the intro video if it is present, we have the capability
-        themename = Config.get("coffee", "themename")
+        themename = self.config.get("coffee", "themename")
         vidSource = os.path.join(Version.dataPath(), 'themes', themename, 'menu', 'intro.ogv')
         if os.path.isfile(vidSource):
             try:
@@ -252,18 +267,16 @@ class Main():
 
         # Run the main game loop.
         try:
+            self.restartRequested = False
             self.engine.ticksAtStart = pygame.time.get_ticks()
             while self.engine.run():
                 pass
+            self.restartRequested = self.engine.restartRequested
         except KeyboardInterrupt:
             logger.info("Left mainloop due to KeyboardInterrupt.")
             # don't reraise
 
-        # Restart the program if the engine is asking that we do so.
-        if self.engine.restartRequested:
-            self.restart()
-
-        # evilynux - MainMenu class already calls this - useless?
+        # Shutdown engine. Needed even if restarting.
         self.engine.quit()
 
 
