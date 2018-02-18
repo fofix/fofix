@@ -1411,7 +1411,7 @@ class Instrument(object):
         if (not self.openStarNotesInView) and (not self.starNotesInView) and self.finalStarSeen:
             self.spEnabled = True
             self.finalStarSeen = False
-            self.isStarPhrase = Fals
+            self.isStarPhrase = False
 
     #group rendering of 3D keys/frets into method
     def render3DKey(self, texture, model, x, y, color, fretNum, f):
