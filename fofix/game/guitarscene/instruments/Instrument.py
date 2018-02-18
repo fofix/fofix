@@ -325,19 +325,21 @@ class Instrument(object):
                                   [0,0,0,1]], dtype=np.float32)
 
         self.tail_vtx = np.array([[0, 0, 0],
-                                 [0, 0, 0],
-                                 [0, 0, 0],
-                                 [0, 0, 0]], dtype=np.float32)
+                                  [0, 0, 0],
+                                  [0, 0, 0],
+                                  [0, 0, 0]], dtype=np.float32)
 
-    #this checks to see if there is a "drum" or "bass" folder
-    #inside the subdirectory for image replacement
-    def checkPath(self, subdirectory, file, lastResort = False):
-    #  parameters
-    #     @subdirectory       the folder in the theme to search
-    #                           if the instrument is drum or bass it will extend this
-    #     @file               the file to search for
-    #     @lastResort         if the file isn't even found in the default path then
-    #                           resort to using the file in the data folder
+    def checkPath(self, subdirectory, file, lastResort=False):
+        """
+        Check if there is a "drum" or "bass" folder inside the subdirectory for
+        image replacement.
+
+        :param subdirectory: the folder in the theme to search
+                             if the instrument is drum or bass it will extend this
+        :param file: the file to search for
+        :param lastResort: if the file isn't even found in the default path then
+                           resort to using the file in the data folder
+        """
 
         #Get theme
         themename = self.engine.data.themeLabel
@@ -672,8 +674,8 @@ class Instrument(object):
                 possible = True
         return possible
 
-    #Renders the tail glow hitflame
     def renderHitTrails(self, controls):
+        """ Renders the tail glow hitflame """
         if self.hitGlowColors[0][0] == -1 or self.disableFlameSFX:
             return
 
@@ -765,8 +767,8 @@ class Instrument(object):
                                               vertex = (-vtx,-vtx,vtx,vtx), texcoord = (0.0,0.0,1.0,1.0),
                                               multiples = True, alpha = alphaEnabled, color = flamecol)
 
-    #renders the flames that appear when a note is struck
     def renderAnimatedFlames(self, song, pos):
+        """ Renders the flames that appear when a note is struck """
         if not song or self.flameColors[0][0] == -1:
             return
 
@@ -834,8 +836,8 @@ class Instrument(object):
                                                   texcoord = (texX[0],0.0,texX[1],1.0),  multiples = True,
                                                   alpha = alphaEnabled, color = (1,1,1))
 
-    #renders the flames that appear when a note is struck
     def renderFlames(self, song, pos):
+        """ Renders the flames that appear when a note is struck """
         if not song or self.flameColors[0][0] == -1:
             return
 
@@ -941,8 +943,8 @@ class Instrument(object):
 
                 event.flameCount += 1
 
-    #group rendering of 2D notes into method
     def render3DNote(self, texture, model, color, isTappable):
+        """ Group rendering of 2D notes into method """
         if (self.billboardNote):
             gl.glRotatef(self.camAngle + 90, 1, 0, 0)
         if texture:
@@ -1413,8 +1415,8 @@ class Instrument(object):
             self.finalStarSeen = False
             self.isStarPhrase = False
 
-    #group rendering of 3D keys/frets into method
     def render3DKey(self, texture, model, x, y, color, fretNum, f):
+        """ Group rendering of 3D keys/frets into method """
         gl.glPushMatrix()
         gl.glDepthMask(1)
         gl.glEnable(gl.GL_LIGHTING)
@@ -1540,11 +1542,12 @@ class Instrument(object):
                                     texcoord = (0.0, 0.0, 1.0, 1.0), vertex = (-size * f, -size * f, size * f, size * f),
                                     multiples = True, alpha = True, color = glowcol)
 
-    def renderTail(self, song, length, sustain, kill, color, tailOnly = False, isTappable = False, big = False, fret = 0, spNote = False, freestyleTail = 0, pos = 0):
-
-        #volshebnyi - if freestyleTail == 0, act normally.
-        #  if freestyleTail == 1, render an freestyle tail
-        #  if freestyleTail == 2, render highlighted freestyle tail
+    def renderTail(self, song, length, sustain, kill, color, tailOnly=False, isTappable=False, big=False, fret=0, spNote=False, freestyleTail=0, pos=0):
+        """
+        if freestyleTail == 0, act normally.
+        if freestyleTail == 1, render an freestyle tail
+        if freestyleTail == 2, render highlighted freestyle tail
+        """
 
         def project(beat):
             return 0.125 * beat / self.beatsPerUnit    # glorandwarf: was 0.12
