@@ -324,16 +324,17 @@ class Instrument(object):
                                   [0, 0, 0],
                                   [0, 0, 0]], dtype=np.float32)
 
-    def checkPath(self, subdirectory, file, lastResort=False):
+    def checkPath(self, subdirectory, s_file, lastResort=False):
         """
         Check if there is a "drum" or "bass" folder inside the subdirectory for
         image replacement.
 
         :param subdirectory: the folder in the theme to search
                              if the instrument is drum or bass it will extend this
-        :param file: the file to search for
+        :param s_file: the file to search for
         :param lastResort: if the file isn't even found in the default path then
                            resort to using the file in the data folder
+        :return: the path of the searched file.
         """
 
         # Get theme
@@ -346,19 +347,19 @@ class Instrument(object):
         elif self.isBassGuitar:
             themepath = os.path.join(themepath, "bass")
 
-        if self.engine.fileExists(os.path.join(themepath, file)):
-            return os.path.join(themepath, file)
+        if self.engine.fileExists(os.path.join(themepath, s_file)):
+            return os.path.join(themepath, s_file)
         else:
-            if lastResort and not self.engine.fileExists(os.path.join(defaultpath, file)):
-                return file
-            log.debug("Image not found: " + themepath + "/" + file)
-            return os.path.join(defaultpath, file)
+            if lastResort and not self.engine.fileExists(os.path.join(defaultpath, s_file)):
+                return s_file
+            log.debug("Image not found: " + os.path.join(themepath, s_file))
+            return os.path.join(defaultpath, s_file)
 
     def loadFlames(self):
         engine = self.engine
         themename = self.engine.data.themeLabel
 
-        get = lambda file: self.checkPath("flames", file)
+        get = lambda s_file: self.checkPath("flames", s_file)
 
         self.HCount = 0
         self.HFrameLimit = self.engine.theme.HoldFlameFrameLimit
@@ -393,7 +394,7 @@ class Instrument(object):
     def loadNotes(self):
         engine = self.engine
 
-        get = lambda file: self.checkPath("notes", file)
+        get = lambda s_file: self.checkPath("notes", s_file)
 
         self.noteSpin = self.engine.config.get("performance", "animated_notes")
 
@@ -476,7 +477,7 @@ class Instrument(object):
     def loadFrets(self):
         engine = self.engine
 
-        get = lambda file: self.checkPath("frets", file)
+        get = lambda s_file: self.checkPath("frets", s_file)
 
         if self.twoDkeys:
             engine.loadImgDrawing(self, "fretButtons", get("fretbuttons.png"))
@@ -504,8 +505,8 @@ class Instrument(object):
     def loadTails(self):
         engine = self.engine
 
-        get = lambda file: self.checkPath("tails", file)
-        getD = lambda file: self.checkPath("tails", file, True)  # resorts to checking data
+        get = lambda s_file: self.checkPath("tails", s_file)
+        getD = lambda s_file: self.checkPath("tails", s_file, True)  # resorts to checking data
 
         #MFH - freestyle tails (for drum fills & BREs)
         engine.loadImgDrawing(self, "freestyle1", getD("freestyletail1.png"), textureSize=(128, 128))
