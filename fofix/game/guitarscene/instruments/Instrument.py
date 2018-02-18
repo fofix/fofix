@@ -808,7 +808,7 @@ class Instrument(object):
                     else:
                         y -= self.hitFlameOffset[event.number]
 
-                    y + .665
+                    # y += .665  # XXX: see if it's useless
 
                     ff += 1.5 #ff first time is 2.75 after this
 
@@ -893,7 +893,7 @@ class Instrument(object):
                     else:
                         y -= self.hitFlameOffset[event.number]
 
-                    y + .665
+                    # y += .665  # XXX: see if it's useless
 
                     ff += 1.5 #ff first time is 2.75 after this
 
