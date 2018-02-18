@@ -368,14 +368,14 @@ class Instrument(object):
         self.HFrameLimit2   = self.engine.theme.HitFlameFrameLimit
         self.HCountAni      = False
 
-        if self.disableFretSFX != False:
+        if self.disableFretSFX:
             self.glowDrawing = None
         else:
             engine.loadImgDrawing(self, "glowDrawing", get("glow.png"))
             if not self.glowDrawing:
                 engine.loadImgDrawing(self, "glowDrawing", "glow.png")
 
-        if self.disableFlameSFX == True:
+        if self.disableFlameSFX:
             self.hitglow2Drawing = None
             self.hitglowDrawing = None
             self.hitglowAnim = None
@@ -404,7 +404,7 @@ class Instrument(object):
         self.noteTex = None
         self.noteButtons = None
 
-        if self.twoDnote == True:
+        if self.twoDnote:
             if self.noteSpin:
                 self.starSpinFrames = 16
                 engine.loadImgDrawing(self, "noteAnimatedNormal", get("animated_normal.png"))
@@ -477,7 +477,7 @@ class Instrument(object):
 
         get = lambda file: self.checkPath("frets", file)
 
-        if self.twoDkeys == True: #death_au
+        if self.twoDkeys:
             engine.loadImgDrawing(self, "fretButtons", get("fretbuttons.png"))
         else:
             defaultKey = False
@@ -508,7 +508,7 @@ class Instrument(object):
         engine.loadImgDrawing(self, "freestyle1", getD("freestyletail1.png"),  textureSize = (128, 128))
         engine.loadImgDrawing(self, "freestyle2", getD("freestyletail2.png"),  textureSize = (128, 128))
 
-        if self.tailsEnabled == True:
+        if self.tailsEnabled:
             self.simpleTails = False
             for i in range(0,7):
                 if not engine.loadImgDrawing(self, "tail"+str(i), get("tail"+str(i)+".png"),  textureSize = (128, 128)):
@@ -668,13 +668,13 @@ class Instrument(object):
         if self.isDrum:
             return possible
         for i in range(0,5):
-            if self.hit[i] == True:
+            if self.hit[i]:
                 possible = True
         return possible
 
     #Renders the tail glow hitflame
     def renderHitTrails(self, controls):
-        if self.hitGlowColors[0][0] == -1  or self.disableFlameSFX == True:
+        if self.hitGlowColors[0][0] == -1 or self.disableFlameSFX:
             return
 
         if self.HCountAni:
@@ -989,7 +989,7 @@ class Instrument(object):
                     gl.glColor4f(*color)
                 else:
                     gl.glColor3f(self.hopoColor[0], self.hopoColor[1], self.hopoColor[2])
-                if(model.find("Mesh_003")) == True:
+                if model.find("Mesh_003"):
                     model.render("Mesh_003")
                     gl.glColor3f(self.spotColor[0], self.spotColor[1], self.spotColor[2])
             model.render("Mesh_002")
@@ -1003,7 +1003,7 @@ class Instrument(object):
 
         #myfingershurt: this should be retrieved once at init, not repeatedly in-game whenever tails are rendered.
 
-        if self.twoDnote == True:
+        if self.twoDnote:
 
             noteImage = self.noteButtons
 
@@ -1049,7 +1049,7 @@ class Instrument(object):
             self.notepos = self.engine.theme.notepos
             self.noterot = self.engine.theme.noterot
 
-            if spNote == True and self.starMesh is not None:
+            if spNote and self.starMesh is not None:
                 meshObj = self.starMesh
             else:
                 meshObj = self.noteMesh
@@ -1110,7 +1110,7 @@ class Instrument(object):
             if isinstance(event, Tempo):
 
                 self.tempoBpm = event.bpm
-                if self.lastBpmChange > 0 and self.disableVBPM == True:
+                if self.lastBpmChange > 0 and self.disableVBPM:
                     continue
                 if (pos - time > self.currentPeriod or self.lastBpmChange < 0) and time > self.lastBpmChange:
                     self.baseBeat          += (time - self.lastBpmChange) / self.currentPeriod
@@ -1174,7 +1174,7 @@ class Instrument(object):
                     if time > self.freestyleStart - self.freestyleOffset and time < self.freestyleStart + self.freestyleOffset + self.freestyleLength:
                         z = -2.0
 
-            if self.twoDnote == True and not self.useFretColors:
+            if self.twoDnote and not self.useFretColors:
                 color      = (1,1,1, 1 * visibility * f)
             else:
                 color      = (.1 + .8 * c[0], .1 + .8 * c[1], .1 + .8 * c[2], 1 * visibility * f)
@@ -1294,7 +1294,7 @@ class Instrument(object):
             if isinstance(event, Tempo):
 
                 self.tempoBpm = event.bpm
-                if self.lastBpmChange > 0 and self.disableVBPM == True:
+                if self.lastBpmChange > 0 and self.disableVBPM:
                     continue
                 if (pos - time > self.currentPeriod or self.lastBpmChange < 0) and time > self.lastBpmChange:
                     self.baseBeat          += (time - self.lastBpmChange) / self.currentPeriod
@@ -1344,7 +1344,7 @@ class Instrument(object):
                     if time > self.freestyleStart - self.freestyleOffset and time < self.freestyleStart + self.freestyleOffset + self.freestyleLength:
                         z = -2.0
 
-            if self.twoDnote == True and not self.useFretColors:
+            if self.twoDnote and not self.useFretColors:
                 color      = (1,1,1, 1 * visibility * f)
             else:
                 color      = (.1 + .8 * c[0], .1 + .8 * c[1], .1 + .8 * c[2], 1 * visibility * f)
@@ -1503,7 +1503,7 @@ class Instrument(object):
                 y = 0
             size = .22
 
-            if f and self.disableFretSFX != True:
+            if f and not self.disableFretSFX:
 
                 if self.glowColor[0] == -1:
                     s = 1.0
@@ -1520,8 +1520,8 @@ class Instrument(object):
                     gl.glRotatef( 90, 0, 1, 0)
                     gl.glRotatef(-90, 1, 0, 0)
                     gl.glRotatef(-90, 0, 0, 1)
-                    if self.twoDkeys == False and self.keytex == False:
-                        if(self.keyMesh.find("Glow_001")) == True:
+                    if not self.twoDkeys and not self.keytex:
+                        if self.keyMesh.find("Glow_001"):
                             self.keyMesh.render("Glow_001")
                         else:
                             self.keyMesh.render()
@@ -1565,7 +1565,8 @@ class Instrument(object):
         elif spNote and self.powerGainColorToggle:
             tailcol = self.spColor
 
-        elif big == False and tailOnly == True: #grey because the note was missed
+        elif not big and tailOnly:
+            # grey because the note was missed
             tailcol = (.6, .6, .6, color[3])
 
         else: #normal colors
@@ -1579,7 +1580,7 @@ class Instrument(object):
 
         size = (.4, s)
 
-        if kill and big == True:
+        if kill and big:
             kEffect = ( math.sin( pos / 50 ) + 1 ) /2
             size = ((0.02 + (kEffect * 0.182) * 2), s)
             c = [self.killColor[fret][0],self.killColor[fret][1],self.killColor[fret][2]]
@@ -1589,11 +1590,11 @@ class Instrument(object):
                     tailcol = (.1 + .8 * c[0], .1 + .8 * c[1], .1 + .8 * c[2], 1)
 
         if sustain:
-            if not length == None:
+            if length is not None:
                 #myfingershurt: so any theme containing appropriate files can use new tails
                 if not self.simpleTails:
                     for n in range(5):
-                        if big == True and tailOnly == True:
+                        if big and tailOnly:
                             if kill and self.killfx == 0:
                                 tex1 = self.kill1
                                 tex2 = self.kill2
@@ -1625,7 +1626,7 @@ class Instrument(object):
                                         tex1 = getattr(self,"tail" + str(n+1))
                                         tex2 = getattr(self,"taile" + str(n+1))
                 else:
-                    if big == True and tailOnly == True:
+                    if big and tailOnly:
                         if kill:
                             tex1 = self.kill1
                             tex2 = self.kill2
@@ -1683,7 +1684,7 @@ class Instrument(object):
 
     def renderFreeStyleTail(self, length, color, fret, pos):
 
-        if not length == None:
+        if length is not None:
             if length > self.boardLength:
                 s = self.boardLength
             else:
@@ -1926,7 +1927,7 @@ class Instrument(object):
 
             if self.spEnabled and killswitch:
                 if event.star or event.finalStar:
-                    if big == True and tailOnly == True:
+                    if big and tailOnly:
                         self.killPoints = True
                         color = (1,1,1,1)
 
@@ -1944,7 +1945,7 @@ class Instrument(object):
             gl.glPushMatrix()
             gl.glTranslatef(x, (1.0 - visibility) ** (event.number + 1), z)
 
-            if big == True and num < self.bigMax:
+            if big and num < self.bigMax:
                 num += 1
                 self.renderTail(song, length, sustain = sustain, kill = killswitch, color = color, tailOnly = tailOnly, isTappable = isTappable, big = True, fret = event.number, spNote = spNote, pos = pos)
             else:
