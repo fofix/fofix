@@ -1,5 +1,5 @@
 #####################################################################
-# -*- coding: iso-8859-1 -*-                                        #
+# -*- coding: utf-8 -*-                                             #
 #                                                                   #
 # Frets on Fire                                                     #
 # Copyright (C) 2006 Sami Ky?stil?                                  #
@@ -37,15 +37,14 @@ import gc
 import os
 import sys
 import imp
+import logging
 
-from fretwork import log
 from fretwork.audio import Audio
 from fretwork.task import TaskEngine
 from fretwork.timer import FpsTimer
 
 from fofix.core.constants import *
 from fofix.core.Video import Video
-
 from fofix.core.View import View
 from fofix.core.Input import Input, KeyListener, SystemEventListener
 from fofix.core.Resource import Resource
@@ -55,7 +54,6 @@ from fofix.core.Language import _
 from fofix.core.Theme import Theme
 from fofix.core.Shader import shaders
 from fofix.core.Image import drawImage
-
 from fofix.core import cmgl
 from fofix.core import Config
 from fofix.core import ConfigDefs
@@ -63,9 +61,11 @@ from fofix.core import Version
 from fofix.core import Player
 from fofix.core import Mod
 from fofix.game import Dialogs
-
 from fofix.game.World import World
 from fofix.game.Debug import DebugLayer
+
+
+log = logging.getLogger(__name__)
 
 # evilynux - Grab name and version from Version class.
 version = "%s v%s" % ( Version.PROGRAM_NAME, Version.version() )
@@ -98,7 +98,7 @@ def _init_allthemes():
         defaultTheme = themes[0]    #myfingershurt
 
     #myfingershurt: default theme must be an existing one!
-    Config.define("coffee", "themename",           str,   defaultTheme,      text = _("Theme"),                options = dict([(str(themes[n]),themes[n]) for n in range(0, i)]), tipText = _("Sets the overall graphical feel of the game. You can find and download many more at fretsonfire.net"))
+    Config.define("coffee", "themename",           str,   defaultTheme,      text = _("Theme"),                options = dict([(str(themes[n]),themes[n]) for n in range(0, i)]), tipText = _("Sets the overall graphical feel of the game. You can find and download many more at https://fretsonfire.org"))
 _init_allthemes()
 
 Player.loadControls()
@@ -230,11 +230,6 @@ class GameEngine(object):
         bufferSize   = self.config.get("audio", "buffersize")
         self.audio.open(frequency = frequency, bits = bits, stereo = stereo, bufferSize = bufferSize)
 
-        self.cmdPlay           = 0
-        self.cmdMode           = None
-        self.cmdDiff           = None
-        self.cmdPart           = None
-
         self.gameStarted       = False
         self.world             = None
 
@@ -269,7 +264,7 @@ class GameEngine(object):
         #            GNU/Linux) as the Viewport was not set yet.
         try:
             viewport = glGetIntegerv(GL_VIEWPORT)
-        except:
+        except Exception:
             viewport = [0, 0, width, height]
         h = viewport[3] - viewport[1]
         w = viewport[2] - viewport[0]
@@ -334,7 +329,7 @@ class GameEngine(object):
         :type themepath: str
         """
 
-        log.notice( 'Setting theme %s from "%s"' % (themename,themepath) )
+        log.info('Setting theme %s from "%s"' % (themename,themepath))
 
         self.theme = None
         try:
@@ -344,7 +339,7 @@ class GameEngine(object):
                 # Found it! Load it.
                 theme = imp.load_module("CustomTheme", fp, pathname, description)
                 self.theme = theme.CustomTheme(themepath, themename)
-                log.notice('Theme activated using custom class "%s"' % pathname)
+                log.info('Theme activated using custom class "%s"' % pathname)
             except ImportError as e:
                 # Unable to load module; log it, but continue with default Theme.
                 log.error('Failed to load CustomTheme.py from "%s"' % pathname)
@@ -352,12 +347,12 @@ class GameEngine(object):
                 fp.close()
         except ImportError:
             # CustomTheme.py file is optional, but notify developer anyway.
-            log.notice("No CustomTheme.py found in theme")
+            log.info("No CustomTheme.py found in theme")
             pass
 
         if self.theme is None:
             self.theme = Theme(themepath, themename)
-            log.notice("Theme activated using built-in Theme class")
+            log.info("Theme activated using built-in Theme class")
         self.task.addTask(self.theme)
 
     def _initStages(self):
@@ -486,7 +481,7 @@ class GameEngine(object):
 
     def finishGame(self):
         if not self.world:
-            log.notice("GameEngine.finishGame called before World created.")
+            log.info("GameEngine.finishGame called before World created.")
             return
         self.world.finishGame()
         self.world = None

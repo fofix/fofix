@@ -1,5 +1,5 @@
 #####################################################################
-# -*- coding: iso-8859-1 -*-                                        #
+# -*- coding: utf-8 -*-                                             #
 #                                                                   #
 # Frets on Fire                                                     #
 # Copyright (C) 2006 Sami Kyöstilä                                  #
@@ -22,14 +22,15 @@
 #####################################################################
 
 from __future__ import division
+import logging
 
 from OpenGL.GL import *
 from contextlib import contextmanager
-
 import numpy as np
-
-from fretwork import log
 from fretwork.task import Task
+
+
+log = logging.getLogger(__name__)
 
 
 class Layer(Task):

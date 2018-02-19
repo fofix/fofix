@@ -1,5 +1,5 @@
 #####################################################################
-# -*- coding: iso-8859-1 -*-                                        #
+# -*- coding: utf-8 -*-                                             #
 #                                                                   #
 # Frets on Fire                                                     #
 # Copyright (C) 2006 Sami Ky?stil?                                  #
@@ -20,13 +20,16 @@
 # MA  02110-1301, USA.                                              #
 #####################################################################
 
+import logging
 import os
-
-from fretwork import log
 
 from fofix.core.Language import _
 from fofix.core import Config
 from fofix.core import Theme
+
+
+log = logging.getLogger(__name__)
+
 
 def _getModPath(engine):
     return engine.resource.fileName("mods")

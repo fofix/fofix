@@ -1,5 +1,5 @@
 #####################################################################
-# -*- coding: iso-8859-1 -*-                                        #
+# -*- coding: utf-8 -*-                                             #
 #                                                                   #
 # Frets on Fire                                                     #
 # Copyright (C) 2006 Sami Ky�stil?                                  #
@@ -33,12 +33,10 @@
 from __future__ import with_statement
 
 from math import degrees, atan
+import logging
 import os
 
 import OpenGL.GL as gl
-
-
-from fretwork import log
 
 from fofix.game.song import Note, TextEvent, PictureEvent, loadSong, Bars, VocalPhrase
 from fofix.core.Player import STAR, KILL, CANCEL, KEY1A
@@ -57,6 +55,10 @@ from fofix.game import song
 from fofix.core import Player
 
 import random
+
+
+log = logging.getLogger(__name__)
+
 
 # The plan with this is to move gamemodes to being subclasses of this
 class BandPlayBaseScene(Scene):
@@ -4792,7 +4794,7 @@ class GuitarScene(BandPlayBaseScene):
 
                                     try:
                                         picture = event.picture
-                                    except:
+                                    except Exception:
                                         self.engine.loadImgDrawing(event, "picture", os.path.join(self.libraryName, self.songName, event.fileName))
                                         picture = event.picture
 

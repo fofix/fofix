@@ -13,6 +13,8 @@ matrix:
         - env:
             - GIT_COMMIT=0
           before_install:
+              - LD_LIBRARY_PATH=/usr/local/lib64/:$LD_LIBRARY_PATH
+              - export LD_LIBRARY_PATH
               - sudo apt-get -qq update
               - sudo apt-get install -y
                   libogg-dev
@@ -27,6 +29,11 @@ matrix:
                   libvorbis-dev
                   mesa-utils
                   portaudio19-dev
+              - sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
+              - LD_LIBRARY_PATH=/usr/local/lib64/:$LD_LIBRARY_PATH
+              - export LD_LIBRARY_PATH
+              - sudo apt-get -q update
+              - sudo apt-get install -y gcc-4.9 g++-4.9
 
 install:
     - pip install pytest

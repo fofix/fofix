@@ -29,13 +29,13 @@ import cPickle  # Cerealizer and sqlite3 don't seem to like each other that much
 import copy
 import glob
 import hashlib
+import logging
 import os
 import random
 import re
 import time
 import urllib
 
-from fretwork import log
 from fretwork import midi
 from fretwork.audio import StreamingSound
 from fretwork.unicode import utf8
@@ -48,6 +48,9 @@ from fofix.core.Language import _
 from fofix.core.Theme import *
 from fofix.core.Theme import hexToColor, colorToHex
 from fofix.game.song.songconstants import *
+
+
+log = logging.getLogger(__name__)
 
 
 # code for adding tracks, inside song.py:
@@ -118,10 +121,10 @@ instrumentDiff = {
 
 
 class Part:
-    def __init__(self, id, text, trackName):
-        self.id = id
-        self.text = text
-        self.trackName = trackName  # list(str) of names which the part is called in the midi
+    def __init__(self, uid, text, trackName):
+        self.id   = uid             #int uid for this instance
+        self.text = text            #str friendly name for this instance
+        self.trackName = trackName  #list(str) of names which the part is called in the midi
 
     def __cmp__(self, other):
         if isinstance(other, Part):
@@ -153,8 +156,8 @@ parts = {
 
 
 class Difficulty:
-    def __init__(self, id, text):
-        self.id = id
+    def __init__(self, uid, text):
+        self.id   = uid
         self.text = text
 
     def __cmp__(self, other):
@@ -206,7 +209,7 @@ try:
     else:
         _mustReinitialize = True
         log.debug('Song cache has incompatible schema version; forcing reinitialization.')
-except:
+except Exception:
     _mustReinitialize = True
 if _mustReinitialize:
     log.debug('Initializing song cache.')
@@ -241,10 +244,7 @@ class SongInfo(object):
 
         self.name = _("NoName")
 
-        try:
-            self.info.read(infoFileName)
-        except:
-            pass
+        self.info.read(infoFileName)
 
         self.logClassInits = Config.get("game", "log_class_inits")
         if self.logClassInits == 1:
@@ -291,7 +291,7 @@ class SongInfo(object):
                     _songDB.execute('UPDATE `songinfo` SET `seen` = 1 WHERE `hash` = ?', [songhash])
                     log.debug('Song %s successfully loaded from cache.' % infoFileName)
                     return
-                except:
+                except Exception:
                     # The entry is there but could not be loaded.
                     # Nuke it and let it be rebuilt.
                     log.error('Song %s has invalid cache data (will rebuild): ' % infoFileName)
@@ -335,12 +335,23 @@ class SongInfo(object):
             scores = self._get("scores", str, "")
             scores_ext = self._get("scores_ext", str, "")
 
+        if scores:
+            try:
+                scores = cerealizer.loads(binascii.unhexlify(scores))
+            except Exception:
+                log.error("High scores lost! Can't parse scores = %s" % scores)
+                scores = None
+
         if not scores:
             return
 
-        scores = cerealizer.loads(binascii.unhexlify(scores))
         if scores_ext:
-            scores_ext = cerealizer.loads(binascii.unhexlify(scores_ext))
+            try:
+                scores_ext = cerealizer.loads(binascii.unhexlify(scores_ext))
+            except Exception:
+                log.error("High scores lost! Can't parse scores_ext = %s" % scores_ext)
+                scores_ext = None
+            
         for difficulty in scores.keys():
             try:
                 difficulty = difficulties[difficulty]
@@ -348,8 +359,8 @@ class SongInfo(object):
                 continue
             for i, base_scores in enumerate(scores[difficulty.id]):
                 score, stars, name, hash = base_scores
-                if scores_ext != "":
-                    # Someone may have mixed extended and non extended
+                if scores_ext:
+                    #Someone may have mixed extended and non extended
                     try:
                         if len(scores_ext[difficulty.id][i]) < 9:
                             hash_ext, stars2, notesHit, notesTotal, noteStreak, modVersion, oldInfo, oldInfo2 = scores_ext[
@@ -362,12 +373,12 @@ class SongInfo(object):
                                 difficulty.id][i]
                         scoreExt = (notesHit, notesTotal, noteStreak, modVersion,
                                     handicapValue, longHandicap, originalScore)
-                    except:
+                    except Exception:
                         hash_ext = 0
                         scoreExt = (0, 0, 0, "RF-mod", 0, "None", 0)
                 if self.getScoreHash(difficulty, score, stars, name) == hash:
-                    if scores_ext != "" and hash == hash_ext:
-                        self.addHighscore(difficulty, score, stars, name, part, scoreExt=scoreExt)
+                    if scores_ext and hash == hash_ext:
+                        self.addHighscore(difficulty, score, stars, name, part, scoreExt = scoreExt)
                     else:
                         self.addHighscore(difficulty, score, stars, name, part)
                 else:
@@ -425,7 +436,7 @@ class SongInfo(object):
     def _get(self, attr, type=None, default=""):
         try:
             v = self.info.get("song", attr)
-        except:
+        except Exception:
             v = default
         if v == "":  # key found, but empty - need to catch as int("") will burn.
             v = default
@@ -467,8 +478,7 @@ class SongInfo(object):
                 midiIn = midi.MidiInFile(info, noteFileName)
                 midiIn.read()
             if info.parts == []:
-                log.warn("No tracks found!")
-                raise Exception
+                raise Exception("No tracks found in %s" % noteFileName)
             self._midiStyle = info.midiStyle
             info.parts.sort(lambda b, a: cmp(b.id, a.id))
             self._parts = info.parts
@@ -478,7 +488,7 @@ class SongInfo(object):
                     continue
                 info.difficulties[part.id].sort(lambda a, b: cmp(a.id, b.id))
                 self._partDifficulties[part.id] = info.difficulties[part.id]
-        except:
+        except Exception:
             log.warn("Note file not parsed correctly. Selected part and/or difficulty may not be available.")
             self._parts = parts.values()
             for part in self._parts:
@@ -740,7 +750,7 @@ class LibraryInfo(object):
 
         try:
             self.info.read(infoFileName)
-        except:
+        except Exception:
             pass
 
         # Set a default name
@@ -773,7 +783,7 @@ class LibraryInfo(object):
     def _get(self, attr, type=None, default=""):
         try:
             v = self.info.get("library", attr)
-        except:
+        except Exception:
             v = default
         if v is not None and type:
             v = type(v)
@@ -853,7 +863,7 @@ class TitleInfo(object):
     def _get(self, attr, type=None, default=""):
         try:
             v = self.info.get(self.section, attr)
-        except:
+        except Exception:
             v = default
         if v is not None and type:
             v = type(v)
@@ -1091,7 +1101,7 @@ class Track:
 
 class VocalTrack(Track):
     def __init__(self, engine):
-        self.allNotes = {}
+        self.allNotes = {}      #dict(int -> tuple(num,Event)) -- basically a time -> Event map
         self.allWords = {}
         self.starTimes = []
         self.minPitch = 127
@@ -2843,7 +2853,7 @@ class MidiPartsDiffReader(midi.MidiOutStream):
                         log.debug(tempText + tempText2)
                 self.firstTrack = True
             else:
-                log.notice("This song has multiple tracks, none properly named. Behavior may be erratic.")
+                log.info("This song has multiple tracks, none properly named. Behavior may be erratic.")
 
     def sequence_name(self, text):
         """ Track name encountered in file, see if we can match it to an instrument part. """
@@ -2922,7 +2932,7 @@ def loadSong(engine, name, library=DEFAULT_LIBRARY, playbackOnly=False, notesOnl
         # escape all characters that cause the problem. For now the change dir
         # method is a cleaner work around than reimpplementing that function here.
         orgpath = os.path.abspath('.')
-        os.chdir("{1}{0}{2}{0}".format(os.path.sep, library, name))
+        os.chdir(engine.resource.fileName(library, name))
         songOggFiles = glob.glob('*.ogg')
 
         os.chdir(orgpath)
@@ -3025,6 +3035,11 @@ def getDefaultLibrary(engine):
 
 
 def getAvailableLibraries(engine, library=DEFAULT_LIBRARY):
+    """ Find libraries (i.e. sub-directories of songs) inside a directory.
+    
+    :param library: directory to search
+    :return: list[LibraryInfo]
+    """
     log.debug("Song.getAvailableLibraries function call...library = " + str(library))
     # Search for libraries in both the read-write and read-only directories
     songRoots = [engine.resource.fileName(library),
@@ -3259,7 +3274,7 @@ def getAvailableTitles(engine, library=DEFAULT_LIBRARY):
         if gameMode1p == 2:
             titles.append(BlankSpaceInfo(_("End of Career")))
 
-    except:
+    except Exception:
         log.debug("titles.ini could not be read (song.py)")
         return []
 

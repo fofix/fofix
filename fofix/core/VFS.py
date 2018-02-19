@@ -74,7 +74,7 @@ class Mount(object):
             candidate = os.path.join(p, path).rstrip(os.sep)
             if os.path.exists(candidate):
                 return candidate
-        raise OSError(errno.ENOENT, os.strerror(errno.ENOENT))
+        raise OSError(errno.ENOENT, os.strerror(errno.ENOENT), path)
 
     def resolveWrite(self, path):
         '''
