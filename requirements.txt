@@ -7,4 +7,4 @@ PyAudio==0.2.11
 pygame==1.9.3
 PyOpenGL==3.1.0
 PyOpenGL-accelerate==3.1.0
-https://github.com/fofix/fretwork/archive/0.2.0.tar.gz
+fretwork==0.3.0

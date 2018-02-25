@@ -1,5 +1,5 @@
 #####################################################################
-# -*- coding: iso-8859-1 -*-                                        #
+# -*- coding: utf-8 -*-                                             #
 #                                                                   #
 # Frets on Fire                                                     #
 # Copyright (C) 2006 Sami Kyöstilä                                  #
@@ -24,13 +24,12 @@
 
 from __future__ import with_statement
 
+import logging
 import math
 import os
 
 from OpenGL.GL import *
 import pygame
-
-from fretwork import log
 
 from fofix.core.Input import KeyListener
 from fofix.core.Image import drawImage
@@ -38,6 +37,10 @@ from fofix.core.View import Layer
 from fofix.core import Player
 from fofix.core import Data
 from fofix.core.constants import *
+
+
+log = logging.getLogger(__name__)
+
 
 class Choice:
     def __init__(self, text, callback, name = None, values = None, valueIndex = 0, append_submenu_char = True, tipText = None):

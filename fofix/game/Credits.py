@@ -24,11 +24,11 @@
 #####################################################################
 
 from __future__ import with_statement
+import logging
 import os
 import sys
 
 from OpenGL.GL import OpenGL, glColor4f, glTranslatef
-from fretwork import log
 import pygame
 
 from fofix.core import Config
@@ -40,6 +40,9 @@ from fofix.core.Language import _
 from fofix.core.VideoPlayer import VideoLayer, VideoPlayerError
 from fofix.core.View import Layer
 from fofix.core.constants import *
+
+
+log = logging.getLogger(__name__)
 
 
 class Element:
@@ -145,7 +148,7 @@ class Credits(Layer, KeyListener):
         self.bank['honorary']   = [_("Honorary Credits")]
         self.bank['codeHonor']  = [_("Without whom this game would not exist")]
         self.bank['giveThanks'] = [_("Special Thanks to")]
-        self.bank['community']  = [_("nwru and all of the community at fretsonfire.net")]
+        self.bank['community']  = [_("nwru and all of the community at https://fretsonfire.org")]
         self.bank['other']      = [_("Other Contributors:")]
         self.bank['tutorial']   = [_("Jurgen FoF tutorial inspired by adam02"),
                                    _("Drum test song tutorial by Heka"),

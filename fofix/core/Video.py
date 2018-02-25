@@ -1,5 +1,5 @@
-##################################################################
-# -*- coding: iso-8859-1 -*-                                        #
+#####################################################################
+# -*- coding: utf-8 -*-                                             #
 #                                                                   #
 # Frets on Fire                                                     #
 # Copyright (C) 2006 Sami Kyöstilä                                  #
@@ -20,6 +20,7 @@
 # MA  02110-1301, USA.                                              #
 #####################################################################
 
+import logging
 import os
 import struct
 
@@ -28,9 +29,11 @@ from PIL import Image
 from OpenGL.GL import *
 from OpenGL.GL.ARB.multisample import *
 
-from fretwork import log
-
 from fofix.core.Language import _
+
+
+log = logging.getLogger(__name__)
+
 
 class Video:
     def __init__(self, caption = "Game", icon = None):
@@ -54,7 +57,7 @@ class Video:
 
         try:
             pygame.display.quit()
-        except:
+        except Exception:
             pass
 
         pygame.display.init()
@@ -140,7 +143,7 @@ class Video:
         if multisamples:
             try:
                 glEnable(GL_MULTISAMPLE_ARB)
-            except:
+            except Exception:
                 pass
 
         return bool(self.screen)

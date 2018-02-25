@@ -1,5 +1,5 @@
 #####################################################################
-# -*- coding: iso-8859-1 -*-                                        #
+# -*- coding: utf-8 -*-                                             #
 #                                                                   #
 # Frets on Fire                                                     #
 # Copyright (C) 2009 Vlad Emelyanov                                 #
@@ -20,6 +20,7 @@
 # MA  02110-1301, USA.                                              #
 #####################################################################
 
+import logging
 import os
 import sys
 import time
@@ -34,19 +35,23 @@ from OpenGL.GL.ARB.fragment_shader import *
 from OpenGL.GL.ARB.multitexture import *
 from OpenGL.GL.EXT.texture3D import *
 
-from fretwork import log
-
 from fofix.core.constants import isTrue
 from fofix.core import Config
 from fofix.core import Version
 
+
+log = logging.getLogger(__name__)
+
+
 class ShaderCompilationError(Exception):
     pass
+
 
 if sys.platform == 'darwin':
     GL_TEXTURE_3D_EXT = GL_TEXTURE_3D
     GL_TEXTURE_WRAP_R_EXT = GL_TEXTURE_WRAP_R
     glTexImage3DEXT = glTexImage3D
+
 
 # main class for shaders library
 class ShaderList:
@@ -135,8 +140,10 @@ class ShaderList:
                 break
             if aline[0] == "uniform":
                 value = None
-                try:    n = int(aline[1][-1])
-                except: n = 4
+                try:
+                    n = int(aline[1][-1])
+                except Exception:
+                    n = 4
                 if   aline[1] == "bool": value = False
                 elif aline[1] == "int": value = 0
                 elif aline[1] == "float": value = 0.0
@@ -499,7 +506,7 @@ class ShaderList:
                     continue
             return True
         return False
-        
+
     def defineConfig(self):
         for name in self.shaders.keys():
             for key in self[name].keys():
@@ -534,7 +541,7 @@ class ShaderList:
         try:
             self.noise3D = self.loadTex3D("noise3d.dds")
             self.outline = self.loadTex2D("outline.tga")
-        except:
+        except Exception:
             log.error('Could not load shader textures - shaders disabled: ')
             return
 
@@ -546,7 +553,7 @@ class ShaderList:
         # Also set uniform shader variables to default values.
         try:
             self.make("lightning","stage")
-        except:
+        except Exception:
             log.error("Error compiling lightning shader: ")
         else:
             self.enable("stage")
@@ -566,7 +573,7 @@ class ShaderList:
 
         try:
             self.make("lightning","sololight")
-        except:
+        except Exception:
             log.error("Error compiling lightning shader: ")
         else:
             self.enable("sololight")
@@ -588,7 +595,7 @@ class ShaderList:
 
         try:
             self.make("lightning","tail")
-        except:
+        except Exception:
             log.error("Error compiling lightning shader: ")
         else:
             self.enable("tail")
@@ -611,7 +618,7 @@ class ShaderList:
 
         try:
             self.make("rockbandtail","tail2")
-        except:
+        except Exception:
             log.error("Error compiling rockbandtail shader: ")
         else:
             self.enable("tail2")
@@ -624,7 +631,7 @@ class ShaderList:
 
         try:
             self.make("metal","notes")
-        except:
+        except Exception:
             log.error("Error compiling metal shader: ")
         else:
             self.enable("notes")
@@ -632,12 +639,12 @@ class ShaderList:
 
         try:
             self.make("neck","neck")
-        except:
+        except Exception:
             log.error("Error compiling neck shader: ")
 
         try:
             self.make("cd","cd")
-        except:
+        except Exception:
             log.error("Error compiling cd shader: ")
 
 def mixColors(c1,c2,blend=0.5):

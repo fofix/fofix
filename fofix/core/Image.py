@@ -23,15 +23,18 @@
 #####################################################################
 
 from __future__ import with_statement
+import logging
 
 from OpenGL.GL import *
 from PIL import Image
-from fretwork import log
 import numpy as np
 
 from fofix.core import cmgl
 from fofix.core.Texture import Texture
 from fofix.core.constants import *
+
+
+log = logging.getLogger(__name__)
 
 
 class SvgContext(object):

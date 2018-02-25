@@ -1,5 +1,5 @@
 #####################################################################
-# -*- coding: iso-8859-1 -*-                                        #
+# -*- coding: utf-8 -*-                                             #
 #                                                                   #
 # Frets on Fire                                                     #
 # Copyright (C) 2006 Sami Kyöstilä                                  #
@@ -29,11 +29,10 @@
 # MA  02110-1301, USA.                                              #
 #####################################################################
 
+import logging
 import os
 
 import pygame
-
-from fretwork import log
 
 from fofix.core.Language import _
 from fofix.core.View import BackgroundLayer
@@ -46,6 +45,10 @@ from fofix.core import Config
 from fofix.core import Player
 from fofix.core import Mod
 from fofix.core import VFS
+
+
+log = logging.getLogger(__name__)
+
 
 class ConfigChoice(Menu.Choice):
     def __init__(self, engine, config, section, option, autoApply = False, isQuickset = 0):
@@ -178,7 +181,7 @@ class KeyConfigChoice(Menu.Choice):
         def keycode(k):
             try:
                 return int(k)
-            except:
+            except Exception:
                 return getattr(pygame, k)
 
         if self.shift:
@@ -198,7 +201,7 @@ class KeyConfigChoice(Menu.Choice):
         def keycode(k):
             try:
                 return int(k)
-            except:
+            except Exception:
                 return getattr(pygame, k)
         o = self.config.prototype[self.section][self.option]
         v = self.config.get(self.section, self.option)

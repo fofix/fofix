@@ -1,5 +1,5 @@
 #####################################################################
-# -*- coding: iso-8859-1 -*-                                        #
+# -*- coding: utf-8 -*-                                             #
 #                                                                   #
 # Frets on Fire                                                     #
 # Copyright (C) 2009 Blazingamer <n_hydock@comcast.net>             #
@@ -30,13 +30,12 @@ FUTURE_DIVISION = __future__.division.compiler_flag
 
 from math import *
 import locale
+import logging
 import imp
 import os
 
 from PIL import Image, ImageDraw
 import OpenGL.GL as gl
-
-from fretwork import log
 
 from fofix.core.LinedConfigParser import LinedConfigParser
 from fofix.core.Theme import halign, valign
@@ -46,6 +45,9 @@ from fofix.core.Image import drawImage
 from fofix.core.constants import *
 from fofix.core import Version
 from fofix.core import cmgl
+
+
+log = logging.getLogger(__name__)
 
 #these are the variables for setting the alignment of text and images
 #when setting them up in the rockmeter.ini you do not have
@@ -908,7 +910,7 @@ class Rockmeter(ConfigGetMixin):
             self.customRMLayers = imp.load_module("CustomRMLayers", fp, pathname, description)
         except ImportError:
             self.customRMLayers = None
-            log.notice("Custom Rockmeter layers are not available")
+            log.info("Custom Rockmeter layers are not available")
 
         # Build the layers
         for i in range(Rockmeter._layerLimit):
