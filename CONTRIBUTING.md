@@ -97,8 +97,8 @@ before pushing your code.
 For more information about those community standards, take a look at:
 - Tim Pope's [A Note About Git Commit Messages](http://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html)
 - Chris Beams's summary: [How to Write a Git Commit Message](https://chris.beams.io/posts/git-commit/)
-- Pro Git book: [Contributing to a Project](https://www.git-scm.com/book/en/v2/Distributed-Git-Contributing-to-a-Project#Commit-Guidelines)
-- Wikipedia: [Atomic commit](https://en.wikipedia.org/wiki/Atomic_commit#Atomic_Commit_Convention)
+- Pro Git book: [Contributing to a Project](https://www.git-scm.com/book/en/v2/Distributed-Git-Contributing-to-a-Project#_commit_guidelines)
+- Wikipedia: [Atomic commit](https://en.wikipedia.org/wiki/Atomic_commit#Atomic_commit_convention)
 - Thoughtbot's [5 Useful Tips For A Better Commit Message](https://robots.thoughtbot.com/5-useful-tips-for-a-better-commit-message).
 
 
