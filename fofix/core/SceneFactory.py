@@ -1,10 +1,10 @@
 #####################################################################
-# -*- coding: iso-8859-1 -*-                                        #
+# -*- coding: utf-8 -*-                                             #
 #                                                                   #
 # Frets on Fire X (FoFiX)                                           #
-# Copyright (C) 2006 Sami Kyöstilä                                  #
-#               2009 FoFiX Team                                     #
+# Copyright (C) 2006 Sami KyÃ¶stilÃ¤                                  #
 #               2009 akedrou                                        #
+#               2009 FoFiX Team                                     #
 #                                                                   #
 # This program is free software; you can redistribute it and/or     #
 # modify it under the terms of the GNU General Public License       #
