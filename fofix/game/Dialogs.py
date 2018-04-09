@@ -59,11 +59,11 @@ def wrapCenteredText(font, pos, text, rightMargin=1.0, scale=0.002, visibility=0
     """
     Wrap a piece of text inside given margins.
 
-    @param pos:         (x, y) tuple, x defines the centerline
-    @param text:        Text to wrap
-    @param rightMargin: Right margin
-    @param scale:       Text scale
-    @param visibility:  Visibility factor [0..1], 0 is fully visible
+    :param pos:         (x, y) tuple, x defines the centerline
+    :param text:        Text to wrap
+    :param rightMargin: Right margin
+    :param scale:       Text scale
+    :param visibility:  Visibility factor [0..1], 0 is fully visible
     """
 
     x, y = pos
@@ -106,11 +106,11 @@ def wrapText(font, pos, text, rightMargin=0.9, scale=0.002, visibility=0.0):
     """
     Wrap a piece of text inside given margins.
 
-    @param pos:         (x, y) tuple, x defines the left margin
-    @param text:        Text to wrap
-    @param rightMargin: Right margin
-    @param scale:       Text scale
-    @param visibility:  Visibility factor [0..1], 0 is fully visible
+    :param pos:         (x, y) tuple, x defines the left margin
+    :param text:        Text to wrap
+    :param rightMargin: Right margin
+    :param scale:       Text scale
+    :param visibility:  Visibility factor [0..1], 0 is fully visible
     """
     x, y = pos
     w = h = 0
@@ -1862,9 +1862,9 @@ def getText(engine, prompt, text=""):
     """
     Get a string of text from the user.
 
-    @param engine:  Game engine
-    @param prompt:  Prompt shown to the user
-    @param text:    Default text
+    :param engine:  Game engine
+    :param prompt:  Prompt shown to the user
+    :param text:    Default text
     """
     d = GetText(engine, prompt, text)
     _runDialog(engine, d)
@@ -1875,10 +1875,10 @@ def getKey(engine, prompt, key=None, specialKeyList=[]):
     """
     Ask the user to choose a key.
 
-    @param engine:          Game engine
-    @param prompt:          Prompt shown to the user
-    @param key:             Default key
-    @param specialKeyList:  A list of keys that are ineligible.
+    :param engine:          Game engine
+    :param prompt:          Prompt shown to the user
+    :param key:             Default key
+    :param specialKeyList:  A list of keys that are ineligible.
     """
     d = GetKey(engine, prompt, key, specialKeyList=specialKeyList)
     _runDialog(engine, d)
@@ -1889,10 +1889,10 @@ def chooseFile(engine, masks=["*.*"], path=u".", prompt=_("Choose a File"), dirS
     """
     Ask the user to select a file.
 
-    @param engine:  Game engine
-    @param masks:   List of glob masks for files that are acceptable
-    @param path:    Initial path
-    @param prompt:  Prompt shown to the user
+    :param engine:  Game engine
+    :param masks:   List of glob masks for files that are acceptable
+    :param path:    Initial path
+    :param prompt:  Prompt shown to the user
     """
     d = FileChooser(engine, masks, path, prompt, dirSelect)
     _runDialog(engine, d)
@@ -1903,11 +1903,11 @@ def chooseItem(engine, items, prompt="", selected=None, pos=None):
     """
     Ask the user to choose one item from a list.
 
-    @param engine:    Game engine
-    @param items:     List of items
-    @param prompt:    Prompt shown to the user
-    @param selected:  Item selected by default
-    @param pos:       Position tuple (x,y) for placing the menu
+    :param engine:    Game engine
+    :param items:     List of items
+    :param prompt:    Prompt shown to the user
+    :param selected:  Item selected by default
+    :param pos:       Position tuple (x,y) for placing the menu
     """
     d = ItemChooser(engine, items, prompt=prompt, selected=selected, pos=pos)
     _runDialog(engine, d)
@@ -1919,9 +1919,9 @@ def chooseNeck(engine, player="default"):
     """
     Ask the user to choose their in-game neck.
 
-    @param engine:    Game engine
-    @type  player:    str
-    @param player:    The active player
+    :param engine:    Game engine
+    :type  player:    str
+    :param player:    The active player
     """
     d = NeckChooser(engine, player=player)
     _runDialog(engine, d)
@@ -1932,7 +1932,7 @@ def chooseAvatar(engine):
     """
     Have the user select an avatar.
 
-    @param engine:   Game engine
+    :param engine:   Game engine
     """
     d = AvatarChooser(engine)
     _runDialog(engine, d)
@@ -1958,8 +1958,8 @@ def testKeys(engine, control, prompt=_("Play with the keys and press Escape when
     """
     Have the user test the current keyboard configuration.
 
-    @param engine:  Game engine
-    @param prompt:  Prompt shown to the user
+    :param engine:  Game engine
+    :param prompt:  Prompt shown to the user
     """
     if engine.input.controls.type[control] == 5 and not Microphone.supported:
         showMessage(engine, 'A required module for microphone support is missing.')
@@ -1972,12 +1972,12 @@ def showLoadingScreen(engine, condition, text=_("Loading..."), allowCancel=False
     """
     Show a loading screen until a condition is met.
 
-    @param engine:      Game engine
-    @param condition:   A function that will be polled until it returns a true value
-    @param text:        Text shown to the user
-    @type  allowCancel: bool
-    @param allowCancel: Can the loading be canceled
-    @return:            True if the condition was met, False if the loading was canceled.
+    :param engine:      Game engine
+    :param condition:   A function that will be polled until it returns a true value
+    :param text:        Text shown to the user
+    :type  allowCancel: bool
+    :param allowCancel: Can the loading be canceled
+    :return:            True if the condition was met, False if the loading was canceled.
     """
 
     # poll the condition first for some time
