@@ -283,7 +283,7 @@ class GetText(Layer, KeyListener):
 
 class GetKey(Layer, KeyListener):
     """Key choosing layer."""
-    def __init__(self, engine, prompt="", key=None, noKey=False, specialKeyList=[]):
+    def __init__(self, engine, prompt="", key=None, noKey=False, specialKeyList=None):
         self.key = key
         self.prompt = prompt
         self.engine = engine
@@ -292,7 +292,7 @@ class GetKey(Layer, KeyListener):
         self.noKey = noKey
         self.toggleEsc = False
         self.escTimer = 1000
-        self.specialKeyList = specialKeyList
+        self.specialKeyList = specialKeyList if specialKeyList is not None else []
 
         self.logClassInits = self.engine.config.get("game", "log_class_inits")
         if self.logClassInits == 1:
@@ -1871,7 +1871,7 @@ def getText(engine, prompt, text=""):
     return d.text
 
 
-def getKey(engine, prompt, key=None, specialKeyList=[]):
+def getKey(engine, prompt, key=None, specialKeyList=None):
     """
     Ask the user to choose a key.
 
@@ -1880,6 +1880,7 @@ def getKey(engine, prompt, key=None, specialKeyList=[]):
     :param key:             Default key
     :param specialKeyList:  A list of keys that are ineligible.
     """
+    specialKeyList = specialKeyList if specialKeyList is not None else []
     d = GetKey(engine, prompt, key, specialKeyList=specialKeyList)
     _runDialog(engine, d)
     return d.key
