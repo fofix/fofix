@@ -55,7 +55,7 @@ log = logging.getLogger(__name__)
 
 
 # for loading phrases
-def wrapCenteredText(font, pos, text, rightMargin = 1.0, scale = 0.002, visibility = 0.0, linespace = 1.0, allowshadowoffset = False, shadowoffset = (.0022, .0005)):
+def wrapCenteredText(font, pos, text, rightMargin=1.0, scale=0.002, visibility=0.0, linespace=1.0, allowshadowoffset=False, shadowoffset=(.0022, .0005)):
     """
     Wrap a piece of text inside given margins.
 
@@ -66,21 +66,20 @@ def wrapCenteredText(font, pos, text, rightMargin = 1.0, scale = 0.002, visibili
     @param visibility:  Visibility factor [0..1], 0 is fully visible
     """
 
-
     x, y = pos
 
-    #MFH: rewriting WrapCenteredText function to properly wrap lines in a centered fashion around a defined centerline (x)
+    # rewriting WrapCenteredText function to properly wrap lines in a centered fashion around a defined centerline (x)
     sentence = ""
     for n, word in enumerate(text.split(" ")):
-        w, h = font.getStringSize(sentence + " " + word, scale = scale)
-        if x + (w/2) > rightMargin or word == "\n":
-            w, h = font.getStringSize(sentence, scale = scale)
+        w, h = font.getStringSize(sentence + " " + word, scale=scale)
+        if x + (w / 2) > rightMargin or word == "\n":
+            w, h = font.getStringSize(sentence, scale=scale)
             glPushMatrix()
             glRotate(visibility * (n + 1) * -45, 0, 0, 1)
             if allowshadowoffset:
-                font.render(sentence, (x - (w/2), y + visibility * n), scale = scale, shadowoffset = shadowoffset)
+                font.render(sentence, (x - (w / 2), y + visibility * n), scale=scale, shadowoffset=shadowoffset)
             else:
-                font.render(sentence, (x - (w/2), y + visibility * n), scale = scale)
+                font.render(sentence, (x - (w / 2), y + visibility * n), scale=scale)
             glPopMatrix()
             sentence = word
             y += h * linespace
@@ -90,19 +89,20 @@ def wrapCenteredText(font, pos, text, rightMargin = 1.0, scale = 0.002, visibili
             else:
                 sentence = sentence + " " + word
     else:
-        w, h = font.getStringSize(sentence, scale = scale)
+        w, h = font.getStringSize(sentence, scale=scale)
         glPushMatrix()
         glRotate(visibility * (n + 1) * -45, 0, 0, 1)
         if allowshadowoffset:
-            font.render(sentence, (x - (w/2), y + visibility * n), scale = scale, shadowoffset = shadowoffset)
+            font.render(sentence, (x - (w / 2), y + visibility * n), scale=scale, shadowoffset=shadowoffset)
         else:
-            font.render(sentence, (x - (w/2), y + visibility * n), scale = scale)
+            font.render(sentence, (x - (w / 2), y + visibility * n), scale=scale)
         glPopMatrix()
         y += h * linespace
 
     return (x, y)
 
-def wrapText(font, pos, text, rightMargin = 0.9, scale = 0.002, visibility = 0.0):
+
+def wrapText(font, pos, text, rightMargin=0.9, scale=0.002, visibility=0.0):
     """
     Wrap a piece of text inside given margins.
 
@@ -114,22 +114,22 @@ def wrapText(font, pos, text, rightMargin = 0.9, scale = 0.002, visibility = 0.0
     """
     x, y = pos
     w = h = 0
-    space = font.getStringSize(" ", scale = scale)[0]
+    space = font.getStringSize(" ", scale=scale)[0]
 
-    # evilynux - No longer requires "\n" to be in between spaces
+    # No longer requires "\n" to be in between spaces
     for n, sentence in enumerate(text.split("\n")):
         y += h
         x = pos[0]
         if n == 0:
             y = pos[1]
         for n, word in enumerate(sentence.strip().split(" ")):
-            w, h = font.getStringSize(word, scale = scale)
+            w, h = font.getStringSize(word, scale=scale)
             if x + w > rightMargin:
                 x = pos[0]
                 y += h
             glPushMatrix()
             glRotate(visibility * (n + 1) * -45, 0, 0, 1)
-            font.render(word, (x, y + visibility * n), scale = scale)
+            font.render(word, (x, y + visibility * n), scale=scale)
             glPopMatrix()
             x += w + space
     return (x - space, y)
@@ -145,14 +145,15 @@ class MainDialog(Layer, KeyListener):
         self.drawStarScore    = self.engine.drawStarScore
 
     def shown(self):
-        self.engine.input.addKeyListener(self, priority = True)
+        self.engine.input.addKeyListener(self, priority=True)
 
     def hidden(self):
         self.engine.input.removeKeyListener(self)
 
+
 class GetText(Layer, KeyListener):
     """Text input layer."""
-    def __init__(self, engine, prompt = "", text = ""):
+    def __init__(self, engine, prompt="", text=""):
         self.text = text
         self.prompt = prompt
         self.engine = engine
@@ -163,14 +164,12 @@ class GetText(Layer, KeyListener):
         if self.logClassInits == 1:
             log.debug("GetText class init (Dialogs.py)...")
 
-        self.sfxVolume    = self.engine.config.get("audio", "SFX_volume")
+        self.sfxVolume = self.engine.config.get("audio", "SFX_volume")
 
-        self.drumHighScoreNav = self.engine.config.get("game", "drum_navigation")  #MFH
-
-
+        self.drumHighScoreNav = self.engine.config.get("game", "drum_navigation")
 
     def shown(self):
-        self.engine.input.addKeyListener(self, priority = True)
+        self.engine.input.addKeyListener(self, priority=True)
         self.engine.input.enableKeyRepeat()
 
     def hidden(self):
@@ -186,27 +185,27 @@ class GetText(Layer, KeyListener):
             self.text += unicode
         elif key == pygame.K_LSHIFT or key == pygame.K_RSHIFT:
             return True
-        elif (c in Player.menuYes or key == pygame.K_RETURN) and not self.accepted:   #MFH - adding support for green drum "OK"
+        elif (c in Player.menuYes or key == pygame.K_RETURN) and not self.accepted:  # adding support for green drum "OK"
             self.engine.view.popLayer(self)
             self.accepted = True
             if c in Player.key1s:
-                self.engine.data.acceptSound.setVolume(self.sfxVolume)  #MFH
+                self.engine.data.acceptSound.setVolume(self.sfxVolume)
                 self.engine.data.acceptSound.play()
         elif (c in Player.menuNo or key == pygame.K_ESCAPE) and not self.accepted:
             self.text = ""
             self.engine.view.popLayer(self)
             self.accepted = True
             if c in Player.key2s:
-                self.engine.data.cancelSound.setVolume(self.sfxVolume)  #MFH
+                self.engine.data.cancelSound.setVolume(self.sfxVolume)
                 self.engine.data.cancelSound.play()
         elif c in Player.key4s and not self.accepted:
             self.text = self.text[:-1]
             if c in Player.key4s:
-                self.engine.data.cancelSound.setVolume(self.sfxVolume)  #MFH
+                self.engine.data.cancelSound.setVolume(self.sfxVolume)
                 self.engine.data.cancelSound.play()
         elif c in Player.key3s and not self.accepted:
             self.text += self.text[len(self.text) - 1]
-            self.engine.data.acceptSound.setVolume(self.sfxVolume)  #MFH
+            self.engine.data.acceptSound.setVolume(self.sfxVolume)
             self.engine.data.acceptSound.play()
         elif c in Player.action1s and not self.accepted:
             if len(self.text) == 0:
@@ -229,7 +228,7 @@ class GetText(Layer, KeyListener):
             else:
                 letterNum -= 1
             self.text = self.text[:-1] + chr(letterNum)
-            self.engine.data.selectSound.setVolume(self.sfxVolume)  #MFH
+            self.engine.data.selectSound.setVolume(self.sfxVolume)
             self.engine.data.selectSound.play()
         elif c in Player.action2s and not self.accepted:
             if len(self.text) == 0:
@@ -252,7 +251,7 @@ class GetText(Layer, KeyListener):
             else:
                 letterNum += 1
             self.text = self.text[:-1] + chr(letterNum)
-            self.engine.data.selectSound.setVolume(self.sfxVolume)  #MFH
+            self.engine.data.selectSound.setVolume(self.sfxVolume)
             self.engine.data.selectSound.play()
         return True
 
@@ -260,9 +259,9 @@ class GetText(Layer, KeyListener):
         self.time += ticks / 50.0
 
     def render(self, visibility, topMost):
-        self.engine.view.setViewport(1,0)
+        self.engine.view.setViewport(1, 0)
         font = self.engine.data.font
-        with self.engine.view.orthogonalProjection(normalize = True):
+        with self.engine.view.orthogonalProjection(normalize=True):
             v = (1 - visibility) ** 2
 
             self.engine.fadeScreen(v)
@@ -281,17 +280,18 @@ class GetText(Layer, KeyListener):
                 pos = wrapText(font, (.1, (pos[1] + v) + .08 + v / 4), self.text)
                 font.render(cursor, pos)
 
+
 class GetKey(Layer, KeyListener):
     """Key choosing layer."""
-    def __init__(self, engine, prompt = "", key = None, noKey = False, specialKeyList = []):
+    def __init__(self, engine, prompt="", key=None, noKey=False, specialKeyList=[]):
         self.key = key
         self.prompt = prompt
         self.engine = engine
         self.time = 0
-        self.accepted  = False
-        self.noKey     = noKey
+        self.accepted = False
+        self.noKey = noKey
         self.toggleEsc = False
-        self.escTimer  = 1000
+        self.escTimer = 1000
         self.specialKeyList = specialKeyList
 
         self.logClassInits = self.engine.config.get("game", "log_class_inits")
@@ -299,7 +299,7 @@ class GetKey(Layer, KeyListener):
             log.debug("GetKey class init (Dialogs.py)...")
 
     def shown(self):
-        self.engine.input.addKeyListener(self, priority = True)
+        self.engine.input.addKeyListener(self, priority=True)
 
     def hidden(self):
         self.engine.input.removeKeyListener(self)
@@ -333,10 +333,10 @@ class GetKey(Layer, KeyListener):
                 self.accepted = True
 
     def render(self, visibility, topMost):
-        self.engine.view.setViewport(1,0)
+        self.engine.view.setViewport(1, 0)
         font = self.engine.data.font
 
-        with self.engine.view.orthogonalProjection(normalize = True):
+        with self.engine.view.orthogonalProjection(normalize=True):
             v = (1 - visibility) ** 2
 
             self.engine.fadeScreen(v)
@@ -350,9 +350,10 @@ class GetKey(Layer, KeyListener):
                 text = pygame.key.name(self.key).capitalize()
                 pos = wrapText(font, (.1, (pos[1] + v) + .08 + v / 4), text)
 
+
 class LoadingScreen(Layer, KeyListener):
     """Loading screen layer."""
-    def __init__(self, engine, condition, text, allowCancel = False):
+    def __init__(self, engine, condition, text, allowCancel=False):
         self.engine       = engine
         self.text         = text
         self.condition    = condition
@@ -368,11 +369,11 @@ class LoadingScreen(Layer, KeyListener):
         self.loadingy = self.engine.theme.loadingY
         self.allowtext = self.engine.config.get("game", "lphrases")
 
-        #Get theme
+        # Get theme
         self.theme = self.engine.data.theme
 
     def shown(self):
-        self.engine.input.addKeyListener(self, priority = True)
+        self.engine.input.addKeyListener(self, priority=True)
 
     def keyPressed(self, key, unicode):
         c = self.engine.input.controls.getMapping(key)
@@ -390,23 +391,23 @@ class LoadingScreen(Layer, KeyListener):
             self.ready = True
 
     def render(self, visibility, topMost):
-        self.engine.view.setViewport(1,0)
+        self.engine.view.setViewport(1, 0)
         font = self.engine.data.loadingFont
 
         if not font:
             return
 
-        with self.engine.view.orthogonalProjection(normalize = True):
+        with self.engine.view.orthogonalProjection(normalize=True):
             v = (1 - visibility) ** 2
             self.engine.fadeScreen(v)
 
             w, h = self.engine.view.geometry[2:4]
             self.loadingImg = self.engine.data.loadingImage
 
-            #MFH - auto-scaling of loading screen
-            #Volshebnyi - fit to screen applied
+            # auto-scaling of loading screen
+            # fit to screen applied
             if self.loadingImg:
-                drawImage(self.loadingImg, scale = (1.0,-1.0), coord = (w/2,h/2), stretched = FULL_SCREEN)
+                drawImage(self.loadingImg, scale=(1.0, -1.0), coord=(w/2, h/2), stretched=FULL_SCREEN)
 
             self.engine.theme.setBaseColor(1 - v)
             w, h = font.getStringSize(self.text)
@@ -427,13 +428,14 @@ class LoadingScreen(Layer, KeyListener):
 
             if self.allowtext:
                 if self.theme == 1:
-                    font.render(self.text, (x, y), shadowoffset = (self.engine.theme.shadowoffsetx, self.engine.theme.shadowoffsety))
+                    font.render(self.text, (x, y), shadowoffset=(self.engine.theme.shadowoffsetx, self.engine.theme.shadowoffsety))
                 else:
                     font.render(self.text, (x, y))
 
+
 class MessageScreen(Layer, KeyListener):
     """Message screen layer."""
-    def __init__(self, engine, text, prompt = _("<OK>")):
+    def __init__(self, engine, text, prompt=_("<OK>")):
         self.engine = engine
         self.text = text
         self.time = 0.0
@@ -443,9 +445,8 @@ class MessageScreen(Layer, KeyListener):
         if self.logClassInits == 1:
             log.debug("MessageScreen class init (Dialogs.py)...")
 
-
     def shown(self):
-        self.engine.input.addKeyListener(self, priority = True)
+        self.engine.input.addKeyListener(self, priority=True)
 
     def keyPressed(self, key, unicode):
         c = self.engine.input.controls.getMapping(key)
@@ -460,30 +461,31 @@ class MessageScreen(Layer, KeyListener):
         self.time += ticks / 50.0
 
     def render(self, visibility, topMost):
-        self.engine.view.setViewport(1,0)
+        self.engine.view.setViewport(1, 0)
         font = self.engine.data.font
 
         if not font:
             return
 
-        with self.engine.view.orthogonalProjection(normalize = True):
+        with self.engine.view.orthogonalProjection(normalize=True):
             v = (1 - visibility) ** 2
             self.engine.fadeScreen(v)
 
             x = .1
             y = .3 + v * 2
             self.engine.theme.setBaseColor(1 - v)
-            pos = wrapText(font, (x, y), self.text, visibility = v)
+            pos = wrapText(font, (x, y), self.text, visibility=v)
 
-            w, h = font.getStringSize(self.prompt, scale = 0.001)
+            w, h = font.getStringSize(self.prompt, scale=0.001)
             x = .5 - w / 2
             y = pos[1] + 3 * h + v * 2
             self.engine.theme.setSelectedColor(1 - v)
-            font.render(self.prompt, (x, y), scale = 0.001)
+            font.render(self.prompt, (x, y), scale=0.001)
+
 
 class FileChooser(BackgroundLayer, KeyListener):
     """File choosing layer."""
-    def __init__(self, engine, masks, path, prompt = "", dirSelect = False):
+    def __init__(self, engine, masks, path, prompt="", dirSelect=False):
         self.masks          = masks
         self.path           = unicodify(path)
         self.prompt         = prompt
@@ -497,14 +499,13 @@ class FileChooser(BackgroundLayer, KeyListener):
         if self.logClassInits == 1:
             log.debug("FileChooser class init (Dialogs.py)...")
 
+        self.dirSelect = dirSelect
 
-        self.dirSelect      = dirSelect
-
-        #Get theme
-        #now theme determination logic is only in data.py:
+        # Get theme
+        # now theme determination logic is only in data.py:
         self.theme = self.engine.data.theme
 
-       #MFH - added simple black background to place in front of Options background, behind Neck BG, for transparent neck displays
+        # added simple black background to place in front of Options background, behind Neck BG, for transparent neck displays
         if not self.engine.loadImgDrawing(self, "neckBlackBack", ("neckblackback.png")):
             self.neckBlackBack = None
 
@@ -526,7 +527,8 @@ class FileChooser(BackgroundLayer, KeyListener):
     def getFiles(self):
         files = [u".."]
         for fn in os.listdir(self.path):
-            if fn.startswith("."): continue
+            if fn.startswith("."):
+                continue
             f = os.path.join(self.path, fn)
             for mask in self.masks:
                 if fnmatch.fnmatch(fn, mask):
@@ -542,7 +544,7 @@ class FileChooser(BackgroundLayer, KeyListener):
 
     def getDisks(self):
         import win32file, string
-        driveLetters=[]
+        driveLetters = []
         for drive in string.letters[len(string.letters) / 2:]:
             if win32file.GetDriveType(drive + ":") == win32file.DRIVE_FIXED:
                 driveLetters.append(drive + u":\\")
@@ -556,9 +558,9 @@ class FileChooser(BackgroundLayer, KeyListener):
             self.path = u"/"
 
         if self.path == u"toplevel":
-            self.menu = Menu(self.engine, choices = [(self._getFileText(f), self._getFileCallback(f)) for f in self.getDisks()], onClose = self.close, onCancel = self.cancel)
+            self.menu = Menu(self.engine, choices=[(self._getFileText(f), self._getFileCallback(f)) for f in self.getDisks()], onClose=self.close, onCancel=self.cancel)
         else:
-            self.menu = Menu(self.engine, choices = [(self._getFileText(f), self._getFileCallback(f)) for f in self.getFiles()], onClose = self.close, onCancel = self.cancel)
+            self.menu = Menu(self.engine, choices=[(self._getFileText(f), self._getFileCallback(f)) for f in self.getFiles()], onClose=self.close, onCancel=self.cancel)
         self.engine.view.pushLayer(self.menu)
 
     def chooseFile(self, fileName):
@@ -611,34 +613,33 @@ class FileChooser(BackgroundLayer, KeyListener):
 
         # render the background
 
-        self.engine.view.setViewport(1,0)
+        self.engine.view.setViewport(1, 0)
         w, h, = self.engine.view.geometry[2:4]
 
-        #MFH - draw neck black BG in for transparent areas (covers options BG):
+        # draw neck black BG in for transparent areas (covers options BG):
         if self.neckBlackBack is not None:
-            #MFH - auto background scaling
-            drawImage(self.neckBlackBack, scale = (1.0,-1.0), coord = (w/2,h/2), stretched = FULL_SCREEN)
+            # auto background scaling
+            drawImage(self.neckBlackBack, scale=(1.0, -1.0), coord=(w/2, h/2), stretched=FULL_SCREEN)
 
-
-        #MFH - auto background scaling
+        # auto background scaling
         if self.engine.data.optionsBG:
-            drawImage(self.engine.data.optionsBG, scale = (1.0,-1.0), coord = (w/2,h/2), stretched = FULL_SCREEN)
-
+            drawImage(self.engine.data.optionsBG, scale=(1.0, -1.0), coord=(w/2, h/2), stretched=FULL_SCREEN)
 
         font = self.engine.data.font
-        with self.engine.view.orthogonalProjection(normalize = True):
+        with self.engine.view.orthogonalProjection(normalize=True):
             glEnable(GL_BLEND)
             glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
             glEnable(GL_COLOR_MATERIAL)
             self.engine.theme.setBaseColor(1 - v)
             wrapText(font, (.1, .05 - v), self.prompt)
 
+
 class NeckChooser(Layer, KeyListener):
     """
     Item menu layer.
     on-demand Neck Select menu
     """
-    def __init__(self, engine, selected = None, prompt = _("Yellow (#3) / Blue (#4) to change, Green (#1) to confirm:"), player = "default", owner = None):
+    def __init__(self, engine, selected=None, prompt=_("Yellow (#3) / Blue (#4) to change, Green (#1) to confirm:"), player="default", owner=None):
         self.prompt   = prompt
         self.prompt_x = engine.theme.neck_prompt_x
         self.prompt_y = engine.theme.neck_prompt_y
@@ -667,39 +668,40 @@ class NeckChooser(Layer, KeyListener):
         else:
             playerNeck = defaultNeck
 
-        # evilynux - improved loading logic to support arbitrary filenames
-        #          - os.listdir is not guaranteed to return a sorted list, so sort it!
+        # improved loading logic to support arbitrary filenames
+        # os.listdir is not guaranteed to return a sorted list, so sort it!
         path = self.engine.resource.fileName("necks")
         # only list files
         neckfiles = [ f for f in os.listdir(path) if os.path.isfile(os.path.join(path, f)) ]
         neckfiles.sort()
 
-        for i in neckfiles:   #MFH - first go through and find the random neck
-            if ( os.path.splitext(i)[0] == "randomneck" ):    #MFH
+        # first go through and find the random neck
+        for i in neckfiles:
+            if os.path.splitext(i)[0] == "randomneck":
                 exists = 1
 
-                neckImage = engine.loadImgDrawing(self, "neck"+str(i), os.path.join("necks",str(i)))
+                neckImage = engine.loadImgDrawing(self, "neck"+str(i), os.path.join("necks", str(i)))
                 if not neckImage:
-                    # evilynux - Warning, Thumbs.db won't fail at engine.loadImgDrawing
+                    # Warning, Thumbs.db won't fail at engine.loadImgDrawing
                     exists = 0
                     continue
                 else:
                     exists = 1
 
                 if exists == 1:
-                    self.neck.append(str(i)[:-4]) # evilynux - filename w/o extension
+                    self.neck.append(str(i)[:-4])  # filename w/o extension
                     self.necks.append(neckImage)
                     break
 
         for i in neckfiles:
-            # evilynux - Special cases, ignore these...
-            if os.path.splitext(i)[0] == "randomneck" or os.path.splitext(i)[0] == "overdriveneck":    #MFH
+            # Special cases, ignore these...
+            if os.path.splitext(i)[0] == "randomneck" or os.path.splitext(i)[0] == "overdriveneck":
                 exists = 0
                 continue
 
-            neckImage = engine.loadImgDrawing(self, "neck"+str(i), os.path.join("necks",str(i)))
+            neckImage = engine.loadImgDrawing(self, "neck"+str(i), os.path.join("necks", str(i)))
             if not neckImage:
-                # evilynux - Warning, Thumbs.db won't fail at engine.loadImgDrawing
+                # Warning, Thumbs.db won't fail at engine.loadImgDrawing
                 exists = 0
                 continue
             else:
@@ -710,8 +712,8 @@ class NeckChooser(Layer, KeyListener):
                 self.necks.append(neckImage)
                 self.maxNeck += 1
 
-        self.maxNeck -= 1 # evilynux - confusing, but there's an offset of -1
-        Config.define("player",   "neck",  str,  0,  text = _("Neck"), options = self.neck)
+        self.maxNeck -= 1  # confusing, but there's an offset of -1
+        Config.define("player", "neck", str, 0, text=_("Neck"), options=self.neck)
 
         for i, neck in enumerate(self.neck):
             if neck == playerNeck:
@@ -727,39 +729,36 @@ class NeckChooser(Layer, KeyListener):
         self.necks.append("none")
         self.necks.append("2none")
 
-        self.accepted       = False
-        self.time           = 0.0
+        self.accepted = False
+        self.time = 0.0
 
-
-        #Get theme
+        # Get theme
         self.themename = self.engine.data.themeLabel
         self.theme = self.engine.data.theme
 
-        #MFH - added simple black background to place in front of Options background, behind Neck BG, for transparent neck displays
+        # added simple black background to place in front of Options background, behind Neck BG, for transparent neck displays
         if not self.engine.loadImgDrawing(self, "neckBlackBack", ("neckblackback.png")):
             self.neckBlackBack = None
 
-
-
-        self.engine.loadImgDrawing(self, "neckBG", os.path.join("themes",self.themename,"menu","neckchoosebg.png"))
-        self.engine.loadImgDrawing(self, "neckSelect", os.path.join("themes",self.themename,"menu","neckchooseselect.png"))
+        self.engine.loadImgDrawing(self, "neckBG", os.path.join("themes", self.themename, "menu", "neckchoosebg.png"))
+        self.engine.loadImgDrawing(self, "neckSelect", os.path.join("themes", self.themename, "menu", "neckchooseselect.png"))
 
         # ready... hide the splash screen
         hideLoadingSplashScreen(self.engine, splash)
         splash = None
 
     def shown(self):
-        self.engine.input.addKeyListener(self, priority = True)
+        self.engine.input.addKeyListener(self, priority=True)
 
     def hidden(self):
         self.engine.input.removeKeyListener(self)
 
     def chooseNeck(self):
         if self.player == "default":
-            self.engine.config.set("game","default_neck",self.neck[self.selectedNeck])
-        if self.owner: #rather hard-coded...
+            self.engine.config.set("game", "default_neck", self.neck[self.selectedNeck])
+        if self.owner:  # rather hard-coded...
             if self.player != "default":
-                self.owner.neck  = self.neck[self.selectedNeck]
+                self.owner.neck = self.neck[self.selectedNeck]
         self.engine.view.popLayer(self)
 
     def cancel(self):
@@ -794,14 +793,13 @@ class NeckChooser(Layer, KeyListener):
     def render(self, visibility, topMost):
         v = (1 - visibility) ** 2
         # render the background
-        self.engine.view.setViewport(1,0)
+        self.engine.view.setViewport(1, 0)
         w, h, = self.engine.view.geometry[2:4]
 
-
-        #MFH - draw neck black BG in for transparent necks (covers options BG):
+        # draw neck black BG in for transparent necks (covers options BG):
         if self.neckBlackBack is not None:
-            #MFH - auto background scaling
-            drawImage(self.neckBlackBack, scale = (1.0,-1.0), coord = (w/2,h/2), stretched = FULL_SCREEN)
+            # auto background scaling
+            drawImage(self.neckBlackBack, scale=(1.0, -1.0), coord=(w/2, h/2), stretched=FULL_SCREEN)
 
         currentNeck = self.necks[int(self.selectedNeck)+2]
         lastNeck1 = self.necks[int(self.selectedNeck)]
@@ -824,80 +822,74 @@ class NeckChooser(Layer, KeyListener):
             nextNeck1 = self.necks[3]
 
         if self.theme == 2:
-            self.x1 = w*0.067
-            self.x2 = w*0.187
-            self.x3 = w*0.307
-            self.x4 = w*0.427
-            self.x5 = w*0.547
-            self.x6 = w*0.296
-            self.y1 = h*0.420
-            self.y2 = h*0.420
-            self.y3 = h*0.420
-            self.y4 = h*0.420
-            self.y5 = h*0.420
-            self.y6 = h*0.420
+            self.x1 = w * 0.067
+            self.x2 = w * 0.187
+            self.x3 = w * 0.307
+            self.x4 = w * 0.427
+            self.x5 = w * 0.547
+            self.x6 = w * 0.296
+            self.y1 = h * 0.420
+            self.y2 = h * 0.420
+            self.y3 = h * 0.420
+            self.y4 = h * 0.420
+            self.y5 = h * 0.420
+            self.y6 = h * 0.420
             self.wfac = 384.000
             self.wfac2 = 124.000
         else:
-            self.x1 = w*0.05
-            self.x2 = w*0.175
-            self.x3 = w*0.296
-            self.x4 = w*0.42
-            self.x5 = w*0.539
-            self.x6 = w*0.296
-            self.y1 = h*0.420
-            self.y2 = h*0.554
-            self.y3 = h*0.415
-            self.y4 = h*0.554
-            self.y5 = h*0.402
-            self.y6 = h*0.423
+            self.x1 = w * 0.05
+            self.x2 = w * 0.175
+            self.x3 = w * 0.296
+            self.x4 = w * 0.42
+            self.x5 = w * 0.539
+            self.x6 = w * 0.296
+            self.y1 = h * 0.420
+            self.y2 = h * 0.554
+            self.y3 = h * 0.415
+            self.y4 = h * 0.554
+            self.y5 = h * 0.402
+            self.y6 = h * 0.423
             self.wfac = 374.000
             self.wfac2 = 128.000
 
-
-
-        wfactor = currentNeck.widthf(pixelw = self.wfac)
+        wfactor = currentNeck.widthf(pixelw=self.wfac)
         if self.theme != 2:
-            neckcoord = (w/1.31,h/2)
+            neckcoord = (w/1.31, h/2)
         else:
-            neckcoord = (w/1.22,h/2)
-        drawImage(currentNeck, scale = (-wfactor,wfactor), coord = neckcoord)
+            neckcoord = (w/1.22, h/2)
+        drawImage(currentNeck, scale=(-wfactor, wfactor), coord=neckcoord)
 
-
-        wfactor = lastNeck1.widthf(pixelw = self.wfac2)
-        drawImage(lastNeck1, scale = (-wfactor,wfactor), coord = (self.x1,self.y1))
-        wfactor = lastNeck.widthf(pixelw = self.wfac2)
-        drawImage(lastNeck, scale = (-wfactor,wfactor), coord = (self.x2,self.y2))
-        wfactor = currentNeck.widthf(pixelw = self.wfac2)
-        drawImage(currentNeck, scale = (-wfactor,wfactor), coord = (self.x3,self.y3))
-        wfactor = nextNeck.widthf(pixelw = self.wfac2)
-        drawImage(nextNeck, scale = (-wfactor,wfactor), coord = (self.x4,self.y4))
-        wfactor = nextNeck1.widthf(pixelw = self.wfac2)
-        drawImage(nextNeck1, scale = (-wfactor,wfactor), coord = (self.x5,self.y5))
+        wfactor = lastNeck1.widthf(pixelw=self.wfac2)
+        drawImage(lastNeck1, scale=(-wfactor, wfactor), coord=(self.x1, self.y1))
+        wfactor = lastNeck.widthf(pixelw=self.wfac2)
+        drawImage(lastNeck, scale=(-wfactor, wfactor), coord=(self.x2, self.y2))
+        wfactor = currentNeck.widthf(pixelw=self.wfac2)
+        drawImage(currentNeck, scale=(-wfactor, wfactor), coord=(self.x3, self.y3))
+        wfactor = nextNeck.widthf(pixelw=self.wfac2)
+        drawImage(nextNeck, scale=(-wfactor, wfactor), coord=(self.x4, self.y4))
+        wfactor = nextNeck1.widthf(pixelw=self.wfac2)
+        drawImage(nextNeck1, scale=(-wfactor, wfactor), coord=(self.x5, self.y5))
 
         if self.selectedNeck:
-            drawImage(self.neckSelect, scale = (-1.0,1.0), coord = (self.x6, self.y6))
+            drawImage(self.neckSelect, scale=(-1.0, 1.0), coord=(self.x6, self.y6))
 
-        #MFH - draw neck BG on top of necks
-        #MFH - auto background scaling
-        drawImage(self.neckBG, scale = (1.0,-1.0), coord = (w/2,h/2), stretched = FULL_SCREEN)
-
+        # draw neck BG on top of necks
+        # auto background scaling
+        drawImage(self.neckBG, scale=(1.0, -1.0), coord=(w/2, h/2), stretched=FULL_SCREEN)
 
         font = self.engine.data.font
-        with self.engine.view.orthogonalProjection(normalize = True):
+        with self.engine.view.orthogonalProjection(normalize=True):
             glEnable(GL_BLEND)
             glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
             glEnable(GL_COLOR_MATERIAL)
             self.engine.theme.setBaseColor(1 - v)
             wrapText(font, (self.prompt_x, self.prompt_y - v), self.prompt)
-        #==============================================================
-
 
 
 class AvatarChooser(Layer, KeyListener):
     """Avatar choosing layer"""
     def __init__(self, engine):
-        self.engine   = engine
+        self.engine = engine
 
         self.logClassInits = self.engine.config.get("game", "log_class_inits")
         if self.logClassInits == 1:
@@ -905,7 +897,7 @@ class AvatarChooser(Layer, KeyListener):
 
         splash = showLoadingSplashScreen(self.engine, _("Loading avatars..."))
 
-        #Get theme
+        # Get theme
         self.themename = self.engine.data.themeLabel
         self.theme = self.engine.data.theme
 
@@ -921,20 +913,20 @@ class AvatarChooser(Layer, KeyListener):
         self.rate      = 0
         self.scroller  = [0, self.scrollUp, self.scrollDown]
 
-        # evilynux - improved loading logic to support arbitrary filenames
-        #          - os.listdir is not guaranteed to return a sorted list, so sort it!
+        # improved loading logic to support arbitrary filenames
+        # os.listdir is not guaranteed to return a sorted list, so sort it!
         avatarpath = self.engine.resource.fileName("avatars")
         avatarfiles = [ f for f in os.listdir(avatarpath) if os.path.isfile(os.path.join(avatarpath, f)) ]
         avatarfiles.sort()
 
         themeavatarfiles = []
-        themeavatarpath = self.engine.resource.fileName(os.path.join("themes",self.themename,"avatars"))
+        themeavatarpath = self.engine.resource.fileName(os.path.join("themes", self.themename, "avatars"))
         if os.path.exists(themeavatarpath):
             themeavatarfiles = [ f for f in os.listdir(themeavatarpath) if os.path.isfile(os.path.join(themeavatarpath, f)) ]
             themeavatarfiles.sort()
 
         for i in themeavatarfiles:
-            image = engine.loadImgDrawing(self, "av"+str(i), os.path.join("themes",self.themename,"avatars",str(i)))
+            image = engine.loadImgDrawing(self, "av"+str(i), os.path.join("themes", self.themename, "avatars", str(i)))
             if not image:
                 exists = 0
                 continue
@@ -942,13 +934,13 @@ class AvatarChooser(Layer, KeyListener):
                 exists = 1
 
             if exists == 1:
-                self.avatar.append(str(i)[:-4]) # evilynux - filename w/o extension
+                self.avatar.append(str(i)[:-4])  # filename w/o extension
                 self.avatars.append(image)
                 self.maxAv += 1
         self.themeAvs = len(self.avatars)
 
         for i in avatarfiles:
-            image = engine.loadImgDrawing(self, "av"+str(i), os.path.join("avatars",str(i)))
+            image = engine.loadImgDrawing(self, "av"+str(i), os.path.join("avatars", str(i)))
             if not image:
                 exists = 0
                 continue
@@ -956,7 +948,7 @@ class AvatarChooser(Layer, KeyListener):
                 exists = 1
 
             if exists == 1:
-                self.avatar.append(str(i)[:-4]) # evilynux - filename w/o extension
+                self.avatar.append(str(i)[:-4])  # filename w/o extension
                 self.avatars.append(image)
                 self.maxAv += 1
 
@@ -965,63 +957,62 @@ class AvatarChooser(Layer, KeyListener):
         for avatar in self.avatars:
             imgheight = avatar.height1()
             imgwidth  = avatar.width1()
-            hFactor = 110.00/imgheight
-            wFactor = 178.00/imgwidth
+            hFactor = 110.00 / imgheight
+            wFactor = 178.00 / imgwidth
             self.avScale.append(min(hFactor, wFactor))
-        self.maxAv -= 1 # evilynux - confusing, but there's an offset of -1
+        self.maxAv -= 1  # confusing, but there's an offset of -1
 
-        self.accepted       = False
-        self.time           = 0.0
-        self.dist           = 1.0
+        self.accepted = False
+        self.time = 0.0
+        self.dist = 1.0
 
-
-        #MFH - added simple black background to place in front of Options background, behind Neck BG, for transparent neck displays
-        if not self.engine.loadImgDrawing(self, "avFrame", os.path.join("themes",self.themename,"lobby","avatarframe.png")):
+        # added simple black background to place in front of Options background, behind Neck BG, for transparent neck displays
+        if not self.engine.loadImgDrawing(self, "avFrame", os.path.join("themes", self.themename, "lobby", "avatarframe.png")):
             self.avFrame = None
 
-        if not self.engine.loadImgDrawing(self, "avSelFrame", os.path.join("themes",self.themename,"lobby","avatarselectframe.png")):
+        if not self.engine.loadImgDrawing(self, "avSelFrame", os.path.join("themes", self.themename, "lobby", "avatarselectframe.png")):
             self.avSelFrame = self.avFrame
 
-        if not self.engine.loadImgDrawing(self, "avBigFrame", os.path.join("themes",self.themename,"lobby","avatarmainframe.png")):
+        if not self.engine.loadImgDrawing(self, "avBigFrame", os.path.join("themes", self.themename, "lobby", "avatarmainframe.png")):
             self.avBigFrame = self.avFrame
 
-        if not self.engine.loadImgDrawing(self, "avText", os.path.join("themes",self.themename,"lobby","avatartext.png")):
+        if not self.engine.loadImgDrawing(self, "avText", os.path.join("themes", self.themename, "lobby", "avatartext.png")):
             self.avText = None
 
         self.avFrameScale = None
         if self.avFrame:
             imgheight = self.avFrame.height1()
             imgwidth  = self.avFrame.width1()
-            hFactor = 110.00/imgheight
-            wFactor = 178.00/imgwidth
+            hFactor = 110.00 / imgheight
+            wFactor = 178.00 / imgwidth
             self.avFrameScale = (wFactor, -hFactor)
 
         self.avSelFrameScale = None
         if self.avSelFrame:
             imgheight = self.avSelFrame.height1()
             imgwidth  = self.avSelFrame.width1()
-            hFactor = 110.00/imgheight
-            wFactor = 178.00/imgwidth
+            hFactor = 110.00 / imgheight
+            wFactor = 178.00 / imgwidth
             self.avSelFrameScale = (wFactor, -hFactor)
 
         self.avBigFrameScale = None
         if self.avBigFrame:
             imgheight = self.avBigFrame.height1()
             imgwidth  = self.avBigFrame.width1()
-            hFactor = 110.00/imgheight
-            wFactor = 178.00/imgwidth
+            hFactor = 110.00 / imgheight
+            wFactor = 178.00 / imgwidth
             self.avBigFrameScale = (wFactor, -hFactor)
 
         self.avatarText = _("Select Your Avatar:")
 
-        if not self.engine.loadImgDrawing(self, "background", os.path.join("themes",self.themename,"lobby","avatarbg.png")):
+        if not self.engine.loadImgDrawing(self, "background", os.path.join("themes", self.themename, "lobby", "avatarbg.png")):
             self.background = None
 
         hideLoadingSplashScreen(self.engine, splash)
         splash = None
 
     def shown(self):
-        self.engine.input.addKeyListener(self, priority = True)
+        self.engine.input.addKeyListener(self, priority=True)
 
     def hidden(self):
         self.engine.input.removeKeyListener(self)
@@ -1086,20 +1077,20 @@ class AvatarChooser(Layer, KeyListener):
 
     def render(self, visibility, topMost):
         v = (1 - visibility) ** 2
-        self.engine.view.setViewport(1,0)
+        self.engine.view.setViewport(1, 0)
         w, h, = self.engine.view.geometry[2:4]
 
-        with self.engine.view.orthogonalProjection(normalize = True):
+        with self.engine.view.orthogonalProjection(normalize=True):
             if self.background:
-                drawImage(self.background, scale = (1.0, -1.0), coord = (w/2,h/2), stretched = FULL_SCREEN)
+                drawImage(self.background, scale=(1.0, -1.0), coord=(w/2, h/2), stretched=FULL_SCREEN)
             else:
                 self.engine.fadeScreen(v)
             self.engine.theme.setBaseColor(1 - v)
             if len(self.avatars) > 1:
-                lastAv2i  = (int(self.selectedAv)-2) % len(self.avatars)
-                lastAvi   = (int(self.selectedAv)-1) % len(self.avatars)
-                nextAvi   = (int(self.selectedAv)+1) % len(self.avatars)
-                nextAv2i  = (int(self.selectedAv)+2) % len(self.avatars)
+                lastAv2i  = (int(self.selectedAv) - 2) % len(self.avatars)
+                lastAvi   = (int(self.selectedAv) - 1) % len(self.avatars)
+                nextAvi   = (int(self.selectedAv) + 1) % len(self.avatars)
+                nextAv2i  = (int(self.selectedAv) + 2) % len(self.avatars)
             else:
                 lastAv2i  = 0
                 lastAvi   = 0
@@ -1111,55 +1102,55 @@ class AvatarChooser(Layer, KeyListener):
             nextAv    = self.avatars[nextAvi]
             nextAv2   = self.avatars[nextAv2i]
 
-            self.x1 = w*(0.07-self.dist/2)
-            self.x2 = w*(0.17-self.dist/2)
-            self.x3 = w*(0.24-self.dist/2)
-            self.x4 = w*(0.17-self.dist/2)
-            self.x5 = w*(0.07-self.dist/2)
-            self.y1 = h*(0.75+self.engine.theme.avatarSelectWheelY)
-            self.y2 = h*(0.68+self.engine.theme.avatarSelectWheelY)
-            self.y3 = h*(0.5+self.engine.theme.avatarSelectWheelY)
-            self.y4 = h*(0.32+self.engine.theme.avatarSelectWheelY)
-            self.y5 = h*(0.25+self.engine.theme.avatarSelectWheelY)
-            bigCoord = (w*(self.engine.theme.avatarSelectAvX+self.dist),h*self.engine.theme.avatarSelectAvY)
+            self.x1 = w * (0.07 - self.dist / 2)
+            self.x2 = w * (0.17 - self.dist / 2)
+            self.x3 = w * (0.24 - self.dist / 2)
+            self.x4 = w * (0.17 - self.dist / 2)
+            self.x5 = w * (0.07 - self.dist / 2)
+            self.y1 = h * (0.75 + self.engine.theme.avatarSelectWheelY)
+            self.y2 = h * (0.68 + self.engine.theme.avatarSelectWheelY)
+            self.y3 = h * (0.50 + self.engine.theme.avatarSelectWheelY)
+            self.y4 = h * (0.32 + self.engine.theme.avatarSelectWheelY)
+            self.y5 = h * (0.25 + self.engine.theme.avatarSelectWheelY)
+            bigCoord = (w * (self.engine.theme.avatarSelectAvX + self.dist), h * self.engine.theme.avatarSelectAvY)
 
             if self.avBigFrame:
-                drawImage(self.avFrame, scale = (self.avBigFrameScale[0]*1.75,self.avBigFrameScale[1]*1.75), coord = bigCoord)
-            drawImage(currentAv, scale = (self.avScale[self.selectedAv]*1.75,-self.avScale[self.selectedAv]*1.75), coord = bigCoord)
+                drawImage(self.avFrame, scale=(self.avBigFrameScale[0]*1.75, self.avBigFrameScale[1]*1.75), coord=bigCoord)
+            drawImage(currentAv, scale=(self.avScale[self.selectedAv]*1.75, -self.avScale[self.selectedAv]*1.75), coord=bigCoord)
 
             if self.avFrame:
-                drawImage(self.avFrame, scale = self.avFrameScale, coord = (self.x1,self.y1))
-            drawImage(lastAv2, scale = (self.avScale[lastAv2i],-self.avScale[lastAv2i]), coord = (self.x1,self.y1))
+                drawImage(self.avFrame, scale=self.avFrameScale, coord=(self.x1, self.y1))
+            drawImage(lastAv2, scale=(self.avScale[lastAv2i], -self.avScale[lastAv2i]), coord=(self.x1, self.y1))
             if self.avFrame:
-                drawImage(self.avFrame, scale = self.avFrameScale, coord = (self.x2,self.y2))
-            drawImage(lastAv, scale = (self.avScale[lastAvi], -self.avScale[lastAvi]), coord = (self.x2,self.y2))
+                drawImage(self.avFrame, scale=self.avFrameScale, coord=(self.x2, self.y2))
+            drawImage(lastAv, scale=(self.avScale[lastAvi], -self.avScale[lastAvi]), coord=(self.x2, self.y2))
             if self.avFrame:
-                drawImage(self.avFrame, scale = self.avFrameScale, coord = (self.x5,self.y5))
-            drawImage(nextAv2, scale = (self.avScale[nextAv2i],-self.avScale[nextAv2i]), coord = (self.x5,self.y5))
+                drawImage(self.avFrame, scale=self.avFrameScale, coord=(self.x5, self.y5))
+            drawImage(nextAv2, scale=(self.avScale[nextAv2i], -self.avScale[nextAv2i]), coord=(self.x5, self.y5))
             if self.avFrame:
-                drawImage(self.avFrame, scale = self.avFrameScale, coord = (self.x4,self.y4))
-            drawImage(nextAv, scale = (self.avScale[nextAvi],-self.avScale[nextAvi]), coord = (self.x4,self.y4))
+                drawImage(self.avFrame, scale=self.avFrameScale, coord=(self.x4, self.y4))
+            drawImage(nextAv, scale=(self.avScale[nextAvi], -self.avScale[nextAvi]), coord=(self.x4, self.y4))
             if self.avSelFrame:
-                drawImage(self.avSelFrame, scale = self.avSelFrameScale, coord = (self.x3,self.y3))
-            drawImage(currentAv, scale = (self.avScale[int(self.selectedAv)],-self.avScale[int(self.selectedAv)]), coord = (self.x3,self.y3))
+                drawImage(self.avSelFrame, scale=self.avSelFrameScale, coord=(self.x3, self.y3))
+            drawImage(currentAv, scale=(self.avScale[int(self.selectedAv)], -self.avScale[int(self.selectedAv)]), coord=(self.x3, self.y3))
 
             try:
                 font = self.engine.data.fontDict[self.engine.theme.avatarSelectFont]
             except Exception:
                 font = self.engine.data.font
             if self.avText:
-                drawImage(self.avText, scale = (self.engine.theme.avatarSelectTextScale, -self.engine.theme.avatarSelectTextScale), coord = (self.engine.theme.avatarSelectTextX, self.engine.theme.avatarSelectTextY - v))
+                drawImage(self.avText, scale=(self.engine.theme.avatarSelectTextScale, -self.engine.theme.avatarSelectTextScale), coord=(self.engine.theme.avatarSelectTextX, self.engine.theme.avatarSelectTextY - v))
             else:
-                font.render(self.avatarText, (self.engine.theme.avatarSelectTextX, self.engine.theme.avatarSelectTextY - v), scale = self.engine.theme.avatarSelectTextScale)
-        #==============================================================
+                font.render(self.avatarText, (self.engine.theme.avatarSelectTextX, self.engine.theme.avatarSelectTextY - v), scale=self.engine.theme.avatarSelectTextScale)
+
 
 class PartDiffChooser(MainDialog):
     """Part and difficulty select layer"""
-    def __init__(self, engine, parts, info, players, back = False):
+    def __init__(self, engine, parts, info, players, back=False):
         MainDialog.__init__(self, engine)
         self.parts   = parts
-        self.info    = info     #SongInfo
-        self.players = players  #list of [fofix.core.Player.Player]
+        self.info    = info     # SongInfo
+        self.players = players  # list of [fofix.core.Player.Player]
         self.theme   = engine.theme
 
         self.retVal  = None
@@ -1169,13 +1160,13 @@ class PartDiffChooser(MainDialog):
         self.logClassInits = self.engine.config.get("game", "log_class_inits")
         if self.logClassInits == 1:
             log.debug("PartDiffChooser class init (Dialogs.py)...")
-        self.time    = 0.0
+        self.time = 0.0
 
-        self.yes        = []
-        self.no         = []
-        self.conf       = []
-        self.up         = []
-        self.down       = []
+        self.yes = []
+        self.no = []
+        self.conf = []
+        self.up = []
+        self.down = []
 
         for player in self.players:
             self.yes.extend(player.yes)
@@ -1231,8 +1222,8 @@ class PartDiffChooser(MainDialog):
             self.engine.view.popLayer(self)
             return
 
-        if os.path.isdir(os.path.join(self.engine.data.path,"themes",self.engine.data.themeLabel,"setlist","parts")):
-            self.engine.data.loadAllImages(self, os.path.join("themes",self.engine.data.themeLabel,"setlist","parts"))
+        if os.path.isdir(os.path.join(self.engine.data.path, "themes", self.engine.data.themeLabel, "setlist", "parts")):
+            self.engine.data.loadAllImages(self, os.path.join("themes", self.engine.data.themeLabel, "setlist", "parts"))
 
     def scrollUp(self, i):
         self.selected[i] -= 1
@@ -1323,7 +1314,7 @@ class PartDiffChooser(MainDialog):
         self.scrolling[i] = 0
 
     def run(self, ticks):
-        self.time += ticks/50.0
+        self.time += ticks / 50.0
         for i in range(len(self.players)):
             if self.scrolling[i] > 0:
                 self.delay[i] -= ticks
@@ -1334,48 +1325,49 @@ class PartDiffChooser(MainDialog):
         self.engine.theme.partDiff.run(ticks)
 
     def render(self, visibility, topMost):
-        self.engine.view.setViewport(1,0)
+        self.engine.view.setViewport(1, 0)
         w, h = self.geometry
 
-        with self.engine.view.orthogonalProjection(normalize = True):
+        with self.engine.view.orthogonalProjection(normalize=True):
             if self.img_background:
-                drawImage(self.img_background, scale = (1.0, -1.0), coord = (w/2,h/2), stretched = FULL_SCREEN)
+                drawImage(self.img_background, scale=(1.0, -1.0), coord=(w/2, h/2), stretched=FULL_SCREEN)
             self.theme.partDiff.renderPanels(self)
+
 
 class ItemChooser(BackgroundLayer, KeyListener):
     """Item menu layer."""
-    def __init__(self, engine, items, selected = None, prompt = "", pos = None):    #MFH
-        self.prompt         = prompt
-        self.engine         = engine
+    def __init__(self, engine, items, selected=None, prompt="", pos=None):
+        self.prompt = prompt
+        self.engine = engine
 
         self.logClassInits = self.engine.config.get("game", "log_class_inits")
         if self.logClassInits == 1:
             log.debug("ItemChooser class init (Dialogs.py)...")
 
-        self.accepted       = False
-        self.selectedItem   = None
-        self.time           = 0.0
+        self.accepted = False
+        self.selectedItem = None
+        self.time = 0.0
 
         self.font = self.engine.data.streakFont2
         self.promptScale = 0.002
         self.promptWidth, self.promptHeight = self.font.getStringSize(self.prompt, scale=self.promptScale)
         widthOfSpace, heightOfSpace = self.font.getStringSize(" ", scale=self.promptScale)
 
-        if pos: #MFH
+        if pos:
             self.songSelectSubmenuOffsetLines = self.engine.theme.songSelectSubmenuOffsetLines
             self.songSelectSubmenuOffsetSpaces = self.engine.theme.songSelectSubmenuOffsetSpaces
             self.posX, self.posY = pos
-            wrapX, wrapY = wrapText(self.font, (self.posX, self.posY), self.prompt, scale = self.promptScale)
-            self.menu = Menu(self.engine, choices = [(c, self._callbackForItem(c)) for c in items], onClose = self.close, onCancel = self.cancel, font = self.engine.data.streakFont2, pos = (self.posX + widthOfSpace*(self.songSelectSubmenuOffsetSpaces+1), wrapY + self.promptHeight*(self.songSelectSubmenuOffsetLines+1)) )
+            wrapX, wrapY = wrapText(self.font, (self.posX, self.posY), self.prompt, scale=self.promptScale)
+            self.menu = Menu(self.engine, choices=[(c, self._callbackForItem(c)) for c in items], onClose=self.close, onCancel=self.cancel, font=self.engine.data.streakFont2, pos=(self.posX + widthOfSpace*(self.songSelectSubmenuOffsetSpaces+1), wrapY + self.promptHeight*(self.songSelectSubmenuOffsetLines+1)))
         else:
-            self.posX = .1    #MFH - default
-            self.posY = .05   #MFH - default
-            self.menu = Menu(self.engine, choices = [(c, self._callbackForItem(c)) for c in items], onClose = self.close, onCancel = self.cancel, font = self.engine.data.streakFont2)
+            self.posX = .1    # default
+            self.posY = .05   # default
+            self.menu = Menu(self.engine, choices=[(c, self._callbackForItem(c)) for c in items], onClose=self.close, onCancel=self.cancel, font=self.engine.data.streakFont2)
 
         if selected and selected in items:
             self.menu.selectItem(items.index(selected))
 
-        #Get theme
+        # Get theme
         self.theme = self.engine.data.theme
 
     def _callbackForItem(self, item):
@@ -1409,25 +1401,26 @@ class ItemChooser(BackgroundLayer, KeyListener):
         v = (1 - visibility) ** 2
 
         # render the background
-        self.engine.view.setViewport(1,0)
+        self.engine.view.setViewport(1, 0)
         w, h, = self.engine.view.geometry[2:4]
 
-        #MFH - auto background scaling
+        # auto background scaling
         if self.engine.data.optionsBG:
-            drawImage(self.engine.data.optionsBG, scale = (1.0, -1.0), coord = (w/2,h/2), stretched = FULL_SCREEN)
+            drawImage(self.engine.data.optionsBG, scale=(1.0, -1.0), coord=(w/2, h/2), stretched=FULL_SCREEN)
 
-        with self.engine.view.orthogonalProjection(normalize = True):
+        with self.engine.view.orthogonalProjection(normalize=True):
             glEnable(GL_BLEND)
             glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
             glEnable(GL_COLOR_MATERIAL)
             self.engine.theme.setBaseColor(1 - v)
-            wrapText(self.font, (self.posX, self.posY - v), self.prompt, scale = self.promptScale)
+            wrapText(self.font, (self.posX, self.posY - v), self.prompt, scale=self.promptScale)
+
 
 class KeyTester(Layer, KeyListener):
     """Keyboard configuration testing layer."""
-    def __init__(self, engine, control, prompt = ""):
-        self.prompt         = prompt
-        self.engine         = engine
+    def __init__(self, engine, control, prompt=""):
+        self.prompt = prompt
+        self.engine = engine
 
         self.logClassInits = self.engine.config.get("game", "log_class_inits")
         if self.logClassInits == 1:
@@ -1485,11 +1478,11 @@ class KeyTester(Layer, KeyListener):
         self.engine.loadImgDrawing(self, "analogBar", "analog.png")
         self.engine.loadImgDrawing(self, "analogBox", "analogback.png")
         self.engine.loadImgDrawing(self, "analogThresh", "analogthresh.png")
-        self.analogBoxScale = 1.0/6.0
-        self.analogBarScale = 1.0/6.0
-        self.analogThreshScale = 5.000/self.analogThresh.width1()
+        self.analogBoxScale = 1.0 / 6.0
+        self.analogBarScale = 1.0 / 6.0
+        self.analogThreshScale = 5.000 / self.analogThresh.width1()
 
-        #evilynux - Get killswitch mode (analog or digital?)
+        # Get killswitch mode (analog or digital?)
         # If analog, get and show attenuation. Most code taken from GuitarScene.
         self.isKillAnalog = False
         self.isSPAnalog = False
@@ -1531,7 +1524,7 @@ class KeyTester(Layer, KeyListener):
         if self.type == 5:
             self.mic = Microphone.Microphone(self.engine, self.controlNum)
             self.mic.start()
-        self.engine.input.addKeyListener(self, priority = True)
+        self.engine.input.addKeyListener(self, priority=True)
 
     def hidden(self):
         if hasattr(self, 'mic'):
@@ -1576,9 +1569,9 @@ class KeyTester(Layer, KeyListener):
     def run(self, ticks):
         self.time += ticks
         if self.isSPAnalog:
-            if self.starpower > (self.analogSPThresh/100.0):
+            if self.starpower > (self.analogSPThresh / 100.0):
                 if self.starDelay == 0 and not self.starpowerActive:
-                    self.starDelay = (10-self.analogSPSense)*25
+                    self.starDelay = (10 - self.analogSPSense) * 25
                 else:
                     self.starDelay -= ticks
                     if self.starDelay <= 0:
@@ -1590,29 +1583,29 @@ class KeyTester(Layer, KeyListener):
     def render(self, visibility, topMost):
         v = (1 - visibility) ** 2
 
-        self.engine.view.setViewport(1,0)
+        self.engine.view.setViewport(1, 0)
         font = self.engine.data.font
         w, h = self.engine.view.geometry[2:4]
 
-        with self.engine.view.orthogonalProjection(normalize = True):
+        with self.engine.view.orthogonalProjection(normalize=True):
             if self.controls.getState(self.keyList[Player.UP]):
                 if self.controls.getState(self.keyList[Player.LEFT]):
-                    rotateArrow = math.pi/4
+                    rotateArrow = math.pi / 4
                 elif self.controls.getState(self.keyList[Player.RIGHT]):
-                    rotateArrow = -math.pi/4
+                    rotateArrow = -math.pi / 4
                 else:
                     rotateArrow = 0.0
             elif self.controls.getState(self.keyList[Player.DOWN]):
                 if self.controls.getState(self.keyList[Player.LEFT]):
-                    rotateArrow = 3*math.pi/4
+                    rotateArrow = 3 * math.pi / 4
                 elif self.controls.getState(self.keyList[Player.RIGHT]):
-                    rotateArrow = -3*math.pi/4
+                    rotateArrow = -3 * math.pi / 4
                 else:
                     rotateArrow = math.pi
             elif self.controls.getState(self.keyList[Player.LEFT]):
-                rotateArrow = math.pi/2
+                rotateArrow = math.pi / 2
             elif self.controls.getState(self.keyList[Player.RIGHT]):
-                rotateArrow = -math.pi/2
+                rotateArrow = -math.pi / 2
             else:
                 rotateArrow = None
 
@@ -1624,20 +1617,20 @@ class KeyTester(Layer, KeyListener):
             self.engine.theme.setBaseColor(1 - v)
             wrapText(font, (.1, .2 - v), self.prompt)
 
-            drawImage(self.circle, scale = (.5, -.5), coord = (w*.5,h*.6))
+            drawImage(self.circle, scale=(.5, -.5), coord=(w*.5, h*.6))
             if rotateArrow is not None:
-                drawImage(self.arrow,  scale = (.5, -.5), coord = (w*.5,h*.6), rot = rotateArrow)
+                drawImage(self.arrow, scale=(.5, -.5), coord=(w*.5, h*.6), rot=rotateArrow)
 
             if self.type != 5:
-                #akedrou - analog starpower, analog slider
+                # analog starpower, analog slider
                 text = self.names[Player.STAR]
                 wText, hText = font.getStringSize(text)
 
                 if self.isSlideAnalog:
-                    if self.analogSlideMode == 1:  #Inverted mode
-                        slideVal = -(self.engine.input.joysticks[self.whichJoySlide].get_axis(self.whichAxisSlide)+1.0)/2.0
-                    else:  #Default
-                        slideVal = (self.engine.input.joysticks[self.whichJoySlide].get_axis(self.whichAxisSlide)+1.0)/2.0
+                    if self.analogSlideMode == 1:  # Inverted mode
+                        slideVal = -(self.engine.input.joysticks[self.whichJoySlide].get_axis(self.whichAxisSlide) + 1.0) / 2.0
+                    else:  # Default
+                        slideVal = (self.engine.input.joysticks[self.whichJoySlide].get_axis(self.whichAxisSlide) + 1.0) / 2.0
                     if slideVal > 0.9 or slideVal < 0.01:
                         self.slideActive = 4
                         self.midFret = False
@@ -1670,8 +1663,8 @@ class KeyTester(Layer, KeyListener):
                         self.midFret = False
 
                 if self.isSPAnalog:
-                    starThresh = (self.analogSPThresh/100.0)*(w/6.0)-(w/12.0)
-                    drawImage(self.analogThresh, scale = (self.analogThreshScale, -self.analogThreshScale), coord = ((w*.25)+starThresh, h*.3))
+                    starThresh = (self.analogSPThresh / 100.0) * (w / 6.0) - (w / 12.0)
+                    drawImage(self.analogThresh, scale=(self.analogThreshScale, -self.analogThreshScale), coord=((w*.25)+starThresh, h*.3))
                     #(0.0 at level, -1 upright; 1 upside down)
                     self.starpower = abs(self.engine.input.joysticks[self.whichJoyStar].get_axis(self.whichAxisStar))
 
@@ -1681,9 +1674,9 @@ class KeyTester(Layer, KeyListener):
                     else:
                         glColor3f(.4, .4, .4)
                     font.render(text, (.25-wText/2, .45 + v))
-                    starC = (1-self.starpower)*.5*w*self.analogBarScale
-                    drawImage(self.analogBar, scale = (self.analogBarScale*self.starpower, -self.analogBarScale), coord = ((w*.25)-starC, h*.3), rect = (0, self.starpower, 0, 1), stretched = KEEP_ASPECT | FIT_WIDTH)
-                    drawImage(self.analogBox, scale = (self.analogBoxScale, -self.analogBoxScale), coord = (w*.25, h*.3), stretched = KEEP_ASPECT | FIT_WIDTH)
+                    starC = (1 - self.starpower) * .5 * w * self.analogBarScale
+                    drawImage(self.analogBar, scale=(self.analogBarScale*self.starpower, -self.analogBarScale), coord=((w*.25)-starC, h*.3), rect=(0, self.starpower, 0, 1), stretched=KEEP_ASPECT | FIT_WIDTH)
+                    drawImage(self.analogBox, scale=(self.analogBoxScale, -self.analogBoxScale), coord=(w*.25, h*.3), stretched=KEEP_ASPECT | FIT_WIDTH)
                 else:
                     if self.controls.getState(self.keyList[Player.STAR]):
                         self.engine.theme.setSelectedColor(1 - v)
@@ -1742,27 +1735,27 @@ class KeyTester(Layer, KeyListener):
                             wText, hText = font.getStringSize(text)
                             font.render(text, ((.125 + .15 * i)-wText/2, .35 + v))
 
-                #evilynux - Compute analog killswitch value
+                # Compute analog killswitch value
                 wText, hText = font.getStringSize(self.names[Player.KILL])
                 if self.isKillAnalog:
-                    if self.analogKillMode == 2:  #XBOX mode: (1.0 at rest, -1.0 fully depressed)
-                        self.whammy = 1.0 - ((self.engine.input.joysticks[self.whichJoyKill].get_axis(self.whichAxisKill)+1.0) / 2.0)
+                    if self.analogKillMode == 2:  # XBOX mode: (1.0 at rest, -1.0 fully depressed)
+                        self.whammy = 1.0 - ((self.engine.input.joysticks[self.whichJoyKill].get_axis(self.whichAxisKill) + 1.0) / 2.0)
 
-                    elif self.analogKillMode == 3:  #XBOX Inverted mode: (-1.0 at rest, 1.0 fully depressed)
-                        self.whammy = (self.engine.input.joysticks[self.whichJoyKill].get_axis(self.whichAxisKill)+1.0) / 2.0
+                    elif self.analogKillMode == 3:  # XBOX Inverted mode: (-1.0 at rest, 1.0 fully depressed)
+                        self.whammy = (self.engine.input.joysticks[self.whichJoyKill].get_axis(self.whichAxisKill) + 1.0) / 2.0
 
-                    else: #PS2 mode: (0.0 at rest, fluctuates between 1.0 and -1.0 when pressed)
+                    else:  # PS2 mode: (0.0 at rest, fluctuates between 1.0 and -1.0 when pressed)
                         self.whammy = abs(self.engine.input.joysticks[self.whichJoyKill].get_axis(self.whichAxisKill))
 
-                #evilynux - analog killswitch rendering
+                # analog killswitch rendering
                 if self.whammy > 0:
                     if self.whammy > 0.1:
                         self.engine.theme.setSelectedColor(1 - v)
                     else:
                         glColor3f(.4, .4, .4)
                     font.render(self.names[Player.KILL], (.75-wText/2, .45 + v))
-                    whammyC = (1-self.whammy)*.5*w*self.analogBarScale
-                    drawImage(self.analogBar, scale = (self.analogBarScale*self.whammy, -self.analogBarScale), coord = (w*.75-whammyC, h*.3), rect = (0, self.whammy, 0, 1), stretched = KEEP_ASPECT | FIT_WIDTH)
+                    whammyC = (1 - self.whammy) * .5 * w * self.analogBarScale
+                    drawImage(self.analogBar, scale=(self.analogBarScale*self.whammy, -self.analogBarScale), coord=(w*.75-whammyC, h*.3), rect=(0, self.whammy, 0, 1), stretched=KEEP_ASPECT | FIT_WIDTH)
                 else:
                     if self.controls.getState(self.keyList[Player.KILL]):
                         self.engine.theme.setSelectedColor(1 - v)
@@ -1770,7 +1763,7 @@ class KeyTester(Layer, KeyListener):
                         glColor3f(.4, .4, .4)
                     font.render(self.names[Player.KILL], (.75-wText/2, .45 + v))
 
-                drawImage(self.analogBox, scale = (self.analogBoxScale, -self.analogBoxScale), coord = (w*.75, h*.3), stretched = KEEP_ASPECT | FIT_WIDTH)
+                drawImage(self.analogBox, scale=(self.analogBoxScale, -self.analogBoxScale), coord=(w*.75, h*.3), stretched=KEEP_ASPECT | FIT_WIDTH)
                 if self.controls.getState(self.keyList[Player.ACTION1]) or self.controls.getState(self.keyList[Player.ACTION2]):
                     self.engine.theme.setSelectedColor(1 - v)
                 else:
@@ -1853,6 +1846,7 @@ class KeyTester(Layer, KeyListener):
                 wText, hText = font.getStringSize(self.names[Player.DRUMBASS])
                 font.render(self.names[Player.DRUMBASS], (.5-wText/2, .5 + v))
 
+
 def _runDialog(engine, dialog):
     """Run a dialog in a sub event loop until it is finished."""
     if not engine.running:
@@ -1863,7 +1857,8 @@ def _runDialog(engine, dialog):
     while engine.running and dialog in engine.view.layers:
         engine.run()
 
-def getText(engine, prompt, text = ""):
+
+def getText(engine, prompt, text=""):
     """
     Get a string of text from the user.
 
@@ -1875,7 +1870,8 @@ def getText(engine, prompt, text = ""):
     _runDialog(engine, d)
     return d.text
 
-def getKey(engine, prompt, key = None, specialKeyList = []):
+
+def getKey(engine, prompt, key=None, specialKeyList=[]):
     """
     Ask the user to choose a key.
 
@@ -1884,11 +1880,12 @@ def getKey(engine, prompt, key = None, specialKeyList = []):
     @param key:             Default key
     @param specialKeyList:  A list of keys that are ineligible.
     """
-    d = GetKey(engine, prompt, key, specialKeyList = specialKeyList)
+    d = GetKey(engine, prompt, key, specialKeyList=specialKeyList)
     _runDialog(engine, d)
     return d.key
 
-def chooseFile(engine, masks = ["*.*"], path = u".", prompt = _("Choose a File"), dirSelect = False):
+
+def chooseFile(engine, masks=["*.*"], path=u".", prompt=_("Choose a File"), dirSelect=False):
     """
     Ask the user to select a file.
 
@@ -1901,7 +1898,8 @@ def chooseFile(engine, masks = ["*.*"], path = u".", prompt = _("Choose a File")
     _runDialog(engine, d)
     return d.getSelectedFile()
 
-def chooseItem(engine, items, prompt = "", selected = None, pos = None):   #MFH
+
+def chooseItem(engine, items, prompt="", selected=None, pos=None):
     """
     Ask the user to choose one item from a list.
 
@@ -1911,12 +1909,13 @@ def chooseItem(engine, items, prompt = "", selected = None, pos = None):   #MFH
     @param selected:  Item selected by default
     @param pos:       Position tuple (x,y) for placing the menu
     """
-    d = ItemChooser(engine, items, prompt = prompt, selected = selected, pos = pos)
+    d = ItemChooser(engine, items, prompt=prompt, selected=selected, pos=pos)
     _runDialog(engine, d)
     return d.getSelectedItem()
 
-#MFH - on-demand Neck Chooser
-def chooseNeck(engine, player = "default"):
+
+# on-demand Neck Chooser
+def chooseNeck(engine, player="default"):
     """
     Ask the user to choose their in-game neck.
 
@@ -1924,9 +1923,10 @@ def chooseNeck(engine, player = "default"):
     @type  player:    str
     @param player:    The active player
     """
-    d = NeckChooser(engine, player = player)
+    d = NeckChooser(engine, player=player)
     _runDialog(engine, d)
     return d.getSelectedNeck()
+
 
 def chooseAvatar(engine):
     """
@@ -1938,21 +1938,23 @@ def chooseAvatar(engine):
     _runDialog(engine, d)
     return d.getAvatar()
 
+
 def choosePartDiffs(engine, parts, info, players):
     """
     Have the user select their part and difficulty.
-
     """
     d = PartDiffChooser(engine, parts, info, players)
     _runDialog(engine, d)
     return d.retVal
 
-# evilynux - Show credits
+
+# Show credits
 def showCredits(engine):
     d = Credits(engine)
     _runDialog(engine, d)
 
-def testKeys(engine, control, prompt = _("Play with the keys and press Escape when you're done.")):
+
+def testKeys(engine, control, prompt=_("Play with the keys and press Escape when you're done.")):
     """
     Have the user test the current keyboard configuration.
 
@@ -1962,10 +1964,11 @@ def testKeys(engine, control, prompt = _("Play with the keys and press Escape wh
     if engine.input.controls.type[control] == 5 and not Microphone.supported:
         showMessage(engine, 'A required module for microphone support is missing.')
     else:
-        d = KeyTester(engine, control, prompt = prompt)
+        d = KeyTester(engine, control, prompt=prompt)
         _runDialog(engine, d)
 
-def showLoadingScreen(engine, condition, text = _("Loading..."), allowCancel = False):
+
+def showLoadingScreen(engine, condition, text=_("Loading..."), allowCancel=False):
     """
     Show a loading screen until a condition is met.
 
@@ -1989,6 +1992,7 @@ def showLoadingScreen(engine, condition, text = _("Loading..."), allowCancel = F
     _runDialog(engine, d)
     return d.ready
 
+
 def showMessage(engine, text):
     """
     Show a message to the user.
@@ -2000,13 +2004,13 @@ def showMessage(engine, text):
     d = MessageScreen(engine, text)
     _runDialog(engine, d)
 
-# glorandwarf: added derived class LoadingSplashScreen
+
 class LoadingSplashScreen(Layer, KeyListener):
     """Loading splash screen layer"""
     def __init__(self, engine, text):
-        self.engine       = engine
-        self.text         = text
-        self.time         = 0.0
+        self.engine = engine
+        self.text = text
+        self.time = 0.0
         self.loadingx = self.engine.theme.loadingX
         self.loadingy = self.engine.theme.loadingY
         self.textColor = self.engine.theme.loadingColor
@@ -2020,11 +2024,11 @@ class LoadingSplashScreen(Layer, KeyListener):
         if self.logClassInits == 1:
             log.debug("LoadingSplashScreen class init (Dialogs.py)...")
 
-        #Get theme
+        # Get theme
         self.theme = self.engine.data.theme
 
     def shown(self):
-        self.engine.input.addKeyListener(self, priority = True)
+        self.engine.input.addKeyListener(self, priority=True)
 
     def keyPressed(self, key, unicode):
         return True
@@ -2036,18 +2040,18 @@ class LoadingSplashScreen(Layer, KeyListener):
         self.time += ticks / 50.0
 
     def render(self, visibility, topMost):
-        self.engine.view.setViewport(1,0)
-        font = self.engine.data.loadingFont   #MFH - new font support
+        self.engine.view.setViewport(1, 0)
+        font = self.engine.data.loadingFont  # new font support
 
         if not font:
             return
 
-        with self.engine.view.orthogonalProjection(normalize = True):
+        with self.engine.view.orthogonalProjection(normalize=True):
             v = (1 - visibility) ** 2
             self.engine.fadeScreen(v)
             w, h = self.engine.view.geometry[2:4]
             if self.loadingImg:
-                drawImage(self.loadingImg, scale = (1.0,-1.0), coord = (w/2,h/2), stretched = FULL_SCREEN)
+                drawImage(self.loadingImg, scale=(1.0, -1.0), coord=(w/2, h/2), stretched=FULL_SCREEN)
 
             self.engine.theme.setBaseColor(1 - v)
             w, h = font.getStringSize(self.text, scale=self.fScale)
@@ -2055,18 +2059,19 @@ class LoadingSplashScreen(Layer, KeyListener):
             x = self.loadingx
             y = self.loadingy - h / 2 + v * .5
 
-            #akedrou - support for Loading Text Color
-            c1,c2,c3 = self.textColor
-            glColor3f(c1,c2,c3)
+            # support for Loading Text Color
+            c1, c2, c3 = self.textColor
+            glColor3f(c1, c2, c3)
 
-            # evilynux - Made text about 2 times smaller (as requested by worldrave)
+            # Made text about 2 times smaller (as requested by worldrave)
             if self.allowtext:
                 if self.theme == 1:
-                    wrapCenteredText(font, (x,y), self.text, scale = self.fScale, rightMargin = self.rMargin, linespace = self.lspacing, allowshadowoffset = True, shadowoffset = (self.engine.theme.shadowoffsetx, self.engine.theme.shadowoffsety))
+                    wrapCenteredText(font, (x, y), self.text, scale=self.fScale, rightMargin=self.rMargin, linespace=self.lspacing, allowshadowoffset=True, shadowoffset=(self.engine.theme.shadowoffsetx, self.engine.theme.shadowoffsety))
                 else:
-                    wrapCenteredText(font, (x,y), self.text, scale = self.fScale, rightMargin = self.rMargin, linespace = self.lspacing)
+                    wrapCenteredText(font, (x, y), self.text, scale=self.fScale, rightMargin=self.rMargin, linespace=self.lspacing)
 
-#nhydock - expanding on LoadingSplashScreen so there can be overlay and song dependant backgrounds
+
+# expanding on LoadingSplashScreen so there can be overlay and song dependant backgrounds
 class SongLoadingSplashScreen(LoadingSplashScreen):
     def __init__(self, engine, text, songName, libraryName):
         super(SongLoadingSplashScreen, self).__init__(engine, text)
@@ -2076,52 +2081,56 @@ class SongLoadingSplashScreen(LoadingSplashScreen):
             self.engine.loadImgDrawing(self, "loadingImg", os.path.join("themes", self.engine.data.themeLabel, "loading_overlay.png"))
 
     def render(self, visibility, topMost):
-        self.engine.view.setViewport(1,0)
-        font = self.engine.data.loadingFont   #MFH - new font support
+        self.engine.view.setViewport(1, 0)
+        font = self.engine.data.loadingFont  # new font support
 
         if not font:
             return
 
-        with self.engine.view.orthogonalProjection(normalize = True):
+        with self.engine.view.orthogonalProjection(normalize=True):
             v = (1 - visibility) ** 2
             self.engine.fadeScreen(v)
             w, h = self.engine.view.geometry[2:4]
 
             self.engine.theme.setBaseColor(1 - v)
             if self.songBack:
-                drawImage(self.songBack, scale = (1.0,-1.0), coord = (w/2,h/2), stretched = FULL_SCREEN)
-            drawImage(self.loadingImg, scale = (1.0,-1.0), coord = (w/2,h/2), stretched = FULL_SCREEN)
+                drawImage(self.songBack, scale=(1.0, -1.0), coord=(w/2, h/2), stretched=FULL_SCREEN)
+            drawImage(self.loadingImg, scale=(1.0, -1.0), coord=(w/2, h/2), stretched=FULL_SCREEN)
             w, h = font.getStringSize(self.text, scale=self.fScale)
 
             x = self.loadingx
             y = self.loadingy - h / 2 + v * .5
 
-            #akedrou - support for Loading Text Color
-            c1,c2,c3 = self.textColor
-            glColor3f(c1,c2,c3)
+            # support for Loading Text Color
+            c1, c2, c3 = self.textColor
+            glColor3f(c1, c2, c3)
 
-            # evilynux - Made text about 2 times smaller (as requested by worldrave)
+            # Made text about 2 times smaller
             if self.allowtext:
                 if self.theme == 1:
-                    wrapCenteredText(font, (x,y), self.text, scale = self.fScale, rightMargin = self.rMargin, linespace = self.lspacing, allowshadowoffset = True, shadowoffset = (self.engine.theme.shadowoffsetx, self.engine.theme.shadowoffsety))
+                    wrapCenteredText(font, (x, y), self.text, scale=self.fScale, rightMargin=self.rMargin, linespace=self.lspacing, allowshadowoffset=True, shadowoffset=(self.engine.theme.shadowoffsetx, self.engine.theme.shadowoffsety))
                 else:
-                    wrapCenteredText(font, (x,y), self.text, scale = self.fScale, rightMargin = self.rMargin, linespace = self.lspacing)
+                    wrapCenteredText(font, (x, y), self.text, scale=self.fScale, rightMargin=self.rMargin, linespace=self.lspacing)
 
-def showLoadingSplashScreen(engine, text = _("Loading...")):
+
+def showLoadingSplashScreen(engine, text=_("Loading...")):
     splash = LoadingSplashScreen(engine, text)
     engine.view.pushLayer(splash)
     engine.run()
     return splash
 
-def showSongLoadingSplashScreen(engine, songName, libraryName, text = _("Loading...")):
-    splash = SongLoadingSplashScreen(engine, text,  songName, libraryName)
+
+def showSongLoadingSplashScreen(engine, songName, libraryName, text=_("Loading...")):
+    splash = SongLoadingSplashScreen(engine, text, songName, libraryName)
     engine.view.pushLayer(splash)
     engine.run()
     return splash
 
+
 def changeLoadingSplashScreenText(engine, splash, text=_("Loading...")):
     splash.text = text
     engine.run()
+
 
 def hideLoadingSplashScreen(engine, splash):
     engine.view.popLayer(splash)
