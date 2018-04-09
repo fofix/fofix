@@ -716,15 +716,11 @@ class NeckChooser(Layer, KeyListener):
         Config.define("player", "neck", str, 0, text=_("Neck"), options=self.neck)
 
         for i, neck in enumerate(self.neck):
+            if neck == defaultNeck:
+                self.selectedNeck = i
             if neck == playerNeck:
                 self.selectedNeck = i
                 break
-        else:
-            for i, neck in enumerate(self.neck):
-                if neck == defaultNeck:
-                    self.selectedNeck = i
-            else:
-                self.selectedNeck = 0
 
         self.necks.append("none")
         self.necks.append("2none")
