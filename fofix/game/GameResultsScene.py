@@ -529,7 +529,7 @@ class GameResultsScene(Scene):
             scores_ext[player.getDifficultyInt()] = [(scoreHash, self.scoring[i].stars) + scoreExt]
             d["scores"] = binascii.hexlify(cerealizer.dumps(scores))
             d["scores_ext"] = binascii.hexlify(cerealizer.dumps(scores_ext))
-            url = self.engine.config.get("network", "uploadurl_w67_starpower")
+            url = self.engine.config.get("network", "uploadurl")
             data = urllib.urlopen(url + "?" + urllib.urlencode(d)).read()
             log.debug("Score upload result: %s" % data)
             return data   #MFH - want to return the actual result data.

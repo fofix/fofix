@@ -74,7 +74,7 @@ Config.define("audio",  "bits",         int,   16,    text = _("Sample Bits"), o
 Config.define("audio",  "stereo",       bool,  True)
 
 Config.define("network",   "uploadscores", bool,  False, text = _("Upload Highscores"),    options = {False: _("No"), True: _("Yes")}, tipText = _("If enabled, your high scores will be sent to the server to rank you against other players."))
-Config.define("network",   "uploadurl_w67_starpower",    str,   "http://www.wembley1967.com/chart/uploadsp.php") # evilynux - new one starting 20080902
+Config.define("network",   "uploadurl",    str,   "http://www.wembley1967.com/chart/uploadsp.php") # evilynux - new one starting 20080902
 
 Config.define("setlist", "base_library",      str, "")
 Config.define("setlist", "selected_library",  str, "")
