@@ -54,6 +54,7 @@ Notes:
   - shared more code between the guitar and drums
   - added ``CMGL`` as a faster OpenGL binding
   - added the ``pypitch`` module
+  - rename the option *uploadurl_w67_starpower* to *uploadurl* in ``fofix.ini``
 
 
 3.121 (2009-12-06)
