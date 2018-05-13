@@ -108,7 +108,7 @@ class Drum(Instrument):
         self.openFretActivity = 0.0
         self.openFretColor  = self.fretColors[5]
 
-        self.logClassInits = self.engine.config.get("log", "log_class_inits")
+        self.logClassInits = self.engine.config.get("game", "log_class_inits")
         if self.logClassInits == 1:
             log.debug("Drum class initialization!")
 
