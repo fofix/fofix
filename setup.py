@@ -313,11 +313,12 @@ else:
     lib_blacklist = []
 
 
-def pc_info(pkg, altnames=[]):
+def pc_info(pkg, altnames=None):
     '''Obtain build options for a library from pkg-config and
     return a dict that can be expanded into the argument list for
     L{distutils.core.Extension}.'''
 
+    altnames = [] if altnames is None else altnames
     sys.stdout.write('checking for library %s... ' % pkg)
     if not pc_exists(pkg):
         for name in altnames:
