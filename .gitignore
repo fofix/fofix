@@ -19,6 +19,7 @@
 /bin/
 /build/
 /dist/
+/doc/build/
 /include/
 /gstreamer/
 /lib/
