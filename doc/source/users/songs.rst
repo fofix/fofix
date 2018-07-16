@@ -140,4 +140,4 @@ Compatibility
 
 Thanks to open source formats, FoFiX songs are compatible with many softwares like:
     - `PhaseShift <http://www.dwsk.co.uk/index_phase_shift.html>`_
-    - `Performous <http://performous.org/>`_
+    - `Performous <https://performous.org>`_

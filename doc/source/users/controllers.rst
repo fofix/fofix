@@ -38,7 +38,7 @@ Wii
 
 - Rock Band Wii instruments: work out of the box
 - Guitar Hero 3 / World Tour instruments: communicate with the Wiimote
-    * use a compatible `Bluetooth receiver <http://wiibrew.org/wiki/List_of_Working_Bluetooth_Devices>`_
+    * use a compatible `Bluetooth receiver <https://wiibrew.org/wiki/List_of_Working_Bluetooth_Devices>`_
     * install *GlovePIE*
     * connect your Wiimote to your computer via GlovePIE
     * connect your Wiimote to your instrument.
