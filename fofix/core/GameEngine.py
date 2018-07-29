@@ -49,7 +49,7 @@ from fofix.core.View import View
 from fofix.core.Input import Input, KeyListener, SystemEventListener
 from fofix.core.Resource import Resource
 from fofix.core.Data import Data
-from fofix.core.Image import SvgContext, ImgDrawing
+from fofix.core.Image import SvgContext
 from fofix.core.Language import _
 from fofix.core.Theme import Theme
 from fofix.core.Shader import shaders
@@ -67,19 +67,20 @@ from fofix.game.Debug import DebugLayer
 
 log = logging.getLogger(__name__)
 
-# evilynux - Grab name and version from Version class.
-version = "%s v%s" % ( Version.PROGRAM_NAME, Version.version() )
+# Grab name and version from Version class.
+version = "%s v%s" % (Version.PROGRAM_NAME, Version.version())
+
 
 def _init_allthemes():
-    """ Alarian: Get unlimited themes by foldername """
+    """ Get unlimited themes by foldername """
     # this global code is in a function to hide vars from rest of file
 
     themepath = os.path.join(Version.dataPath(), "themes")
     themes = []
-    defaultTheme = None           #myfingershurt
+    defaultTheme = None
     allthemes = os.listdir(themepath)
     for name in allthemes:
-        if os.path.exists(os.path.join(themepath,name,"notes","notes.png")):
+        if os.path.exists(os.path.join(themepath, name, "notes", "notes.png")):
             themes.append(name)
             if name == "MegaLight V4":
                 defaultTheme = name
@@ -95,10 +96,12 @@ def _init_allthemes():
         sys.exit(1)
 
     if defaultTheme is None:
-        defaultTheme = themes[0]    #myfingershurt
+        defaultTheme = themes[0]
 
-    #myfingershurt: default theme must be an existing one!
-    Config.define("coffee", "themename",           str,   defaultTheme,      text = _("Theme"),                options = dict([(str(themes[n]),themes[n]) for n in range(0, i)]), tipText = _("Sets the overall graphical feel of the game. You can find and download many more at https://fretsonfire.org"))
+    # default theme must be an existing one!
+    Config.define("coffee", "themename", str, defaultTheme, text=_("Theme"), options=dict([(str(themes[n]), themes[n]) for n in range(0, i)]), tipText=_("Sets the overall graphical feel of the game. You can find and download many more at https://fretsonfire.org"))
+
+
 _init_allthemes()
 
 Player.loadControls()
@@ -131,6 +134,7 @@ class FullScreenSwitcher(KeyListener):
         if key == pygame.K_LALT:
             self.altStatus = False
 
+
 class SystemEventHandler(SystemEventListener):
     """
     A system event listener that takes care of restarting the game when needed
@@ -148,23 +152,24 @@ class SystemEventHandler(SystemEventListener):
     def quit(self):
         self.engine.quit()
 
+
 class GameEngine(object):
     """The main game engine."""
 
-    def __init__(self, config = None):
+    def __init__(self, config=None):
 
         log.debug("GameEngine class init (GameEngine.py)...")
-        self.mainMenu = None    #placeholder for main menu object - to prevent reinstantiation
+        self.mainMenu = None  # placeholder for main menu object - to prevent reinstantiation
 
         self.currentScene = None
 
-        self.versionString = version  #stump: other version stuff moved to allow full version string to be retrieved without instantiating GameEngine
-        self.uploadVersion = "%s-4.0" % Version.PROGRAM_NAME #akedrou - the version passed to the upload site.
+        self.versionString = version  # other version stuff moved to allow full version string to be retrieved without instantiating GameEngine
+        self.uploadVersion = "%s-4.0" % Version.PROGRAM_NAME  # the version passed to the upload site.
 
         self.dataPath = Version.dataPath()
         log.debug(self.versionString + " starting up...")
         log.debug("Python version: " + sys.version.split(' ')[0])
-        log.debug("Pygame version: " + str(pygame.version.ver) )
+        log.debug("Pygame version: " + str(pygame.version.ver))
         log.debug("PyOpenGL version: " + OpenGL.__version__)
         log.debug("Numpy version: " + np.__version__)
         log.debug("PIL version: " + Image.VERSION)
@@ -187,7 +192,7 @@ class GameEngine(object):
         if config is None:
             config = Config.load()
 
-        self.config  = config
+        self.config = config
 
         self.fps = self.config.get("video", "fps")
 
@@ -202,13 +207,13 @@ class GameEngine(object):
         self.pauseTask = self.task.pauseTask
         self.resumeTask = self.task.resumeTask
 
-        self.title             = self.versionString
-        self.restartRequested  = False
+        self.title = self.versionString
+        self.restartRequested = False
 
         # Load window icon
         icon = os.path.join(Version.dataPath(), "fofix_icon.png")
 
-        self.video             = Video(self.title, icon)
+        self.video = Video(self.title, icon)
         if self.config.get("video", "disable_screensaver"):
             self.video.disableScreensaver()
 
@@ -228,7 +233,7 @@ class GameEngine(object):
         bits         = self.config.get("audio", "bits")
         stereo       = self.config.get("audio", "stereo")
         bufferSize   = self.config.get("audio", "buffersize")
-        self.audio.open(frequency = frequency, bits = bits, stereo = stereo, bufferSize = bufferSize)
+        self.audio.open(frequency=frequency, bits=bits, stereo=stereo, bufferSize=bufferSize)
 
         self.gameStarted       = False
         self.world             = None
@@ -236,13 +241,13 @@ class GameEngine(object):
         self.audioSpeedFactor  = 1.0
 
         log.debug("Initializing video.")
-        #myfingershurt: ensuring windowed mode starts up in center of the screen instead of cascading positions:
+        # ensuring windowed mode starts up in center of the screen instead of cascading positions
         os.environ['SDL_VIDEO_WINDOW_POS'] = 'center'
 
         width, height = [int(s) for s in self.config.get("video", "resolution").split("x")]
         fullscreen    = self.config.get("video", "fullscreen")
         multisamples  = self.config.get("video", "multisamples")
-        self.video.setMode((width, height), fullscreen = fullscreen, multisamples = multisamples)
+        self.video.setMode((width, height), fullscreen=fullscreen, multisamples=multisamples)
         log.debug("OpenGL version: " + glGetString(GL_VERSION))
         log.debug("OpenGL vendor: " + glGetString(GL_VENDOR))
         log.debug("OpenGL renderer: " + glGetString(GL_RENDERER))
@@ -258,10 +263,10 @@ class GameEngine(object):
         # Enable the high priority timer if configured
         if self.priority:
             log.debug("Enabling high priority timer.")
-            self.fps = 0 # High priority
+            self.fps = 0  # High priority
 
-        # evilynux - This was generating an error on the first pass (at least under
-        #            GNU/Linux) as the Viewport was not set yet.
+        # This was generating an error on the first pass (at least under
+        # GNU/Linux) as the Viewport was not set yet.
         try:
             viewport = glGetIntegerv(GL_VIEWPORT)
         except Exception:
@@ -272,33 +277,33 @@ class GameEngine(object):
         self.svg = SvgContext(geometry)
         glViewport(int(viewport[0]), int(viewport[1]), int(viewport[2]), int(viewport[3]))
 
-        self.startupMessages   = self.video.error
-        self.input     = Input()
-        self.view      = View(self, geometry)
+        self.startupMessages = self.video.error
+        self.input = Input()
+        self.view = View(self, geometry)
         self.resizeScreen(w, h)
 
-        self.resource  = Resource(Version.dataPath())
-        self.mainloop  = self.loading
+        self.resource = Resource(Version.dataPath())
+        self.mainloop = self.loading
         self.menuMusic = False
 
         self.setlistMsg = None
 
         # Init theme system
         themename = self.config.get("coffee", "themename")
-        themepath  = os.path.join(Version.dataPath(), "themes", themename)
+        themepath = os.path.join(Version.dataPath(), "themes", themename)
         self._initTheme(themename, themepath)
         self._initStages()
 
         # Load game modifications
         Mod.init(self)
 
-        self.task.addTask(self.input, synced = False)
-        self.task.addTask(self.view, synced = False)
-        self.task.addTask(self.resource, synced = False)
+        self.task.addTask(self.input, synced=False)
+        self.task.addTask(self.view, synced=False)
+        self.task.addTask(self.resource, synced=False)
 
         self.data = Data(self.resource, self.svg)
 
-        self.input.addKeyListener(FullScreenSwitcher(self), priority = True)
+        self.input.addKeyListener(FullScreenSwitcher(self), priority=True)
         self.input.addSystemEventListener(SystemEventHandler(self))
 
         self.debugLayer         = None
@@ -310,7 +315,7 @@ class GameEngine(object):
 
     # evilynux - This stops the crowd cheers if they're still playing (issue 317).
     def quit(self):
-        # evilynux - self.audio.close() crashes when we attempt to restart
+        # self.audio.close() crashes when we attempt to restart
         if not self.restartRequested:
             self.audio.close()
         Player.savePlayers()
@@ -329,18 +334,18 @@ class GameEngine(object):
         :type themepath: str
         """
 
-        log.info('Setting theme %s from "%s"' % (themename,themepath))
+        log.info('Setting theme %s from "%s"' % (themename, themepath))
 
         self.theme = None
         try:
             # Look for "CustomTheme.py" inside theme dir
-            fp, pathname, description = imp.find_module("CustomTheme",[themepath])
+            fp, pathname, description = imp.find_module("CustomTheme", [themepath])
             try:
                 # Found it! Load it.
                 theme = imp.load_module("CustomTheme", fp, pathname, description)
                 self.theme = theme.CustomTheme(themepath, themename)
                 log.info('Theme activated using custom class "%s"' % pathname)
-            except ImportError as e:
+            except ImportError:
                 # Unable to load module; log it, but continue with default Theme.
                 log.error('Failed to load CustomTheme.py from "%s"' % pathname)
             finally:
@@ -379,7 +384,7 @@ class GameEngine(object):
                 aniStageFolderListing = []
                 thisIsAnAnimatedStageFolder = False
                 try:
-                    aniStageFolderListing = os.listdir(os.path.join(stagespath,name))
+                    aniStageFolderListing = os.listdir(os.path.join(stagespath, name))
                 except Exception:
                     thisIsAnAnimatedStageFolder = False
                 for aniFile in aniStageFolderListing:
@@ -396,30 +401,30 @@ class GameEngine(object):
             else:
                 defaultAniStage = "Normal"
             log.debug("Default animated stage for " + currentTheme + " theme = " + defaultAniStage)
-            aniStageOptions = dict([(str(self.stageFolders[n]),self.stageFolders[n]) for n in range(0, i)])
-            aniStageOptions.update({"Normal":_("Slideshow")})
+            aniStageOptions = dict([(str(self.stageFolders[n]), self.stageFolders[n]) for n in range(0, i)])
+            aniStageOptions.update({"Normal": _("Slideshow")})
             if i > 1:
                 # only add Random setting if more than one animated stage exists
-                aniStageOptions.update({"Random":_("Random")})
-            Config.define("game", "animated_stage_folder", str, defaultAniStage, text = _("Animated Stage"), options = aniStageOptions )
+                aniStageOptions.update({"Random": _("Random")})
+            Config.define("game", "animated_stage_folder", str, defaultAniStage, text=_("Animated Stage"), options=aniStageOptions)
 
-            #MFH: here, need to track and check a new ini entry for last theme - so when theme changes we can re-default animated stage to first found
-            lastTheme = self.config.get("game","last_theme")
+            # here, need to track and check a new ini entry for last theme - so when theme changes we can re-default animated stage to first found
+            lastTheme = self.config.get("game", "last_theme")
             if lastTheme == "" or lastTheme != currentTheme:
-                #MFH - no last theme, and theme just changed:
+                # no last theme, and theme just changed:
                 # force defaultAniStage
-                self.config.set("game","animated_stage_folder",defaultAniStage)
-            self.config.set("game","last_theme",currentTheme)
+                self.config.set("game", "animated_stage_folder", defaultAniStage)
+            self.config.set("game", "last_theme", currentTheme)
 
             selectedAnimatedStage = self.config.get("game", "animated_stage_folder")
             if selectedAnimatedStage != "Normal" and selectedAnimatedStage != "Random":
-                if not os.path.exists(os.path.join(stagespath,selectedAnimatedStage)):
+                if not os.path.exists(os.path.join(stagespath, selectedAnimatedStage)):
                     log.warn("Selected animated stage folder " + selectedAnimatedStage + " does not exist, forcing Normal.")
-                    self.config.set("game","animated_stage_folder","Normal") #MFH: force "Standard" currently selected animated stage folder is invalid
+                    self.config.set("game", "animated_stage_folder", "Normal")  # force "Standard" currently selected animated stage folder is invalid
         else:
-            Config.define("game", "animated_stage_folder", str, "None", text = _("Animated Stage"), options = ["None",_("None")])
-            log.warn("No stages\ folder found, forcing None setting for Animated Stage.")
-            self.config.set("game","animated_stage_folder", "None") #MFH: force "None" when Stages folder can't be found
+            Config.define("game", "animated_stage_folder", str, "None", text=_("Animated Stage"), options=["None", _("None")])
+            log.warn("No 'stages/' folder found, forcing None setting for Animated Stage.")
+            self.config.set("game", "animated_stage_folder", "None")  # force "None" when Stages folder can't be found
 
     def setStartupLayer(self, startupLayer):
         """
@@ -476,7 +481,7 @@ class GameEngine(object):
         self.view.setGeometry((0, 0, width, height))
         self.svg.setGeometry((0, 0, width, height))
 
-    def startWorld(self, players, maxplayers = None, gameMode = 0, multiMode = 0, allowGuitar = True, allowDrum = True, allowMic = False, tutorial = False):
+    def startWorld(self, players, maxplayers=None, gameMode=0, multiMode=0, allowGuitar=True, allowDrum=True, allowMic=False, tutorial=False):
         self.world = World(self, players, maxplayers, gameMode, multiMode, allowGuitar, allowDrum, allowMic, tutorial)
 
     def finishGame(self):
@@ -488,7 +493,7 @@ class GameEngine(object):
         self.gameStarted = False
         self.view.pushLayer(self.mainMenu)
 
-    def loadImgDrawing(self, target, name, fileName, textureSize = None):
+    def loadImgDrawing(self, target, name, fileName, textureSize=None):
         """
         Load an SVG drawing synchronously.
 
@@ -501,8 +506,7 @@ class GameEngine(object):
         """
         return self.data.loadImgDrawing(target, name, fileName, textureSize)
 
-    #volshebnyi
-    def drawStarScore(self, screenwidth, screenheight, xpos, ypos, stars, scale = None, horiz_spacing = 1.2, space = 1.0, hqStar = False, align = LEFT):
+    def drawStarScore(self, screenwidth, screenheight, xpos, ypos, stars, scale=None, horiz_spacing=1.2, space=1.0, hqStar=False, align=LEFT):
         minScale = 0.02
         w = screenwidth
         h = screenheight
@@ -515,20 +519,20 @@ class GameEngine(object):
         else:
             star = self.data.starPerfect
         wide = scale * horiz_spacing
-        if align == CENTER: #center - akedrou (simplifying the alignment...)
-            xpos  -= (2 * wide)
-        elif align == RIGHT: #right
-            xpos  -= (4 * wide)
+        if align == CENTER:
+            xpos -= (2 * wide)
+        elif align == RIGHT:
+            xpos -= (4 * wide)
         if stars > 5:
             for j in range(5):
 
                 if self.data.maskStars:
                     if self.data.theme == 2:
-                        drawImage(star, scale = (scale,-scale), coord = (w*(xpos+wide*j)*space**4,h*ypos), color = (1, 1, 0, 1), stretched = KEEP_ASPECT | FIT_WIDTH)
+                        drawImage(star, scale=(scale, -scale), coord=(w*(xpos+wide*j)*space**4, h*ypos), color=(1, 1, 0, 1), stretched=KEEP_ASPECT | FIT_WIDTH)
                     else:
-                        drawImage(star, scale = (scale,-scale), coord = (w*(xpos+wide*j)*space**4,h*ypos), color = (0, 1, 0, 1), stretched = KEEP_ASPECT | FIT_WIDTH)
+                        drawImage(star, scale=(scale, -scale), coord=(w*(xpos+wide*j)*space**4, h*ypos), color=(0, 1, 0, 1), stretched=KEEP_ASPECT | FIT_WIDTH)
                 else:
-                    drawImage(star, scale = (scale,-scale), coord = (w*(xpos+wide*j)*space**4,h*ypos), stretched = KEEP_ASPECT | FIT_WIDTH)
+                    drawImage(star, scale=(scale, -scale), coord=(w*(xpos+wide*j)*space**4, h*ypos), stretched=KEEP_ASPECT | FIT_WIDTH)
         else:
             for j in range(5):
                 if j < stars:
@@ -541,9 +545,8 @@ class GameEngine(object):
                         star = self.data.star3
                     else:
                         star = self.data.star1
-                drawImage(star, scale = (scale,-scale), coord = (w*(xpos+wide*j)*space**4,h*ypos), stretched = KEEP_ASPECT | FIT_WIDTH)
+                drawImage(star, scale=(scale, -scale), coord=(w*(xpos+wide*j)*space**4, h*ypos), stretched=KEEP_ASPECT | FIT_WIDTH)
 
-    #glorandwarf: renamed to retrieve the path of the file
     def fileExists(self, fileName):
         return self.data.fileExists(fileName)
 
@@ -618,7 +621,7 @@ class GameEngine(object):
 
         # Calculate FPS every 2 seconds
         if self.clock.fpsTime >= 2000:
-            # evilynux - Printing on the console with a frozen binary may cause a crash.
+            # Printing on the console with a frozen binary may cause a crash.
             self.fpsEstimate = self.clock.get_fps()
             if self.show_fps and not Version.isWindowsExe():
                 print("%.2f fps" % self.fpsEstimate)
