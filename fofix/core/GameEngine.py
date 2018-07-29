@@ -623,7 +623,7 @@ class GameEngine(object):
             # Printing on the console with a frozen binary may cause a crash.
             self.fpsEstimate = self.clock.get_fps()
             if self.show_fps and not Version.isWindowsExe():
-                print("%.2f fps" % self.fpsEstimate)
+                log.debug("%.2f fps" % self.fpsEstimate)
         return done
 
     def run(self):
