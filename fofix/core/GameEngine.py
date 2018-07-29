@@ -157,6 +157,10 @@ class GameEngine(object):
     """The main game engine."""
 
     def __init__(self, config=None):
+        """
+        Constructor.
+        :param config: `Config` instance for settings
+        """
 
         log.debug("GameEngine class init (GameEngine.py)...")
         self.mainMenu = None  # placeholder for main menu object - to prevent reinstantiation
@@ -181,11 +185,6 @@ class GameEngine(object):
             log.debug("win32api.GetVersionEx(1): " + repr(win32api.GetVersionEx(1)))
         elif os.name == 'posix':
             log.debug("os.uname(): " + repr(os.uname()))
-
-        """
-        Constructor.
-        @param config:  L{Config} instance for settings
-        """
 
         self.tutorialFolder = "tutorials"
 
@@ -313,8 +312,8 @@ class GameEngine(object):
 
         log.debug("Ready.")
 
-    # evilynux - This stops the crowd cheers if they're still playing (issue 317).
     def quit(self):
+        """ Quit the game (audio and video) """
         # self.audio.close() crashes when we attempt to restart
         if not self.restartRequested:
             self.audio.close()
@@ -431,7 +430,7 @@ class GameEngine(object):
         Set the L{Layer} that will be shown when the all
         the resources have been loaded. See L{Data}
 
-        @param startupLayer:    Startup L{Layer}
+        :param startupLayer: Startup L{Layer}
         """
         self.startupLayer = startupLayer
 
@@ -442,7 +441,7 @@ class GameEngine(object):
         """
         Show or hide the debug layer.
 
-        @type enabled: bool
+        :type enabled: bool
         """
         if enabled:
             self.debugLayer = DebugLayer(self)
@@ -453,7 +452,7 @@ class GameEngine(object):
         """
         Toggle between fullscreen and windowed mode.
 
-        @return: True on success
+        :return: True on success
         """
         if not self.video.toggleFullscreen():
             # on windows, the fullscreen toggle kills our textures, se we must restart the whole game
@@ -475,8 +474,8 @@ class GameEngine(object):
         """
         Resize the game screen.
 
-        @param width:   New width in pixels
-        @param height:  New height in pixels
+        :param width: New width in pixels
+        :param height: New height in pixels
         """
         self.view.setGeometry((0, 0, width, height))
         self.svg.setGeometry((0, 0, width, height))
@@ -497,12 +496,12 @@ class GameEngine(object):
         """
         Load an SVG drawing synchronously.
 
-        @param target:      An object that will own the drawing
-        @param name:        The name of the attribute the drawing will be assigned to
-        @param fileName:    The name of the file in the data directory
-        @param textureSize: Either None or (x, y), in which case the file will
+        :param target:      An object that will own the drawing
+        :param name:        The name of the attribute the drawing will be assigned to
+        :param fileName:    The name of the file in the data directory
+        :param textureSize: Either None or (x, y), in which case the file will
                             be rendered to an x by y texture
-        @return:            L{ImgDrawing} instance
+        :return:            L{ImgDrawing} instance
         """
         return self.data.loadImgDrawing(target, name, fileName, textureSize)
 
@@ -576,7 +575,7 @@ class GameEngine(object):
         """
         Fade the screen to a dark color to make whatever is on top easier to read.
 
-        @param v: Visibility factor [0..1], 0 is fully visible
+        :param v: Visibility factor [0..1], 0 is fully visible
         """
         glEnable(GL_BLEND)
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
