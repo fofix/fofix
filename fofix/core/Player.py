@@ -39,6 +39,8 @@ log = logging.getLogger(__name__)
 
 
 class ConfigOption:
+    """ Deprecated: also in fofix.core.ConfigDefs """
+
     def __init__(self, id, text):
         self.id   = id
         self.text = text
@@ -62,6 +64,7 @@ class ConfigOption:
 
 
 def sortOptionsByKey(dict):
+    """ Deprecated: also in fofix.core.ConfigDefs """
     a = {}
     for k in dict.keys():
         a[k] = ConfigOption(k, dict[k])
