@@ -731,7 +731,7 @@ class Controls:
             controlMapping = self.checkMapping(controlMapping, i)
             self.controlMapping.update(controlMapping)
 
-        self.reverseControlMapping = dict((value, key) for key, value in self.controlMapping.iteritems())
+        self.reverseControlMapping = dict((value, key) for key, value in self.controlMapping.items())
 
         # Multiple key support
         self.heldKeys = {}
@@ -770,7 +770,7 @@ class Controls:
             return newDict
         okconflict = lefts + rights + ups + downs + starts + cancels
         a = []
-        for key, value in newDict.iteritems():
+        for key, value in newDict.items():
             if key == "None":
                 continue
             if key in self.controlMapping.keys():
