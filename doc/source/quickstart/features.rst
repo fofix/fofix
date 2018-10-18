@@ -12,7 +12,7 @@ The original game Frets On Fire provides:
     - native MIDI instrument input / controller support
     - customizable songs (free song formats, MIDI, OGG)
     - key settings
-    - Jurgen bot (computer player, skilled at guitar, bass and dums)
+    - Jurgen bot (computer player, skilled at guitar, bass and drums)
     - support uploading scores
     - support for solos (guitar, bass and drums)
 
