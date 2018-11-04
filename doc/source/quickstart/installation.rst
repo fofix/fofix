@@ -29,12 +29,6 @@ From sources
     python setup.py build_ext --inplace --force
 
 
-.. note::
-
-    Due to a bug in the builder, the `cerealizer` is installed in non binary
-    mode.
-
-
 Windows
 +++++++
 **Only 32 bit Python is supported**
