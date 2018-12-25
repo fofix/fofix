@@ -58,7 +58,7 @@ def halign(value, default='center'):
                 'center': CENTER,
                 'right':  RIGHT}[value.lower()]
     except KeyError:
-        log.warn('Invalid horizontal alignment value - defaulting to %s' % default)
+        log.warning('Invalid horizontal alignment value - defaulting to %s' % default)
         return halign(default)
 
 def valign(value, default='middle'):
@@ -70,7 +70,7 @@ def valign(value, default='middle'):
                 'center': MIDDLE,  # for temporary backward compatibility
                 'bottom': BOTTOM}[value.lower()]
     except KeyError:
-        log.warn('Invalid vertical alignment value - defaulting to %s' % default)
+        log.warning('Invalid vertical alignment value - defaulting to %s' % default)
         return valign(default)
 
 
@@ -111,7 +111,7 @@ class Theme(Task):
             return object.__getattribute__(self, attr)
         except KeyError:
             if attr in classNames.keys():
-                log.warn("No theme class for %s - Loading default..." % attr)
+                log.warning("No theme class for %s - Loading default..." % attr)
                 object.__getattribute__(self, '__dict__')[attr] = classNames[attr](self)
                 return object.__getattribute__(self, attr)
             elif attr.startswith('__') and attr.endswith('__'): #for object's attributes (eg: __hash__, __eq__)
@@ -124,7 +124,7 @@ class Theme(Task):
 
         self.themePath = os.path.join(Version.dataPath(),"themes", name)
         if not os.path.exists(self.themePath):
-            log.warn("Theme: %s does not exist!\n" % self.themePath)
+            log.warning("Theme: %s does not exist!\n" % self.themePath)
             name = Config.get("coffee", "themename")
             log.info("Theme: Attempting fallback to default theme \"%s\"." % name)
             self.themePath = os.path.join(Version.dataPath(),"themes", name)

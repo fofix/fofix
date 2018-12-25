@@ -153,7 +153,7 @@ class Video:
         raise
 
     def resolutionReset(self):
-        log.warn("Video setup failed. Trying default windowed resolution.")
+        log.warning("Video setup failed. Trying default windowed resolution.")
         self.error.append(_("Video setup failed with your resolution settings, and so were reset to defaults."))
         if self.fullscreen:
             self.flags ^= pygame.FULLSCREEN
@@ -168,7 +168,7 @@ class Video:
                 self.screenError()
 
     def multisampleReset(self, resolution):
-        log.warn("Video setup failed. Trying without antialiasing.")
+        log.warning("Video setup failed. Trying without antialiasing.")
         pygame.display.gl_set_attribute(pygame.GL_MULTISAMPLEBUFFERS, 0)
         pygame.display.gl_set_attribute(pygame.GL_MULTISAMPLESAMPLES, 0)
         self.multisamples = 0

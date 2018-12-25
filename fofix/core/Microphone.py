@@ -37,7 +37,7 @@ try:
     from fofix.core import pypitch
     supported = True
 except ImportError:
-    log.warn('Missing pyaudio or pypitch - microphone support will not be possible')
+    log.warning('Missing pyaudio or pypitch - microphone support will not be possible')
     supported = False
 
 if supported:

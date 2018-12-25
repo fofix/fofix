@@ -1234,7 +1234,7 @@ class GameResultsScene(Scene):
                 try:
                     notesHit, notesTotal, noteStreak, modVersion, handicap, handicapLong, originalScore = scoreExt
                 except ValueError:
-                    log.warn("Old highscores found.")
+                    log.warning("Old highscores found.")
                     notesHit, notesTotal, noteStreak, modVersion, oldScores1, oldScores2 = scoreExt
                 for j,player in enumerate(self.playerList):
                     if (self.time % 10.0) < 5.0 and i == self.highscoreIndex[j] and self.scoreDifficulty == player.difficulty and self.scorePart == player.part:
