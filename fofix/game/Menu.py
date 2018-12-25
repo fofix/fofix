@@ -43,7 +43,25 @@ log = logging.getLogger(__name__)
 
 
 class Choice:
+    """ Choice constructor """
+
     def __init__(self, text, callback, name=None, values=None, valueIndex=0, append_submenu_char=True, tipText=None):
+        """
+        Initialise an item in the menu
+
+        :param text: name of the item (ending with ' >' if it is a submenu)
+        :type text: string
+        :param callback: function to call when the item is chosen
+        :param name: name of the submenu
+        :type name: string
+        :param values: (x, y) position
+        :param valueIndex: the index of the first (current) selected value
+        :type valueIndex: integer
+        :param append_submenu_char:
+        :type append_submenu_char: boolean
+        :param tipText: the tip for the item
+        :type tipText: string
+        """
         self.text       = unicode(text)
         self.callback   = callback
         self.name       = name
@@ -58,8 +76,13 @@ class Choice:
         else:
             self.isSubMenu = isinstance(self.callback, Menu) or isinstance(self.callback, list)
 
-    # add support for passing position values to the callback "next menu"
     def trigger(self, engine=None):
+        """
+        Trigger action
+
+        :param engine: the engine
+        """
+        # select the action (submenu or callback)
         if engine and isinstance(self.callback, list):
             if self.values:
                 nextMenu = Menu(engine, self.callback, name=self.name, pos=self.values, selectedIndex=self.valueIndex)
@@ -71,15 +94,19 @@ class Choice:
             nextMenu = self.callback(self.values[self.valueIndex])
         else:
             nextMenu = self.callback()
+
+        # display the new menu if necessary
         if isinstance(nextMenu, Menu):
             engine.view.pushLayer(nextMenu)
 
     def selectNextValue(self):
+        """ Select the next value """
         if self.values:
             self.valueIndex = (self.valueIndex + 1) % len(self.values)
             self.trigger()
 
     def selectPreviousValue(self):
+        """ Select the previous value """
         if self.values:
             self.valueIndex = (self.valueIndex - 1) % len(self.values)
             self.trigger()
@@ -96,7 +123,37 @@ class Choice:
 
 
 class Menu(Layer, KeyListener):
+    """ Menu constructor """
+
     def __init__(self, engine, choices, name=None, onClose=None, onCancel=None, pos=(.2, .31), viewSize=6, fadeScreen=False, font="font", mainMenu=None, textColor=None, selectedColor=None, append_submenu_char=True, selectedIndex=None, showTips=True, selectedBox=False):
+        """
+        Initialise the menu
+
+        :param engine: the engine
+        :param choices: choices for the menu
+        :type choices: list of tuples (item name, callback, tiptext)
+        :param name: the name of the menu
+        :type name: string
+        :param onClose: function to call when closing the menu
+        :param onCancel: function to call when cancelling
+        :param pos: (x, y) position
+        :type pos: tuple of floats (x, y)
+        :param viewSize:
+        :type viewSize: integer
+        :param fadeScreen: fade the screen
+        :type fadeScreen: boolean
+        :param font: the font for the text
+        :param mainMenu:
+        :param textColor: the color of the text
+        :param selectedColor:
+        :param append_submenu_char:
+        :type append_submenu_char: boolean
+        :param selectedIndex: the index of the first (current) selected value
+        :type selectedIndex: integer
+        :param showTips: display tips
+        :type showTips: boolean
+        :param selectedBox:
+        """
         self.engine = engine
 
         self.logClassInits = self.engine.config.get("game", "log_class_inits")
@@ -108,9 +165,7 @@ class Menu(Layer, KeyListener):
         self.theme = self.engine.data.theme
 
         self.choices = []
-        self.currentIndex = 0
-        if selectedIndex:
-            self.currentIndex = selectedIndex
+        self.currentIndex = selectedIndex if selectedIndex else 0
         self.time         = 0
         self.onClose      = onClose
         self.onCancel     = onCancel
@@ -135,14 +190,18 @@ class Menu(Layer, KeyListener):
 
         if self.name and self.useGraphics > 0:
             try:
+                # try to load the background menu image
                 if self.engine.loadImgDrawing(self, "menuBackground", os.path.join("themes", self.themename, "menu", "%s.png" % self.name)):
                     if self.menuBackground.height1() == 1:
                         raise KeyError
                 else:
                     raise KeyError
+
+                # try to load the text menu image
                 self.gfxText = "%stext%d" % (self.name, len(choices))
                 if not self.engine.loadImgDrawing(self, "menuText", os.path.join("themes", self.themename, "menu", "%s.png" % self.gfxText)):
                     raise KeyError
+
                 self.graphicMenu = True
                 self.menux = self.engine.theme.submenuX[self.gfxText]
                 self.menuy = self.engine.theme.submenuY[self.gfxText]
@@ -225,6 +284,7 @@ class Menu(Layer, KeyListener):
         self.tipY = self.engine.theme.menuTipTextY
         self.tipScrollMode = self.engine.theme.menuTipTextScrollMode  # 0 for constant scroll; 1 for back and forth
 
+        # get the list of items
         for c in choices:
             try:
                 text, callback = c
@@ -255,6 +315,12 @@ class Menu(Layer, KeyListener):
         self.setTipScroll()
 
     def selectItem(self, index):
+        """
+        Select an item
+
+        :param index: the index of the selected item
+        :type index: integer
+        """
         self.currentIndex = index
 
     def shown(self):
@@ -266,15 +332,22 @@ class Menu(Layer, KeyListener):
             self.onClose()
 
     def updateSelection(self):
+        """ Update the selection of an item """
         self.setTipScroll()
         if self.currentIndex > self.viewOffset + self.viewSize - 1:
             self.viewOffset = self.currentIndex - self.viewSize + 1
         if self.currentIndex < self.viewOffset:
             self.viewOffset = self.currentIndex
 
-    # added drum navigation conditional here to prevent drum nav if disabled
-    # updated SFX play logic to just play the new sound instead of setting volume
+    # XXX: unicode param is deprecated
     def keyPressed(self, key, unicode):
+        """
+        Manage action when a key is pressed (drum navigation supported)
+
+        :param key: the key pressed
+        :param unicode: deprecated (not used)
+        :return: always True
+        """
         choice = self.choices[self.currentIndex]
         c = self.engine.input.controls.getMapping(key)
         if c in Player.menuYes or key == pygame.K_RETURN:
@@ -306,19 +379,23 @@ class Menu(Layer, KeyListener):
         return True
 
     def scrollDown(self):
+        """ Scroll down """
         self.engine.data.selectSound.play()
         self.currentIndex = (self.currentIndex + 1) % len(self.choices)
         self.updateSelection()
 
     def scrollUp(self):
+        """ Scroll up """
         self.engine.data.selectSound.play()
         self.currentIndex = (self.currentIndex - 1) % len(self.choices)
         self.updateSelection()
 
     def scrollLeft(self):
+        """ Scroll left """
         self.choices[self.currentIndex].selectPreviousValue()
 
     def scrollRight(self):
+        """ Scroll right """
         self.choices[self.currentIndex].selectNextValue()
 
     def keyReleased(self, key):
@@ -402,6 +479,7 @@ class Menu(Layer, KeyListener):
             font = self.font
             tipFont = self.tipFont
 
+            # Fade
             if self.fadeScreen:
                 self.engine.fadeScreen(v)
 
