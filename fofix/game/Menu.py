@@ -43,7 +43,7 @@ log = logging.getLogger(__name__)
 
 
 class Choice:
-    def __init__(self, text, callback, name = None, values = None, valueIndex = 0, append_submenu_char = True, tipText = None):
+    def __init__(self, text, callback, name=None, values=None, valueIndex=0, append_submenu_char=True, tipText=None):
         self.text       = unicode(text)
         self.callback   = callback
         self.name       = name
@@ -58,14 +58,13 @@ class Choice:
         else:
             self.isSubMenu = isinstance(self.callback, Menu) or isinstance(self.callback, list)
 
-    #MFH - add support for passing position values to the callback "next menu"
-    def trigger(self, engine = None):
+    # add support for passing position values to the callback "next menu"
+    def trigger(self, engine=None):
         if engine and isinstance(self.callback, list):
-            #MFH
             if self.values:
-                nextMenu = Menu(engine, self.callback, name = self.name, pos = self.values, selectedIndex = self.valueIndex )
+                nextMenu = Menu(engine, self.callback, name=self.name, pos=self.values, selectedIndex=self.valueIndex)
             else:
-                nextMenu = Menu(engine, self.callback, name = self.name)
+                nextMenu = Menu(engine, self.callback, name=self.name)
         elif engine and isinstance(self.callback, Menu):
             nextMenu = self.callback
         elif self.values:
@@ -95,28 +94,28 @@ class Choice:
         else:
             return "%s: %s" % (self.text, self.values[self.valueIndex])
 
+
 class Menu(Layer, KeyListener):
-    def __init__(self, engine, choices, name = None, onClose = None, onCancel = None, pos = (.2, .31), viewSize = 6, fadeScreen = False, font = "font", mainMenu = None, textColor = None, selectedColor = None, append_submenu_char = True, selectedIndex = None, showTips = True, selectedBox = False):
-        self.engine       = engine
+    def __init__(self, engine, choices, name=None, onClose=None, onCancel=None, pos=(.2, .31), viewSize=6, fadeScreen=False, font="font", mainMenu=None, textColor=None, selectedColor=None, append_submenu_char=True, selectedIndex=None, showTips=True, selectedBox=False):
+        self.engine = engine
 
         self.logClassInits = self.engine.config.get("game", "log_class_inits")
         if self.logClassInits == 1:
             log.debug("Menu class init (Menu.py)...")
 
-        #Get theme
+        # Get theme
         self.themename = self.engine.data.themeLabel
         self.theme = self.engine.data.theme
 
-        self.choices      = []
+        self.choices = []
         self.currentIndex = 0
-        #MFH
         if selectedIndex:
             self.currentIndex = selectedIndex
         self.time         = 0
         self.onClose      = onClose
         self.onCancel     = onCancel
         self.viewOffset   = 0
-        self.name     = name # akedrou - for graphical support
+        self.name = name  # for graphical support
         self.mainMenu = False
         self.graphicMenu = False
         self.useSelectedBox = selectedBox
@@ -132,17 +131,17 @@ class Menu(Layer, KeyListener):
         self.selectedColor = selectedColor
         self.tipColor = self.engine.theme.menuTipTextColor
 
-        self.drumNav = self.engine.config.get("game", "drum_navigation")  #MFH
+        self.drumNav = self.engine.config.get("game", "drum_navigation")
 
         if self.name and self.useGraphics > 0:
             try:
-                if self.engine.loadImgDrawing(self, "menuBackground", os.path.join("themes",self.themename,"menu","%s.png" % self.name)):
+                if self.engine.loadImgDrawing(self, "menuBackground", os.path.join("themes", self.themename, "menu", "%s.png" % self.name)):
                     if self.menuBackground.height1() == 1:
                         raise KeyError
                 else:
                     raise KeyError
                 self.gfxText = "%stext%d" % (self.name, len(choices))
-                if not self.engine.loadImgDrawing(self, "menuText", os.path.join("themes",self.themename,"menu","%s.png" % self.gfxText)):
+                if not self.engine.loadImgDrawing(self, "menuText", os.path.join("themes", self.themename, "menu", "%s.png" % self.gfxText)):
                     raise KeyError
                 self.graphicMenu = True
                 self.menux = self.engine.theme.submenuX[self.gfxText]
@@ -169,8 +168,8 @@ class Menu(Layer, KeyListener):
                 self.menuBackground = None
                 self.menuText = None
 
-
-        if pos == (.2, .66 - .35):  #MFH - default position, not called with a special one - this is a submenu:
+        # default position, not called with a special one - this is a submenu
+        if pos == (.2, .66 - .35):
             self.sub_menu_x = self.engine.theme.sub_menu_xVar
             self.sub_menu_y = self.engine.theme.sub_menu_yVar
 
@@ -192,8 +191,10 @@ class Menu(Layer, KeyListener):
 
             pos = (self.sub_menu_x, self.sub_menu_y)
 
-        if viewSize == 6:   #MFH - default viewsize
-            if self.theme in [0, 1, 2]:#8bit
+        # default viewsize
+        if viewSize == 6:
+            # 8bit
+            if self.theme in [0, 1, 2]:
                 viewSize = 10
 
         self.pos          = pos
@@ -222,27 +223,31 @@ class Menu(Layer, KeyListener):
         self.tipDir = 0
         self.tipSize = 0
         self.tipY = self.engine.theme.menuTipTextY
-        self.tipScrollMode = self.engine.theme.menuTipTextScrollMode # - 0 for constant scroll; 1 for back and forth
+        self.tipScrollMode = self.engine.theme.menuTipTextScrollMode  # 0 for constant scroll; 1 for back and forth
 
         for c in choices:
             try:
                 text, callback = c
                 if isinstance(text, tuple):
-                    if len(text) == 2: # a submenu's name
-                        c = Choice(text[0], callback, name = text[1], append_submenu_char = append_submenu_char)
-                    else: # Dialogs menus - FileChooser, NeckChooser, ItemChooser - this last to be changed soon
-                        c = Choice(text[0], callback, values = text[2], valueIndex = text[1], append_submenu_char = append_submenu_char)
+                    if len(text) == 2:
+                        # a submenu's name
+                        c = Choice(text[0], callback, name=text[1], append_submenu_char=append_submenu_char)
+                    else:
+                        # Dialogs menus - FileChooser, NeckChooser, ItemChooser - this last to be changed soon
+                        c = Choice(text[0], callback, values=text[2], valueIndex=text[1], append_submenu_char=append_submenu_char)
                 else:
-                    c = Choice(text, callback, append_submenu_char = append_submenu_char)
+                    c = Choice(text, callback, append_submenu_char=append_submenu_char)
             except ValueError:
                 text, callback, tipText = c
                 if isinstance(text, tuple):
-                    if len(text) == 2: # a submenu's name
-                        c = Choice(text[0], callback, name = text[1], append_submenu_char = append_submenu_char, tipText = tipText)
-                    else: # Dialogs menus - FileChooser, NeckChooser, ItemChooser - this last to be changed soon
-                        c = Choice(text[0], callback, values = text[2], valueIndex = text[1], append_submenu_char = append_submenu_char, tipText = tipText)
+                    if len(text) == 2:
+                        # a submenu's name
+                        c = Choice(text[0], callback, name=text[1], append_submenu_char=append_submenu_char, tipText=tipText)
+                    else:
+                        # Dialogs menus - FileChooser, NeckChooser, ItemChooser - this last to be changed soon
+                        c = Choice(text[0], callback, values=text[2], valueIndex=text[1], append_submenu_char=append_submenu_char, tipText=tipText)
                 else:
-                    c = Choice(text, callback, append_submenu_char = append_submenu_char, tipText = tipText)
+                    c = Choice(text, callback, append_submenu_char=append_submenu_char, tipText=tipText)
             except TypeError:
                 pass
             self.choices.append(c)
@@ -267,9 +272,9 @@ class Menu(Layer, KeyListener):
         if self.currentIndex < self.viewOffset:
             self.viewOffset = self.currentIndex
 
-    #MFH added drum navigation conditional here to prevent drum nav if disabled
-    #MFH updated SFX play logic to just play the new sound instead of setting volume
-    def keyPressed(self, key, unicode): #racer: drum nav.
+    # added drum navigation conditional here to prevent drum nav if disabled
+    # updated SFX play logic to just play the new sound instead of setting volume
+    def keyPressed(self, key, unicode):
         choice = self.choices[self.currentIndex]
         c = self.engine.input.controls.getMapping(key)
         if c in Player.menuYes or key == pygame.K_RETURN:
@@ -334,27 +339,27 @@ class Menu(Layer, KeyListener):
                     self.tipDelay = 0
                     self.tipDir = (self.tipDir+1)&1
             elif self.tipDir == 1 and self.tipScrollMode == 1:
-                self.tipScroll -= ticks/8000.0
-                if self.tipScroll < -(self.tipSize-.98):
-                    self.tipScroll = -(self.tipSize-.98)
+                self.tipScroll -= ticks / 8000.0
+                if self.tipScroll < -(self.tipSize - .98):
+                    self.tipScroll = -(self.tipSize - .98)
                     self.tipDelay = 900
             elif self.tipDir == 0 and self.tipScrollMode == 1:
-                self.tipScroll += ticks/8000.0
+                self.tipScroll += ticks / 8000.0
                 if self.tipScroll > .02:
                     self.tipScroll = .02
                     self.tipDelay = 900
             elif self.tipScrollMode == 0:
-                self.tipScroll  -= ticks/8000.0
-                self.tipScrollB -= ticks/8000.0
+                self.tipScroll  -= ticks / 8000.0
+                self.tipScrollB -= ticks / 8000.0
                 if self.tipScroll < -(self.tipSize):
                     self.tipScroll = self.tipScrollB + self.tipSize + self.tipScrollSpace
                 if self.tipScrollB < -(self.tipSize):
                     self.tipScrollB = self.tipScroll + self.tipSize + self.tipScrollSpace
 
-    def renderTriangle(self, up = (0, 1), s = .2):
+    def renderTriangle(self, up=(0, 1), s=.2):
         left = (-up[1], up[0])
         glBegin(GL_TRIANGLES)
-        glVertex2f( up[0] * s,  up[1] * s)
+        glVertex2f(up[0] * s, up[1] * s)
         glVertex2f((-up[0] + left[0]) * s, (-up[1] + left[1]) * s)
         glVertex2f((-up[0] - left[0]) * s, (-up[1] - left[1]) * s)
         glEnd()
@@ -372,15 +377,14 @@ class Menu(Layer, KeyListener):
             self.tipWait = False
             self.tipDir = 0
         else:
-            self.tipScroll = .5 - tipW/2
+            self.tipScroll = .5 - tipW / 2
             self.tipScrollB = None
             self.tipTimerEnabled = False
             self.tipDir = 0
             self.tipSize = tipW
 
     def render(self, visibility, topMost):
-        #MFH - display version in any menu:
-
+        # display version in any menu
         if not visibility:
             self.active = False
             return
@@ -391,10 +395,10 @@ class Menu(Layer, KeyListener):
         else:
             self.engine.graphicMenuShown = False
 
-        with self.engine.view.orthogonalProjection(normalize = True):
+        with self.engine.view.orthogonalProjection(normalize=True):
             v = (1 - visibility) ** 2
-            # Default to this font if none was specified
 
+            # Default to this font if none was specified
             font = self.font
             tipFont = self.tipFont
 
@@ -404,8 +408,8 @@ class Menu(Layer, KeyListener):
             wS, hS = self.engine.view.geometry[2:4]
 
             if self.graphicMenu and self.menuBackground:
-                #volshebnyi - better menu scaling
-                drawImage(self.menuBackground, scale = (1.0,-1.0), coord = (wS/2,hS/2), stretched = FULL_SCREEN)
+                # better menu scaling
+                drawImage(self.menuBackground, scale=(1.0, -1.0), coord=(wS/2, hS/2), stretched=FULL_SCREEN)
             else:
                 glEnable(GL_BLEND)
                 glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
@@ -417,13 +421,13 @@ class Menu(Layer, KeyListener):
             for i, choice in enumerate(self.choices[self.viewOffset:self.viewOffset + self.viewSize]):
                 if self.graphicMenu:
                     if self.currentIndex == i:
-                        xpos = (.5,1)
+                        xpos = (.5, 1)
                     else:
-                        xpos = (0,.5)
-                    ypos = float(i+self.viewOffset)
-                    drawImage(self.menuText, scale = (.5*self.menuScale,(-1.0/n*self.menuScale)),
-                                          coord = (wS*self.menux,(hS*self.menuy)-(hS*self.vSpace)*i),
-                                          rect = (xpos[0],xpos[1],ypos/n,(ypos+1.0)/n), stretched = KEEP_ASPECT | FIT_WIDTH)
+                        xpos = (0, .5)
+                    ypos = float(i + self.viewOffset)
+                    drawImage(self.menuText, scale=(.5*self.menuScale, (-1.0/n*self.menuScale)),
+                              coord=(wS*self.menux, (hS*self.menuy)-(hS*self.vSpace)*i),
+                              rect=(xpos[0], xpos[1], ypos/n, (ypos+1.0)/n), stretched=KEEP_ASPECT | FIT_WIDTH)
                 else:
                     text = choice.getText(i + self.viewOffset == self.currentIndex)
                     glPushMatrix()
@@ -431,38 +435,38 @@ class Menu(Layer, KeyListener):
 
                     scale = self.engine.theme.settingsmenuScale
 
-                    w, h = font.getStringSize(" ", scale = scale)
+                    w, h = font.getStringSize(" ", scale=scale)
 
                     # Draw arrows if scrolling is needed to see all items
                     if i == 0 and self.viewOffset > 0:
                         self.engine.theme.setBaseColor((1 - v) * max(.1, 1 - (1.0 / self.viewOffset) / 3))
                         glPushMatrix()
                         glTranslatef(x - v / 4 - w * 2, y + h / 2, 0)
-                        self.renderTriangle(up = (0, -1), s = .015)
+                        self.renderTriangle(up=(0, -1), s=.015)
                         glPopMatrix()
                     elif i == self.viewSize - 1 and self.viewOffset + self.viewSize < n:
                         self.engine.theme.setBaseColor((1 - v) * max(.1, 1 - (1.0 / (n - self.viewOffset - self.viewSize)) / 3))
                         glPushMatrix()
                         glTranslatef(x - v / 4 - w * 2, y + h / 2, 0)
-                        self.renderTriangle(up = (0, 1), s = .015)
+                        self.renderTriangle(up=(0, 1), s=.015)
                         glPopMatrix()
 
                     if i + self.viewOffset == self.currentIndex:
                         if choice.tipText and self.showTips:
                             if self.tipColor:
                                 c1, c2, c3 = self.tipColor
-                                glColor3f(c1,c2,c3)
+                                glColor3f(c1, c2, c3)
                             elif self.textColor:
                                 c1, c2, c3 = self.textColor
-                                glColor3f(c1,c2,c3)
+                                glColor3f(c1, c2, c3)
                             else:
-                                self.engine.theme.setBaseColor(1-v)
+                                self.engine.theme.setBaseColor(1 - v)
                             tipScale = self.tipScale
                             if self.tipScroll > -(self.tipSize) and self.tipScroll < 1:
-                                tipFont.render(choice.tipText, (self.tipScroll, self.tipY), scale = tipScale)
+                                tipFont.render(choice.tipText, (self.tipScroll, self.tipY), scale=tipScale)
                             if self.tipScrollMode == 0:
                                 if self.tipScrollB > -(self.tipSize) and self.tipScrollB < 1:
-                                    tipFont.render(choice.tipText, (self.tipScrollB, self.tipY), scale = tipScale)
+                                    tipFont.render(choice.tipText, (self.tipScrollB, self.tipY), scale=tipScale)
                         a = (math.sin(self.time) * .15 + .75) * (1 - v * 2)
                         self.engine.theme.setSelectedColor(a)
                         a *= -.005
@@ -470,32 +474,32 @@ class Menu(Layer, KeyListener):
                     else:
                         self.engine.theme.setBaseColor(1 - v)
 
-                    #MFH - settable color through Menu constructor
+                    # settable color through Menu constructor
                     if i + self.viewOffset == self.currentIndex and self.selectedColor:
-                        c1,c2,c3 = self.selectedColor
-                        glColor3f(c1,c2,c3)
+                        c1, c2, c3 = self.selectedColor
+                        glColor3f(c1, c2, c3)
                     elif self.textColor:
-                        c1,c2,c3 = self.textColor
-                        glColor3f(c1,c2,c3)
+                        c1, c2, c3 = self.textColor
+                        glColor3f(c1, c2, c3)
 
-                    #MFH - now to catch " >" main menu options and blank them:
+                    # now to catch " >" main menu options and blank them
                     if text == " >":
                         text = ""
 
                     if self.engine.data.submenuSelectFound and len(text) > 0 and not self.mainMenu and self.useSelectedBox:
-                        Tw, Th = font.getStringSize(text,scale)
-                        boxXOffset = (x + (Tw/2))*wS
-                        boxYOffset = (1.0 - (y*4.0/3.0) - (Th*1.2/2))*hS
+                        Tw, Th = font.getStringSize(text, scale)
+                        boxXOffset = (x + (Tw / 2)) * wS
+                        boxYOffset = (1.0 - (y * 4.0 / 3.0) - (Th * 1.2 / 2)) * hS
                         drawImage(self.engine.data.submenuSelect,
-                                              scale = (tempWScale,tempHScale), #FIXME
-                                              coord = (boxXOffset,boxYOffset))
+                                  scale=(tempWScale, tempHScale),  #FIXME
+                                  coord=(boxXOffset, boxYOffset))
 
-                    font.render(text, (x - v / 4, y), scale = scale)
-
+                    font.render(text, (x - v / 4, y), scale=scale)
 
                     v *= 2
-                    if self.theme == 1 and self.font == self.engine.data.pauseFont: # evilynux - Ugly workaround for Gh3
-                        y += h*.70      #Worldrave - Changed Pause menu spacing back to .70 from .65 for now.
+                    if self.theme == 1 and self.font == self.engine.data.pauseFont:
+                        # Ugly workaround for Gh3
+                        y += h * .70  # Changed Pause menu spacing back to .70 from .65 for now.
                     else:
                         y += h
                     glPopMatrix()
