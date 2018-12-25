@@ -76,13 +76,13 @@ class MainMenu(BackgroundLayer):
         if exists == 0:
             if engine.loadImgDrawing(self, "ok", os.path.join("necks","Neck_1.png")):
                 Config.set("game", "default_neck", "1")
-                log.warn("Default chosen neck not valid; fallback Neck_1.png forced.")
+                log.warning("Default chosen neck not valid; fallback Neck_1.png forced.")
                 exists = 1
 
         #MFH - check for defaultneck
         if exists == 0:
             if engine.loadImgDrawing(self, "ok", os.path.join("necks","defaultneck.png")):
-                log.warn("Default chosen neck not valid; fallback defaultneck.png forced.")
+                log.warning("Default chosen neck not valid; fallback defaultneck.png forced.")
                 Config.set("game", "default_neck", "defaultneck")
                 exists = 1
             else:

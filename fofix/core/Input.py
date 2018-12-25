@@ -437,7 +437,7 @@ class Input(Task):
     # glorandwarf: check that there are no control conflicts #FIXME
     def checkControls(self):
         if self.controls.isKeyMappingOK() is False:
-            log.warn("Conflicting player controls, resetting to defaults")
+            log.warning("Conflicting player controls, resetting to defaults")
             self.controls.restoreDefaultKeyMappings()
             self.reloadControls()
 

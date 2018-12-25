@@ -519,20 +519,20 @@ class ShaderList:
 
         #stump: check whether all needed extensions are actually supported
         if not glInitShaderObjectsARB():
-            log.warn('OpenGL extension ARB_shader_objects not supported - shaders disabled')
+            log.warning('OpenGL extension ARB_shader_objects not supported - shaders disabled')
             return
         if not glInitVertexShaderARB():
-            log.warn('OpenGL extension ARB_vertex_shader not supported - shaders disabled')
+            log.warning('OpenGL extension ARB_vertex_shader not supported - shaders disabled')
             return
         if not glInitFragmentShaderARB():
-            log.warn('OpenGL extension ARB_fragment_shader not supported - shaders disabled')
+            log.warning('OpenGL extension ARB_fragment_shader not supported - shaders disabled')
             return
         if not glInitMultitextureARB():
-            log.warn('OpenGL extension ARB_multitexture not supported - shaders disabled')
+            log.warning('OpenGL extension ARB_multitexture not supported - shaders disabled')
             return
         if not glInitTexture3DEXT():
             if sys.platform != 'darwin':
-                log.warn('OpenGL extension EXT_texture3D not supported - shaders disabled')
+                log.warning('OpenGL extension EXT_texture3D not supported - shaders disabled')
                 return
 
         self.workdir = dir

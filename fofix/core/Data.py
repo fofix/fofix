@@ -261,8 +261,8 @@ class Data(object):
                 self.loadSoundEffect(
                     self, self.sounds[0], os.path.join("sounds", self.sounds[1]))
             else:
-                log.warn("File " + self.sounds[1] +
-                         " not found using default instead.")
+                log.warning("File " + self.sounds[1] +
+                            " not found using default instead.")
                 self.loadSoundEffect(
                     self, self.sounds[0], os.path.join("sounds", "default.ogg"))
 
@@ -277,11 +277,11 @@ class Data(object):
             self.loadSoundEffect(self, "crowdSound", os.path.join(
                 "sounds", "crowdcheers.ogg"), crowd=True)
             self.cheerSoundFound = 1
-            log.warn(
+            log.warning(
                 themename + "/sounds/crowdcheers.ogg not found -- using data/sounds/crowdcheers.ogg instead.")
         else:
             self.cheerSoundFound = 0
-            log.warn("crowdcheers.ogg not found -- no crowd cheering.")
+            log.warning("crowdcheers.ogg not found -- no crowd cheering.")
 
     def loadPartImages(self):
         """Load part images."""
@@ -507,9 +507,9 @@ class Data(object):
                         imgDrawing = ImgDrawing(self.svg, fileName1)
                         return imgDrawing
                     except IOError:
-                        log.warn("Unable to load image file: %s" % fileName1)
+                        log.warning("Unable to load image file: %s" % fileName1)
                     except OverflowError:
-                        log.warn("Unable to read image file: %s" % fileName1)
+                        log.warning("Unable to read image file: %s" % fileName1)
                 else:
                     return True
             else:
@@ -533,13 +533,13 @@ class Data(object):
                             imgDrawing = ImgDrawing(self.svg, f)
                             return imgDrawing
                         except IOError:
-                            log.warn("Unable to load image file: %s" % f)
+                            log.warning("Unable to load image file: %s" % f)
                 elif len(files) > 0:
                     return True
 
         # image not found
         if self.logImageNotFound:
-            log.warn("Image not found: %s" % fileName)
+            log.warning("Image not found: %s" % fileName)
         return False
 
     def loadImgDrawing(self, target, name, fileName, textureSize=None):

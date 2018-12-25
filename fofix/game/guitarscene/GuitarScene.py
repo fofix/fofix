@@ -1358,17 +1358,17 @@ class GuitarScene(BandPlayBaseScene):
                                 if self.logMarkerNotes == 1:
                                     log.debug("GuitarScene: P%d overdrive / starpower phrase marked between %f and %f" % ( i+1, time, time+event.length ) )
                                     if lastSpNoteTime == 0:
-                                        log.warn("This starpower phrase doesn't appear to have any finalStar notes marked... probably will not reward starpower!")
+                                        log.warning("This starpower phrase doesn't appear to have any finalStar notes marked... probably will not reward starpower!")
                     self.midiSP = True
                     unisonCheck.extend(self.spTimes[i])
 
                 elif self.starpowerMode == 2: #this particular instrument only has one starpower path marked!  Force auto-generation of SP paths.
-                    log.warn("Instrument %s only has one starpower path marked!  ...falling back on auto-generated paths for this instrument." % self.players[i].part.text)
+                    log.warning("Instrument %s only has one starpower path marked!  ...falling back on auto-generated paths for this instrument." % self.players[i].part.text)
                     guitar.starNotesSet = False     #fallback on auto generation.
 
         elif self.starpowerMode == 2:
             if self.numberOfGuitars > 0:
-                log.warn("This song does not appear to have any starpower or overdrive paths marked, falling back on auto-generated paths.")
+                log.warning("This song does not appear to have any starpower or overdrive paths marked, falling back on auto-generated paths.")
                 for instrument in self.instruments:
                     if instrument.isVocal:
                         continue

@@ -165,7 +165,7 @@ class Menu(Layer, KeyListener):
                     self.vSpace = .08
                 log.debug("Graphic menu enabled for submenu: %s" % self.name)
             except KeyError:
-                log.warn("Your theme does not appear to properly support the %s graphical submenu. Check to be sure you have the latest version of your theme." % self.name)
+                log.warning("Your theme does not appear to properly support the %s graphical submenu. Check to be sure you have the latest version of your theme." % self.name)
                 self.menuBackground = None
                 self.menuText = None
 

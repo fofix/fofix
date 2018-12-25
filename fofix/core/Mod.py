@@ -48,7 +48,7 @@ def getAvailableMods(engine):
     try:
         dirList = os.listdir(modPath)
     except OSError:
-        log.warn("Could not find mods directory")
+        log.warning("Could not find mods directory")
         return []
     return [m for m in dirList if os.path.isdir(os.path.join(modPath, m)) and not m.startswith(".")]
 
