@@ -31,16 +31,16 @@ import string
 
 from fretwork.audio import Music
 
-from fofix.core.View import BackgroundLayer
-from fofix.core.Image import drawImage
-from fofix.core.Shader import shaders
-from fofix.game.Lobby import Lobby
-from fofix.core.constants import *
-from fofix.core.Language import _
-from fofix.game.Menu import Menu
 from fofix.core import Config
-from fofix.game import Dialogs
 from fofix.core import Settings
+from fofix.core.Image import drawImage
+from fofix.core.Language import _
+from fofix.core.Shader import shaders
+from fofix.core.View import BackgroundLayer
+from fofix.core.constants import *
+from fofix.game import Dialogs
+from fofix.game.Lobby import Lobby
+from fofix.game.Menu import Menu
 
 
 log = logging.getLogger(__name__)
@@ -48,47 +48,46 @@ log = logging.getLogger(__name__)
 
 class MainMenu(BackgroundLayer):
     def __init__(self, engine):
-        self.engine              = engine
+        self.engine = engine
 
         self.logClassInits = Config.get("game", "log_class_inits")
         if self.logClassInits == 1:
             log.debug("MainMenu class init (MainMenu.py)...")
 
-        self.time                = 0.0
-        self.nextLayer           = None
-        self.visibility          = 0.0
-        self.active              = False
+        self.time       = 0.0
+        self.nextLayer  = None
+        self.visibility = 0.0
+        self.active     = False
 
         self.showStartupMessages = False
 
         self.gfxVersionTag = Config.get("game", "gfx_version_tag")
 
+        # Neck
         self.chosenNeck = Config.get("game", "default_neck")
         exists = 0
-
-        if engine.loadImgDrawing(self, "ok", os.path.join("necks",self.chosenNeck+".png")):
+        if engine.loadImgDrawing(self, "ok", os.path.join("necks", self.chosenNeck + ".png")):
             exists = 1
-        elif engine.loadImgDrawing(self, "ok", os.path.join("necks","Neck_"+self.chosenNeck+".png")):
+        elif engine.loadImgDrawing(self, "ok", os.path.join("necks", "Neck_" + self.chosenNeck + ".png")):
             exists = 1
 
-        #MFH - fallback logic now supports a couple valid default neck filenames
-        #MFH - check for Neck_1
+        ## check for the default Neck_1
         if exists == 0:
-            if engine.loadImgDrawing(self, "ok", os.path.join("necks","Neck_1.png")):
+            if engine.loadImgDrawing(self, "ok", os.path.join("necks", "Neck_1.png")):
                 Config.set("game", "default_neck", "1")
                 log.warning("Default chosen neck not valid; fallback Neck_1.png forced.")
                 exists = 1
 
-        #MFH - check for defaultneck
+        ## check for defaultneck
         if exists == 0:
-            if engine.loadImgDrawing(self, "ok", os.path.join("necks","defaultneck.png")):
+            if engine.loadImgDrawing(self, "ok", os.path.join("necks", "defaultneck.png")):
                 log.warning("Default chosen neck not valid; fallback defaultneck.png forced.")
                 Config.set("game", "default_neck", "defaultneck")
                 exists = 1
             else:
                 log.error("Default chosen neck not valid; fallbacks Neck_1.png and defaultneck.png also not valid!")
 
-        #Get theme
+        # Get theme
         self.theme       = self.engine.data.theme
         self.themeCoOp   = self.engine.data.themeCoOp
         self.themename   = self.engine.data.themeLabel
@@ -101,55 +100,58 @@ class MainMenu(BackgroundLayer):
 
         self.rbmenu = self.engine.theme.menuRB
 
-        #MFH
         self.main_menu_scale = self.engine.theme.main_menu_scaleVar
         self.main_menu_vspacing = self.engine.theme.main_menu_vspacingVar
 
-        if not self.engine.loadImgDrawing(self, "background", os.path.join("themes",self.themename,"menu","mainbg.png")):
+        # Background
+        if not self.engine.loadImgDrawing(self, "background", os.path.join("themes", self.themename, "menu", "mainbg.png")):
             self.background = None
-        self.engine.loadImgDrawing(self, "BGText", os.path.join("themes",self.themename,"menu","maintext.png"))
-        self.engine.loadImgDrawing(self, "optionsBG", os.path.join("themes",self.themename,"menu","optionsbg.png"))
-        self.engine.loadImgDrawing(self, "optionsPanel", os.path.join("themes",self.themename,"menu","optionspanel.png"))
+        self.engine.loadImgDrawing(self, "BGText", os.path.join("themes", self.themename, "menu", "maintext.png"))
+        self.engine.loadImgDrawing(self, "optionsBG", os.path.join("themes", self.themename, "menu", "optionsbg.png"))
+        self.engine.loadImgDrawing(self, "optionsPanel", os.path.join("themes", self.themename, "menu", "optionspanel.png"))
 
-        #racer: added version tag
+        # Version tag
         if self.gfxVersionTag or self.engine.theme.versiontag:
-            if not self.engine.loadImgDrawing(self, "version", os.path.join("themes",self.themename,"menu","versiontag.png")):
-                if not self.engine.loadImgDrawing(self, "version", "versiontag.png"): #falls back on default versiontag.png in data\ folder
+            if not self.engine.loadImgDrawing(self, "version", os.path.join("themes", self.themename, "menu", "versiontag.png")):
+                # falls back on default versiontag.png in 'data' folder
+                if not self.engine.loadImgDrawing(self, "version", "versiontag.png"):
                     self.version = None
         else:
             self.version = None
 
-        #myfingershurt: random main menu music function, menu.ogg and menuXX.ogg (any filename with "menu" as the first 4 letters)
+        # Main menu music
+        ## get all muics: menu.ogg and menuXX.ogg (any filename with "menu" as the first 4 letters)
         self.files = None
-        filepath = self.engine.getPath(os.path.join("themes",self.themename,"sounds"))
+        filepath = self.engine.getPath(os.path.join("themes", self.themename, "sounds"))
         if os.path.isdir(filepath):
             self.files = []
             allfiles = os.listdir(filepath)
             for name in allfiles:
                 if os.path.splitext(name)[1] == ".ogg":
-                    if string.find(name,"menu") > -1:
+                    if string.find(name, "menu") > -1:
                         self.files.append(name)
 
-
+        ## get a random music
         if self.files:
-            i = random.randint(0,len(self.files)-1)
+            i = random.randint(0, len(self.files)-1)
             filename = self.files[i]
-            sound = os.path.join("themes",self.themename,"sounds",filename)
+            sound = os.path.join("themes", self.themename, "sounds", filename)
             self.menumusic = True
             engine.menuMusic = True
 
             self.song = Music(self.engine.resource.fileName(sound))
             self.song.setVolume(self.engine.config.get("audio", "menu_volume"))
-            self.song.play(0)  #no loop
+            self.song.play(0)  # no loop
         else:
             self.menumusic = False
 
+        # Items
         self.opt_text_color     = self.engine.theme.opt_text_colorVar
         self.opt_selected_color = self.engine.theme.opt_selected_colorVar
 
         trainingMenu = [
-          (_("Tutorials"), self.showTutorial),
-          (_("Practice"), lambda: self.newLocalGame(mode1p = 1)),
+            (_("Tutorials"), self.showTutorial),
+            (_("Practice"), lambda: self.newLocalGame(mode1p=1)),
         ]
 
         self.opt_bkg_size = [float(i) for i in self.engine.theme.opt_bkg_size]
@@ -174,46 +176,42 @@ class MainMenu(BackgroundLayer):
             strQuit = _("Quit")
 
         multPlayerMenu = [
-            (_("Face-Off"),     lambda: self.newLocalGame(players = 2,             maxplayers = 4)),
-            (_("Pro Face-Off"), lambda: self.newLocalGame(players = 2, mode2p = 1, maxplayers = 4)),
-            (_("FoFiX Co-Op"),  lambda: self.newLocalGame(players = 2, mode2p = 3, maxplayers = 4, allowMic = allowMic)),
-            (_("RB Co-Op"),     lambda: self.newLocalGame(players = 2, mode2p = 4, maxplayers = 4, allowMic = allowMic)),
-          ]
+            (_("Face-Off"),     lambda: self.newLocalGame(players=2,           maxplayers=4)),
+            (_("Pro Face-Off"), lambda: self.newLocalGame(players=2, mode2p=1, maxplayers=4)),
+            (_("FoFiX Co-Op"),  lambda: self.newLocalGame(players=2, mode2p=3, maxplayers=4, allowMic=allowMic)),
+            (_("RB Co-Op"),     lambda: self.newLocalGame(players=2, mode2p=4, maxplayers=4, allowMic=allowMic)),
+        ]
 
         if not self.useSoloMenu:
-
             mainMenu = [
-              (strCareer, lambda:   self.newLocalGame(mode1p = 2, allowMic = allowMic)),
-              (strQuickplay, lambda:        self.newLocalGame(allowMic = allowMic)),
-              ((strMultiplayer,"multiplayer"), multPlayerMenu),
-              ((strTraining,"training"),    trainingMenu),
-              ((strSettings,"settings"),  self.settingsMenu),
-              (strQuit,        self.quit),
+                (strCareer, lambda: self.newLocalGame(mode1p=2, allowMic=allowMic)),
+                (strQuickplay, lambda: self.newLocalGame(allowMic=allowMic)),
+                ((strMultiplayer, "multiplayer"), multPlayerMenu),
+                ((strTraining, "training"), trainingMenu),
+                ((strSettings, "settings"), self.settingsMenu),
+                (strQuit, self.quit),
             ]
-
         else:
-
             soloMenu = [
-              (_("Solo Tour"), lambda: self.newLocalGame(mode1p = 2, allowMic = allowMic)),
-              (_("Quickplay"), lambda: self.newLocalGame(allowMic = allowMic)),
+                (_("Solo Tour"), lambda: self.newLocalGame(mode1p=2, allowMic=allowMic)),
+                (_("Quickplay"), lambda: self.newLocalGame(allowMic=allowMic)),
             ]
 
             mainMenu = [
-              ((strSolo,"solo"), soloMenu),
-              ((strMultiplayer,"multiplayer"), multPlayerMenu),
-              ((strTraining,"training"),    trainingMenu),
-              ((strSettings,"settings"),  self.settingsMenu),
-              (strQuit,        self.quit),
+                ((strSolo, "solo"), soloMenu),
+                ((strMultiplayer, "multiplayer"), multPlayerMenu),
+                ((strTraining, "training"), trainingMenu),
+                ((strSettings, "settings"), self.settingsMenu),
+                (strQuit, self.quit),
             ]
-
 
         w, h, = self.engine.view.geometry[2:4]
 
-        self.menu = Menu(self.engine, mainMenu, onClose = lambda: self.engine.view.popLayer(self), pos = (self.menux, .75-(.75*self.menuy)))
+        self.menu = Menu(self.engine, mainMenu, onClose=lambda: self.engine.view.popLayer(self), pos=(self.menux, .75-(.75*self.menuy)))
 
-        engine.mainMenu = self    #Points engine.mainMenu to the one and only MainMenu object instance
+        engine.mainMenu = self  # Points engine.mainMenu to the one and only MainMenu object instance
 
-        ## whether the main menu has come into view at least once
+        # whether the main menu has come into view at least once
         self.shownOnce = False
 
     def settingsMenu(self):
@@ -228,11 +226,12 @@ class MainMenu(BackgroundLayer):
         shaders.checkIfEnabled()
 
     def runMusic(self):
-        if self.menumusic and not self.song.isPlaying():   #re-randomize
+        if self.menumusic and not self.song.isPlaying():
+            # re-randomize
             if self.files:
-                i = random.randint(0,len(self.files)-1)
+                i = random.randint(0, len(self.files)-1)
                 filename = self.files[i]
-                sound = os.path.join("themes",self.themename,"sounds",filename)
+                sound = os.path.join("themes", self.themename, "sounds", filename)
                 self.menumusic = True
                 self.engine.menuMusic = True
 
@@ -270,22 +269,22 @@ class MainMenu(BackgroundLayer):
             self.engine.view.popAllLayers()
 
     def showTutorial(self):
-        # evilynux - Make sure tutorial exists before launching
+        # Make sure tutorial exists before launching
         tutorialpath = self.engine.tutorialFolder
         if not os.path.isdir(self.engine.resource.fileName(tutorialpath)):
             log.debug("No folder found: %s" % tutorialpath)
             Dialogs.showMessage(self.engine, _("No tutorials found!"))
             return
 
-        self.engine.startWorld(1, None, 0, 0, tutorial = True)
+        self.engine.startWorld(1, None, 0, 0, tutorial=True)
 
         self.launchLayer(lambda: Lobby(self.engine))
 
-    #MFH: adding deprecated support for EOF's method of quickstarting a song to test it
+    # adding deprecated support for EOF's method of quickstarting a song to test it
     def newSinglePlayerGame(self):
-        self.newLocalGame()   #just call start function with default settings  = 1p quickplay
+        self.newLocalGame()  # just call start function with default settings = 1p quickplay
 
-    def newLocalGame(self, players=1, mode1p=0, mode2p=0, maxplayers = None, allowGuitar = True, allowDrum = True, allowMic = False): #mode1p=0(quickplay),1(practice),2(career) / mode2p=0(faceoff),1(profaceoff)
+    def newLocalGame(self, players=1, mode1p=0, mode2p=0, maxplayers=None, allowGuitar=True, allowDrum=True, allowMic=False): #mode1p=0(quickplay),1(practice),2(career) / mode2p=0(faceoff),1(profaceoff)
         self.engine.startWorld(players, maxplayers, mode1p, mode2p, allowGuitar, allowDrum, allowMic)
         self.launchLayer(lambda: Lobby(self.engine))
 
@@ -306,12 +305,11 @@ class MainMenu(BackgroundLayer):
         if len(self.engine.startupMessages) > 0:
             self.showStartupMessages = True
 
-        if (not self.engine.world) or (not self.engine.world.scene):  #MFH
+        if (not self.engine.world) or (not self.engine.world.scene):
             self.runMusic()
 
-
     def render(self, visibility, topMost):
-        self.engine.view.setViewport(1,0)
+        self.engine.view.setViewport(1, 0)
         self.visibility = visibility
         if self.rbmenu:
             v = 1.0 - ((1 - visibility) ** 2)
@@ -328,39 +326,40 @@ class MainMenu(BackgroundLayer):
         if self.active:
             if self.engine.view.topLayer() is not None:
                 if self.optionsBG:
-                    drawImage(self.optionsBG, (self.opt_bkg_size[2],-self.opt_bkg_size[3]), (w*self.opt_bkg_size[0],h*self.opt_bkg_size[1]), stretched = FULL_SCREEN)
+                    drawImage(self.optionsBG, (self.opt_bkg_size[2], -self.opt_bkg_size[3]), (w*self.opt_bkg_size[0], h*self.opt_bkg_size[1]), stretched=FULL_SCREEN)
                 if self.optionsPanel:
-                    drawImage(self.optionsPanel, (1.0,-1.0), (w/2, h/2), stretched = FULL_SCREEN)
+                    drawImage(self.optionsPanel, (1.0, -1.0), (w/2, h/2), stretched=FULL_SCREEN)
             else:
-                drawImage(self.engine.data.loadingImage, (1.0,-1.0), (w/2, h/2), stretched = FULL_SCREEN)
+                drawImage(self.engine.data.loadingImage, (1.0, -1.0), (w/2, h/2), stretched=FULL_SCREEN)
 
         if self.menu.active:
             if self.background is not None:
-                #MFH - auto-scaling
-                drawImage(self.background, (1.0,-1.0), (w/2, h/2), stretched = FULL_SCREEN)
+                # auto-scaling
+                drawImage(self.background, (1.0, -1.0), (w/2, h/2), stretched=FULL_SCREEN)
 
             if self.BGText:
                 numOfChoices = len(self.menu.choices)
                 for i in range(numOfChoices):
-                    #Item selected
+                    # Item selected
                     if self.menu.currentIndex == i:
-                        xpos = (.5,1)
-                    #Item unselected
+                        xpos = (.5, 1)
+                    # Item unselected
                     else:
-                        xpos = (0,.5)
-                    #which item?
+                        xpos = (0, .5)
+                    # which item?
                     ypos = (1/float(numOfChoices) * i, 1/float(numOfChoices) * (i + 1))
 
-                    textcoord = (w*self.menux,h*self.menuy-(h*self.main_menu_vspacing)*i)
+                    textcoord = (w*self.menux, h*self.menuy-(h*self.main_menu_vspacing)*i)
                     sFactor = self.main_menu_scale
                     wFactor = xpos[1] - xpos[0]
                     hFactor = ypos[1] - ypos[0]
                     drawImage(self.BGText,
-                                        scale = (wFactor*sFactor,-hFactor*sFactor),
-                                        coord = textcoord,
-                                        rect  = (xpos[0],xpos[1],ypos[0],ypos[1]), stretched = KEEP_ASPECT | FIT_WIDTH)
+                        scale=(wFactor*sFactor, -hFactor*sFactor),
+                        coord=textcoord,
+                        rect=(xpos[0], xpos[1], ypos[0], ypos[1]), stretched=KEEP_ASPECT | FIT_WIDTH)
 
-        #racer: added version tag to main menu:
+        # added version tag to main menu
         if self.version is not None:
+            # Added theme settings to control X+Y positions of versiontag.
             wfactor = (w * self.engine.theme.versiontagScale) / self.version.width1()
-            drawImage(self.version,( wfactor, -wfactor ),(w*self.engine.theme.versiontagposX, h*self.engine.theme.versiontagposY)) #worldrave - Added theme settings to control X+Y positions of versiontag.
+            drawImage(self.version, (wfactor, -wfactor), (w*self.engine.theme.versiontagposX, h*self.engine.theme.versiontagposY))
