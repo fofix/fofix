@@ -28,6 +28,7 @@ import logging
 import os
 import random
 import string
+import warnings
 
 from fretwork.audio import Music
 
@@ -47,7 +48,14 @@ log = logging.getLogger(__name__)
 
 
 class MainMenu(BackgroundLayer):
+    """ The main menu """
+
     def __init__(self, engine):
+        """
+        Initialise the main menu
+
+        :param engine: the engine
+        """
         self.engine = engine
 
         self.logClassInits = Config.get("game", "log_class_inits")
@@ -215,6 +223,11 @@ class MainMenu(BackgroundLayer):
         self.shownOnce = False
 
     def settingsMenu(self):
+        """
+        Callback to launch the settings menu
+
+        :return: the settings menu objet
+        """
         if self.engine.advSettings:
             self.settingsMenuObject = Settings.SettingsMenu(self.engine)
         else:
@@ -226,6 +239,7 @@ class MainMenu(BackgroundLayer):
         shaders.checkIfEnabled()
 
     def runMusic(self):
+        """ Run a random theme music in background """
         if self.menumusic and not self.song.isPlaying():
             # re-randomize
             if self.files:
@@ -243,10 +257,12 @@ class MainMenu(BackgroundLayer):
                 self.engine.menuMusic = False
 
     def setMenuVolume(self):
+        """ Set the volume of the menu song """
         if self.menumusic and self.song.isPlaying():
             self.song.setVolume(self.engine.config.get("audio", "menu_volume"))
 
     def cutMusic(self):
+        """ Fade out the volume of the song before stopping """
         if self.menumusic:
             if self.song and not self.engine.menuMusic:
                 self.song.fadeout(1400)
@@ -269,6 +285,7 @@ class MainMenu(BackgroundLayer):
             self.engine.view.popAllLayers()
 
     def showTutorial(self):
+        """ Callback to show the tutorial menu """
         # Make sure tutorial exists before launching
         tutorialpath = self.engine.tutorialFolder
         if not os.path.isdir(self.engine.resource.fileName(tutorialpath)):
@@ -280,20 +297,34 @@ class MainMenu(BackgroundLayer):
 
         self.launchLayer(lambda: Lobby(self.engine))
 
-    # adding deprecated support for EOF's method of quickstarting a song to test it
     def newSinglePlayerGame(self):
-        self.newLocalGame()  # just call start function with default settings = 1p quickplay
+        """ Deprecated: start the game in 1p quickplay mode (to test a song) """
+        warnings.warn("fofix.game.MainMenu.newSinglePlayerGame is not used anymore.", PendingDeprecationWarning)
+        self.newLocalGame()
 
     def newLocalGame(self, players=1, mode1p=0, mode2p=0, maxplayers=None, allowGuitar=True, allowDrum=True, allowMic=False): #mode1p=0(quickplay),1(practice),2(career) / mode2p=0(faceoff),1(profaceoff)
+        """
+        Callback to start the game
+
+        :param players: number of players (default: 1)
+        :param mode1p: game mode 1p (default: quickplay, practice, career)
+        :param mode2p: game mode 2p (default: Face-Off, Pro FO, Co-Op, RB Co-Op)
+        :param maxplayers: max number of players (default: None)
+        :param allowGuitar: if a guitar is allowed or not (default: True)
+        :param allowDrum: if a drum is allowed or not (default: True)
+        :param allowMic: if a mic is allowed or not (default: False)
+        """
         self.engine.startWorld(players, maxplayers, mode1p, mode2p, allowGuitar, allowDrum, allowMic)
         self.launchLayer(lambda: Lobby(self.engine))
 
     def restartGame(self):
+        """ Restart the game: go to the main menu again """
         splash = Dialogs.showLoadingSplashScreen(self.engine, "")
         self.engine.view.pushLayer(Lobby(self.engine))
         Dialogs.hideLoadingSplashScreen(self.engine, splash)
 
     def showMessages(self):
+        """ Show a message at start up """
         msg = self.engine.startupMessages.pop()
         self.showStartupMessages = False
         Dialogs.showMessage(self.engine, msg)
