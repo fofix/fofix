@@ -38,10 +38,13 @@ class MainMenuTest(unittest.TestCase):
         self.config = Config.load(config_file, setAsDefault=True)
 
         # init the engine
-        engine = GameEngine(self.config)
+        self.engine = GameEngine(self.config)
 
         # init the menu
-        self.mainmenu = MainMenu(engine)
+        self.mainmenu = MainMenu(self.engine)
+
+    def tearDown(self):
+        self.engine.quit()
 
     def test_init(self):
         self.assertIsInstance(self.mainmenu.menu, Menu)
