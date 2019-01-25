@@ -1,5 +1,4 @@
 required Programs:
-- Subversion (http://subversion.tigris.org/getting.html#windows)
 - 7-Zip (http://www.7-zip.org/)
 - NSIS (http://nsis.sourceforge.net/)
 
