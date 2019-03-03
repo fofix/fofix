@@ -130,7 +130,7 @@ else:
 log.configure(logfile)
 logger = logging.getLogger(__name__)
 
-fretworkRequired = (0, 3, 0)
+fretworkRequired = (0, 4, 0)
 reqVerStr = '.'.join([str(i) for i in fretworkRequired])
 fretworkErrorStr = '''
 
