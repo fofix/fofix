@@ -1763,9 +1763,6 @@ class Setlist:
                     font.render(text, (.92, .0413*(n+1)+.15), scale=scale, align = 2)
 
     def renderItem(self, scene, color, label):
-
-        from fofix.game import song
-
         if not scene.itemMesh:
             return
         if color:
@@ -1859,8 +1856,9 @@ class Setlist:
         if color:
             glColor3f(*color)
 
-        glEnable(GL_NORMALIZE)
         glEnable(GL_COLOR_MATERIAL)
+        if self.setlist_type == 2:
+            glRotate(90, 0, 0, 1)
         scene.itemMesh.render("Mesh_001")
         glColor3f(.1, .1, .1)
         scene.itemMesh.render("Mesh")
@@ -1873,12 +1871,11 @@ class Setlist:
             glMatrixMode(GL_TEXTURE)
             glScalef(1, -1, 1)
             glMatrixMode(GL_MODELVIEW)
-            scene.libraryLabel.render()
+            scene.label.render("Mesh_001")
             glMatrixMode(GL_TEXTURE)
             glLoadIdentity()
             glMatrixMode(GL_MODELVIEW)
             glDisable(GL_TEXTURE_2D)
-        glDisable(GL_NORMALIZE)
 
     def renderAlbumArt(self, scene):
 
@@ -1887,6 +1884,7 @@ class Setlist:
         if not scene.itemLabels:
             return
         if self.setlist_type == 0:
+            # CD mode
             w, h = scene.geometry
             try:
                 glMatrixMode(GL_PROJECTION)
@@ -1933,15 +1931,23 @@ class Setlist:
                     glTranslatef(0, -h / 2, 0)
                     glPushMatrix()
                     if abs(d) < 1.2:
+                        # Fetch item's label image
                         label = scene.itemLabels[i]
-                        if label == "Random":
-                            label = scene.img_random_label
-                        if not label:
-                            label = scene.img_empty_label
+                        # Compatibility: replace str with label
+                        if label == "Random" and scene.img_random_label:
+                            label = scene.img_random_label.texture
+                        else:
+                            label = None
+                        
+                        # Draw 3D item model with label applied
                         if isinstance(item, song.SongInfo):
+                            if not label and scene.img_default_song:
+                                label = scene.img_default_song.texture
                             glRotate(scene.itemRenderAngles[i], 0, 0, 1)
                             self.renderItem(scene, item.cassetteColor, label)
                         elif isinstance(item, song.LibraryInfo):
+                            if not label and scene.img_default_library:
+                                label = scene.img_default_library.texture
                             #myfingershurt: cd cases are backwards
                             glRotate(-scene.itemRenderAngles[i], 0, 1, 0)    #spin 90 degrees around y axis
                             glRotate(-scene.itemRenderAngles[i], 0, 1, 0)    #spin 90 degrees around y axis again, now case is corrected
@@ -1950,6 +1956,8 @@ class Setlist:
                                 glRotate(((scene.time - scene.lastTime) * 4 % 360) - 90, 1, 0, 0)
                             self.renderLibrary(scene, item.color, label)
                         elif isinstance(item, song.TitleInfo):
+                            if not label and scene.img_default_title:
+                                label = scene.img_default_title.texture
                             #myfingershurt: cd cases are backwards
                             glRotate(-scene.itemRenderAngles[i], 0, 0.5, 0)    #spin 90 degrees around y axis
                             glRotate(-scene.itemRenderAngles[i], 0, 0.5, 0)    #spin 90 degrees around y axis again, now case is corrected
@@ -1958,6 +1966,8 @@ class Setlist:
                                 glRotate(((scene.time - scene.lastTime) * 4 % 360) - 90, 1, 0, 0)
                             self.renderTitle(scene, item.color, label)
                         elif isinstance(item, song.RandomSongInfo):
+                            if not label and scene.img_random_label:
+                                label = scene.img_random_label.texture
                             #myfingershurt: cd cases are backwards
                             glRotate(scene.itemRenderAngles[i], 0, 0, 1)
                             self.renderRandom(scene, item.color, label)
@@ -1974,8 +1984,10 @@ class Setlist:
                 glMatrixMode(GL_MODELVIEW)
 
         elif self.setlist_type == 1:
+            # List mode
             return
         elif self.setlist_type == 2:
+            # List/CD mode
             w, h = scene.geometry
             try:
                 glMatrixMode(GL_PROJECTION)
@@ -1999,24 +2011,35 @@ class Setlist:
 
                 y = 0.0
 
-
-
                 glPushMatrix()
                 item = scene.selectedItem
                 i = scene.selectedIndex
+
+                # Fetch item's label image
                 label = scene.itemLabels[i]
-                if label == "Random":
-                    label = scene.img_random_label
-                if not label:
-                    label = scene.img_empty_label
+                # Compatibility: replace str with label
+                if label == "Random" and scene.img_random_label:
+                    label = scene.img_random_label.texture
+                else:
+                    label = None
+
+                # Draw 3D item model with label applied
                 if isinstance(item, song.SongInfo):
                     if scene.labelType:
+                        if not label and scene.img_default_song:
+                            label = scene.img_default_song.texture
                         self.renderItem(scene, item.cassetteColor, label)
                     else:
+                        if not label and scene.img_default_library:
+                            label = scene.img_default_library.texture
                         self.renderLibrary(scene, item.cassetteColor, label)
                 elif isinstance(item, song.LibraryInfo):
+                    if not label and scene.img_default_library:
+                        label = scene.img_default_library.texture
                     self.renderLibrary(scene, item.color, label)
                 elif isinstance(item, song.RandomSongInfo):
+                    if not label and scene.img_random_label:
+                        label = scene.img_random_label.texture
                     if scene.labelType:
                         self.renderItem(scene, None, label)
                     else:
@@ -2050,6 +2073,7 @@ class Setlist:
             glEnable(GL_COLOR_MATERIAL)
             self.theme.setBaseColor(1)
         elif self.setlist_type == 3:
+            # RB2 mode
             w, h = scene.geometry
             item  = scene.items[scene.selectedIndex]
             i = scene.selectedIndex
