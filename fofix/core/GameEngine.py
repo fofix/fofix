@@ -167,7 +167,7 @@ class GameEngine(object):
         log.debug("Pygame version: " + str(pygame.version.ver) )
         log.debug("PyOpenGL version: " + OpenGL.__version__)
         log.debug("Numpy version: " + np.__version__)
-        log.debug("PIL version: " + Image.VERSION)
+        log.debug("PIL version: " + Image.__version__)
         log.debug("sys.argv: " + repr(sys.argv))
         log.debug("os.name: " + os.name)
         log.debug("sys.platform: " + sys.platform)
