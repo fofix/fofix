@@ -26,7 +26,7 @@
 import distutils.ccompiler
 from distutils.dep_util import newer
 from distutils.command.install import install as _install
-import sys, glob, os, fnmatch
+import sys, glob, os, fnmatch, platform
 import subprocess
 import shlex
 
@@ -35,6 +35,7 @@ import numpy
 from fofix.core import Version, SceneFactory
 
 from setuptools import setup, Extension, Command
+import pkg_resources
 from Cython.Build import cythonize
 
 
@@ -462,11 +463,20 @@ if os.name == 'nt':
 else:
     vidInclude = ['.']
 
+extra_compile_args_pitch = [];
+extra_link_args_pitch = [];
+if os.uname()[0] == "Darwin" and pkg_resources.parse_version(os.uname()[2]) >= pkg_resources.parse_version("17.7.0"):
+  print("success")
+  extra_compile_args_pitch.append("-stdlib=libc++")
+  extra_link_args_pitch.append("-stdlib=libc++")
+
 extensions = [
     Extension('fofix.lib.cmgl', ['fofix/core/cmgl/cmgl.pyx'], **combine_info(numpy_info, gl_info)),
     Extension('fofix.lib._pypitch',
               language='c++',
-              sources=['fofix/core/pypitch/_pypitch.pyx', 'fofix/core/pypitch/pitch.cpp']),
+              sources=['fofix/core/pypitch/_pypitch.pyx', 'fofix/core/pypitch/pitch.cpp'],
+              extra_compile_args=extra_compile_args_pitch,
+              extra_link_args=extra_link_args_pitch),
     Extension('fofix.lib._VideoPlayer',
               ['fofix/core/VideoPlayer/_VideoPlayer.pyx', 'fofix/core/VideoPlayer/VideoPlayer.c'],
               **combine_info(gl_info, ogg_info, theoradec_info, glib_info, swscale_info,
