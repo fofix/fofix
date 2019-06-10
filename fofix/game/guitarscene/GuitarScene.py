@@ -992,8 +992,6 @@ class GuitarScene(BandPlayBaseScene):
         self.missPausesAnim = self.engine.config.get("game", "miss_pauses_anim")
         self.starpowerMode = self.engine.config.get("game", "starpower_mode")
         self.useMidiSoloMarkers = False
-        self.logMarkerNotes = self.engine.config.get("game", "log_marker_notes")
-        self.logStarpowerMisses = self.engine.config.get("game", "log_starpower_misses")
         self.soloFrameMode = self.engine.config.get("game", "solo_frame")
         self.whammyEffect = self.engine.config.get("audio", "whammy_effect")
         shaders.var["whammy"] = self.whammyEffect
@@ -1001,7 +999,6 @@ class GuitarScene(BandPlayBaseScene):
         self.showFreestyleActive = self.engine.config.get("debug", "show_freestyle_active")
         self.showBpm = self.engine.config.get("debug", "show_bpm")
 
-        self.logLyricEvents = self.engine.config.get("log", "log_lyric_events")
         self.vbpmLogicType = self.engine.config.get("debug", "use_new_vbpm_beta")
 
         # switch to midi lyric mode option
@@ -1330,10 +1327,10 @@ class GuitarScene(BandPlayBaseScene):
                                             if (guitar.isDrum and not oneLastSpNoteMarked) or (not guitar.isDrum):
                                                 spEvent.finalStar = True
                                                 oneLastSpNoteMarked = True
-                                if self.logMarkerNotes == 1:
-                                    log.debug("GuitarScene: P%d overdrive / starpower phrase marked between %f and %f" % (i+1, time, time+event.length))
-                                    if lastSpNoteTime == 0:
-                                        log.warning("This starpower phrase doesn't appear to have any finalStar notes marked... probably will not reward starpower!")
+                                # Marker notes logs
+                                log.debug("GuitarScene: P%d overdrive / starpower phrase marked between %f and %f" % (i+1, time, time+event.length))
+                                if lastSpNoteTime == 0:
+                                    log.warning("This starpower phrase doesn't appear to have any finalStar notes marked... probably will not reward starpower!")
                     self.midiSP = True
                     unisonCheck.extend(self.spTimes[i])
 
@@ -1562,16 +1559,16 @@ class GuitarScene(BandPlayBaseScene):
 
             # test unpacking / decoding the lyrical lines:
             for midiLyricSubList in self.midiLyricLineEvents:
-                if self.logLyricEvents == 1:
-                    log.debug("...New MIDI lyric line:")
+                # Lyric events log
+                log.debug("... New MIDI lyric line:")
                 for lyricTuple in midiLyricSubList:
                     time, event = lyricTuple
-                    if self.logLyricEvents == 1:
-                        log.debug("MIDI Line-by-line lyric unpack test - time, event = " + str(time) + ", " + event.text)
+                    # Lyric events log
+                    log.debug("MIDI Line-by-line lyric unpack test - time, event = " + str(time) + ", " + event.text)
 
             for lineStartTime, midiLyricSimpleLineText in self.midiLyricLines:
-                if self.logLyricEvents == 1:
-                    log.debug("MIDI Line-by-line simple lyric line starting at time: " + str(lineStartTime) + ", " + midiLyricSimpleLineText)
+                # Lyric events log
+                log.debug("MIDI Line-by-line simple lyric line starting at time: " + str(lineStartTime) + ", " + midiLyricSimpleLineText)
 
         self.numMidiLyricLines = len(self.midiLyricLines)
 
@@ -3022,8 +3019,8 @@ class GuitarScene(BandPlayBaseScene):
                             if self.coOpType:
                                 self.coOpScoreCard.notesMissed += 1
                             if theNote.star or theNote.finalStar:
-                                if self.logStarpowerMisses == 1:
-                                    log.debug("SP Miss: run(), note: %d, gameTime: %s" % (theNote.number, self.timeLeft))
+                                # Starpower misses log
+                                log.debug("SP Miss: run(), note: %d, gameTime: %s" % (theNote.number, self.timeLeft))
                                 self.starNotesMissed[i] = True
                                 if self.unisonActive:
                                     self.inUnison[i] = False
