@@ -41,6 +41,7 @@ matrix:
 
 install:
     - pip install pytest
+    - pip install pytest-xvfb
     - pip install cython
     - pip install -r requirements.txt
     # build ext
@@ -50,4 +51,4 @@ before_script:
     - export SDL_AUDIODRIVER=disk
 
 script:
-    - pytest fofix
+    - pytest -s fofix
