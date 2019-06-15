@@ -1,6 +1,10 @@
 language: python
 python:
     - 2.7
+sudo: required
+dist: xenial
+services:
+    - xvfb
 
 matrix:
     include:
@@ -43,10 +47,6 @@ install:
     - python setup.py build_ext --inplace --force
 
 before_script:
-    # hack: GUI tests
-    - export DISPLAY=:99.0
-    - sh -e /etc/init.d/xvfb start
-    - sleep 3   # give xvfb some time to start
     - export SDL_AUDIODRIVER=disk
 
 script:
