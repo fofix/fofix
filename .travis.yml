@@ -47,6 +47,7 @@ install:
     - python setup.py build_ext --inplace --force
 
 before_script:
+    - sleep 3   # give xvfb some time to start
     - export SDL_AUDIODRIVER=disk
 
 script:
