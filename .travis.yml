@@ -44,10 +44,10 @@ install:
     - pip install cython
     - pip install -r requirements.txt
     # build ext
-    - xvfb-run python setup.py build_ext --inplace --force
+    - python setup.py build_ext --inplace --force
 
 before_script:
     - export SDL_AUDIODRIVER=disk
 
 script:
-    - pytest -s fofix
+    - xvfb-run pytest -s fofix
