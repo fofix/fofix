@@ -41,11 +41,10 @@ matrix:
 
 install:
     - pip install -U pytest
-    - pip install pytest-xvfb pytest-faulthandler
     - pip install cython
     - pip install -r requirements.txt
     # build ext
-    - python setup.py build_ext --inplace --force
+    - xvfb-run python setup.py build_ext --inplace --force
 
 before_script:
     - export SDL_AUDIODRIVER=disk
