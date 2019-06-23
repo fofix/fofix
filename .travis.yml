@@ -39,6 +39,7 @@ matrix:
               - export LD_LIBRARY_PATH
               - sudo apt-get -q update
               - sudo apt-get install -y gcc-4.9 g++-4.9
+              - /usr/bin/Xvfb :99 -screen 0 1024x768x24 -ac +extension GLX +render -noreset &
 
 install:
     - pip install -U pytest
