@@ -3,8 +3,8 @@ python:
     - 2.7
 sudo: required
 dist: xenial
-#services:
-#    - xvfb
+services:
+    - xvfb
 
 matrix:
     include:
@@ -42,6 +42,7 @@ matrix:
 
 install:
     - pip install -U pytest
+    - pip install -U pytest-xvfb
     - pip install cython
     - pip install -r requirements.txt
     # build ext
@@ -52,5 +53,4 @@ before_script:
     - export SDL_VIDEODRIVER=dummy
 
 script:
-    - xvfb-run -a -s "+extension GLX" glxinfo
-    - xvfb-run -a -s "+extension GLX" pytest fofix
+    - pytest fofix
