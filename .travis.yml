@@ -3,8 +3,8 @@ python:
     - 2.7
 sudo: required
 dist: xenial
-services:
-    - xvfb
+#services:
+#    - xvfb
 
 matrix:
     include:
@@ -33,7 +33,7 @@ matrix:
                   libvorbis-dev
                   portaudio19-dev
                   mesa-utils
-                  libgl1-mesa-glx
+                  libgl1-mesa-dev
               - sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
               - LD_LIBRARY_PATH=/usr/local/lib64/:$LD_LIBRARY_PATH
               - export LD_LIBRARY_PATH
@@ -49,7 +49,7 @@ install:
 
 before_script:
     - export SDL_AUDIODRIVER=disk
-    - export SDL_VIDEODRIVER=dummy
 
 script:
+    - xvfb-run -a glxinfo
     - pytest fofix
