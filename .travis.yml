@@ -52,5 +52,5 @@ before_script:
     - export SDL_VIDEODRIVER=dummy
 
 script:
-    - xvfb-run -a glxinfo
-    - xvfb-run -a "+extension GLX" pytest fofix
+    - xvfb-run -a "+extension GLX" glxinfo
+    - xvfb-run -a pytest fofix
