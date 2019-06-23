@@ -51,4 +51,4 @@ before_script:
     - export SDL_AUDIODRIVER=disk
 
 script:
-    - xvfb-run -e /dev/stdout pytest -s fofix
+    - xvfb-run --auto-servernum --server-num=1 pytest -s fofix
