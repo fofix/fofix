@@ -31,8 +31,10 @@ matrix:
                   libswscale-dev
                   libtheora-dev
                   libvorbis-dev
-                  mesa-utils
                   portaudio19-dev
+                  mesa-utils
+                  libgl1-mesa-glx
+                  xvfb
               - sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
               - LD_LIBRARY_PATH=/usr/local/lib64/:$LD_LIBRARY_PATH
               - export LD_LIBRARY_PATH
