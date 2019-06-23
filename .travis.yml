@@ -3,6 +3,8 @@ python:
     - 2.7
 sudo: required
 dist: xenial
+services:
+    - xvfb
 
 matrix:
     include:
@@ -45,6 +47,7 @@ install:
     - python setup.py build_ext --inplace --force
 
 before_script:
+    - export DISPLAY=:99.0
     - export SDL_AUDIODRIVER=disk
     - export SDL_VIDEODRIVER=dummy
 
