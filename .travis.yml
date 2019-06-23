@@ -3,8 +3,8 @@ python:
     - 2.7
 sudo: required
 dist: xenial
-#services:
-#    - xvfb
+services:
+    - xvfb
 
 matrix:
     include:
@@ -34,7 +34,6 @@ matrix:
                   portaudio19-dev
                   mesa-utils
                   libgl1-mesa-glx
-                  xvfb
               - sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
               - LD_LIBRARY_PATH=/usr/local/lib64/:$LD_LIBRARY_PATH
               - export LD_LIBRARY_PATH
@@ -49,9 +48,8 @@ install:
     - python setup.py build_ext --inplace --force
 
 before_script:
-    - sleep 3   # give xvfb some time to start
     - export SDL_AUDIODRIVER=disk
     - export SDL_VIDEODRIVER=dummy
 
 script:
-    - xvfb-run --auto-servernum --server-num=1 pytest -s fofix
+    - pytest fofix
