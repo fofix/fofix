@@ -49,6 +49,7 @@ install:
 before_script:
     - sleep 3   # give xvfb some time to start
     - export SDL_AUDIODRIVER=disk
+    - export SDL_VIDEODRIVER=dummy
 
 script:
     - xvfb-run --auto-servernum --server-num=1 pytest -s fofix
