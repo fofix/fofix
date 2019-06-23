@@ -3,8 +3,8 @@ python:
     - 2.7
 sudo: required
 dist: xenial
-services:
-    - xvfb
+#services:
+#    - xvfb
 
 matrix:
     include:
