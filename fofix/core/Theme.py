@@ -151,12 +151,12 @@ class Theme(Task):
             self.config = None
             log.debug("no theme.ini")
 
-        def get(value, type=str, default=None):
+        def get(value, vtype=str, default=None):
             if self.config:
                 if self.config.has_option("theme", value):
-                    if type == bool:
+                    if vtype == bool:
                         return isTrue(self.config.get("theme", value).lower())
-                    elif type == "color":
+                    elif vtype == "color":
                         try:
                             value = hexToColor(self.config.get("theme", value))
                         except ValueError:
@@ -164,8 +164,8 @@ class Theme(Task):
 
                         return value
                     else:
-                        return type(self.config.get("theme", value))
-            if type == "color":
+                        return vtype(self.config.get("theme", value))
+            if vtype == "color":
                 try:
                     value = hexToColor(default)
                 except ValueError:
@@ -781,12 +781,12 @@ class Theme(Task):
         except (ValueError, TypeError):
             return self.baseColor
 
-    def packTupleKey(self, key, type = str):
+    def packTupleKey(self, key, vtype=str):
         vals = key.split(',')
-        if isinstance(type, list):
-            retval = tuple(type[i](n.strip()) for i, n in enumerate(vals))
+        if isinstance(vtype, list):
+            retval = tuple(vtype[i](n.strip()) for i, n in enumerate(vals))
         else:
-            retval = tuple(type(n.strip()) for n in vals)
+            retval = tuple(vtype(n.strip()) for n in vals)
         return retval
 
     def loadThemeModule(self, moduleName):
@@ -840,17 +840,17 @@ class ThemeLobby:
                     if i == self.nextImage:
                         break
 
-    def drawPartImage(self, lobby, type, scale, coord):
+    def drawPartImage(self, lobby, ptype, scale, coord):
         if not lobby.partImages[self.currentImage]:
             return
-        if type in GUITARTYPES:
+        if ptype in GUITARTYPES:
             if self.fadeTime < 1000 or self.nextImage == self.currentImage:
                 drawImage(lobby.partImages[self.currentImage], scale=scale, coord=coord)
             else:
                 drawImage(lobby.partImages[self.currentImage], scale=scale, coord=coord, color=(1, 1, 1, ((2500.0-self.fadeTime)/1500.0)))
                 drawImage(lobby.partImages[self.nextImage], scale=scale, coord=coord, color=(1, 1, 1, ((self.fadeTime-1000.0)/1500.0)))
                 glColor4f(1, 1, 1, 1)
-        elif type in DRUMTYPES:
+        elif ptype in DRUMTYPES:
             if lobby.partImages[4]:
                 drawImage(lobby.partImages[4], scale=scale, coord=coord)
         else:
