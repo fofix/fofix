@@ -26,7 +26,7 @@
 import distutils.ccompiler
 from distutils.dep_util import newer
 from distutils.command.install import install as _install
-import sys, glob, os, fnmatch
+import sys, glob, os, fnmatch, platform
 import subprocess
 import shlex
 
@@ -37,8 +37,6 @@ from fofix.core import Version, SceneFactory
 from setuptools import setup, Extension, Command
 import pkg_resources
 from Cython.Build import cythonize
-
-import platform
 
 def glob_recursive(directory, file_pattern="*"):
     """ Like glob, but recurses sub-dirs.
