@@ -38,6 +38,7 @@ from setuptools import setup, Extension, Command
 import pkg_resources
 from Cython.Build import cythonize
 
+import platform
 
 def glob_recursive(directory, file_pattern="*"):
     """ Like glob, but recurses sub-dirs.
@@ -466,7 +467,7 @@ else:
 extra_compile_args_pitch = []
 extra_link_args_pitch = []
 # As of mac os version 10.13.6 (high sierra), xcode 10 is supported. Xcode 10 requires the use of the libc++ standard library.
-if os.uname()[0] == "Darwin" and pkg_resources.parse_version(os.uname()[2]) >= pkg_resources.parse_version("17.7.0"):
+if platform.uname()[0] == "Darwin" and pkg_resources.parse_version(platform.uname()[2]) >= pkg_resources.parse_version("17.7.0"):
   print("success")
   extra_compile_args_pitch.append("-stdlib=libc++")
   extra_link_args_pitch.append("-stdlib=libc++")
