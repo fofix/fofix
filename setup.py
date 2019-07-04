@@ -38,6 +38,7 @@ from setuptools import setup, Extension, Command
 import pkg_resources
 from Cython.Build import cythonize
 
+
 def glob_recursive(directory, file_pattern="*"):
     """ Like glob, but recurses sub-dirs.
     :param directory: directory from which to start searching
