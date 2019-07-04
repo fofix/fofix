@@ -2121,27 +2121,26 @@ class Setlist:
 
             #Add support for lead and rhythm diff
 
-            # Sorting Text
-            text = _("SORTING:") + "     "
+            # Sorting text
             if scene.sortOrder == 0: #title
-                text = text + _("ALPHABETICALLY BY TITLE")
+                text_ = _("SORTING: %(spaces)s ALPHABETICALLY BY TITLE")
             elif scene.sortOrder == 1: #artist
-                text = text + _("ALPHABETICALLY BY ARTIST")
+                text_ = _("SORTING: %(spaces)s ALPHABETICALLY BY ARTIST")
             elif scene.sortOrder == 2: #timesplayed
-                text = text + _("BY PLAY COUNT")
+                text_ = _("SORTING: %(spaces)s BY PLAY COUNT")
             elif scene.sortOrder == 3: #album
-                text = text + _("ALPHABETICALLY BY ALBUM")
+                text_ = _("SORTING: %(spaces)s ALPHABETICALLY BY ALBUM")
             elif scene.sortOrder == 4: #genre
-                text = text + _("ALPHABETICALLY BY GENRE")
+                text_ = _("SORTING: %(spaces)s ALPHABETICALLY BY GENRE")
             elif scene.sortOrder == 5: #year
-                text = text + _("BY YEAR")
+                text_ = _("SORTING: %(spaces)s BY YEAR")
             elif scene.sortOrder == 6: #Band Difficulty
-                text = text + _("BY BAND DIFFICULTY")
+                text_ = _("SORTING: %(spaces)s BY BAND DIFFICULTY")
             elif scene.sortOrder == 7: #Band Difficulty
-                text = text + _("BY INSTRUMENT DIFFICULTY")
+                text_ = _("SORTING: %(spaces)s BY INSTRUMENT DIFFICULTY")
             else:
-                text = text + _("BY SONG COLLECTION")
-
+                text_ = _("SORTING: %(spaces)s BY SONG COLLECTION")
+            text = text_ % {'spaces': "   "}
             font.render(text, (.13, .152), scale=0.0017)
 
             if scene.songLoader:
@@ -2495,7 +2494,7 @@ class Setlist:
                 drawImage(scene.img_tab1, scale=(.5, -.5), coord=(w*.5,h*.5+yI))
                 text = item.name
                 if item.artist != "":
-                    text += " by %s" % item.artist
+                    text += _(" by %(artist)s") % {'artist': item.artist}
                 if item.year != "":
                     text += " (%s)" % item.year
                 scale = font.scaleText(text, .45, .0015)
