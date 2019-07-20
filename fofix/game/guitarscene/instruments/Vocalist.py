@@ -21,7 +21,7 @@
 # MA  02110-1301, USA.                                              #
 #####################################################################
 
-from random import random
+import random
 import logging
 import os
 
@@ -326,15 +326,15 @@ class Vocalist:
         if not self.jurgenEnabled:
             return 1
         if j == 0:
-            return min((.70 + (.05*self.difficulty*random())), 1)
+            return min((.70 + (.05*self.difficulty*random.random())), 1)
         elif j == 1:
-            return min((.80 + (.05*self.difficulty*random())), 1)
+            return min((.80 + (.05*self.difficulty*random.random())), 1)
         elif j == 2:
-            return min((.85 + (.05*self.difficulty*random())), 1)
+            return min((.85 + (.05*self.difficulty*random.random())), 1)
         elif j == 3:
-            return min((.90 + (.05*self.difficulty*random())), 1)
+            return min((.90 + (.05*self.difficulty*random.random())), 1)
         elif j == 4:
-            return min((.95 + (.05*self.difficulty*random())), 1)
+            return min((.95 + (.05*self.difficulty*random.random())), 1)
         else:
             return 1
 
