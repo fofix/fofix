@@ -98,6 +98,9 @@ class ConfigGetMixin(object):
     Functions for getting config values, optionally as compiled code objects
     ready to eval().
     """
+    def __init__(self):
+        self.config = None
+        self.section = None
 
     def get(self, value, type=str, default=None):
         if self.config.has_option(self.section, value):
