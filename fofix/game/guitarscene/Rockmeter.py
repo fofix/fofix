@@ -541,7 +541,7 @@ class IncrementEffect(Effect):
                         self.outRates[i] = (self.start[i] - self.end[i]) / t
                     else:
                         self.outRates[i] = (self.end[i] - self.start[i]) / t
-        except:
+        except IndexError:
             # catches if rates have been declared or if they're proper size
             # then tries updating them again now that they're proper
             self.inRates = [0 for i in range(len(self.start))]
