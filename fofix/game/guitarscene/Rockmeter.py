@@ -462,14 +462,15 @@ class Effect(ConfigGetMixin):
         self.section = section
         self.condition = True
 
-    def _smoothstep(self, min, max, x):
-        if x < min:
-            return 0
-        if x > max:
-            return 1
+    def _smoothstep(self, x_min, x_max, x):
         def f(x):
-            return -2 * x**3 + 3*x**2
-        return f((x - min) / (max - min))
+            return -2 * x**3 + 3 * x**2
+
+        if x < x_min:
+            return 0
+        if x > x_max:
+            return 1
+        return f((x - x_min) / (x_max - x_min))
 
     def triggerPick(self):
         if not self.stage.lastPickPos:
