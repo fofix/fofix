@@ -133,6 +133,7 @@ class Layer(ConfigGetMixin):
         :param stage: the rockmeter stage
         :param section: the section of rockmeter.ini involving this layer
         """
+        super(Layer, self).__init__()
 
         # init vars
         self.stage       = stage  # the rockmeter
@@ -238,15 +239,14 @@ class ImageLayer(Layer):
         self.rect = [0.0, 1.0, 0.0, 1.0]
 
     def updateLayer(self, playerNum):
+        super(ImageLayer, self).updateLayer(playerNum)
+
         # don't try to update an image layer if the texture doesn't even exist
         if not self.drawing:
             return
 
         w, h, = self.engine.view.geometry[2:4]
         texture = self.drawing
-
-        super(ImageLayer, self).updateLayer(playerNum)
-
         self.rect = [float(i) for i in eval(self.rectexpr)]
 
         #
@@ -284,6 +284,7 @@ class ImageLayer(Layer):
             self.position[1] *= h
 
     def render(self, visibility, playerNum):
+        super(ImageLayer, self).render(visibility, playerNum)
 
         # don't try to render an image layer if the texture doesn't even exist
         if not self.drawing:
@@ -327,7 +328,7 @@ class FontLayer(Layer):
         self.shadowOpacity = self.get("shadowOpacity", float, 1.0)  # the opacity of the shadow on the text
 
     def updateLayer(self, playerNum):
-        w, h, = self.engine.view.geometry[2:4]
+        super(FontLayer, self).updateLayer(playerNum)
 
         #
         # update the text
@@ -341,10 +342,6 @@ class FontLayer(Layer):
 
         text = text.replace(self.replace[0], self.replace[1])
         wid, hgt = self.font.getStringSize(str(text))
-
-        # needs to be done later because of values that may be dependant on the text's properties
-        super(FontLayer, self).updateLayer(playerNum)
-
         self.text = text
 
         #
@@ -420,14 +417,10 @@ class CircleLayer(ImageLayer):
             self.drawnOverlays[degrees] = dispOverlay
 
     def updateLayer(self, playerNum):
-        # don't try to update an image layer if the texture doesn't even exist
-        if not self.drawing:
-            return
+        super(CircleLayer, self).updateLayer(playerNum)
 
         ratio = eval(self.ratioexpr)
         self.ratio = ratio
-
-        super(CircleLayer, self).updateLayer(playerNum)
 
     def render(self, visibility, playerNum):
         # don't try to render image layer if the texture doesn't even exist
@@ -456,6 +449,7 @@ class Effect(ConfigGetMixin):
         :param layer: the rockmeter layer
         :param section: the section of rockmeter.ini involving this layer
         """
+        super(Effect, self).__init__()
 
         # init vars
         self.layer = layer
@@ -679,8 +673,6 @@ class Scale(IncrementEffect):
 
     def __init__(self, layer, section):
         super(Scale, self).__init__(layer, section)
-
-        w, h, = self.engine.view.geometry[2:4]
 
         # position of the image
         self.start = [eval(self.getexpr("startX", "0.0")), eval(self.getexpr("startY", "0.0"))]
@@ -908,9 +900,9 @@ class Group(Layer):
             self.layers[int(num)] = self.stage.layers[int(num)]
 
     def updateLayer(self, playerNum):
-        w, h, = self.engine.view.geometry[2:4]
-
         super(Group, self).updateLayer(playerNum)
+
+        w, h, = self.engine.view.geometry[2:4]
 
         position = self.position
         if "xpos" in self.inPixels:
