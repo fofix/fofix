@@ -832,15 +832,18 @@ class Replace(Effect):
                     if len(self.rects) > 1:
                         self.layer.rect = [float(i) for i in eval(self.rects[i])]
                     self.fixScale()
-                return
-        if self.type == "font":
-            self.layer.text = self.text[-1]
+                break
         else:
-            if len(self.drawings) > 0:
-                self.layer.drawing = self.drawings[-1]
-            if len(self.rects) > 0:
-                self.layer.rect = [float(i) for i in eval(self.rects[-1])]
-            self.fixScale()
+            # if no conditions are True
+            if self.type == "font":
+                self.layer.text = self.text[-1]
+            else:
+                if len(self.drawings) > 0:
+                    self.layer.drawing = self.drawings[-1]
+                if len(self.rects) > 0:
+                    self.layer.rect = [float(i) for i in eval(self.rects[-1])]
+                self.fixScale()
+
 
 class Animate(Effect):
     """
