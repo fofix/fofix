@@ -741,7 +741,7 @@ class Fade(IncrementEffect):
 
         # starting color
         color = list(hexToColor(self.get("color", str, "#FFFFFF")))
-        self.start = list(color)
+        self.start = color
         if len(self.start) == 3:
             self.start.append(1.0)
 
