@@ -24,10 +24,10 @@
 from __future__ import with_statement
 import __future__
 
-from math import *
+import imp
 import locale
 import logging
-import imp
+import math
 import os
 
 from PIL import Image, ImageDraw
@@ -189,7 +189,7 @@ class Layer(ConfigGetMixin):
         self.engine.view.setViewport(1, 0)
         wFull, hFull = self.engine.view.geometry[2:4]
         scaleCoef = (0.6 + 0.4 * self.stage.scene.numberOfGuitars) * 1.256 * hFull / wFull
-        return player.boardWidth / sqrt((self.stage.scene.camera.origin[1] + x)**2 + ((self.stage.scene.camera.origin[2] + x) - 0.5)**2) * scaleCoef
+        return player.boardWidth / math.sqrt((self.stage.scene.camera.origin[1] + x)**2 + ((self.stage.scene.camera.origin[2] + x) - 0.5)**2) * scaleCoef
 
     def updateLayer(self, playerNum):
         """ Update vars during the rendering process.
