@@ -1187,10 +1187,7 @@ class Rockmeter(ConfigGetMixin):
         if boost:
             multiplier *= 2
 
-        if player.isBassGuitar and streak >= 40:
-            bassgroove = True
-        else:
-            bassgroove = False
+        bassgroove = player.isBassGuitar and streak >= 40
 
         # force bassgroove to false if it's not enabled
         if not scene.bassGrooveEnabled:
