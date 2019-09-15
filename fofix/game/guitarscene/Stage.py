@@ -35,7 +35,7 @@ import OpenGL.GL as gl
 
 from fofix.core.Image import drawImage
 from fofix.core.Language import _
-from fofix.core.LinedConfigParser import LinedConfigParser
+from fofix.core.Config import MyConfigParser
 from fofix.core.Shader import shaders
 from fofix.core.VideoPlayer import VideoLayer, VideoPlayerError
 from fofix.core.constants import *
@@ -246,7 +246,7 @@ class Stage(object):
     def __init__(self, guitarScene, configFileName):
         self.scene            = guitarScene
         self.engine           = guitarScene.engine
-        self.config           = LinedConfigParser()
+        self.config           = MyConfigParser()
         self.backgroundLayers = []
         self.foregroundLayers = []
         self.textures         = {}

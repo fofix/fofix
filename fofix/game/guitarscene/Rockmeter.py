@@ -37,7 +37,7 @@ from fofix.core import Version
 from fofix.core import cmgl
 from fofix.core.Image import ImgDrawing
 from fofix.core.Image import drawImage
-from fofix.core.LinedConfigParser import LinedConfigParser
+from fofix.core.Config import MyConfigParser
 from fofix.core.Theme import halign, valign
 from fofix.core.Theme import hexToColor
 from fofix.core.constants import *
@@ -109,16 +109,14 @@ class ConfigGetMixin(object):
 
     def getexpr(self, value, default=None):
         if self.config.has_option(self.section, value):
-            filename, lineno = self.config.getlineno(self.section, value)
             expr = self.config.get(self.section, value)
-            return compile('\n' * (lineno - 1) + expr, filename, 'eval', FUTURE_DIVISION)
+            return compile(expr, '<string>', 'eval', FUTURE_DIVISION)
         return compile(default, '<string>', 'eval', FUTURE_DIVISION)
 
     def getexprs(self, value, default=None, separator='|'):
         if self.config.has_option(self.section, value):
-            filename, lineno = self.config.getlineno(self.section, value)
             exprs = [e.strip() for e in self.config.get(self.section, value).split(separator)]
-            return [compile('\n' * (lineno - 1) + expr, filename, 'eval', FUTURE_DIVISION) for expr in exprs]
+            return [compile(expr, '<string>', 'eval', FUTURE_DIVISION) for expr in exprs]
         return [compile(expr, '<string>', 'eval', FUTURE_DIVISION) for expr in default.split(separator)]
 
 
@@ -957,7 +955,7 @@ class Rockmeter(ConfigGetMixin):
         self.sharedGroups = {}
 
         self.coOp = coOp
-        self.config = LinedConfigParser()
+        self.config = MyConfigParser()
         self.config.read(configFileName)
 
         self.themename = self.engine.data.themeLabel
