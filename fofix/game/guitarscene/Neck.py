@@ -1,5 +1,5 @@
 #####################################################################
-# -*- coding: iso-8859-1 -*-                                        #
+# -*- coding: utf-8 -*-                                             #
 #                                                                   #
 # Frets on Fire                                                     #
 # Copyright (C) 2009 Team FoFiX                                     #
@@ -7,7 +7,7 @@
 #                                                                   #
 # This program is free software; you can redistribute it and/or     #
 # modify it under the terms of the GNU General Public License       #
-# as published by the Free Software Foundation; either version 2    #++-
+# as published by the Free Software Foundation; either version 2    #
 # of the License, or (at your option) any later version.            #
 #                                                                   #
 # This program is distributed in the hope that it will be useful,   #
@@ -21,18 +21,21 @@
 # MA  02110-1301, USA.                                              #
 #####################################################################
 
+import logging
 import os
 import random
 
 import OpenGL.GL as gl
 import numpy as np
 
-from fretwork import log
-
 from fofix.core.Shader import shaders, mixColors
 from fofix.game.song import Bars, \
     MarkerNote, SP_MARKING_NOTE, TK_GUITAR_SOLOS
 from fofix.core import cmgl
+
+
+log = logging.getLogger(__name__)
+
 
 class Neck:
     def __init__(self, engine, instrument, playerObj):

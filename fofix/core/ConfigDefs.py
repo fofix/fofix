@@ -74,7 +74,7 @@ Config.define("audio",  "bits",         int,   16,    text = _("Sample Bits"), o
 Config.define("audio",  "stereo",       bool,  True)
 
 Config.define("network",   "uploadscores", bool,  False, text = _("Upload Highscores"),    options = {False: _("No"), True: _("Yes")}, tipText = _("If enabled, your high scores will be sent to the server to rank you against other players."))
-Config.define("network",   "uploadurl_w67_starpower",    str,   "http://www.wembley1967.com/chart/uploadsp.php") # evilynux - new one starting 20080902
+Config.define("network",   "uploadurl",    str,   "http://www.wembley1967.com/chart/uploadsp.php") # evilynux - new one starting 20080902
 
 Config.define("setlist", "base_library",      str, "")
 Config.define("setlist", "selected_library",  str, "")
@@ -215,9 +215,7 @@ Config.define("game",   "log_class_inits",          int, 0,    text = _("Log Cla
 Config.define("game",   "log_loadings",          int, 0,    text = _("Log Loadings"), options = {0: _("No"), 1: _("Yes")}, tipText = _("Logs resource loads. This is unnecessary information in bug reports; please leave it disabled unless you are certain it is relevant."))
 Config.define("game",   "log_sections",          int, 0,    text = _("Log MIDI Sections"), options = {0: _("No"), 1: _("Yes")}, tipText = _("Logs MIDI sections. This is unnecessary information in bug reports; please leave it disabled unless you are certain it is relevant."))
 Config.define("game",   "log_marker_notes",          int, 0,    text = _("Log Marker Notes"), options = {0: _("No"), 1: _("Yes")}, tipText = _("Logs MIDI marker notes (solo, SP, etc). This is unnecessary information in bug reports; please leave it disabled unless you are certain it is relevant."))
-Config.define("game",   "log_starpower_misses",          int, 0,    text = _("Log SP Misses"), options = {0: _("No"), 1: _("Yes")}, tipText = _("Logs SP phrase misses. This is unnecessary information."))
 Config.define("log",   "log_unedited_midis",          int, 0,    text = _("Log Unedited MIDIs"), options = {0: _("No"), 1: _("Yes")}, tipText = _("Logs when notes-unedited.mid is used. This is unnecessary information."))
-Config.define("log",   "log_lyric_events",          int, 0,    text = _("Log Lyric Events"), options = {0: _("No"), 1: _("Yes")}, tipText = _("Logs MIDI lyric events. This is unnecessary information in bug reports; please leave it disabled unless you are certain it is relevant."))
 Config.define("log",   "log_tempo_events",          int, 0,    text = _("Log Tempo Events"), options = {0: _("No"), 1: _("Yes")}, tipText = _("Logs MIDI tempo events. This is unnecessary information in bug reports; please leave it disabled unless you are certain it is relevant."))
 Config.define("log",   "log_image_not_found",       int, 0,    text = _("Log Missing Images"), options = {0: _("No"), 1:_("Only on single images"), 2:_("Always")}, tipText = _("Logs when files loaded are not found. 'Only on single images' skips logging when directories are loaded."))
 

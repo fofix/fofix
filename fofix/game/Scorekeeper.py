@@ -1,5 +1,5 @@
 #####################################################################
-# -*- coding: iso-8859-1 -*-                                        #
+# -*- coding: utf-8 -*-                                             #
 #                                                                   #
 # Frets on Fire                                                     #
 # Copyright (C) 2006 Sami Kyöstilä                                  #
@@ -29,11 +29,14 @@
 # MA  02110-1301, USA.                                              #
 #####################################################################
 
-from fretwork import log
+import logging
 
 from fofix.core.Language import _
 from fofix.game import song
 from fofix.core import Config
+
+
+log = logging.getLogger(__name__)
 
 HANDICAPS = [.75, 1.0, .8, .9, .75, .8, 1.05, 1.1, 1.03, 1.02, 1.01, .95, .9, .85, .7, .95, 0.0, .5, .7, .7]
 HANDICAP_NAMES = [_("Auto Kick Bass"), _("Medium Assist Mode"), _("Easy Assist Mode"), _("Jurgen Played!"), \

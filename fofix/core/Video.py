@@ -1,5 +1,5 @@
-##################################################################
-# -*- coding: iso-8859-1 -*-                                        #
+#####################################################################
+# -*- coding: utf-8 -*-                                             #
 #                                                                   #
 # Frets on Fire                                                     #
 # Copyright (C) 2006 Sami Kyöstilä                                  #
@@ -20,6 +20,7 @@
 # MA  02110-1301, USA.                                              #
 #####################################################################
 
+import logging
 import os
 import struct
 
@@ -28,9 +29,11 @@ from PIL import Image
 from OpenGL.GL import *
 from OpenGL.GL.ARB.multisample import *
 
-from fretwork import log
-
 from fofix.core.Language import _
+
+
+log = logging.getLogger(__name__)
+
 
 class Video:
     def __init__(self, caption = "Game", icon = None):
@@ -54,7 +57,7 @@ class Video:
 
         try:
             pygame.display.quit()
-        except:
+        except Exception:
             pass
 
         pygame.display.init()
@@ -92,7 +95,7 @@ class Video:
         # a bug in SDL, the alpha channel is lost and some parts of the image are
         # corrupted.  As a result, we go the long way and load and set the icon
         # by hand to work around the bug.
-        if os.name == 'nt':
+        if os.name == 'nt' and self.icon:
             import win32api
             import win32gui
             import win32con
@@ -140,7 +143,7 @@ class Video:
         if multisamples:
             try:
                 glEnable(GL_MULTISAMPLE_ARB)
-            except:
+            except Exception:
                 pass
 
         return bool(self.screen)
@@ -150,7 +153,7 @@ class Video:
         raise
 
     def resolutionReset(self):
-        log.warn("Video setup failed. Trying default windowed resolution.")
+        log.warning("Video setup failed. Trying default windowed resolution.")
         self.error.append(_("Video setup failed with your resolution settings, and so were reset to defaults."))
         if self.fullscreen:
             self.flags ^= pygame.FULLSCREEN
@@ -165,7 +168,7 @@ class Video:
                 self.screenError()
 
     def multisampleReset(self, resolution):
-        log.warn("Video setup failed. Trying without antialiasing.")
+        log.warning("Video setup failed. Trying without antialiasing.")
         pygame.display.gl_set_attribute(pygame.GL_MULTISAMPLEBUFFERS, 0)
         pygame.display.gl_set_attribute(pygame.GL_MULTISAMPLESAMPLES, 0)
         self.multisamples = 0

@@ -1,3 +1,8 @@
+# Always use leading / for absolute paths; without it, git may ignore things
+# in other dirs.  See for a better analysis:
+#   https://stackoverflow.com/questions/24139478/when-to-use-leading-slash-in-gitignore
+
+# Ignore these files in every dir
 *.py[cod]
 *.so
 *.exe
@@ -9,38 +14,49 @@
 .project
 .pydevproject
 .settings
-fofix/html
-fofix/*.ini
-fofix/*.log
-fofix/*.idb
-fofix/core/cmgl/cmgl.c
-fofix/core/MixStream/_MixStream.c
-fofix/core/VideoPlayer/_VideoPlayer.c
-fofix/core/pypitch/_pypitch.cpp
-bin
-build
-include
-lib
-lib64
-local
-pyvenv.cfg
-gstreamer/*
-data/library.zip
-data/users/players/*
-!data/users/players/default.png
-!data/users/players/default.ini
-data/users/controllers/*
-!data/users/controllers/default[dgm].ini
-data/songs/
-data/themes/*
-!data/themes/MegaLight
-!data/themes/MegaLight GH3
-!data/themes/MegaLight V4
-!data/themes/Uberlight
-win32/*
-!win32/*.sh
-!win32/*.py
-!win32/*.patch
-!win32/README.deppack.stub
-!win32/*.ico
+
+# Ignore these general development things
+/bin/
+/build/
 /dist/
+/doc/build/
+/include/
+/gstreamer/
+/lib/
+/lib64/
+/local/
+pyvenv.cfg
+
+# Ignore these source code items
+/fofix/html
+/fofix/*.ini
+/fofix/*.log
+/fofix/*.idb
+/fofix/core/cmgl/cmgl.c
+/fofix/core/MixStream/_MixStream.c
+/fofix/core/VideoPlayer/_VideoPlayer.c
+/fofix/core/pypitch/_pypitch.cpp
+
+# Ignore these app resources
+/data/library.zip
+
+/data/users/players/*
+!/data/users/players/default.png
+!/data/users/players/default.ini
+/data/users/controllers/*
+!/data/users/controllers/default[dgm].ini
+
+/data/songs/
+
+/data/themes/*
+!/data/themes/MegaLight
+!/data/themes/MegaLight GH3
+!/data/themes/MegaLight V4
+!/data/themes/Uberlight
+
+/win32/
+!/win32/*.sh
+!/win32/*.py
+!/win32/*.patch
+!/win32/README.deppack.stub
+!/win32/*.ico

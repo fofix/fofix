@@ -1,5 +1,5 @@
 #####################################################################
-# -*- coding: iso-8859-1 -*-                                        #
+# -*- coding: utf-8 -*-                                             #
 #                                                                   #
 # Frets on Fire                                                     #
 # Copyright (C) 2006 Sami Kyöstilä                                  #
@@ -20,41 +20,44 @@
 # MA  02110-1301, USA.                                              #
 #####################################################################
 
-import gettext
-import os
-import glob
+from __future__ import print_function
+from __future__ import division
+from __future__ import absolute_import
 
-from fretwork import log
-from fretwork.unicode import unicodify
+import gettext
+import glob
+import logging
+import os
 
 from fofix.core import Version
 from fofix.core import Config
 
-Config.define("game", "language", str, "")
+
+log = logging.getLogger(__name__)
+
 
 def getAvailableLanguages():
     return [os.path.basename(l).capitalize().replace(".mo", "").replace("_", " ") for l in glob.glob(os.path.join(Version.dataPath(), "translations", "*.mo"))]
 
-def dummyTranslator(string):
-    return unicodify(string)
+
+Config.define("game", "language", str, "")
 
 language = Config.load(Version.PROGRAM_UNIXSTYLE_NAME + ".ini").get("game", "language")
-_ = dummyTranslator
+catalog = gettext.NullTranslations()
 
 if language:
     try:
         trFile = os.path.join(Version.dataPath(), "translations", "%s.mo" % language.lower().replace(" ", "_"))
         catalog = gettext.GNUTranslations(open(trFile, "rb"))
-        def translate(m):
-            return catalog.ugettext(m)
-        _ = translate
     except Exception as x:
-        log.warn("Unable to select language '%s': %s" % (language, x))
+        log.warning("Unable to select language '%s': %s" % (language, x))
         language = None
         Config.set("game", "language", "")
+
+_ = catalog.ugettext
 
 # Define the config key again now that we have some options for it
 langOptions = {"": "English"}
 for lang in getAvailableLanguages():
     langOptions[lang] = _(lang)
-Config.define("game", "language", str, "", _("Language"), langOptions, tipText = _("Change the game language!"))
+Config.define("game", "language", str, "", _("Language"), langOptions, tipText=_("Change the game language!"))
