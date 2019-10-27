@@ -28,6 +28,10 @@ From sources
 
     python setup.py build_ext --inplace --force
 
+- generate translations::
+
+    python setup.py msgfmt
+
 
 Windows
 +++++++
