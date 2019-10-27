@@ -52,7 +52,7 @@ if language:
     except Exception as x:
         log.warning("Unable to select language '%s': %s" % (language, x))
         language = None
-        Config.set("game", "language", "")
+        # Config.set("game", "language", "")
 
 _ = catalog.ugettext
 
