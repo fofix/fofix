@@ -54,6 +54,11 @@ before you can start the game from source:
     python setup.py build_ext --inplace --force
 
 
+### Generate translations
+
+    python setup.py msgfmt
+
+
 Start the game
 --------------
 
