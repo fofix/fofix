@@ -94,11 +94,7 @@ if not args['gl_error_check']:
 
 from fofix.core import Version
 from fofix.core import VFS
-from fofix.core.VideoPlayer import VideoLayer, VideoPlayerError
-from fofix.core.GameEngine import GameEngine
-from fofix.game.MainMenu import MainMenu
 from fofix.core.Language import _
-from fofix.core import Config
 from fofix.game.Main import Main
 
 import fretwork
