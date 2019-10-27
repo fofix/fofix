@@ -41,6 +41,22 @@ import subprocess
 import sys
 import traceback
 
+# PIL doesn't init correctly when inside py2exe, so here we kick it in butt.
+# Web search results all point to this solution:
+# http://www.py2exe.org/index.cgi/py2exeAndPIL
+import PIL.Image
+import PIL.BmpImagePlugin
+import PIL.GifImagePlugin
+import PIL.JpegImagePlugin
+import PIL.MpoImagePlugin
+import PIL.PpmImagePlugin
+import PIL.TiffImagePlugin
+import PIL.PngImagePlugin
+from fretwork import log
+
+from fofix.core import Version
+from fofix.core import VFS
+
 
 def run_command(command):
     command = command.split(' ')
@@ -84,38 +100,23 @@ def cmd_args():
     return vars(parser.parse_args())
 
 
-args = cmd_args()
-
-# Disable pyOpenGL error checking if we are not asked for it.
-# This must be before *anything* that may import pyOpenGL!
-if not args['gl_error_check']:
-    disable_gl_checks()
-
-
-from fofix.core import Version
-from fofix.core import VFS
-from fofix.core.Language import _
-from fofix.game.Main import Main
-
-import fretwork
-from fretwork import log
-
-# PIL doesn't init correctly when inside py2exe, so here we kick it in butt.
-# Web search results all point to this solution:
-# http://www.py2exe.org/index.cgi/py2exeAndPIL
-import PIL.Image
-import PIL.BmpImagePlugin
-import PIL.GifImagePlugin
-import PIL.JpegImagePlugin
-import PIL.MpoImagePlugin
-import PIL.PpmImagePlugin
-import PIL.TiffImagePlugin
-import PIL.PngImagePlugin
-
-
 if __name__ == '__main__':
     is_windows = (os.name == 'nt')
     is_macos = sys.platform.startswith('darwin')
+
+    # Get command line args
+    args = cmd_args()
+
+    # Disable pyOpenGL error checking if we are not asked for it.
+    # This must be before *anything* that may import pyOpenGL!
+    if not args['gl_error_check']:
+        disable_gl_checks()
+
+    # Imports
+    from fofix.core.Language import _
+    from fofix.game.Main import Main
+
+    import fretwork
 
     # This prevents the following message being displayed on macOS:
     # ApplePersistenceIgnoreState: Existing state will not be touched. New state will be written to *path*
