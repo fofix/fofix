@@ -112,11 +112,22 @@ if __name__ == '__main__':
     if not args['gl_error_check']:
         disable_gl_checks()
 
-    # Imports
-    from fofix.core.Language import _
-    from fofix.game.Main import Main
+    # setup the logfile
+    # File object representing the logfile
+    if is_macos:
+        # Under MacOS X, put the logs in ~/Library/Logs
+        logfile = os.path.expanduser('~/Library/Logs/%s.log' % Version.PROGRAM_UNIXSTYLE_NAME)
+    else:
+        # Unix: ~/.fofix/
+        logfile = VFS.resolveWrite('/userdata/%s.log' % Version.PROGRAM_UNIXSTYLE_NAME)
 
+    log.configure(logfile)
+    logger = logging.getLogger(__name__)
+
+    # Imports
     import fretwork
+    from fofix.game.Main import Main
+    from fofix.core.Language import _
 
     # This prevents the following message being displayed on macOS:
     # ApplePersistenceIgnoreState: Existing state will not be touched. New state will be written to *path*
@@ -130,18 +141,6 @@ if __name__ == '__main__':
     # from source on Windows so we pick them up when those bits are imported.
     if is_windows and not hasattr(sys, 'frozen'):
         os.environ['PATH'] = os.path.abspath(os.path.join('.', 'win32', 'deps', 'bin')) + os.pathsep + os.environ['PATH']
-
-    # setup the logfile
-    # File object representing the logfile
-    if is_macos:
-        # Under MacOS X, put the logs in ~/Library/Logs
-        logfile = os.path.expanduser('~/Library/Logs/%s.log' % Version.PROGRAM_UNIXSTYLE_NAME)
-    else:
-        # Unix: ~/.fofix/
-        logfile = VFS.resolveWrite('/userdata/%s.log' % Version.PROGRAM_UNIXSTYLE_NAME)
-
-    log.configure(logfile)
-    logger = logging.getLogger(__name__)
 
     fretworkRequired = (0, 4, 0)
     reqVerStr = '.'.join([str(i) for i in fretworkRequired])
