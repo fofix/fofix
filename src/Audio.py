@@ -220,16 +220,9 @@ class Sound(object):
   def fadeout(self, time):
     self.sound.fadeout(time)
 
-if tuple(int(i) for i in pygame.__version__[:5].split('.')) < (1, 9, 0):
-  # Must use Numeric instead of numpy, since PyGame 1.7.1 is
-  # not compatible with the latter, and 1.8.x isn't either (though it claims to be).
-  import Numeric
-  def zeros(size):
-    return Numeric.zeros(size, typecode='s')   #myfingershurt: typecode s = short = int16
-else:
-  import numpy
-  def zeros(size):
-    return numpy.zeros(size, dtype='h')
+import numpy
+def zeros(size):
+return numpy.zeros(size, dtype='h')
 
 #stump: mic passthrough
 class MicrophonePassthroughStream(Sound, Task):
