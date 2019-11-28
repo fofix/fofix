@@ -46,7 +46,7 @@ if not hasattr(pygame.mixer, 'music'):
   pygame.mixer.music = sys.modules['pygame.mixer_music']
 
 try:
-  import ogg.vorbis
+  import pyogg.vorbis as ogg
 except ImportError:
   Log.warn("PyOGG not found. OGG files will be fully decoded prior to playing; expect absurd memory usage.")
   ogg = None
