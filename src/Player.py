@@ -31,6 +31,7 @@ import Song
 import Scorekeeper
 import os
 import sys
+import shutil
 from Language import _
 #import Dialogs
 import Microphone  #stump
@@ -229,6 +230,19 @@ playerpath  = os.path.join("data","users","players")
 if not hasattr(sys,"frozen"):
   controlpath = os.path.join("..",controlpath)
   playerpath  = os.path.join("..",playerpath)
+
+#stump: permission fix for read-only system-wide installation
+if not os.path.isfile(os.path.join(playerpath, 'FoFiX-players.cache')):
+  baseuserpath = os.path.join(Resource.getWritableResourcePath(), 'users')
+  newcontrolpath = os.path.join(baseuserpath, 'controllers')
+  newplayerpath = os.path.join(baseuserpath, 'players')
+  for old, new in [(controlpath, newcontrolpath), (playerpath, newplayerpath)]:
+    if not os.path.isdir(new):
+      os.makedirs(new)
+    for f in os.listdir(old):
+      shutil.copy(os.path.join(old, f), os.path.join(new, f))
+  controlpath = newcontrolpath
+  playerpath = newplayerpath
 
 control0 = None
 control1 = None
