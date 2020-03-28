@@ -1686,7 +1686,7 @@ class Instrument(object):
 
                 tex1.texture.bind()
 
-                cmgl.drawArrays(gl.GL_TRIANGLE_STRIP, vertices=self.tail_vtx, colors=self.tail_col, texcoords=self.tail_tex)
+                cmgl.draw_arrays(gl.GL_TRIANGLE_STRIP, vertices=self.tail_vtx, colors=self.tail_col, texcoords=self.tail_tex)
 
                 gl.glDisable(gl.GL_TEXTURE_2D)
 

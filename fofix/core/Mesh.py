@@ -67,7 +67,7 @@ class Mesh:
         # Prepare a new list for all the geometry
         if not self.geoms:
             for geom in self.doc.geometriesLibrary.items:
-                self.geoms[geom.name] = cmgl.List()
+                self.geoms[geom.name] = cmgl.GList()
                 with self.geoms[geom.name]:
 
                     for prim in geom.data.primitives:
@@ -121,7 +121,7 @@ class Mesh:
                             glEnd()
 
         # Prepare a new display list for this particular geometry
-        self.fullGeoms[geomName] = cmgl.List()
+        self.fullGeoms[geomName] = cmgl.GList()
         with self.fullGeoms[geomName]:
 
             if self.geoms:

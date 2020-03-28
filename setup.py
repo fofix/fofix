@@ -381,8 +381,6 @@ else:
           'libraries': [],
           'library_dirs': [],
         }
-# Build a similar info record for the numpy headers.
-numpy_info = {'include_dirs': [numpy.get_include()]}
 
 
 def combine_info(*args):
@@ -472,7 +470,6 @@ if platform.uname()[0] == "Darwin" and pkg_resources.parse_version(platform.unam
   extra_link_args_pitch.append("-stdlib=libc++")
 
 extensions = [
-    Extension('fofix.lib.cmgl', ['fofix/core/cmgl/cmgl.pyx'], **combine_info(numpy_info, gl_info)),
     Extension('fofix.lib._pypitch',
               language='c++',
               sources=['fofix/core/pypitch/_pypitch.pyx', 'fofix/core/pypitch/pitch.cpp'],

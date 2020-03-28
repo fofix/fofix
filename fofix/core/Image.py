@@ -170,7 +170,7 @@ def draw3Dtex(image, vertex, texcoord, coord=None, scale=None, rot=None, color=(
             [texcoord[0], texcoord[3]],
             [texcoord[2], texcoord[3]]], dtype=np.float32)
 
-    cmgl.drawArrays(GL_TRIANGLE_STRIP, vertices=vertex, colors=col_array, texcoords=texcoord)
+    cmgl.draw_arrays(GL_TRIANGLE_STRIP, vertices=vertex, colors=col_array, texcoords=texcoord)
 
     if depth:
         glDepthMask(0)
@@ -379,5 +379,5 @@ class ImgDrawing(object):
 
                     glEnable(GL_TEXTURE_2D)
                     self.texture.bind()
-                    cmgl.drawArrays(GL_QUADS, vertices=ImgDrawing.VTX_ARRAY, texcoords=self.texArray)
+                    cmgl.draw_arrays(GL_QUADS, vertices=ImgDrawing.VTX_ARRAY, texcoords=self.texArray)
                     glDisable(GL_TEXTURE_2D)

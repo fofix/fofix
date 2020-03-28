@@ -412,7 +412,7 @@ class Vocalist:
                              [xEndPos,                      yEndPos  +self.vocalLaneSize, 0],
                              [xStartPos,                    yStartPos+self.vocalLaneSize, 0]],
                                dtype=np.float32)
-        cmgl.drawArrays(gl.GL_QUADS, vertices=vertexArray, colors=colorArray)
+        cmgl.draw_arrays(gl.GL_QUADS, vertices=vertexArray, colors=colorArray)
 
     def coOpRescue(self, pos):
         self.coOpRestart = True  # initializes Restart Timer

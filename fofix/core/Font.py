@@ -159,7 +159,7 @@ class Font:
         self.square_prim[2, 1] = self.square_prim[3, 1] = h
         self.square_tex[0, 1] = self.square_tex[1, 1] = th
         self.square_tex[1, 0] = self.square_tex[3, 0] = tw
-        cmgl.drawArrays(GL_TRIANGLE_STRIP, vertices=self.square_prim, texcoords=self.square_tex)
+        cmgl.draw_arrays(GL_TRIANGLE_STRIP, vertices=self.square_prim, texcoords=self.square_tex)
 
     def render(self, text, pos=(0, 0), rotate=0, scale=DEFAULT_SCALE, shadowoffset=(.0022, .0005), align=LEFT, shadow=False, outline=False, shadowOpacity=1.0):
         """
