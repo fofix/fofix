@@ -102,7 +102,7 @@ import numpy as np
 from fofix.core import cmgl
 
 # This is Cython after all, so we may as well directly bind to OpenGL for the video layer implementation.
-include "../cmgl/gl.pxi"
+include "gl.pxi"
 
 class VideoLayer(BackgroundLayer, KeyListener):
     def __init__(self, engine, filename, mute = False, loop = False, cancellable = False):
@@ -179,12 +179,12 @@ class VideoLayer(BackgroundLayer, KeyListener):
 
         # The black rectangle.
         glColor4f(0.0, 0.0, 0.0, 1.0)
-        cmgl.drawArrays(GL_QUADS, vertices=background_vertices)
+        cmgl.draw_arrays(GL_QUADS, vertices=background_vertices)
 
         # The actual video.
         glEnable(GL_TEXTURE_2D)
         glColor4f(1.0, 1.0, 1.0, 1.0)
-        cmgl.drawArrays(GL_QUADS, vertices=video_vertices, texcoords=texcoords)
+        cmgl.draw_arrays(GL_QUADS, vertices=video_vertices, texcoords=texcoords)
         glDisable(GL_TEXTURE_2D)
 
         glPopMatrix()
