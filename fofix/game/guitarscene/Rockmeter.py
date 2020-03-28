@@ -34,7 +34,6 @@ from PIL import Image, ImageDraw
 import OpenGL.GL as gl
 
 from fofix.core import Version
-from fofix.core import cmgl
 from fofix.core.Image import ImgDrawing
 from fofix.core.Image import drawImage
 from fofix.core.Config import MyConfigParser
