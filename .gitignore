@@ -32,7 +32,6 @@ pyvenv.cfg
 /fofix/*.ini
 /fofix/*.log
 /fofix/*.idb
-/fofix/core/cmgl/cmgl.c
 /fofix/core/MixStream/_MixStream.c
 /fofix/core/VideoPlayer/_VideoPlayer.c
 /fofix/core/pypitch/_pypitch.cpp
