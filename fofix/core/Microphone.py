@@ -34,7 +34,7 @@ log = logging.getLogger(__name__)
 
 try:
     import pyaudio
-    from fofix.core import pypitch
+    from pypitch import pypitch
     supported = True
 except ImportError:
     log.warning('Missing pyaudio or pypitch - microphone support will not be possible')

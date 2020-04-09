@@ -53,7 +53,7 @@ Notes:
   - implemented song specific loading screen images
   - shared more code between the guitar and drums
   - added ``CMGL`` as a faster OpenGL binding
-  - added the ``pypitch`` module
+  - replace the PitchAnalyzer module with the ``pypitch`` one
   - rename the option *uploadurl_w67_starpower* to *uploadurl* in ``fofix.ini``
 
 
