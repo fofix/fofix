@@ -34,7 +34,6 @@ pyvenv.cfg
 /fofix/*.idb
 /fofix/core/MixStream/_MixStream.c
 /fofix/core/VideoPlayer/_VideoPlayer.c
-/fofix/core/pypitch/_pypitch.cpp
 
 # Ignore these app resources
 /data/library.zip
