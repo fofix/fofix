@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-                                             #
 #                                                                   #
 # Frets on Fire                                                     #
-# Copyright (C) 2006 Sami Ky?stil?                                  #
+# Copyright (C) 2006 Sami Kyöstilä                                  #
 #               2008 Alarian                                        #
 #               2008 myfingershurt                                  #
 #               2008 Glorandwarf                                    #
@@ -11,6 +11,7 @@
 #               2008 Blazingamer                                    #
 #               2008 evilynux <evilynux@gmail.com>                  #
 #               2008 fablaculp                                      #
+#               2020 FoFiX Team                                     #
 #                                                                   #
 # This program is free software; you can redistribute it and/or     #
 # modify it under the terms of the GNU General Public License       #
@@ -28,20 +29,20 @@
 # MA  02110-1301, USA.                                              #
 #####################################################################
 
-import OpenGL
-from OpenGL.GL import *
-import numpy as np
-from PIL import Image
-import pygame
 import gc
-import os
-import sys
 import imp
 import logging
+import os
+import sys
 
 from fretwork.audio import Audio
 from fretwork.task import TaskEngine
 from fretwork.timer import FpsTimer
+from OpenGL.GL import *
+from PIL import Image
+import OpenGL
+import numpy as np
+import pygame
 
 from fofix.core.constants import *
 from fofix.core.Video import Video
@@ -158,6 +159,7 @@ class GameEngine(object):
     def __init__(self, config=None):
         """
         Constructor.
+
         :param config: `Config` instance for settings
         """
 
@@ -170,6 +172,10 @@ class GameEngine(object):
         self.uploadVersion = "%s-4.0" % Version.PROGRAM_NAME  # the version passed to the upload site.
 
         self.dataPath = Version.dataPath()
+
+        #
+        # Debug logs: versions
+        #
         log.debug(self.versionString + " starting up...")
         log.debug("Python version: " + sys.version.split(' ')[0])
         log.debug("Pygame version: " + str(pygame.version.ver))
@@ -187,9 +193,11 @@ class GameEngine(object):
 
         self.tutorialFolder = "tutorials"
 
+        #
+        # Load the config
+        #
         if config is None:
             config = Config.load()
-
         self.config = config
 
         self.fps = self.config.get("video", "fps")
@@ -197,9 +205,12 @@ class GameEngine(object):
         self.running = True
         self.clock = FpsTimer()
         self.tickDelta = 0
-        self.task = TaskEngine(self)
 
+        #
+        # Tasks
+        #
         # Compatiblity task management
+        self.task = TaskEngine(self)
         self.addTask = self.task.addTask
         self.removeTask = self.task.removeTask
         self.pauseTask = self.task.pauseTask
@@ -208,6 +219,9 @@ class GameEngine(object):
         self.title = self.versionString
         self.restartRequested = False
 
+        #
+        # Video
+        #
         # Load window icon
         icon = os.path.join(Version.dataPath(), "fofix_icon.png")
 
@@ -255,6 +269,7 @@ class GameEngine(object):
             self.config.set("video", "fullscreen", False)
             self.config.set("video", "resolution", "800x600")
 
+        # use shaders
         if self.config.get("video", "shader_use"):
             shaders.set(os.path.join(Version.dataPath(), "shaders"))
 
@@ -286,6 +301,9 @@ class GameEngine(object):
 
         self.setlistMsg = None
 
+        #
+        # Theme
+        #
         # Init theme system
         themename = self.config.get("coffee", "themename")
         themepath = os.path.join(Version.dataPath(), "themes", themename)
