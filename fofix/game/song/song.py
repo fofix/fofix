@@ -382,7 +382,7 @@ class SongInfo(object):
                     else:
                         self.addHighscore(difficulty, score, stars, name, part)
                 else:
-                    log.warn("Weak hack attempt detected. Better luck next time.")
+                    log.warning("Weak hack attempt detected. Better luck next time.")
 
     def _set(self, attr, value):
         if not self.info.has_section("song"):
@@ -489,7 +489,7 @@ class SongInfo(object):
                 info.difficulties[part.id].sort(lambda a, b: cmp(a.id, b.id))
                 self._partDifficulties[part.id] = info.difficulties[part.id]
         except Exception:
-            log.warn("Note file not parsed correctly. Selected part and/or difficulty may not be available.")
+            log.warning("Note file not parsed correctly. Selected part and/or difficulty may not be available.")
             self._parts = parts.values()
             for part in self._parts:
                 self._partDifficulties[part.id] = difficulties.values()
@@ -665,7 +665,7 @@ class SongInfo(object):
                 self._sections.insert(0, ["0:00 -> Start", 0.0])
 
                 # MFH - only log if enabled
-                log.warn("Song.py: Using auto-generated note count sections...")
+                log.warning("Song.py: Using auto-generated note count sections...")
                 if self.logSections == 1:
                     log.debug("Practice sections: " + str(self._sections))
 
@@ -677,7 +677,7 @@ class SongInfo(object):
                     log.debug("Practice sections: " + str(self._sections))
 
         except Exception as e:
-            log.warn("Song.py: Unable to retrieve section names for practice mode selection: %s" % e)
+            log.warning("Song.py: Unable to retrieve section names for practice mode selection: %s" % e)
             self._sections = None
         return self._sections
 
@@ -1132,14 +1132,14 @@ class VocalTrack(Track):
         markStars = False
         if len(self.starTimes) < 2:
             markStars = True
-            log.warn(
+            log.warning(
                 "This song does not appear to have any vocal star power events - falling back on auto-generation.")
         for time, event in self.getAllEvents():
             if isinstance(event, VocalPhrase):
                 if time in self.starTimes and not markStars:
                     event.star = True
                 if time in phraseTimes:
-                    log.warn("Phrase repeated - some lyric phrase errors may occur.")
+                    log.warning("Phrase repeated - some lyric phrase errors may occur.")
                     phraseId += 1
                     continue
                 if markStars and phraseId + 1 % 7 == 0:
@@ -1908,7 +1908,7 @@ class Song(object):
                         self.engine.audio.getChannel(channel), filePath))
                     channel += 1
                 except Exception as e:
-                    log.warn("Unable to load song track: %s" % e)
+                    log.warning("Unable to load song track: %s" % e)
 
         self.songTrack = self.songTracks.get('song', [])
         self.guitarTrack = self.songTracks.get('guitar', [])
@@ -2439,8 +2439,8 @@ class MidiReader(midi.MidiOutStream):
             else:
                 pass
         except KeyError:
-            log.warn("MIDI note 0x%x on channel %d ending at %d was never started." %
-                     (note, channel, self.abs_time()))
+            log.warning("MIDI note 0x%x on channel %d ending at %d was never started." %
+                        (note, channel, self.abs_time()))
 
     # MFH - OK - this needs to be optimized.
     # There should be a separate "Sections" track, and a separate "Lyrics" track created for their respective events
@@ -2767,7 +2767,7 @@ class SongQueue:
 
     def getSong(self):
         if len(self.songName) == 0 or len(self.library) == 0:
-            log.warn("SongQueue.getSong: Empty queue get.")
+            log.warning("SongQueue.getSong: Empty queue get.")
             return False
         song = self.songName.pop(0)
         library = self.library.pop(0)
@@ -2775,7 +2775,7 @@ class SongQueue:
 
     def getRandomSong(self):
         if len(self.songName) == 0 or len(self.library) == 0:
-            log.warn("SongQueue.getRandomSong: Empty queue get.")
+            log.warning("SongQueue.getRandomSong: Empty queue get.")
             return False
         n = random.randint(0, len(self.songName) - 1)
         song = self.songName.pop(n)

@@ -45,16 +45,6 @@ OS-specific dependencies:
     - python's developpment headers
     - and: `GLU`, `GLib`, `SDL`, `SDL_mixer`, `libogg`, `libvorbisfile`, `libtheora`, `libsoundtouch`, `libswscale` (part of `ffmpeg`) development headers
 
-    About `cerealizer`, you need to reinstall it. You can run those commands for
-    example:
-
-        pip download cerealizer
-        tar jxf Cerealizer*.tar.bz2 -C /tmp/
-        cd /tmp/Cerealizer-*
-        pip install --upgrade .
-        cd -
-        rm -r /tmp/Cerealizer-* Cerealizer-*
-
 
 ### Native modules
 
@@ -62,6 +52,11 @@ Some parts of FoFiX are written in C or C++. These must be compiled
 before you can start the game from source:
 
     python setup.py build_ext --inplace --force
+
+
+### Generate translations
+
+    python setup.py msgfmt
 
 
 Start the game

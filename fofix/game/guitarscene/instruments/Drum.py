@@ -39,7 +39,6 @@ from fofix.game.song import Note, Tempo
 from fofix.core.Image import draw3Dtex
 from fofix.core.Shader import shaders
 from fofix.core.Mesh import Mesh
-from fofix.core import cmgl
 
 
 log = logging.getLogger(__name__)

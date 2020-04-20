@@ -19,6 +19,7 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,        #
 # MA  02110-1301, USA.                                              #
 #####################################################################
+
 from __future__ import with_statement
 
 from OpenGL.GL import *
@@ -26,6 +27,7 @@ import numpy as np
 
 from fofix.core import Collada
 from fofix.core import cmgl
+
 
 class Mesh:
     def __init__(self, fileName):
@@ -35,7 +37,7 @@ class Mesh:
         self.fullGeoms = {}
 
     def _unflatten(self, array, stride):
-        return [tuple(array[i * stride : (i + 1) * stride]) for i in range(len(array) / stride)]
+        return [tuple(array[i * stride: (i + 1) * stride]) for i in range(len(array) / stride)]
 
     def setupLight(self, light, n, pos):
         l = light.techniqueCommon
@@ -57,7 +59,7 @@ class Mesh:
                             glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE,   shader.diffuse.color.rgba)
                             glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR,  shader.specular.color.rgba)
 
-    def render(self, geomName = None):
+    def render(self, geomName=None):
         if geomName in self.fullGeoms:
             self.fullGeoms[geomName]()
             return
@@ -65,7 +67,7 @@ class Mesh:
         # Prepare a new list for all the geometry
         if not self.geoms:
             for geom in self.doc.geometriesLibrary.items:
-                self.geoms[geom.name] = cmgl.List()
+                self.geoms[geom.name] = cmgl.GList()
                 with self.geoms[geom.name]:
 
                     for prim in geom.data.primitives:
@@ -119,7 +121,7 @@ class Mesh:
                             glEnd()
 
         # Prepare a new display list for this particular geometry
-        self.fullGeoms[geomName] = cmgl.List()
+        self.fullGeoms[geomName] = cmgl.GList()
         with self.fullGeoms[geomName]:
 
             if self.geoms:
@@ -160,7 +162,7 @@ class Mesh:
         # Render the new list
         self.render(geomName)
 
-    def find(self, geomName = None):
+    def find(self, geomName=None):
         found = False
         if self.geoms:
             # render geometry

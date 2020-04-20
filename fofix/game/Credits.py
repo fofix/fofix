@@ -268,7 +268,7 @@ class Credits(Layer, KeyListener):
                     scale = float(line.strip("!"))
                     continue
             except ValueError:
-                log.warn("CREDITS file does not parse properly")
+                log.warning("CREDITS file does not parse properly")
             if line == "":
                 self.credits.append(space)
             elif line.startswith("`") and line.endswith("`"):

@@ -1,6 +1,7 @@
 language: python
 python:
     - 2.7
+dist: trusty
 
 matrix:
     include:
@@ -39,9 +40,6 @@ install:
     - pip install pytest
     - pip install cython
     - pip install -r requirements.txt
-    # hack: cerealizer
-    - export PY_PACKAGES=`pip --version | cut -d' ' -f4`
-    - wget https://bitbucket.org/jibalamy/cerealizer/raw/ffbb9283c507c2bb7191bb413722a316e9c0718b/__init__.py2 -O $PY_PACKAGES/cerealizer/__init__.py2
     # build ext
     - python setup.py build_ext --inplace --force
 

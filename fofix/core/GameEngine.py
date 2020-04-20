@@ -54,7 +54,6 @@ from fofix.core.Language import _
 from fofix.core.Theme import Theme
 from fofix.core.Shader import shaders
 from fofix.core.Image import drawImage
-from fofix.core import cmgl
 from fofix.core import Config
 from fofix.core import ConfigDefs
 from fofix.core import Version

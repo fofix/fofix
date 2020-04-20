@@ -50,9 +50,9 @@ if language:
         trFile = os.path.join(Version.dataPath(), "translations", "%s.mo" % language.lower().replace(" ", "_"))
         catalog = gettext.GNUTranslations(open(trFile, "rb"))
     except Exception as x:
-        log.warn("Unable to select language '%s': %s" % (language, x))
+        log.warning("Unable to select language '%s': %s" % (language, x))
         language = None
-        Config.set("game", "language", "")
+        # Config.set("game", "language", "")
 
 _ = catalog.ugettext
 

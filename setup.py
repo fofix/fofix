@@ -380,8 +380,6 @@ else:
           'libraries': [],
           'library_dirs': [],
         }
-# Build a similar info record for the numpy headers.
-numpy_info = {'include_dirs': [numpy.get_include()]}
 
 
 def combine_info(*args):
@@ -463,10 +461,6 @@ else:
     vidInclude = ['.']
 
 extensions = [
-    Extension('fofix.lib.cmgl', ['fofix/core/cmgl/cmgl.pyx'], **combine_info(numpy_info, gl_info)),
-    Extension('fofix.lib._pypitch',
-              language='c++',
-              sources=['fofix/core/pypitch/_pypitch.pyx', 'fofix/core/pypitch/pitch.cpp']),
     Extension('fofix.lib._VideoPlayer',
               ['fofix/core/VideoPlayer/_VideoPlayer.pyx', 'fofix/core/VideoPlayer/VideoPlayer.c'],
               **combine_info(gl_info, ogg_info, theoradec_info, glib_info, swscale_info,

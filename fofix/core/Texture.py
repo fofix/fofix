@@ -87,7 +87,7 @@ class Texture:
         else:
             try:
                 image = image.convert('RGB')
-                log.warn("Unsupported image mode '%s' converted to 'RGB'. May have unexpected results." % image.mode)
+                log.warning("Unsupported image mode '%s' converted to 'RGB'. May have unexpected results." % image.mode)
                 string = image.tobytes('raw', 'RGB', 0, -1)
                 self.loadRaw(image.size, string, GL_RGB, 3)
             except Exception:
