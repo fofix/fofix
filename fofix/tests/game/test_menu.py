@@ -44,13 +44,10 @@ class MenuTest(unittest.TestCase):
         ]
 
         # init the engine
-        self.engine = GameEngine(self.config)
+        engine = GameEngine(self.config)
 
         # init the menu
-        self.menu = Menu(self.engine, choices)
-
-    def tearDown(self):
-        self.engine.quit()
+        self.menu = Menu(engine, choices)
 
     def test_init(self):
         self.assertGreater(len(self.menu.choices), 0)
