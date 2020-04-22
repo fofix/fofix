@@ -20,6 +20,7 @@
 
 
 import unittest
+import warnings
 
 from fofix.core import Config
 from fofix.core import Version
@@ -77,3 +78,12 @@ class MainMenuTest(unittest.TestCase):
         #time.sleep(1400)
         if self.mainmenu.menumusic:
             self.assertFalse(self.song.isPlaying())
+
+    def test_newSinglePlayerGame_deprecated(self):
+        with warnings.catch_warnings(record=True) as w:
+            # always trigger warnings
+            warnings.simplefilter("always")
+            self.mainmenu.newSinglePlayerGame()
+            # check warnings
+            assert len(w) == 1
+            assert issubclass(w[-1].category, PendingDeprecationWarning)
