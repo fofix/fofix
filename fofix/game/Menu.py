@@ -143,7 +143,7 @@ class Menu(Layer, KeyListener):
         :param fadeScreen: fade the screen
         :type fadeScreen: boolean
         :param font: the font for the text
-        :param mainMenu: choices of the main menu (list of tuples)
+        :param mainMenu:
         :param textColor: the color of the text
         :param selectedColor:
         :param append_submenu_char:
