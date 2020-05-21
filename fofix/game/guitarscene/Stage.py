@@ -37,7 +37,8 @@ from fofix.core.Image import drawImage
 from fofix.core.Language import _
 from fofix.core.Config import MyConfigParser
 from fofix.core.Shader import shaders
-from fofix.core.VideoPlayer import VideoLayer, VideoPlayerError
+from fofix.core.videolayer import VideoLayer
+from fofix.core.videolayer import VideoPlayerError
 from fofix.core.constants import *
 from fofix.game.guitarscene import Rockmeter
 

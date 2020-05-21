@@ -55,6 +55,7 @@ Notes:
   - added ``CMGL`` as a faster OpenGL binding
   - replace the PitchAnalyzer module with the ``pypitch`` one
   - rename the option *uploadurl_w67_starpower* to *uploadurl* in ``fofix.ini``
+  - added ``videoplayer`` as a reader for OGG video files (OGV)
 
 
 3.121 (2009-12-06)

@@ -24,9 +24,6 @@ From sources
         - ``pyopengl-accelerate``: this will make PyOpenGL go a good bit faster
         - ``pyaudio``: this provides support for microphone input, which is required for vocal play
         - ``gettext``: for translations
-- compile native modules::
-
-    python setup.py build_ext --inplace --force
 
 - generate translations::
 
@@ -50,6 +47,5 @@ Install the following dependencies:
     - ``Python`` 2.7
     - ``OpenGL``
     - ``ffmpeg``
-    - ``pkg-config``
     - python's developpment headers
-    - and: ``GLU``, ``GLib``, ``SDL``, ``SDL_mixer``, ``libogg``, ``libvorbisfile``, ``libtheora``, ``libsoundtouch``, ``libswscale`` (part of ``ffmpeg``) development headers.
+    - and: ``GLU``, ``SDL``, ``SDL_mixer``, ``libsoundtouch`` development headers.
