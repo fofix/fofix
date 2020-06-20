@@ -58,6 +58,14 @@ Notes:
   - dependencies: bump `Pillow` to 6.2.2
 
 
+3.122 (2019-11-28)
+------------------
+
+- Fix PIL imports (to use Pillow)
+- Fix OGG imports
+- Add the `Version.versionNum` function.
+
+
 3.121 (2009-12-06)
 ------------------
 
