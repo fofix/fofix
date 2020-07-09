@@ -124,6 +124,11 @@ if __name__ == '__main__':
     log.configure(logfile)
     logger = logging.getLogger(__name__)
 
+    # Add the directory of DLL dependencies to the PATH if we're running
+    # from source on Windows so we pick them up when those bits are imported.
+    if is_windows and not hasattr(sys, 'frozen'):
+        os.environ['PATH'] = os.path.abspath(os.path.join('.', 'win32', 'deps', 'bin')) + os.pathsep + os.environ['PATH']
+
     # Imports
     import fretwork
     from fofix.game.Main import Main
@@ -136,11 +141,6 @@ if __name__ == '__main__':
         if data in ['1', 'ON']:
             run_command('defaults write org.python.python ApplePersistenceIgnoreState 0')
             atexit.register(run_command, 'defaults write org.python.python ApplePersistenceIgnoreState %s' % data)
-
-    # Add the directory of DLL dependencies to the PATH if we're running
-    # from source on Windows so we pick them up when those bits are imported.
-    if is_windows and not hasattr(sys, 'frozen'):
-        os.environ['PATH'] = os.path.abspath(os.path.join('.', 'win32', 'deps', 'bin')) + os.pathsep + os.environ['PATH']
 
     fretworkRequired = (0, 4, 0)
     reqVerStr = '.'.join([str(i) for i in fretworkRequired])
