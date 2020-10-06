@@ -63,3 +63,4 @@ Start the game
 --------------
 
     python FoFiX.py
+[![Run on Repl.it](https://repl.it/badge/github/fofix/fofix)](https://repl.it/github/fofix/fofix)
