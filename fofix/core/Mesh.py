@@ -30,14 +30,19 @@ from fofix.core import cmgl
 
 
 class Mesh:
-    def __init__(self, fileName):
+
+    def __init__(self, filename):
         self.doc = Collada.DaeDocument()
-        self.doc.LoadDocumentFromFile(fileName)
+        self.doc.LoadDocumentFromFile(filename)
         self.geoms = {}
         self.fullGeoms = {}
 
     def _unflatten(self, array, stride):
-        return [tuple(array[i * stride: (i + 1) * stride]) for i in range(len(array) / stride)]
+        """ Unflatten a list
+
+        Return a list of tuples with <stride> elements per tuples.
+        """
+        return [tuple(array[i * stride:(i + 1) * stride]) for i in range(len(array) / stride)]
 
     def setupLight(self, light, n, pos):
         l = light.techniqueCommon
@@ -163,6 +168,11 @@ class Mesh:
         self.render(geomName)
 
     def find(self, geomName=None):
+        """ Find if a node scene exists
+
+        :param geomName: the node scene name to find
+        :rtype: boolean
+        """
         found = False
         if self.geoms:
             # render geometry
