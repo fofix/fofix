@@ -528,7 +528,7 @@ class Theme(Task):
         self.lobbyPanelAvatarDimension = (get("lobbyPanelAvatarWidth", float, 200.00),
                                           get("lobbyPanelAvatarHeight", float, 110.00))
         self.lobbyTitleText = get("lobbyTitleText", str, "Lobby")
-        self.lobbyTitleTextPos = (get("lobbyTitleTextX", str, 0.3),
+        self.lobbyTitleTextPos = (get("lobbyTitleTextX", float, 0.3),
                                   get("lobbyTitleTextY", float, 0.015))
         self.lobbyTitleTextAlign = halign(get("lobbyTitleTextAlign", str, "CENTER"))
         self.lobbyTitleTextScale = get("lobbyTitleTextScale", float, .001)
