@@ -1,5 +1,5 @@
 #####################################################################
-# -*- coding: iso-8859-1 -*-                                        #
+# -*- coding: utf-8 -*-                                             #
 #                                                                   #
 # Frets on Fire                                                     #
 # Copyright (C) 2006 Sami Kyöstilä                                  #
@@ -28,14 +28,17 @@ from __future__ import absolute_import
 
 from collections import MutableMapping, namedtuple
 from ConfigParser import RawConfigParser
+import logging
 import os
 import StringIO
 import sys
 
-from fretwork import log
 from fretwork.unicode import utf8, unicodify
 
 from fofix.core import VFS
+
+
+log = logging.getLogger(__name__)
 
 
 class MyConfigParser(RawConfigParser):
@@ -183,7 +186,7 @@ class Config(object):
         else:
             try:
                 return type(value)
-            except:
+            except Exception:
                 return None
 
     def get(self, section, option):

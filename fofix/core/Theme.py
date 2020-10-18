@@ -1,5 +1,5 @@
 #####################################################################
-# -*- coding: iso-8859-1 -*-                                        #
+# -*- coding: utf-8 -*-                                             #
 #                                                                   #
 # Frets on Fire X (FoFiX)                                           #
 # Copyright (C) 2006 Sami Kyöstilä                                  #
@@ -23,26 +23,28 @@
 # MA  02110-1301, USA.                                              #
 #####################################################################
 
-import os
-import sys
 import imp
-import string
+import logging
 import math
+import os
+import string
+import sys
 
 from OpenGL.GL import *
 from OpenGL.GLU import *
-
-from fretwork import log
 from fretwork.task import Task
 
-from fofix.core import Version
 from fofix.core import Config
+from fofix.core import Version
+from fofix.core.Image import drawImage
 from fofix.core.Language import _
 from fofix.core.Shader import shaders
-from fofix.core.Image import drawImage
 from fofix.core.constants import *
 
-#Theme Constants.
+
+log = logging.getLogger(__name__)
+
+# Theme Constants
 GUITARTYPES = [0, 1, 4]
 DRUMTYPES   = [2, 3]
 MICTYPES    = [5]
@@ -50,25 +52,33 @@ MICTYPES    = [5]
 defaultDict = {}
 classNames = {'setlist': lambda x: Setlist(x), 'themeLobby': lambda x: ThemeLobby(x), 'partDiff': lambda x: ThemeParts(x)}
 
+
 def halign(value, default='center'):
     try:
-        return {'left':   LEFT,
-                'center': CENTER,
-                'right':  RIGHT}[value.lower()]
+        positions = {
+            'left': LEFT,
+            'center': CENTER,
+            'right': RIGHT
+        }
+        return positions[value.lower()]
     except KeyError:
-        log.warn('Invalid horizontal alignment value - defaulting to %s' % default)
+        log.warning('Invalid horizontal alignment value - defaulting to %s' % default)
         return halign(default)
+
 
 def valign(value, default='middle'):
     try:
         if value.lower() == 'center':
-            log.notice('Use of "center" for vertical alignment is deprecated. Use "middle" instead.')
-        return {'top':    TOP,
-                'middle': MIDDLE,  # for consistency with HTML/CSS terminology
-                'center': MIDDLE,  # for temporary backward compatibility
-                'bottom': BOTTOM}[value.lower()]
+            log.info('Use of "center" for vertical alignment is deprecated. Use "middle" instead.')
+        positions = {
+            'top': TOP,
+            'middle': MIDDLE,  # for consistency with HTML/CSS terminology
+            'center': MIDDLE,  # for temporary backward compatibility
+            'bottom': BOTTOM
+        }
+        return positions[value.lower()]
     except KeyError:
-        log.warn('Invalid vertical alignment value - defaulting to %s' % default)
+        log.warning('Invalid vertical alignment value - defaulting to %s' % default)
         return valign(default)
 
 
@@ -93,23 +103,26 @@ def hexToColor(color):
 
     return rgbColor
 
+
 def colorToHex(color):
     if not isinstance(color, tuple):
         raise TypeError
 
-    colorData = [ "%02x" % int(c * 255) for c in color]
+    colorData = ["%02x" % int(c * 255) for c in color]
     return "#%s" % "".join(colorData)
+
 
 class Theme(Task):
 
     def __getattr__(self, attr):
-        try: #getting to this function is kinda slow. Set it on the first get to keep renders from lagging.
+        # getting to this function is kinda slow. Set it on the first get to keep renders from lagging
+        try:
             object.__getattribute__(self, '__dict__')[attr] = defaultDict[attr]
             log.debug("No theme variable for %s - Loading default..." % attr)
             return object.__getattribute__(self, attr)
         except KeyError:
             if attr in classNames.keys():
-                log.warn("No theme class for %s - Loading default..." % attr)
+                log.warning("No theme class for %s - Loading default..." % attr)
                 object.__getattribute__(self, '__dict__')[attr] = classNames[attr](self)
                 return object.__getattribute__(self, attr)
             elif attr.startswith('__') and attr.endswith('__'): #for object's attributes (eg: __hash__, __eq__)
@@ -120,12 +133,12 @@ class Theme(Task):
         self.name = name
         self.path = path
 
-        self.themePath = os.path.join(Version.dataPath(),"themes", name)
+        self.themePath = os.path.join(Version.dataPath(), "themes", name)
         if not os.path.exists(self.themePath):
-            log.warn("Theme: %s does not exist!\n" % self.themePath)
+            log.warning("Theme: %s does not exist!" % self.themePath)
             name = Config.get("coffee", "themename")
-            log.notice("Theme: Attempting fallback to default theme \"%s\"." % name)
-            self.themePath = os.path.join(Version.dataPath(),"themes", name)
+            log.info("Theme: Attempting fallback to default theme \"%s\"." % name)
+            self.themePath = os.path.join(Version.dataPath(), "themes", name)
             if not os.path.exists(self.themePath):
                 log.error("Theme: %s does not exist!\nExiting.\n" % self.themePath)
                 sys.exit(1)
@@ -138,12 +151,12 @@ class Theme(Task):
             self.config = None
             log.debug("no theme.ini")
 
-        def get(value, type = str, default = None):
+        def get(value, vtype=str, default=None):
             if self.config:
                 if self.config.has_option("theme", value):
-                    if type == bool:
+                    if vtype == bool:
                         return isTrue(self.config.get("theme", value).lower())
-                    elif type == "color":
+                    elif vtype == "color":
                         try:
                             value = hexToColor(self.config.get("theme", value))
                         except ValueError:
@@ -151,8 +164,8 @@ class Theme(Task):
 
                         return value
                     else:
-                        return type(self.config.get("theme", value))
-            if type == "color":
+                        return vtype(self.config.get("theme", value))
+            if vtype == "color":
                 try:
                     value = hexToColor(default)
                 except ValueError:
@@ -175,9 +188,9 @@ class Theme(Task):
         #The color of the Mesh_001 is the color of the note (green, red, yellow, etc)
         #Mesh_002 is set by the hopo_color but if Mesh_003 is present it will be colored spot_color
         #When Mesh_003 is present it will be colored hopo_color
-        self.meshColor   = get("mesh_color",   "color", "#000000")
-        self.hopoColor   = get("hopo_color",   "color", "#00AAAA")
-        self.spotColor   = get("spot_color",   "color", "#FFFFFF")
+        self.meshColor = get("mesh_color", "color", "#000000")
+        self.hopoColor = get("hopo_color", "color", "#00AAAA")
+        self.spotColor = get("spot_color", "color", "#FFFFFF")
 
         #keys when they are not textured are made of three parts (Mesh, Key_001, Key_002),
         #two of which can be colored by the CustomTheme.py or the Theme.ini (Mesh, Mesh_002).
@@ -192,38 +205,38 @@ class Theme(Task):
         #the glow is either the color of the fret it's over or it can be the color the image
         #actually is (if the image is white then no matter what key is hit the glow will be white)
 
-        self.hitGlowColor   = get("hit_glow_color", str, "frets")
+        self.hitGlowColor = get("hit_glow_color", str, "frets")
         if not self.hitGlowColor == "frets":
             self.hitGlowColor = hexToColor(self.hitGlowColor)
 
-        #Sets the color of the glow.png
-        self.glowColor   = get("glow_color",       str,    "frets")
+        # Sets the color of the glow.png
+        self.glowColor = get("glow_color", str, "frets")
         if not self.glowColor == "frets":
             self.glowColor = hexToColor(self.glowColor)
 
-        #Acts similar to the glowColor but its does so for flames instead
-        self.flamesColor   = get("flames_color",       str,    "frets")
+        # Acts similar to the glowColor but its does so for flames instead
+        self.flamesColor = get("flames_color", str, "frets")
         if not self.flamesColor == "frets":
             self.flamesColor = hexToColor(self.flamesColor)
 
         #Note Colors (this applies to frets and notes)
         #default is green, red, yellow, blue, orange, purple (6th color is for open frets)
         default_color = ["#22FF22", "#FF2222", "#FFFF22", "#3333FF", "#FF9933", "#CC22CC"]
-        self.noteColors  = [get("fret%d_color" % i, "color", default_color[i]) for i in range(6)]
-        self.spNoteColor =  get("fretS_color",      "color", "#4CB2E5")
+        self.noteColors = [get("fret%d_color" % i, "color", default_color[i]) for i in range(6)]
+        self.spNoteColor = get("fretS_color", "color", "#4CB2E5")
 
         #Specifies how the power color is used in-game for both Active power and gaining power
         self.powerGainColorToggle    = get("power_color_gain_toggle",      bool, True)
         self.powerActiveColorToggle  = get("power_color_active_toggle",    bool, False)
 
         #Color of the tails when whammied, default is set to the colors of the frets
-        self.killNoteColor  = get("fretK_color",       str,    "frets")
+        self.killNoteColor = get("fretK_color", str, "frets")
         if not self.killNoteColor == "frets":
             self.killNoteColor = hexToColor(self.killNoteColor)
 
         #just like glow_color, this allows you to have tails use either the color of the note
         #or the actual color of the tail
-        self.use_fret_colors =  get("use_fret_colors", bool, False)
+        self.use_fret_colors = get("use_fret_colors", bool, False)
 
         #themes can define how many frames their hitflames will be.
         # Separate variables for hit and hold animation frame counts.
@@ -231,12 +244,12 @@ class Theme(Task):
         self.HoldFlameFrameLimit   = get("hold_flame_frame_limit", int, 16)
 
         #Lets themers turn alpha = True to alpha = False making black not removed from the flames or glows.
-        self.hitFlameBlackRemove   = get("hit_flame_black_remove", bool, True)
-        self.hitGlowsBlackRemove   = get("hit_Glows_black_remove", bool, True)
+        self.hitFlameBlackRemove = get("hit_flame_black_remove", bool, True)
+        self.hitGlowsBlackRemove = get("hit_Glows_black_remove", bool, True)
 
         #Rotation in degrees for the hitFlames and hitGlows x y and z axix
-        self.hitFlameRotation     = (get("flame_rotation_base", float, 90), get("flame_rotation_x", float, 1), get("flame_rotation_y", float, 0), get("flame_rotation_z", float, 0))
-        self.hitGlowsRotation     = (get("hit_glow_rotation_base", float, 90), get("hit_glow_rotation_x", float, .5), get("hit_glow_rotation_y", float, 0), get("hit_glow_rotation_z", float, 0))
+        self.hitFlameRotation = (get("flame_rotation_base", float, 90), get("flame_rotation_x", float, 1), get("flame_rotation_y", float, 0), get("flame_rotation_z", float, 0))
+        self.hitGlowsRotation = (get("hit_glow_rotation_base", float, 90), get("hit_glow_rotation_x", float, .5), get("hit_glow_rotation_y", float, 0), get("hit_glow_rotation_z", float, 0))
 
         #The rotation offset will offset each flame/glow so that if the themer chooses so
         #they can align them with the frets individually
@@ -245,22 +258,22 @@ class Theme(Task):
         self.drumHitFlameOffset = (get("drum_flame_offset_0", float, 0), get("drum_flame_offset_1", float, 0), get("drum_flame_offset_2", float, 0), get("drum_flame_offset_3", float, 0), get("drum_flame_offset_4", float, 0))
 
         #controls the size of the hitflames
-        self.hitFlameSize   = get("hit_flame_size", float, .075)
+        self.hitFlameSize = get("hit_flame_size", float, .075)
 
         #controls the y and y position of the hitflames
-        self.hitFlamePos  = (get("hit_flame_y_position", float, .3), get("hit_flame_z_position", float, 0))
+        self.hitFlamePos = (get("hit_flame_y_position", float, .3), get("hit_flame_z_position", float, 0))
 
         #controls the size of the hitflame glows
-        self.holdFlameSize   = get("hold_flame_size", float, .075)
+        self.holdFlameSize = get("hold_flame_size", float, .075)
 
         #controls the y position of the hitflames glows
-        self.holdFlamePos   = (get("hold_flame_y_position", int, 0), get("hold_flame_z_position", int, 0))
+        self.holdFlamePos = (get("hold_flame_y_position", int, 0), get("hold_flame_z_position", int, 0))
 
         self.fretPress = get("fretPress", bool, False)
 
         #Point of View (x, y, z)
-        self.povTarget  = (get("pov_target_x", float), get("pov_target_y", float), get("pov_target_z", float))
-        self.povOrigin  = (get("pov_origin_x", float), get("pov_origin_y", float), get("pov_origin_z", float))
+        self.povTarget = (get("pov_target_x", float), get("pov_target_y", float), get("pov_target_z", float))
+        self.povOrigin = (get("pov_origin_x", float), get("pov_origin_y", float), get("pov_origin_z", float))
 
         #pov presets
         self.povPreset = (get("pov_preset", str, "rb"))
@@ -271,7 +284,7 @@ class Theme(Task):
         #Pause menu type
         self.pauseMenuType = (get("pause_menu_type", str, "RB"))
 
-                #fretboard intro animation
+        #fretboard intro animation
         self.povIntroAnimation = (get("fretboard_intro_animation", str, "fofix"))
 
         #Note Tail Speed multiplier
@@ -294,7 +307,7 @@ class Theme(Task):
 
         #when AI is enabled, this value controls where in the player's window
         #it should say that "Jurgen is here" and how large the words need to be
-        self.jurgTextPos   = get("jurgen_text_pos", str, "1,1,.00035").split(",")
+        self.jurgTextPos = get("jurgen_text_pos", str, "1,1,.00035").split(",")
 
         #just a little misc option that allows you to change the name of what you
         #what starpower/overdrive to be called.  Some enjoy the classic Jurgen Power
@@ -729,8 +742,8 @@ class Theme(Task):
         self.submenuX = {}
         self.submenuY = {}
         self.submenuVSpace = {}
-        if os.path.exists(os.path.join(self.themePath,"menu")):
-            allfiles = os.listdir(os.path.join(self.themePath,"menu"))
+        if os.path.exists(os.path.join(self.themePath, "menu")):
+            allfiles = os.listdir(os.path.join(self.themePath, "menu"))
             listmenu = []
             for name in allfiles:
                 if name.find("text") > -1:
@@ -755,10 +768,10 @@ class Theme(Task):
                 if self.submenuVSpace[i]:
                     self.submenuVSpace[i] = get(i).split(",")[3].strip()
 
-    def setSelectedColor(self, alpha = 1.0):
+    def setSelectedColor(self, alpha=1.0):
         glColor4f(*(self.selectedColor + (alpha,)))
 
-    def setBaseColor(self, alpha = 1.0):
+    def setBaseColor(self, alpha=1.0):
         glColor4f(*(self.baseColor + (alpha,)))
 
     def hexToColorResults(self, color):
@@ -768,17 +781,17 @@ class Theme(Task):
         except (ValueError, TypeError):
             return self.baseColor
 
-    def packTupleKey(self, key, type = str):
+    def packTupleKey(self, key, vtype=str):
         vals = key.split(',')
-        if isinstance(type, list):
-            retval = tuple(type[i](n.strip()) for i, n in enumerate(vals))
+        if isinstance(vtype, list):
+            retval = tuple(vtype[i](n.strip()) for i, n in enumerate(vals))
         else:
-            retval = tuple(type(n.strip()) for n in vals)
+            retval = tuple(vtype(n.strip()) for n in vals)
         return retval
 
     def loadThemeModule(self, moduleName):
         try:
-            fp, pathname, description = imp.find_module(moduleName,[self.path])
+            fp, pathname, description = imp.find_module(moduleName, [self.path])
             module = imp.load_module(moduleName, fp, pathname, description)
             if moduleName in ["CustomLobby", "ThemeLobby"]:
                 return module.CustomLobby(self)
@@ -801,6 +814,7 @@ class Theme(Task):
     def run(self, ticks):
         pass
 
+
 class ThemeLobby:
     def __init__(self, theme):
         self.theme = theme
@@ -812,36 +826,36 @@ class ThemeLobby:
         self.fadeTime += ticks
         if self.fadeTime >= 2500:
             self.fadeTime -= 2500
-            self.currentImage = (self.currentImage + 1)%4
+            self.currentImage = (self.currentImage + 1) % 4
             i = self.currentImage
             while not lobby.partImages[self.currentImage]:
-                self.currentImage = (self.currentImage + 1)%4
+                self.currentImage = (self.currentImage + 1) % 4
                 if i == self.currentImage:
                     break
             if lobby.partImages[self.currentImage]:
-                self.nextImage = (self.currentImage + 1)%4
+                self.nextImage = (self.currentImage + 1) % 4
                 i = self.nextImage
                 while not lobby.partImages[self.nextImage]:
-                    self.nextImage = (self.nextImage + 1)%4
+                    self.nextImage = (self.nextImage + 1) % 4
                     if i == self.nextImage:
                         break
 
-    def drawPartImage(self, lobby, type, scale, coord):
+    def drawPartImage(self, lobby, ptype, scale, coord):
         if not lobby.partImages[self.currentImage]:
             return
-        if type in GUITARTYPES:
+        if ptype in GUITARTYPES:
             if self.fadeTime < 1000 or self.nextImage == self.currentImage:
-                drawImage(lobby.partImages[self.currentImage], scale = scale, coord = coord)
+                drawImage(lobby.partImages[self.currentImage], scale=scale, coord=coord)
             else:
-                drawImage(lobby.partImages[self.currentImage], scale = scale, coord = coord, color = (1,1,1,((2500.0-self.fadeTime)/1500.0)))
-                drawImage(lobby.partImages[self.nextImage], scale = scale, coord = coord, color = (1,1,1,((self.fadeTime-1000.0)/1500.0)))
-                glColor4f(1,1,1,1)
-        elif type in DRUMTYPES:
+                drawImage(lobby.partImages[self.currentImage], scale=scale, coord=coord, color=(1, 1, 1, ((2500.0-self.fadeTime)/1500.0)))
+                drawImage(lobby.partImages[self.nextImage], scale=scale, coord=coord, color=(1, 1, 1, ((self.fadeTime-1000.0)/1500.0)))
+                glColor4f(1, 1, 1, 1)
+        elif ptype in DRUMTYPES:
             if lobby.partImages[4]:
-                drawImage(lobby.partImages[4], scale = scale, coord = coord)
+                drawImage(lobby.partImages[4], scale=scale, coord=coord)
         else:
             if lobby.partImages[5]:
-                drawImage(lobby.partImages[5], scale = scale, coord = coord)
+                drawImage(lobby.partImages[5], scale=scale, coord=coord)
 
     def renderPanels(self, lobby):
         x = self.theme.lobbyPanelPos[0]
@@ -850,14 +864,14 @@ class ThemeLobby:
         controlFont   = lobby.fontDict[self.theme.lobbyControlFont]
         panelNameFont = lobby.fontDict[self.theme.lobbyPanelNameFont]
         optionFont    = lobby.fontDict[self.theme.lobbyOptionFont]
-        wP = w*self.theme.lobbyPanelSize[0]
-        hP = h*self.theme.lobbyPanelSize[1]
+        wP = w * self.theme.lobbyPanelSize[0]
+        hP = h * self.theme.lobbyPanelSize[1]
         glColor3f(*self.theme.lobbyHeaderColor)
         if self.theme.lobbyTitleText:
-            lobby.fontDict[self.theme.lobbyTitleTextFont].render(self.theme.lobbyTitleText, self.theme.lobbyTitleTextPos, scale = self.theme.lobbyTitleTextScale, align = self.theme.lobbyTitleTextAlign)
+            lobby.fontDict[self.theme.lobbyTitleTextFont].render(self.theme.lobbyTitleText, self.theme.lobbyTitleTextPos, scale=self.theme.lobbyTitleTextScale, align=self.theme.lobbyTitleTextAlign)
         if self.theme.lobbySubtitleText:
-            lobby.fontDict[self.theme.lobbySubtitleTextFont].render(self.theme.lobbySubtitleText, self.theme.lobbySubtitleTextPos, scale = self.theme.lobbySubtitleTextScale, align = self.theme.lobbySubtitleTextAlign)
-        lobby.fontDict[self.theme.lobbyGameModeFont].render(lobby.gameModeText, self.theme.lobbyGameModePos, scale = self.theme.lobbyGameModeScale, align = self.theme.lobbyGameModeAlign)
+            lobby.fontDict[self.theme.lobbySubtitleTextFont].render(self.theme.lobbySubtitleText, self.theme.lobbySubtitleTextPos, scale=self.theme.lobbySubtitleTextScale, align=self.theme.lobbySubtitleTextAlign)
+        lobby.fontDict[self.theme.lobbyGameModeFont].render(lobby.gameModeText, self.theme.lobbyGameModePos, scale=self.theme.lobbyGameModeScale, align=self.theme.lobbyGameModeAlign)
         for i in range(4):
             j = lobby.panelOrder[i]
             if j in lobby.blockedPlayers or len(lobby.selectedPlayers) == lobby.maxPlayers:
@@ -865,27 +879,27 @@ class ThemeLobby:
             else:
                 glColor3f(*self.theme.lobbyHeaderColor)
             if i == lobby.keyControl and lobby.img_keyboard_panel:
-                drawImage(lobby.img_keyboard_panel, scale = (self.theme.lobbyPanelSize[0], -self.theme.lobbyPanelSize[1]), coord = (wP*.5+w*x,hP*.5+h*y), stretched = FULL_SCREEN)
+                drawImage(lobby.img_keyboard_panel, scale=(self.theme.lobbyPanelSize[0], -self.theme.lobbyPanelSize[1]), coord=(wP*.5+w*x,hP*.5+h*y), stretched=FULL_SCREEN)
             elif lobby.img_panel:
-                drawImage(lobby.img_panel, scale = (self.theme.lobbyPanelSize[0], -self.theme.lobbyPanelSize[1]), coord = (wP*.5+w*x,hP*.5+h*y), stretched = FULL_SCREEN)
+                drawImage(lobby.img_panel, scale=(self.theme.lobbyPanelSize[0], -self.theme.lobbyPanelSize[1]), coord=(wP*.5+w*x,hP*.5+h*y), stretched=FULL_SCREEN)
             if i == lobby.keyControl and lobby.img_keyboard:
-                drawImage(lobby.img_keyboard, scale = (self.theme.lobbyKeyboardImgScale, -self.theme.lobbyKeyboardImgScale), coord = (wP*self.theme.lobbyKeyboardImgPos[0]+w*x, hP*self.theme.lobbyKeyboardImgPos[1]+h*y))
-            controlFont.render(lobby.controls[j], (self.theme.lobbyPanelSize[0]*self.theme.lobbyControlPos[0]+x, self.theme.lobbyPanelSize[1]*self.theme.lobbyControlPos[1]+y), scale = self.theme.lobbyControlScale, align = self.theme.lobbyControlAlign, new = True)
-            self.drawPartImage(lobby, lobby.types[j], scale = (self.theme.lobbyPartScale, -self.theme.lobbyPartScale), coord = (wP*self.theme.lobbyPartPos[0]+w*x, hP*self.theme.lobbyPartPos[1]+h*y))
-            #self.drawControlImage(lobby, lobby.types[j], scale = (self.theme.lobbyControlImgScale, -self.theme.lobbyControlImgScale), coord = (wP*self.theme.lobbyControlImgPos[0]+w*x, hP*self.theme.lobbyControlImgPos[1]+h*y))
-            panelNameFont.render(lobby.options[lobby.selected[j]].lower(), (x+w*self.theme.lobbyPanelNamePos[0], y+h*self.theme.lobbyPanelNamePos[1]), scale = self.theme.lobbyPanelNameScale, align = self.theme.lobbyPanelNameAlign, new = True)
+                drawImage(lobby.img_keyboard, scale=(self.theme.lobbyKeyboardImgScale, -self.theme.lobbyKeyboardImgScale), coord=(wP*self.theme.lobbyKeyboardImgPos[0]+w*x, hP*self.theme.lobbyKeyboardImgPos[1]+h*y))
+            controlFont.render(lobby.controls[j], (self.theme.lobbyPanelSize[0]*self.theme.lobbyControlPos[0]+x, self.theme.lobbyPanelSize[1]*self.theme.lobbyControlPos[1]+y), scale=self.theme.lobbyControlScale, align=self.theme.lobbyControlAlign)
+            self.drawPartImage(lobby, lobby.types[j], scale=(self.theme.lobbyPartScale, -self.theme.lobbyPartScale), coord=(wP*self.theme.lobbyPartPos[0]+w*x, hP*self.theme.lobbyPartPos[1]+h*y))
+            #self.drawControlImage(lobby, lobby.types[j], scale=(self.theme.lobbyControlImgScale, -self.theme.lobbyControlImgScale), coord=(wP*self.theme.lobbyControlImgPos[0]+w*x, hP*self.theme.lobbyControlImgPos[1]+h*y))
+            panelNameFont.render(lobby.options[lobby.selected[j]].lower(), (x+w*self.theme.lobbyPanelNamePos[0], y+h*self.theme.lobbyPanelNamePos[1]), scale=self.theme.lobbyPanelNameScale, align=self.theme.lobbyPanelNameAlign)
             for l, k in enumerate(range(lobby.pos[j][0], lobby.pos[j][1]+1)):
                 if k >= len(lobby.options):
                     break
                 if lobby.selected[j] == k and (j not in lobby.blockedPlayers or j in lobby.selectedPlayers):
                     if lobby.img_selected:
-                        drawImage(lobby.img_selected, scale = (.5, -.5), coord = (wP*.5+w*x, hP*(.46*.75)+h*y-(h*.04*l)/.75))
+                        drawImage(lobby.img_selected, scale=(.5, -.5), coord=(wP*.5+w*x, hP*(.46*.75)+h*y-(h*.04*l)/.75))
                     if lobby.avatars[k]:
-                        drawImage(lobby.avatars[k], scale = (lobby.avatarScale[k], -lobby.avatarScale[k]), coord = (wP*.5+w*x, hP*.7+h*y))
+                        drawImage(lobby.avatars[k], scale=(lobby.avatarScale[k], -lobby.avatarScale[k]), coord=(wP*.5+w*x, hP*.7+h*y))
                     elif k == 0 and lobby.img_newchar_av:
-                        drawImage(lobby.img_newchar_av, scale = (lobby.newCharAvScale, -lobby.newCharAvScale), coord = (wP*.5+w*x, hP*.7+h*y))
+                        drawImage(lobby.img_newchar_av, scale=(lobby.newCharAvScale, -lobby.newCharAvScale), coord=(wP*.5+w*x, hP*.7+h*y))
                     elif lobby.img_default_av:
-                        drawImage(lobby.img_default_av, scale = (lobby.defaultAvScale, -lobby.defaultAvScale), coord = (wP*.5+w*x, hP*.7+h*y))
+                        drawImage(lobby.img_default_av, scale=(lobby.defaultAvScale, -lobby.defaultAvScale), coord=(wP*.5+w*x, hP*.7+h*y))
                     glColor3f(*self.theme.lobbySelectedColor)
                 elif k in lobby.blockedItems or j in lobby.blockedPlayers:
                     glColor3f(*self.theme.lobbyDisabledColor)
@@ -893,29 +907,33 @@ class ThemeLobby:
                     glColor3f(*self.theme.lobbyOptionColor)
                 if k == 1:
                     if lobby.img_save_char:
-                        drawImage(lobby.img_save_char, scale = (.5, -.5), coord = (wP*.5+w*x, hP*(.46*.75)+h*y-(h*.04*l)/.75))
+                        drawImage(lobby.img_save_char, scale=(.5, -.5), coord=(wP*.5+w*x, hP*(.46*.75)+h*y-(h*.04*l)/.75))
                     else:
                         glColor3f(*self.theme.lobbySaveCharColor)
-                        lobby.fontDict[self.theme.lobbySaveCharFont].render(lobby.options[k], (self.theme.lobbyPanelSize[0]*self.theme.lobbyOptionPos[0]+x,self.theme.lobbyPanelSize[1]*self.theme.lobbyOptionPos[1]+y+self.theme.lobbyOptionSpace*l), scale = self.theme.lobbySaveCharScale, align = self.theme.lobbySaveCharAlign, new = True)
+                        lobby.fontDict[self.theme.lobbySaveCharFont].render(lobby.options[k], (self.theme.lobbyPanelSize[0]*self.theme.lobbyOptionPos[0]+x,self.theme.lobbyPanelSize[1]*self.theme.lobbyOptionPos[1]+y+self.theme.lobbyOptionSpace*l), scale=self.theme.lobbySaveCharScale, align=self.theme.lobbySaveCharAlign)
                 else:
-                    optionFont.render(lobby.options[k], (self.theme.lobbyPanelSize[0]*self.theme.lobbyOptionPos[0]+x,self.theme.lobbyPanelSize[1]*self.theme.lobbyOptionPos[1]+y+self.theme.lobbyOptionSpace*l), scale = self.theme.lobbyOptionScale, align = self.theme.lobbyOptionAlign, new = True)
+                    optionFont.render(lobby.options[k], (self.theme.lobbyPanelSize[0]*self.theme.lobbyOptionPos[0]+x,self.theme.lobbyPanelSize[1]*self.theme.lobbyOptionPos[1]+y+self.theme.lobbyOptionSpace*l), scale=self.theme.lobbyOptionScale, align=self.theme.lobbyOptionAlign)
             x += self.theme.lobbyPanelSpacing
+
 
 class ThemeParts:
     def __init__(self, theme):
         self.theme = theme
+
     def run(self, ticks):
         pass
+
     def drawPartImage(self, dialog, part, scale, coord):
         if part in [0, 2, 4, 5]:
             if dialog.partImages[part]:
-                drawImage(dialog.partImages[part], scale = scale, coord = coord)
+                drawImage(dialog.partImages[part], scale=scale, coord=coord)
         else:
             if dialog.partImages[part]:
-                drawImage(dialog.partImages[part], scale = scale, coord = coord)
+                drawImage(dialog.partImages[part], scale=scale, coord=coord)
             else:
                 if dialog.partImages[0]:
-                    drawImage(dialog.partImages[0], scale = scale, coord = coord)
+                    drawImage(dialog.partImages[0], scale=scale, coord=coord)
+
     def renderPanels(self, dialog):
         x = self.theme.partDiffPanelPos[0]
         y = self.theme.partDiffPanelPos[1]
@@ -923,49 +941,50 @@ class ThemeParts:
         font = dialog.fontDict['font']
         controlFont   = dialog.fontDict[self.theme.partDiffControlFont]
         panelNameFont = dialog.fontDict[self.theme.partDiffPanelNameFont]
-        wP = w*self.theme.partDiffPanelSize[0]
-        hP = h*self.theme.partDiffPanelSize[1]
+        wP = w * self.theme.partDiffPanelSize[0]
+        hP = h * self.theme.partDiffPanelSize[1]
         glColor3f(*self.theme.partDiffHeaderColor)
         dialog.engine.fadeScreen(-2.00)
         if self.theme.partDiffTitleText:
-            dialog.fontDict[self.theme.partDiffTitleTextFont].render(self.theme.partDiffTitleText, self.theme.partDiffTitleTextPos, scale = self.theme.partDiffTitleTextScale, align = self.theme.partDiffTitleTextAlign)
+            dialog.fontDict[self.theme.partDiffTitleTextFont].render(self.theme.partDiffTitleText, self.theme.partDiffTitleTextPos, scale=self.theme.partDiffTitleTextScale, align=self.theme.partDiffTitleTextAlign)
         if self.theme.partDiffSubtitleText:
-            dialog.fontDict[self.theme.partDiffSubtitleTextFont].render(self.theme.partDiffSubtitleText, self.theme.partDiffSubtitleTextPos, scale = self.theme.partDiffSubtitleTextScale, align = self.theme.partDiffSubtitleTextAlign)
+            dialog.fontDict[self.theme.partDiffSubtitleTextFont].render(self.theme.partDiffSubtitleText, self.theme.partDiffSubtitleTextPos, scale=self.theme.partDiffSubtitleTextScale, align=self.theme.partDiffSubtitleTextAlign)
         for i in range(len(dialog.players)):
             glColor3f(*self.theme.partDiffHeaderColor)
-            dialog.fontDict[self.theme.partDiffGameModeFont].render(dialog.gameModeText, self.theme.partDiffGameModePos, scale = self.theme.partDiffGameModeScale, align = self.theme.partDiffGameModeAlign)
+            dialog.fontDict[self.theme.partDiffGameModeFont].render(dialog.gameModeText, self.theme.partDiffGameModePos, scale=self.theme.partDiffGameModeScale, align=self.theme.partDiffGameModeAlign)
             if i == dialog.keyControl and dialog.img_keyboard_panel:
-                drawImage(dialog.img_keyboard_panel, scale = (self.theme.partDiffPanelSize[0], -self.theme.partDiffPanelSize[1]), coord = (wP*.5+w*x,hP*.5+h*y), stretched = FULL_SCREEN)
+                drawImage(dialog.img_keyboard_panel, scale=(self.theme.partDiffPanelSize[0], -self.theme.partDiffPanelSize[1]), coord=(wP*.5+w*x,hP*.5+h*y), stretched=FULL_SCREEN)
             elif dialog.img_panel:
-                drawImage(dialog.img_panel, scale = (self.theme.partDiffPanelSize[0], -self.theme.partDiffPanelSize[1]), coord = (wP*.5+w*x,hP*.5+h*y), stretched = FULL_SCREEN)
+                drawImage(dialog.img_panel, scale=(self.theme.partDiffPanelSize[0], -self.theme.partDiffPanelSize[1]), coord=(wP*.5+w*x,hP*.5+h*y), stretched=FULL_SCREEN)
             if i == dialog.keyControl and dialog.img_keyboard:
-                drawImage(dialog.img_keyboard, scale = (self.theme.partDiffKeyboardImgScale, -self.theme.partDiffKeyboardImgScale), coord = (wP*self.theme.partDiffKeyboardImgPos[0]+w*x, hP*self.theme.partDiffKeyboardImgPos[1]+h*y))
-            controlFont.render(dialog.players[i].name, (self.theme.partDiffPanelSize[0]*self.theme.partDiffControlPos[0]+x, self.theme.partDiffPanelSize[1]*self.theme.partDiffControlPos[1]+y), scale = self.theme.partDiffControlScale, align = self.theme.partDiffControlAlign, new = True)
-            panelNameFont.render(dialog.players[i].name.lower(), (x+w*self.theme.partDiffPanelNamePos[0], y+h*self.theme.partDiffPanelNamePos[1]), scale = self.theme.partDiffPanelNameScale, align = self.theme.partDiffPanelNameAlign, new = True)
+                drawImage(dialog.img_keyboard, scale=(self.theme.partDiffKeyboardImgScale, -self.theme.partDiffKeyboardImgScale), coord=(wP*self.theme.partDiffKeyboardImgPos[0]+w*x, hP*self.theme.partDiffKeyboardImgPos[1]+h*y))
+            controlFont.render(dialog.players[i].name, (self.theme.partDiffPanelSize[0]*self.theme.partDiffControlPos[0]+x, self.theme.partDiffPanelSize[1]*self.theme.partDiffControlPos[1]+y), scale=self.theme.partDiffControlScale, align=self.theme.partDiffControlAlign)
+            panelNameFont.render(dialog.players[i].name.lower(), (x+w*self.theme.partDiffPanelNamePos[0], y+h*self.theme.partDiffPanelNamePos[1]), scale=self.theme.partDiffPanelNameScale, align=self.theme.partDiffPanelNameAlign)
             if dialog.mode[i] == 0:
-                self.drawPartImage(dialog, dialog.parts[i][dialog.selected[i]].id, scale = (self.theme.partDiffPartScale, -self.theme.partDiffPartScale), coord = (wP*self.theme.partDiffPartPos[0]+w*x, hP*self.theme.partDiffPartPos[1]+h*y))
+                self.drawPartImage(dialog, dialog.parts[i][dialog.selected[i]].id, scale=(self.theme.partDiffPartScale, -self.theme.partDiffPartScale), coord=(wP*self.theme.partDiffPartPos[0]+w*x, hP*self.theme.partDiffPartPos[1]+h*y))
                 for p in range(len(dialog.parts[i])):
                     if dialog.selected[i] == p:
                         if dialog.img_selected:
-                            drawImage(dialog.img_selected, scale = (.5, -.5), coord = (wP*.5+w*x, hP*(.46*.75)+h*y-(h*.04*p)/.75))
+                            drawImage(dialog.img_selected, scale=(.5, -.5), coord=(wP*.5+w*x, hP*(.46*.75)+h*y-(h*.04*p)/.75))
                         glColor3f(*self.theme.partDiffSelectedColor)
                     else:
                         glColor3f(*self.theme.partDiffOptionColor)
-                    font.render(str(dialog.parts[i][p]), (.2*.5+x,.8*.46+y+.04*p), scale = .001, align = 1, new = True)
+                    font.render(str(dialog.parts[i][p]), (.2*.5+x,.8*.46+y+.04*p), scale=.001, align=1)
             elif dialog.mode[i] == 1:
-                self.drawPartImage(dialog, dialog.players[i].part.id, scale = (self.theme.partDiffPartScale, -self.theme.partDiffPartScale), coord = (wP*self.theme.partDiffPartPos[0]+w*x, hP*self.theme.partDiffPartPos[1]+h*y))
+                self.drawPartImage(dialog, dialog.players[i].part.id, scale=(self.theme.partDiffPartScale, -self.theme.partDiffPartScale), coord=(wP*self.theme.partDiffPartPos[0]+w*x, hP*self.theme.partDiffPartPos[1]+h*y))
                 for d in range(len(dialog.info.partDifficulties[dialog.players[i].part.id])):
                     if dialog.selected[i] == d:
                         if dialog.img_selected:
-                            drawImage(dialog.img_selected, scale = (.5, -.5), coord = (wP*.5+w*x, hP*(.46*.75)+h*y-(h*.04*d)/.75))
+                            drawImage(dialog.img_selected, scale=(.5, -.5), coord=(wP*.5+w*x, hP*(.46*.75)+h*y-(h*.04*d)/.75))
                         glColor3f(*self.theme.partDiffSelectedColor)
                     else:
                         glColor3f(*self.theme.partDiffOptionColor)
-                    font.render(str(dialog.info.partDifficulties[dialog.players[i].part.id][d]), (.2*.5+x,.8*.46+y+.04*d), scale = .001, align = 1, new = True)
+                    font.render(str(dialog.info.partDifficulties[dialog.players[i].part.id][d]), (.2*.5+x,.8*.46+y+.04*d), scale=.001, align=1)
                 if i in dialog.readyPlayers:
                     if dialog.img_ready:
-                        drawImage(dialog.img_ready, scale = (.5, -.5), coord = (wP*.5+w*x,hP*(.75*.46)+h*y))
+                        drawImage(dialog.img_ready, scale=(.5, -.5), coord=(wP*.5+w*x,hP*(.75*.46)+h*y))
             x += .24
+
 
 class Setlist:
     def __init__(self, theme):
@@ -985,7 +1004,7 @@ class Setlist:
             self.showLockedSongs = False
             self.showSortTiers = True
             self.selectTiers = False
-            self.itemSize = (0,.125)
+            self.itemSize = (0, .125)
         elif self.setlist_type == 1: #List mode
             self.setlistStyle = 1
             self.headerSkip = 2
@@ -1011,7 +1030,7 @@ class Setlist:
             self.showLockedSongs = False
             self.showSortTiers = True
             self.selectTiers = False
-            self.itemSize = (0,.125)
+            self.itemSize = (0, .125)
         else: #RB2 mode
             self.setlistStyle = 0
             self.headerSkip = 0
@@ -1024,7 +1043,7 @@ class Setlist:
             self.showLockedSongs = True
             self.showSortTiers = True
             self.selectTiers = False
-            self.itemSize = (0,.07)
+            self.itemSize = (0, .07)
 
         self.career_title_color = self.theme.career_title_colorVar
         self.song_name_text_color = self.theme.song_name_text_colorVar
@@ -1060,6 +1079,7 @@ class Setlist:
         w, h = scene.geometry
         font = scene.fontDict['songListFont']
         lfont = scene.fontDict['songListFont']
+        notesTotal, notesHit, noteStreak = -1, 0, 0
         if self.setlist_type == 0:
             return
         elif self.setlist_type == 1:
@@ -1067,61 +1087,59 @@ class Setlist:
                 return
             item = scene.items[i]
 
-            glColor4f(0,0,0,1)
+            glColor4f(0, 0, 0, 1)
             if isinstance(item, song.SongInfo) or isinstance(item, song.RandomSongInfo):
-                c1,c2,c3 = self.song_name_text_color
-                glColor3f(c1,c2,c3)
+                c1, c2, c3 = self.song_name_text_color
+                glColor3f(c1, c2, c3)
             elif isinstance(item, song.LibraryInfo):
-                c1,c2,c3 = self.library_text_color
-                glColor3f(c1,c2,c3)
+                c1, c2, c3 = self.library_text_color
+                glColor3f(c1, c2, c3)
             elif isinstance(item, song.TitleInfo) or isinstance(item, song.SortTitleInfo):
-                c1,c2,c3 = self.career_title_color
-                glColor3f(c1,c2,c3)
+                c1, c2, c3 = self.career_title_color
+                glColor3f(c1, c2, c3)
 
             text = item.name
 
             if isinstance(item, song.SongInfo) and item.getLocked(): #TODO: SongDB
                 text = _("-- Locked --")
 
-            if isinstance(item, song.SongInfo): #MFH - add indentation when tier sorting
+            if isinstance(item, song.SongInfo): # add indentation when tier sorting
                 if scene.tiersPresent:
                     text = "    " + text
 
             if isinstance(item, song.TitleInfo) or isinstance(item, song.SortTitleInfo):
                 text = string.upper(text)
 
-            scale = lfont.scaleText(text, maxwidth = 0.440)
+            scale = lfont.scaleText(text, maxwidth=0.440)
 
-            lfont.render(text, (self.song_list_xpos, .0925*(n+1)-.0375), scale = scale)
+            lfont.render(text, (self.song_list_xpos, .0925*(n+1)-.0375), scale=scale)
 
-
-            #MFH - Song list score / info display:
+            # Song list score / info display:
             if isinstance(item, song.SongInfo) and not item.getLocked():
                 scale = 0.0009
                 text = scene.scoreDifficulty.text
-                c1,c2,c3 = self.songlist_score_color
-                glColor3f(c1,c2,c3)
-                lfont.render(text, (self.song_listscore_xpos, .0925*(n+1)-.034), scale=scale, align = 2)
+                c1, c2, c3 = self.songlist_score_color
+                glColor3f(c1, c2, c3)
+                lfont.render(text, (self.song_listscore_xpos, .0925*(n+1)-.034), scale=scale, align=2)
                 if not item.frets == "":
-                    suffix = ", ("+item.frets+")"
+                    suffix = ", (%s)" % item.frets
                 else:
                     suffix = ""
 
                 if not item.year == "":
-                    yeartag = ", "+item.year
+                    yeartag = ", %s" % item.year
                 else:
                     yeartag = ""
 
-
                 scale = .0014
-                c1,c2,c3 = self.artist_text_color
-                glColor3f(c1,c2,c3)
+                c1, c2, c3 = self.artist_text_color
+                glColor3f(c1, c2, c3)
 
-                # evilynux - Force uppercase display for artist name
-                text = string.upper(item.artist)+suffix+yeartag
+                # Force uppercase display for artist name
+                text = string.upper(item.artist) + suffix + yeartag
 
-                # evilynux - automatically scale artist name and year
-                scale = lfont.scaleText(text, maxwidth = 0.440, scale = scale)
+                # automatically scale artist name and year
+                scale = lfont.scaleText(text, maxwidth=0.440, scale=scale)
                 if scale > .0014:
                     scale = .0014
 
@@ -1137,7 +1155,7 @@ class Setlist:
                     difficulties = []
                 for d in difficulties:
                     if d.id == scene.scoreDifficulty.id:
-                        scores = item.getHighscores(d, part = scene.scorePart)
+                        scores = item.getHighscores(d, part=scene.scorePart)
                         if scores:
                             score, stars, name, scoreExt = scores[0]
                             try:
@@ -1150,9 +1168,9 @@ class Setlist:
                         else:
                             score, stars, name = 0, 0, "---"
 
-                if score == _("Nil") and scene.nilShowNextScore:   #MFH
-                    for d in difficulties:   #MFH - just take the first valid difficulty you can find and display it.
-                        scores = item.getHighscores(d, part = scene.scorePart)
+                if score == _("Nil") and scene.nilShowNextScore:
+                    for d in difficulties:   # just take the first valid difficulty you can find and display it.
+                        scores = item.getHighscores(d, part=scene.scorePart)
                         if scores:
                             score, stars, name, scoreExt = scores[0]
                             try:
@@ -1168,65 +1186,65 @@ class Setlist:
                     else:
                         score, stars, name = _("Nil"), 0, "---"
 
-                starx = self.song_listscore_xpos+.01
-                stary = .0925*(n+1)-0.039
+                starx = self.song_listscore_xpos + .01
+                stary = .0925 * (n + 1) - 0.039
                 starscale = 0.03
                 stary = 1.0 - (stary / scene.fontScreenBottom)
-                scene.drawStarScore(w, h, starx, stary - h/2, stars, starscale, horiz_spacing = 1.0, hqStar = True) #MFH
+                scene.drawStarScore(w, h, starx, stary - h/2, stars, starscale, horiz_spacing=1.0, hqStar=True)
 
                 scale = 0.0014
-                # evilynux - score color
-                c1,c2,c3 = self.songlist_score_color
-                glColor3f(c1,c2,c3)
-                # evilynux - hit% and note streak only if enabled
+                # score color
+                c1, c2, c3 = self.songlist_score_color
+                glColor3f(c1, c2, c3)
+                # hit% and note streak only if enabled
                 if score is not _("Nil") and score > 0 and notesTotal != 0:
                     text = "%.1f%% (%d)" % ((float(notesHit) / notesTotal) * 100.0, noteStreak)
-                    lfont.render(text, (self.song_listscore_xpos+.1, .0925*(n+1)-.015), scale=scale, align = 2)
+                    lfont.render(text, (self.song_listscore_xpos+.1, .0925*(n+1)-.015), scale=scale, align=2)
 
                 text = str(score)
-                lfont.render(text, (self.song_listscore_xpos+.1, .0925*(n+1)+.0125), scale=scale*1.28, align = 2)
+                lfont.render(text, (self.song_listscore_xpos+.1, .0925*(n+1)+.0125), scale=scale*1.28, align=2)
 
         elif self.setlist_type == 2: #old list/cd
             if not scene.items:
                 return
             item = scene.items[i]
             if isinstance(item, song.SongInfo) or isinstance(item, song.RandomSongInfo):
-                c1,c2,c3 = self.song_name_text_color
-                glColor4f(c1,c2,c3,1)
+                c1, c2, c3 = self.song_name_text_color
+                glColor4f(c1, c2, c3, 1)
             if isinstance(item, song.LibraryInfo):
-                c1,c2,c3 = self.library_text_color
-                glColor4f(c1,c2,c3,1)
+                c1, c2, c3 = self.library_text_color
+                glColor4f(c1, c2, c3, 1)
             if isinstance(item, song.TitleInfo) or isinstance(item, song.SortTitleInfo):
-                c1,c2,c3 = self.career_title_color
-                glColor4f(c1,c2,c3,1)
+                c1, c2, c3 = self.career_title_color
+                glColor4f(c1, c2, c3, 1)
             text = item.name
             if isinstance(item, song.SongInfo) and item.getLocked():
                 text = _("-- Locked --")
-            if isinstance(item, song.SongInfo): #MFH - add indentation when tier sorting
+            if isinstance(item, song.SongInfo): # add indentation when tier sorting
                 if scene.tiersPresent:
                     text = "    " + text
             if isinstance(item, song.TitleInfo) or isinstance(item, song.SortTitleInfo):
                 text = string.upper(text)
-            scale = font.scaleText(text, maxwidth = 0.45)
-            font.render(text, (self.song_listcd_list_xpos, .09*(n+1)), scale = scale)
+            scale = font.scaleText(text, maxwidth=0.45)
+            font.render(text, (self.song_listcd_list_xpos, .09*(n+1)), scale=scale)
             if isinstance(item, song.SongInfo) and not item.getLocked():
                 if item.frets != "":
-                    suffix = ", ("+item.frets+")"
+                    suffix = ", (%s)" % item.frets
                 else:
                     suffix = ""
 
                 if item.year != "":
-                    yeartag = ", "+item.year
+                    yeartag = ", %s" % item.year
                 else:
                     yeartag = ""
 
                 scale = .0014
-                c1,c2,c3 = self.artist_text_color
-                glColor4f(c1,c2,c3,1)
+                c1, c2, c3 = self.artist_text_color
+                glColor4f(c1, c2, c3, 1)
 
-                text = string.upper(item.artist)+suffix+yeartag
+                text = string.upper(item.artist) + suffix + yeartag
 
-                scale = font.scaleText(text, maxwidth = 0.4, scale = scale)
+                scale = font.scaleText(text, maxwidth=0.4, scale=scale)
                 font.render(text, (self.song_listcd_list_xpos + .05, .09*(n+1)+.05), scale=scale)
         elif self.setlist_type == 3: #old rb2
             font = scene.fontDict['songListFont']
@@ -1237,10 +1255,10 @@ class Setlist:
             if scene.img_tier:
                 imgwidth = scene.img_tier.width1()
                 imgheight = scene.img_tier.height1()
-                wfactor = 381.1/imgwidth
-                hfactor = 24.000/imgheight
+                wfactor = 381.1 / imgwidth
+                hfactor = 24.000 / imgheight
                 if isinstance(item, song.TitleInfo) or isinstance(item, song.SortTitleInfo) and scene.img_tier:
-                    drawImage(scene.img_tier, scale = (wfactor,-hfactor), coord = (w/1.587, h-((0.055*h)*(n+1))-(0.219*h)))
+                    drawImage(scene.img_tier, scale=(wfactor,-hfactor), coord=(w/1.587, h-((0.055*h)*(n+1))-(0.219*h)))
 
             icon = None
             if isinstance(item, song.SongInfo):
@@ -1248,8 +1266,8 @@ class Setlist:
                     try:
                         icon = scene.itemIcons[item.icon]
                         imgwidth = icon.width1()
-                        wfactor = 23.000/imgwidth
-                        drawImage(icon, scale = (wfactor,-wfactor), coord = (w/2.86, h-((0.055*h)*(n+1))-(0.219*h)))
+                        wfactor = 23.000 / imgwidth
+                        drawImage(icon, scale=(wfactor,-wfactor), coord=(w/2.86, h-((0.055*h)*(n+1))-(0.219*h)))
                     except KeyError:
                         pass
             elif isinstance(item, song.LibraryInfo):
@@ -1257,57 +1275,54 @@ class Setlist:
                     icon = scene.itemIcons["Library"]
                     imgwidth = icon.width1()
                     wfactor = 23.000/imgwidth
-                    drawImage(icon, scale = (wfactor,-wfactor), coord = (w/2.86, h-((0.055*h)*(n+1))-(0.219*h)))
+                    drawImage(icon, scale=(wfactor,-wfactor), coord=(w/2.86, h-((0.055*h)*(n+1))-(0.219*h)))
                 except KeyError:
                     pass
             elif isinstance(item, song.RandomSongInfo):
                 try:
                     icon = scene.itemIcons["Random"]
                     imgwidth = icon.width1()
-                    wfactor = 23.000/imgwidth
-                    drawImage(icon, scale = (wfactor,-wfactor), coord = (w/2.86, h-((0.055*h)*(n+1))-(0.219*h)))
+                    wfactor = 23.000 / imgwidth
+                    drawImage(icon, scale=(wfactor,-wfactor), coord=(w/2.86, h-((0.055*h)*(n+1))-(0.219*h)))
                 except KeyError:
                     pass
 
             if isinstance(item, song.SongInfo) or isinstance(item, song.LibraryInfo):
-                c1,c2,c3 = self.song_name_text_color
-                glColor4f(c1,c2,c3,1)
+                c1, c2, c3 = self.song_name_text_color
+                glColor4f(c1, c2, c3, 1)
             elif isinstance(item, song.TitleInfo) or isinstance(item, song.SortTitleInfo):
-                c1,c2,c3 = self.career_title_color
-                glColor4f(c1,c2,c3,1)
+                c1, c2, c3 = self.career_title_color
+                glColor4f(c1, c2, c3, 1)
             elif isinstance(item, song.RandomSongInfo):
-                c1,c2,c3 = self.song_name_text_color
-                glColor4f(c1,c2,c3,1)
+                c1, c2, c3 = self.song_name_text_color
+                glColor4f(c1, c2, c3, 1)
 
             text = item.name
-
 
             if isinstance(item, song.SongInfo) and item.getLocked():
                 text = _("-- Locked --")
 
-            if isinstance(item, song.SongInfo): #MFH - add indentation when tier sorting
+            if isinstance(item, song.SongInfo): # add indentation when tier sorting
                 if scene.tiersPresent or icon:
                     text = "    " + text
 
-
-            # evilynux - Force uppercase display for Career titles
+            # Force uppercase display for Career titles
             maxwidth = .55
 
             if isinstance(item, song.TitleInfo) or isinstance(item, song.SortTitleInfo):
                 text = string.upper(text)
 
             scale = .0015
-            wt, ht = font.getStringSize(text, scale = scale)
+            wt, ht = font.getStringSize(text, scale=scale)
 
             while wt > maxwidth:
                 tlength = len(text) - 4
                 text = text[:tlength] + "..."
-                wt, ht = font.getStringSize(text, scale = scale)
+                wt, ht = font.getStringSize(text, scale=scale)
                 if wt < .45:
                     break
 
-
-            font.render(text, (.35, .0413*(n+1)+.15), scale = scale)
+            font.render(text, (.35, .0413*(n+1)+.15), scale=scale)
 
             if isinstance(item, song.SongInfo):
                 score = _("Nil")
@@ -1322,7 +1337,7 @@ class Setlist:
                         difficulties = []
                     for d in difficulties:
                         if d.id == scene.scoreDifficulty.id:
-                            scores = item.getHighscores(d, part = scene.scorePart)
+                            scores = item.getHighscores(d, part=scene.scorePart)
                             if scores:
                                 score, stars, name, scoreExt = scores[0]
                                 try:
@@ -1336,9 +1351,9 @@ class Setlist:
                             else:
                                 score, stars, name = 0, 0, "---"
 
-                    if score == _("Nil") and scene.nilShowNextScore:   #MFH
-                        for d in difficulties:   #MFH - just take the first valid difficulty you can find and display it.
-                            scores = item.getHighscores(d, part = scene.scorePart)
+                    if score == _("Nil") and scene.nilShowNextScore:
+                        for d in difficulties:   # just take the first valid difficulty you can find and display it.
+                            scores = item.getHighscores(d, part=scene.scorePart)
                             if scores:
                                 score, stars, name, scoreExt = scores[0]
                                 try:
@@ -1351,15 +1366,15 @@ class Setlist:
                         else:
                             score, stars, name = _("Nil"), 0, "---"
 
-                    #evilynux - hit% and note streak if enabled
+                    # hit% and note streak if enabled
                     scale = 0.0009
                     if score is not _("Nil") and score > 0 and notesTotal != 0:
                         text = "%.1f%% (%d)" % ((float(notesHit) / notesTotal) * 100.0, noteStreak)
-                        font.render(text, (.92, .0413*(n+1)+.163), scale=scale, align = 2)
+                        font.render(text, (.92, .0413*(n+1)+.163), scale=scale, align=2)
 
                     text = str(score)
 
-                    font.render(text, (.92, .0413*(n+1)+.15), scale=scale, align = 2)
+                    font.render(text, (.92, .0413*(n+1)+.15), scale=scale, align=2)
 
     def renderSelectedItem(self, scene, n):
 
@@ -1370,6 +1385,7 @@ class Setlist:
         lfont = scene.fontDict['songListFont']
         sfont = scene.fontDict['shadowFont']
         item = scene.selectedItem
+        notesTotal, notesHit, noteStreak = -1, 0, 0
         if not item:
             return
         if isinstance(item, song.BlankSpaceInfo):
@@ -1379,63 +1395,61 @@ class Setlist:
         elif self.setlist_type == 1:
             y = h*(.88-(.125*n))
             if scene.img_item_select:
-                wfactor = scene.img_item_select.widthf(pixelw = 635.000)
-                drawImage(scene.img_item_select, scale = (wfactor,-wfactor), coord = (w/2.1, y))
-            glColor4f(0,0,0,1)
+                wfactor = scene.img_item_select.widthf(pixelw=635.000)
+                drawImage(scene.img_item_select, scale=(wfactor,-wfactor), coord=(w/2.1, y))
+            glColor4f(0, 0, 0, 1)
             if isinstance(item, song.SongInfo) or isinstance(item, song.RandomSongInfo):
-                c1,c2,c3 = self.song_name_selected_color
-                glColor3f(c1,c2,c3)
+                c1, c2, c3 = self.song_name_selected_color
+                glColor3f(c1, c2, c3)
             elif isinstance(item, song.LibraryInfo):
-                c1,c2,c3 = self.library_selected_color
-                glColor3f(c1,c2,c3)
+                c1, c2, c3 = self.library_selected_color
+                glColor3f(c1, c2, c3)
             elif isinstance(item, song.TitleInfo) or isinstance(item, song.SortTitleInfo):
-                c1,c2,c3 = self.career_title_color
-                glColor3f(c1,c2,c3)
+                c1, c2, c3 = self.career_title_color
+                glColor3f(c1, c2, c3)
 
             text = item.name
 
             if isinstance(item, song.SongInfo) and item.getLocked(): #TODO: SongDB
                 text = _("-- Locked --")
 
-            if isinstance(item, song.SongInfo): #MFH - add indentation when tier sorting
+            if isinstance(item, song.SongInfo): # add indentation when tier sorting
                 if scene.tiersPresent:
                     text = "    " + text
 
             if isinstance(item, song.TitleInfo) or isinstance(item, song.SortTitleInfo):
                 text = string.upper(text)
 
-            scale = sfont.scaleText(text, maxwidth = 0.440)
+            scale = sfont.scaleText(text, maxwidth=0.440)
 
-            sfont.render(text, (self.song_list_xpos, .0925*(n+1)-.0375), scale = scale)
+            sfont.render(text, (self.song_list_xpos, .0925*(n+1)-.0375), scale=scale)
 
-
-            #MFH - Song list score / info display:
+            # Song list score / info display
             if isinstance(item, song.SongInfo) and not item.getLocked():
                 scale = 0.0009
                 text = scene.scoreDifficulty.text
-                c1,c2,c3 = self.songlist_score_color
-                glColor3f(c1,c2,c3)
-                lfont.render(text, (self.song_listscore_xpos, .0925*(n+1)-.034), scale=scale, align = 2)
+                c1, c2, c3 = self.songlist_score_color
+                glColor3f(c1, c2, c3)
+                lfont.render(text, (self.song_listscore_xpos, .0925*(n+1)-.034), scale=scale, align=2)
                 if item.frets != "":
-                    suffix = ", ("+item.frets+")"
+                    suffix = ", (%s)" % item.frets
                 else:
                     suffix = ""
 
                 if item.year != "":
-                    yeartag = ", "+item.year
+                    yeartag = ", %s" % item.year
                 else:
                     yeartag = ""
 
-
                 scale = .0014
-                c1,c2,c3 = self.artist_selected_color
-                glColor3f(c1,c2,c3)
+                c1, c2, c3 = self.artist_selected_color
+                glColor3f(c1, c2, c3)
 
-                # evilynux - Force uppercase display for artist name
-                text = string.upper(item.artist)+suffix+yeartag
+                # Force uppercase display for artist name
+                text = string.upper(item.artist) + suffix + yeartag
 
-                # evilynux - automatically scale artist name and year
-                scale = lfont.scaleText(text, maxwidth = 0.440, scale = scale)
+                # automatically scale artist name and year
+                scale = lfont.scaleText(text, maxwidth=0.440, scale=scale)
                 if scale > .0014:
                     scale = .0014
 
@@ -1451,7 +1465,7 @@ class Setlist:
                     difficulties = []
                 for d in difficulties:
                     if d.id == scene.scoreDifficulty.id:
-                        scores = item.getHighscores(d, part = scene.scorePart)
+                        scores = item.getHighscores(d, part=scene.scorePart)
                         if scores:
                             score, stars, name, scoreExt = scores[0]
                             try:
@@ -1464,8 +1478,8 @@ class Setlist:
                         else:
                             score, stars, name = 0, 0, "---"
 
-                if score == _("Nil") and scene.nilShowNextScore:   #MFH
-                    for d in difficulties:   #MFH - just take the first valid difficulty you can find and display it.
+                if score == _("Nil") and scene.nilShowNextScore:
+                    for d in difficulties:   # just take the first valid difficulty you can find and display it.
                         scores = item.getHighscores(d, part = scene.scorePart)
                         if scores:
                             score, stars, name, scoreExt = scores[0]
@@ -1482,37 +1496,37 @@ class Setlist:
                     else:
                         score, stars, name = _("Nil"), 0, "---"
 
-                starx = self.song_listscore_xpos+.01
-                stary = .0925*(n+1)-0.039
+                starx = self.song_listscore_xpos + .01
+                stary = .0925 * (n + 1) - 0.039
                 starscale = 0.03
                 stary = 1.0 - (stary / scene.fontScreenBottom)
-                scene.drawStarScore(w, h, starx, stary - h/2, stars, starscale, horiz_spacing = 1.0, hqStar = True) #MFH
+                scene.drawStarScore(w, h, starx, stary - h/2, stars, starscale, horiz_spacing = 1.0, hqStar=True)
 
                 scale = 0.0014
-                # evilynux - score color
-                c1,c2,c3 = self.songlist_score_color
-                glColor3f(c1,c2,c3)
-                # evilynux - hit% and note streak only if enabled
+                #  score color
+                c1, c2, c3 = self.songlist_score_color
+                glColor3f(c1, c2, c3)
+                # hit% and note streak only if enabled
                 if score is not _("Nil") and score > 0 and notesTotal != 0:
                     text = "%.1f%% (%d)" % ((float(notesHit) / notesTotal) * 100.0, noteStreak)
-                    lfont.render(text, (self.song_listscore_xpos+.1, .0925*(n+1)-.015), scale=scale, align = 2)
+                    lfont.render(text, (self.song_listscore_xpos+.1, .0925*(n+1)-.015), scale=scale, align=2)
 
                 text = str(score)
-                lfont.render(text, (self.song_listscore_xpos+.1, .0925*(n+1)+.0125), scale=scale*1.28, align = 2)
+                lfont.render(text, (self.song_listscore_xpos+.1, .0925*(n+1)+.0125), scale=scale*1.28, align=2)
         elif self.setlist_type == 2:
-            y = h*(.87-(.1*n))
-            glColor4f(1,1,1,1)
+            y = h * (.87 - (.1 * n))
+            glColor4f(1, 1, 1, 1)
             if scene.img_selected:
                 imgwidth = scene.img_selected.width1()
-                drawImage(scene.img_selected, scale = (1, -1), coord = (self.song_listcd_list_xpos * w + (imgwidth*.64/2), y*1.2-h*.215))
+                drawImage(scene.img_selected, scale=(1, -1), coord=(self.song_listcd_list_xpos * w + (imgwidth*.64/2), y*1.2-h*.215))
             text = scene.library
             font.render(text, (.05, .01))
             if scene.songLoader:
-                font.render(_("Loading Preview..."), (.05, .7), scale = 0.001)
+                font.render(_("Loading Preview..."), (.05, .7), scale=0.001)
 
             if isinstance(item, song.SongInfo):
-                c1,c2,c3 = self.song_name_selected_color
-                glColor4f(c1,c2,c3,1)
+                c1, c2, c3 = self.song_name_selected_color
+                glColor4f(c1, c2, c3, 1)
                 if item.getLocked():
                     text = item.getUnlockText()
                 elif scene.careerMode and not item.completed:
@@ -1528,8 +1542,8 @@ class Setlist:
                 else:
                     text = _("Quickplay")
             elif isinstance(item, song.LibraryInfo):
-                c1,c2,c3 = self.library_selected_color
-                glColor4f(c1,c2,c3,1)
+                c1, c2, c3 = self.library_selected_color
+                glColor4f(c1, c2, c3, 1)
                 if item.songCount == 1:
                     text = _("There Is 1 Song In This Setlist.")
                 elif item.songCount > 1:
@@ -1538,76 +1552,75 @@ class Setlist:
                     text = ""
             elif isinstance(item, song.TitleInfo) or isinstance(item, song.SortTitleInfo):
                 text = _("Tier")
-                c1,c2,c3 = self.career_title_color
-                glColor4f(c1,c2,c3,1)
+                c1, c2, c3 = self.career_title_color
+                glColor4f(c1, c2, c3, 1)
             elif isinstance(item, song.RandomSongInfo):
                 text = _("Random Song")
-                c1,c2,c3 = self.song_name_selected_color
-                glColor4f(c1,c2,c3,1)
+                c1, c2, c3 = self.song_name_selected_color
+                glColor4f(c1, c2, c3, 1)
 
-            font.render(text, (self.song_listcd_score_xpos, .085), scale = 0.0012)
+            font.render(text, (self.song_listcd_score_xpos, .085), scale=0.0012)
 
             if isinstance(item, song.SongInfo) or isinstance(item, song.RandomSongInfo):
-                c1,c2,c3 = self.song_name_selected_color
-                glColor4f(c1,c2,c3,1)
+                c1, c2, c3 = self.song_name_selected_color
+                glColor4f(c1, c2, c3, 1)
             elif isinstance(item, song.LibraryInfo):
-                c1,c2,c3 = self.library_selected_color
-                glColor4f(c1,c2,c3,1)
+                c1, c2, c3 = self.library_selected_color
+                glColor4f(c1, c2, c3, 1)
             elif isinstance(item, song.TitleInfo) or isinstance(item, song.SortTitleInfo):
-                c1,c2,c3 = self.career_title_color
-                glColor4f(c1,c2,c3,1)
+                c1, c2, c3 = self.career_title_color
+                glColor4f(c1, c2, c3, 1)
             text = item.name
             if isinstance(item, song.SongInfo) and item.getLocked():
                 text = _("-- Locked --")
 
-            if isinstance(item, song.SongInfo): #MFH - add indentation when tier sorting
+            if isinstance(item, song.SongInfo): # add indentation when tier sorting
                 if scene.tiersPresent:
                     text = "    " + text
 
             elif isinstance(item, song.TitleInfo) or isinstance(item, song.SortTitleInfo):
                 text = string.upper(text)
 
-            scale = font.scaleText(text, maxwidth = 0.45)
-            font.render(text, (self.song_listcd_list_xpos, .09*(n+1)), scale = scale)
+            scale = font.scaleText(text, maxwidth=0.45)
+            font.render(text, (self.song_listcd_list_xpos, .09*(n+1)), scale=scale)
 
             if isinstance(item, song.SongInfo) and not item.getLocked():
                 if item.frets != "":
-                    suffix = ", ("+item.frets+")"
+                    suffix = ", (%s)" % item.frets
                 else:
                     suffix = ""
 
                 if item.year != "":
-                    yeartag = ", "+item.year
+                    yeartag = ", %s" % item.year
                 else:
                     yeartag = ""
 
                 scale = .0014
-                c1,c2,c3 = self.artist_selected_color
-                glColor4f(c1,c2,c3,1)
-                text = string.upper(item.artist)+suffix+yeartag
+                c1, c2, c3 = self.artist_selected_color
+                glColor4f(c1, c2, c3, 1)
+                text = string.upper(item.artist) + suffix + yeartag
 
-                scale = font.scaleText(text, maxwidth = 0.4, scale = scale)
+                scale = font.scaleText(text, maxwidth=0.4, scale=scale)
                 font.render(text, (self.song_listcd_list_xpos + .05, .09*(n+1)+.05), scale=scale)
 
         elif self.setlist_type == 3:
-            y = h*(.7825-(.0459*(n)))
+            y = h * (.7825 - (.0459 * n))
 
             if scene.img_tier:
                 imgwidth = scene.img_tier.width1()
                 imgheight = scene.img_tier.height1()
-                wfactor = 381.1/imgwidth
-                hfactor = 24.000/imgheight
+                wfactor = 381.1 / imgwidth
+                hfactor = 24.000 / imgheight
                 if isinstance(item, song.TitleInfo) or isinstance(item, song.SortTitleInfo):
-                    drawImage(scene.img_tier, scale = (wfactor,-hfactor), coord = (w/1.587, h-((0.055*h)*(n+1))-(0.219*h)))
+                    drawImage(scene.img_tier, scale=(wfactor,-hfactor), coord=(w/1.587, h-((0.055*h)*(n+1))-(0.219*h)))
 
             if scene.img_selected:
                 imgwidth = scene.img_selected.width1()
                 imgheight = scene.img_selected.height1()
-                wfactor = 381.5/imgwidth
-                hfactor = 36.000/imgheight
+                wfactor = 381.5 / imgwidth
+                hfactor = 36.000 / imgheight
 
-                drawImage(scene.img_selected, scale = (wfactor,-hfactor), coord = (w/1.587, y*1.2-h*.213))
-
+                drawImage(scene.img_selected, scale=(wfactor,-hfactor), coord=(w/1.587, y*1.2-h*.213))
 
             icon = None
             if isinstance(item, song.SongInfo):
@@ -1615,13 +1628,13 @@ class Setlist:
                     try:
                         icon = scene.itemIcons[item.icon]
                         imgwidth = icon.width1()
-                        wfactor = 23.000/imgwidth
-                        drawImage(icon, scale = (wfactor,-wfactor), coord = (w/2.86, h-((0.055*h)*(n+1))-(0.219*h)))
+                        wfactor = 23.000 / imgwidth
+                        drawImage(icon, scale=(wfactor,-wfactor), coord=(w/2.86, h-((0.055*h)*(n+1))-(0.219*h)))
                     except KeyError:
                         pass
 
-                c1,c2,c3 = self.song_name_selected_color
-                glColor3f(c1,c2,c3)
+                c1, c2, c3 = self.song_name_selected_color
+                glColor3f(c1, c2, c3)
                 if item.getLocked():
                     text = item.getUnlockText()
                 elif scene.careerMode and not item.completed:
@@ -1640,12 +1653,12 @@ class Setlist:
                 try:
                     icon = scene.itemIcons["Library"]
                     imgwidth = icon.width1()
-                    wfactor = 23.000/imgwidth
-                    drawImage(icon, scale = (wfactor,-wfactor), coord = (w/2.86, h-((0.055*h)*(n+1))-(0.219*h)))
+                    wfactor = 23.000 / imgwidth
+                    drawImage(icon, scale=(wfactor,-wfactor), coord=(w/2.86, h-((0.055*h)*(n+1))-(0.219*h)))
                 except KeyError:
                     pass
-                c1,c2,c3 = self.library_selected_color
-                glColor3f(c1,c2,c3)
+                c1, c2, c3 = self.library_selected_color
+                glColor3f(c1, c2, c3)
                 if item.songCount == 1:
                     text = _("There Is 1 Song In This Setlist.")
                 elif item.songCount > 1:
@@ -1654,57 +1667,55 @@ class Setlist:
                     text = ""
             elif isinstance(item, song.TitleInfo) or isinstance(item, song.SortTitleInfo):
                 text = _("Tier")
-                c1,c2,c3 = self.career_title_color
-                glColor3f(c1,c2,c3)
+                c1, c2, c3 = self.career_title_color
+                glColor3f(c1, c2, c3)
             elif isinstance(item, song.RandomSongInfo):
                 try:
                     icon = scene.itemIcons["Random"]
                     imgwidth = icon.width1()
-                    wfactor = 23.000/imgwidth
-                    drawImage(icon, scale = (wfactor,-wfactor), coord = (w/2.86, h-((0.055*h)*(n+1))-(0.219*h)))
+                    wfactor = 23.000 / imgwidth
+                    drawImage(icon, scale=(wfactor,-wfactor), coord=(w/2.86, h-((0.055*h)*(n+1))-(0.219*h)))
                 except KeyError:
                     pass
                 text = _("Random Song")
-                c1,c2,c3 = self.career_title_color
-                glColor3f(c1,c2,c3)
+                c1, c2, c3 = self.career_title_color
+                glColor3f(c1, c2, c3)
 
-            font.render(text, (0.92, .13), scale = 0.0012, align = 2)
+            font.render(text, (0.92, .13), scale=0.0012, align=2)
 
             maxwidth = .45
             if isinstance(item, song.SongInfo) or isinstance(item, song.LibraryInfo) or isinstance(item, song.RandomSongInfo):
-                c1,c2,c3 = self.song_name_selected_color
-                glColor4f(c1,c2,c3,1)
+                c1, c2, c3 = self.song_name_selected_color
+                glColor4f(c1, c2, c3, 1)
             if isinstance(item, song.TitleInfo) or isinstance(item, song.SortTitleInfo):
-                c1,c2,c3 = self.career_title_color
-                glColor4f(c1,c2,c3,1)
+                c1, c2, c3 = self.career_title_color
+                glColor4f(c1, c2, c3, 1)
 
             text = item.name
 
             if isinstance(item, song.SongInfo) and item.getLocked():
                 text = _("-- Locked --")
 
-            if isinstance(item, song.SongInfo): #MFH - add indentation when tier sorting
+            if isinstance(item, song.SongInfo): # add indentation when tier sorting
                 if scene.tiersPresent or icon:
                     text = "    " + text
 
-
-            # evilynux - Force uppercase display for Career titles
+            # Force uppercase display for Career titles
             if isinstance(item, song.TitleInfo) or isinstance(item, song.SortTitleInfo):
                 maxwidth = .55
                 text = string.upper(text)
 
             scale = .0015
-            wt, ht = font.getStringSize(text, scale = scale)
+            wt, ht = font.getStringSize(text, scale=scale)
 
             while wt > maxwidth:
                 tlength = len(text) - 4
                 text = text[:tlength] + "..."
-                wt, ht = font.getStringSize(text, scale = scale)
+                wt, ht = font.getStringSize(text, scale=scale)
                 if wt < .45:
                     break
 
-
-            font.render(text, (.35, .0413*(n+1)+.15), scale = scale) #add theme option for song_listCD_xpos
+            font.render(text, (.35, .0413*(n+1)+.15), scale=scale) #add theme option for song_listCD_xpos
 
             if isinstance(item, song.SongInfo):
                 score = _("Nil")
@@ -1719,7 +1730,7 @@ class Setlist:
                         difficulties = []
                     for d in difficulties:
                         if d.id == scene.scoreDifficulty.id:
-                            scores = item.getHighscores(d, part = scene.scorePart)
+                            scores = item.getHighscores(d, part=scene.scorePart)
                             if scores:
                                 score, stars, name, scoreExt = scores[0]
                                 try:
@@ -1733,9 +1744,9 @@ class Setlist:
                             else:
                                 score, stars, name = 0, 0, "---"
 
-                    if score == _("Nil") and scene.nilShowNextScore:   #MFH
-                        for d in difficulties:   #MFH - just take the first valid difficulty you can find and display it.
-                            scores = item.getHighscores(d, part = scene.scorePart)
+                    if score == _("Nil") and scene.nilShowNextScore:
+                        for d in difficulties:   # just take the first valid difficulty you can find and display it.
+                            scores = item.getHighscores(d, part=scene.scorePart)
                             if scores:
                                 score, stars, name, scoreExt = scores[0]
                                 try:
@@ -1752,11 +1763,11 @@ class Setlist:
                     if score is not _("Nil") and score > 0 and notesTotal != 0:
                         text = "%.1f%% (%d)" % ((float(notesHit) / notesTotal) * 100.0, noteStreak)
                         w, h = font.getStringSize(text, scale=scale)
-                        font.render(text, (.92, .0413*(n+1)+.163), scale=scale, align = 2)
+                        font.render(text, (.92, .0413*(n+1)+.163), scale=scale, align=2)
 
                     text = str(score)
 
-                    font.render(text, (.92, .0413*(n+1)+.15), scale=scale, align = 2)
+                    font.render(text, (.92, .0413*(n+1)+.15), scale=scale, align=2)
 
     def renderItem(self, scene, color, label):
 
@@ -1938,7 +1949,7 @@ class Setlist:
                             glRotate(scene.itemRenderAngles[i], 0, 0, 1)
                             self.renderItem(scene, item.cassetteColor, label)
                         elif isinstance(item, song.LibraryInfo):
-                            #myfingershurt: cd cases are backwards
+                            # cd cases are backwards
                             glRotate(-scene.itemRenderAngles[i], 0, 1, 0)    #spin 90 degrees around y axis
                             glRotate(-scene.itemRenderAngles[i], 0, 1, 0)    #spin 90 degrees around y axis again, now case is corrected
                             glRotate(-scene.itemRenderAngles[i], 0, 0, 1)    #bring cd case up for viewing
@@ -1946,7 +1957,7 @@ class Setlist:
                                 glRotate(((scene.time - scene.lastTime) * 4 % 360) - 90, 1, 0, 0)
                             self.renderLibrary(scene, item.color, label)
                         elif isinstance(item, song.TitleInfo):
-                            #myfingershurt: cd cases are backwards
+                            # cd cases are backwards
                             glRotate(-scene.itemRenderAngles[i], 0, 0.5, 0)    #spin 90 degrees around y axis
                             glRotate(-scene.itemRenderAngles[i], 0, 0.5, 0)    #spin 90 degrees around y axis again, now case is corrected
                             glRotate(-scene.itemRenderAngles[i], 0, 0, 0.5)    #bring cd case up for viewing
@@ -1954,13 +1965,13 @@ class Setlist:
                                 glRotate(((scene.time - scene.lastTime) * 4 % 360) - 90, 1, 0, 0)
                             self.renderTitle(scene, item.color, label)
                         elif isinstance(item, song.RandomSongInfo):
-                            #myfingershurt: cd cases are backwards
+                            # cd cases are backwards
                             glRotate(scene.itemRenderAngles[i], 0, 0, 1)
                             self.renderRandom(scene, item.color, label)
                     glPopMatrix()
 
                     glTranslatef(0, -h/2, 0)
-                    y+= h
+                    y += h
                 glDisable(GL_DEPTH_TEST)
                 glDisable(GL_CULL_FACE)
                 glDepthMask(0)
@@ -1988,14 +1999,12 @@ class Setlist:
 
                 offset = 0
                 if scene.time < 40:
-                    offset = 10*((40 - scene.time)/40.0)**4
+                    offset = 10 * ((40 - scene.time) / 40.0)**4
                 scene.camera.origin = (-9,(5.196/scene.aspectRatio) - (5.196*2/scene.aspectRatio)*self.song_listcd_cd_ypos,(5.196*scene.aspectRatio)-(5.196*2*scene.aspectRatio)*self.song_listcd_cd_xpos)
                 scene.camera.target = ( 0,(5.196/scene.aspectRatio) - (5.196*2/scene.aspectRatio)*self.song_listcd_cd_ypos,(5.196*scene.aspectRatio)-(5.196*2*scene.aspectRatio)*self.song_listcd_cd_xpos)
                 scene.camera.apply()
 
                 y = 0.0
-
-
 
                 glPushMatrix()
                 item = scene.selectedItem
@@ -2047,7 +2056,7 @@ class Setlist:
             self.theme.setBaseColor(1)
         elif self.setlist_type == 3:
             w, h = scene.geometry
-            item  = scene.items[scene.selectedIndex]
+            item = scene.items[scene.selectedIndex]
             i = scene.selectedIndex
             img = None
             lockImg = None
@@ -2055,33 +2064,33 @@ class Setlist:
                 if scene.img_random_label:
                     img = scene.img_random_label
                     imgwidth = img.width1()
-                    wfactor = 155.000/imgwidth
+                    wfactor = 155.000 / imgwidth
                 elif scene.img_empty_label:
                     img = scene.img_empty_label
                     imgwidth = img.width1()
-                    wfactor = 155.000/imgwidth
+                    wfactor = 155.000 / imgwidth
             elif not scene.itemLabels[i]:
                 if scene.img_empty_label is not None:
                     imgwidth = scene.img_empty_label.width1()
-                    wfactor = 155.000/imgwidth
+                    wfactor = 155.000 / imgwidth
                     img = scene.img_empty_label
             elif scene.itemLabels[i]:
                 img = scene.itemLabels[i]
                 imgwidth = img.width1()
-                wfactor = 155.000/imgwidth
+                wfactor = 155.000 / imgwidth
             if isinstance(item, song.SongInfo) and item.getLocked():
                 if scene.img_locked_label:
                     imgwidth = scene.img_locked_label.width1()
-                    wfactor2 = 155.000/imgwidth
+                    wfactor2 = 155.000 / imgwidth
                     lockImg = scene.img_locked_label
                 elif scene.img_empty_label:
                     imgwidth = scene.img_empty_label.width1()
-                    wfactor = 155.000/imgwidth
+                    wfactor = 155.000 / imgwidth
                     img = scene.img_empty_label
             if img:
-                drawImage(img, scale = (wfactor,-wfactor), coord = (.21*w,.59*h))
+                drawImage(img, scale=(wfactor,-wfactor), coord=(.21*w,.59*h))
             if lockImg:
-                drawImage(lockImg, scale = (wfactor2,-wfactor2), coord = (.21*w,.59*h))
+                drawImage(lockImg, scale=(wfactor2,-wfactor2), coord=(.21*w,.59*h))
 
     def renderForeground(self, scene):
         font = scene.fontDict['songListFont']
@@ -2090,62 +2099,61 @@ class Setlist:
             text = scene.scorePart.text
             scale = 0.00250
             glColor3f(1, 1, 1)
-            font.render(text, (0.95, 0.000), scale=scale, align = 2)
+            font.render(text, (0.95, 0.000), scale=scale, align=2)
         elif self.setlist_type == 3:
             font = scene.fontDict['songListFont']
 
-            c1,c2,c3 = self.song_rb2_diff_color
-            glColor3f(c1,c2,c3)
+            c1, c2, c3 = self.song_rb2_diff_color
+            glColor3f(c1, c2, c3)
 
-            font.render(_("DIFFICULTY"), (.095, .5325), scale = 0.0018)
+            font.render(_("DIFFICULTY"), (.095, .5325), scale=0.0018)
             scale = 0.0014
             text = _("BAND")
-            font.render(text, (.17, .5585), scale = scale, align = 2)
+            font.render(text, (.17, .5585), scale=scale, align=2)
             text = _("GUITAR")
-            font.render(text, (.17, .5835), scale = scale, align = 2)
+            font.render(text, (.17, .5835), scale=scale, align=2)
             text = _("DRUM")
-            font.render(text, (.17, .6085), scale = scale, align = 2)
+            font.render(text, (.17, .6085), scale=scale, align=2)
             text = _("BASS")
-            font.render(text, (.17, .6335), scale = scale, align = 2)
+            font.render(text, (.17, .6335), scale=scale, align=2)
             text = _("VOCALS")
-            font.render(text, (.17, .6585), scale = scale, align = 2)
+            font.render(text, (.17, .6585), scale=scale, align=2)
 
             #Add support for lead and rhythm diff
 
-            #Qstick - Sorting Text
-            text = _("SORTING:") + "     "
+            # Sorting text
             if scene.sortOrder == 0: #title
-                text = text + _("ALPHABETICALLY BY TITLE")
+                text_ = _("SORTING: %(spaces)s ALPHABETICALLY BY TITLE")
             elif scene.sortOrder == 1: #artist
-                text = text + _("ALPHABETICALLY BY ARTIST")
+                text_ = _("SORTING: %(spaces)s ALPHABETICALLY BY ARTIST")
             elif scene.sortOrder == 2: #timesplayed
-                text = text + _("BY PLAY COUNT")
+                text_ = _("SORTING: %(spaces)s BY PLAY COUNT")
             elif scene.sortOrder == 3: #album
-                text = text + _("ALPHABETICALLY BY ALBUM")
+                text_ = _("SORTING: %(spaces)s ALPHABETICALLY BY ALBUM")
             elif scene.sortOrder == 4: #genre
-                text = text + _("ALPHABETICALLY BY GENRE")
+                text_ = _("SORTING: %(spaces)s ALPHABETICALLY BY GENRE")
             elif scene.sortOrder == 5: #year
-                text = text + _("BY YEAR")
+                text_ = _("SORTING: %(spaces)s BY YEAR")
             elif scene.sortOrder == 6: #Band Difficulty
-                text = text + _("BY BAND DIFFICULTY")
+                text_ = _("SORTING: %(spaces)s BY BAND DIFFICULTY")
             elif scene.sortOrder == 7: #Band Difficulty
-                text = text + _("BY INSTRUMENT DIFFICULTY")
+                text_ = _("SORTING: %(spaces)s BY INSTRUMENT DIFFICULTY")
             else:
-                text = text + _("BY SONG COLLECTION")
-
-            font.render(text, (.13, .152), scale = 0.0017)
+                text_ = _("SORTING: %(spaces)s BY SONG COLLECTION")
+            text = text_ % {'spaces': "   "}
+            font.render(text, (.13, .152), scale=0.0017)
 
             if scene.songLoader:
-                font.render(_("Loading Preview..."), (.05, .7), scale = 0.001)
+                font.render(_("Loading Preview..."), (.05, .7), scale=0.001)
             return
         if scene.img_list_button_guide:
-            drawImage(scene.img_list_button_guide, scale = (.5, -.5), coord = (w*.5,0), fit = BOTTOM)
+            drawImage(scene.img_list_button_guide, scale=(.5, -.5), coord=(w*.5,0), fit=BOTTOM)
         if scene.songLoader:
-            font.render(_("Loading Preview..."), (.5, .7), align = 1)
+            font.render(_("Loading Preview..."), (.5, .7), align=1)
         if scene.searching:
-            font.render(scene.searchText, (.5, .7), align = 1)
+            font.render(scene.searchText, (.5, .7), align=1)
         if scene.img_list_fg:
-            drawImage(scene.img_list_fg, scale = (1.0, -1.0), coord = (w/2,h/2), stretched = FULL_SCREEN)
+            drawImage(scene.img_list_fg, scale=(1.0, -1.0), coord=(w/2,h/2), stretched=FULL_SCREEN)
 
     def renderSelectedInfo(self, scene):
 
@@ -2177,7 +2185,7 @@ class Setlist:
             self.theme.setBaseColor(1)
 
             if scene.songLoader:
-                font.render(_("Loading Preview..."), (.05, .7), scale = 0.001)
+                font.render(_("Loading Preview..."), (.05, .7), scale=0.001)
 
             #x = .6
             x = self.song_cdscore_xpos
@@ -2185,29 +2193,29 @@ class Setlist:
 
             self.theme.setSelectedColor(1)
 
-            c1,c2,c3 = self.song_name_selected_color
-            glColor3f(c1,c2,c3)
+            c1, c2, c3 = self.song_name_selected_color
+            glColor3f(c1, c2, c3)
 
-            item  = scene.selectedItem
+            item = scene.selectedItem
 
             angle = scene.itemRenderAngles[scene.selectedIndex]
             f = ((90.0 - angle) / 90.0) ** 2
 
             cText = item.name
-            if (isinstance(item, song.SongInfo) and item.getLocked()):
+            if isinstance(item, song.SongInfo) and item.getLocked():
                 cText = _("-- Locked --")
 
-            fh = lfont.getHeight()*0.0016
-            lfont.render(cText, (x, y), scale = 0.0016)
+            fh = lfont.getHeight() * 0.0016
+            lfont.render(cText, (x, y), scale=0.0016)
 
             if isinstance(item, song.SongInfo):
                 self.theme.setBaseColor(1)
 
-                c1,c2,c3 = self.artist_selected_color
-                glColor3f(c1,c2,c3)
+                c1, c2, c3 = self.artist_selected_color
+                glColor3f(c1, c2, c3)
 
                 if item.year != "":
-                    yeartag = ", "+item.year
+                    yeartag = ", %s" % item.year
                 else:
                     yeartag = ""
 
@@ -2215,14 +2223,14 @@ class Setlist:
                 if (item.getLocked()):
                     cText = "" # avoid giving away artist of locked song
 
-                # evilynux - Use font w/o outline
-                lfont.render(cText, (x, y+fh), scale = 0.0016)
+                # Use font w/o outline
+                lfont.render(cText, (x, y+fh), scale=0.0016)
 
                 if item.count:
                     self.theme.setSelectedColor(1)
 
-                    c1,c2,c3 = self.song_name_selected_color
-                    glColor3f(c1,c2,c3)
+                    c1, c2, c3 = self.song_name_selected_color
+                    glColor3f(c1, c2, c3)
 
                     count = int(item.count)
                     if count == 1:
@@ -2234,19 +2242,19 @@ class Setlist:
                         text = item.getUnlockText()
                     elif scene.careerMode and not item.completed:
                         text = _("Play To Advance.")
-                    font.render(text, (x, y+2*fh), scale = 0.001)
+                    font.render(text, (x, y+2*fh), scale=0.001)
                 else:
                     text = _("Never Played")
                     if item.getLocked():
                         text = item.getUnlockText()
                     elif scene.careerMode and not item.completed:
                         text = _("Play To Advance.")
-                    lfont.render(text, (x, y+3*fh), scale = 0.001)
+                    lfont.render(text, (x, y+3*fh), scale=0.001)
 
                 self.theme.setSelectedColor(1 - v)
 
-                c1,c2,c3 = self.songlistcd_score_color
-                glColor3f(c1,c2,c3)
+                c1, c2, c3 = self.songlistcd_score_color
+                glColor3f(c1, c2, c3)
 
                 scale = 0.0011
 
@@ -2263,7 +2271,7 @@ class Setlist:
                     score, stars, name = "---", 0, "---"
 
                 for d in difficulties:
-                    scores = item.getHighscores(d, part = scene.scorePart)
+                    scores = item.getHighscores(d, part=scene.scorePart)
 
                     if scores:
                         score, stars, name, scoreExt = scores[0]
@@ -2277,48 +2285,48 @@ class Setlist:
                     else:
                         score, stars, name = "---", 0, "---"
                     self.theme.setBaseColor(1)
-                    font.render(song.difficulties[d.id].text, (x, y), scale = scale)
+                    font.render(song.difficulties[d.id].text, (x, y), scale=scale)
 
                     starscale = 0.02
-                    stary = 1.0 - y/scene.fontScreenBottom
-                    scene.drawStarScore(screenw, screenh, x+.01, stary-2*fh, stars, starscale, hqStar = True) #volshebnyi
+                    stary = 1.0 - y / scene.fontScreenBottom
+                    scene.drawStarScore(screenw, screenh, x+.01, stary-2*fh, stars, starscale, hqStar=True)
 
                     self.theme.setSelectedColor(1)
-                    # evilynux - Also use hit%/noteStreak SongList option
+                    # Also use hit%/noteStreak SongList option
                     if scores:
                         if notesTotal != 0:
                             score = "%s %.1f%%" % (score, (float(notesHit) / notesTotal) * 100.0)
                         if noteStreak != 0:
                             score = "%s (%d)" % (score, noteStreak)
-                    font.render(unicode(score), (x + .15, y),     scale = scale)
-                    font.render(name,       (x + .15, y + fh),     scale = scale)
+                    font.render(unicode(score), (x + .15, y),     scale=scale)
+                    font.render(name,       (x + .15, y + fh),     scale=scale)
                     y += 2 * fh
             elif isinstance(item, song.LibraryInfo):
                 self.theme.setBaseColor(1)
-                c1,c2,c3 = self.library_selected_color
 
-                glColor3f(c1,c2,c3)
+                c1, c2, c3 = self.library_selected_color
+                glColor3f(c1, c2, c3)
 
                 if item.songCount == 1:
                     songCount = _("One Song In This Setlist")
                 else:
                     songCount = _("%d Songs In This Setlist") % item.songCount
-                font.render(songCount, (x, y + 3*fh), scale = 0.0016)
+                font.render(songCount, (x, y + 3*fh), scale=0.0016)
 
             elif isinstance(item, song.RandomSongInfo):
                 self.theme.setBaseColor(1 - v)
 
-                c1,c2,c3 = self.song_name_selected_color
-                glColor3f(c1,c2,c3)
+                c1, c2, c3 = self.song_name_selected_color
+                glColor3f(c1, c2, c3)
 
-                font.render(_("(Random Song)"), (x, y + 3*fh), scale = 0.0016)
+                font.render(_("(Random Song)"), (x, y + 3*fh), scale=0.0016)
 
-            #MFH CD list
+            # CD list
             text = scene.scorePart.text
             scale = 0.00250
             #glColor3f(1, 1, 1)
-            c1,c2,c3 = self.song_name_selected_color
-            glColor3f(c1,c2,c3)
+            c1, c2, c3 = self.song_name_selected_color
+            glColor3f(c1, c2, c3)
             w, h = font.getStringSize(text, scale=scale)
             font.render(text, (0.95-w, 0.000), scale=scale)
             # finally:
@@ -2332,15 +2340,15 @@ class Setlist:
             font = scene.fontDict['font']
             w, h = scene.geometry
             lfont = font
-            fh = lfont.getHeight()*0.0016
+            fh = lfont.getHeight() * 0.0016
             if isinstance(item, song.SongInfo):
                 angle = scene.itemRenderAngles[scene.selectedIndex]
                 f = ((90.0 - angle) / 90.0) ** 2
 
                 self.theme.setSelectedColor(1)
 
-                c1,c2,c3 = self.songlistcd_score_color
-                glColor4f(c1,c2,c3,1)
+                c1, c2, c3 = self.songlistcd_score_color
+                glColor4f(c1, c2, c3,1)
 
                 scale = 0.0013
                 x = self.song_listcd_score_xpos
@@ -2355,7 +2363,7 @@ class Setlist:
 
                 #new
                 for d in difficulties:
-                    scores =  item.getHighscores(d, part = scene.scorePart)
+                    scores = item.getHighscores(d, part=scene.scorePart)
                     if scores:
                         score, stars, name, scoreExt = scores[0]
                         try:
@@ -2365,21 +2373,21 @@ class Setlist:
                     else:
                         score, stars, name = "---", 0, "---"
 
-                    font.render(song.difficulties[d.id].text, (x, y), scale = scale)
+                    font.render(song.difficulties[d.id].text, (x, y), scale=scale)
 
                     starscale = 0.02
-                    starx = x + starscale/2
+                    starx = x + starscale / 2
                     stary = 1.0 - (y / scene.fontScreenBottom) - fh - starscale
-                    scene.drawStarScore(w, h, starx, stary, stars, starscale) #MFH
-                    c1,c2,c3 = self.songlistcd_score_color
-                    glColor3f(c1,c2,c3)
+                    scene.drawStarScore(w, h, starx, stary, stars, starscale)
+                    c1, c2, c3 = self.songlistcd_score_color
+                    glColor3f(c1, c2, c3)
                     if scores:
                         if notesTotal != 0:
                             score = "%s %.1f%%" % (score, (float(notesHit) / notesTotal) * 100.0)
                         if noteStreak != 0:
                             score = "%s (%d)" % (score, noteStreak)
-                    font.render(unicode(score), (x + .15, y),     scale = scale)
-                    font.render(name,       (x + .15, y + fh),     scale = scale)
+                    font.render(unicode(score), (x + .15, y),     scale=scale)
+                    font.render(name,       (x + .15, y + fh),     scale=scale)
                     y += 2 * fh + f / 4.0
         elif self.setlist_type == 3:
             w, h = scene.geometry
@@ -2396,19 +2404,19 @@ class Setlist:
                 while wt > .21:
                     tlength = len(text) - 4
                     text = text[:tlength] + "..."
-                    wt, ht = font.getStringSize(text, scale = scale)
+                    wt, ht = font.getStringSize(text, scale=scale)
                     if wt < .22:
                         break
 
-                c1,c2,c3 = self.artist_text_color
-                glColor3f(c1,c2,c3)
+                c1, c2, c3 = self.artist_text_color
+                glColor3f(c1, c2, c3)
 
                 text = string.upper(text)
-                font.render(text, (.095, .44), scale = scale)
+                font.render(text, (.095, .44), scale=scale)
 
                 if scene.img_diff3 is not None:
                     imgwidth = scene.img_diff3.width1()
-                    wfactor1 = 13.0/imgwidth
+                    wfactor1 = 13.0 / imgwidth
 
                 albumtag = item.album
                 albumtag = string.upper(albumtag)
@@ -2417,18 +2425,17 @@ class Setlist:
                 while wt > .21:
                     tlength = len(albumtag) - 4
                     albumtag = albumtag[:tlength] + "..."
-                    wt, ht = font.getStringSize(albumtag, scale = scale)
+                    wt, ht = font.getStringSize(albumtag, scale=scale)
                     if wt < .22:
                         break
 
-                font.render(albumtag, (.095, .47), scale = 0.0015)
+                font.render(albumtag, (.095, .47), scale=0.0015)
 
                 genretag = item.genre
-                font.render(genretag, (.095, .49), scale = 0.0015)
+                font.render(genretag, (.095, .49), scale=0.0015)
 
                 yeartag = item.year
-                font.render(yeartag, (.095, .51), scale = 0.0015)
-
+                font.render(yeartag, (.095, .51), scale=0.0015)
 
                 for i in range(5):
                     glColor3f(1, 1, 1)
@@ -2444,23 +2451,23 @@ class Setlist:
                         diff = item.diffVocals
                     if scene.img_diff1 is None or scene.img_diff2 is None or scene.img_diff3 is None:
                         if diff == -1:
-                            font.render("N/A", (.18, .5585 + i*.025), scale = 0.0014)
+                            font.render("N/A", (.18, .5585 + i*.025), scale=0.0014)
                         elif diff == 6:
                             glColor3f(1, 1, 0)
-                            font.render(str("*" * (diff -1)), (.18, 0.5685 + i*.025), scale = 0.003)
+                            font.render(str("*" * (diff -1)), (.18, 0.5685 + i*.025), scale=0.003)
                         else:
-                            font.render(str("*" * diff + " " * (5 - diff)), (.18, 0.5685 + i*.025), scale = 0.003)
+                            font.render(str("*" * diff + " " * (5 - diff)), (.18, 0.5685 + i*.025), scale=0.003)
                     else:
                         if diff == -1:
-                            font.render("N/A", (.18, .5585 + i*.025), scale = 0.0014)
+                            font.render("N/A", (.18, .5585 + i*.025), scale=0.0014)
                         elif diff == 6:
-                            for k in range(0,5):
-                                drawImage(scene.img_diff3, scale = (wfactor1,-wfactor1), coord = ((.19+.03*k)*w, (0.2354-.0333*i)*h))
+                            for k in range(0, 5):
+                                drawImage(scene.img_diff3, scale=(wfactor1,-wfactor1), coord=((.19+.03*k)*w, (0.2354-.0333*i)*h))
                         else:
-                            for k in range(0,diff):
-                                drawImage(scene.img_diff2, scale = (wfactor1,-wfactor1), coord = ((.19+.03*k)*w, (0.2354-.0333*i)*h))
+                            for k in range(0, diff):
+                                drawImage(scene.img_diff2, scale=(wfactor1,-wfactor1), coord=((.19+.03*k)*w, (0.2354-.0333*i)*h))
                             for k in range(0, 5-diff):
-                                drawImage(scene.img_diff1, scale = (wfactor1,-wfactor1), coord = ((.31-.03*k)*w, (0.2354-.0333*i)*h))
+                                drawImage(scene.img_diff1, scale=(wfactor1,-wfactor1), coord=((.31-.03*k)*w, (0.2354-.0333*i)*h))
 
     def renderMoreInfo(self, scene):
         if not scene.items:
@@ -2474,53 +2481,54 @@ class Setlist:
         font = scene.fontDict['songListFont']
         scene.engine.fadeScreen(0.25)
         if scene.moreInfoTime < 500:
-            y = 1.0-(float(scene.moreInfoTime)/500.0)
-        yI = y*h
+            y = 1.0 - (float(scene.moreInfoTime) / 500.0)
+        yI = y * h
         if scene.img_panel:
-            drawImage(scene.img_panel, scale = (1.0, -1.0), coord = (w*.5,h*.5+yI), stretched = FULL_SCREEN)
+            drawImage(scene.img_panel, scale=(1.0, -1.0), coord=(w*.5,h*.5+yI), stretched=FULL_SCREEN)
         if scene.img_tabs:
             r0 = (0, (1.0/3.0), 0, .5)
             r1 = ((1.0/3.0),(2.0/3.0), 0, .5)
             r2 = ((2.0/3.0),1.0,0,.5)
             if scene.infoPage == 0:
                 r0 = (0, (1.0/3.0), .5, 1.0)
-                drawImage(scene.img_tab1, scale = (.5, -.5), coord = (w*.5,h*.5+yI))
+                drawImage(scene.img_tab1, scale=(.5, -.5), coord=(w*.5,h*.5+yI))
                 text = item.name
                 if item.artist != "":
-                    text += " by %s" % item.artist
+                    text += _(" by %(artist)s") % {'artist': item.artist}
                 if item.year != "":
                     text += " (%s)" % item.year
                 scale = font.scaleText(text, .45, .0015)
-                font.render(text, (.52, .25-y), scale = scale, align = 1)
+                font.render(text, (.52, .25-y), scale=scale, align=1)
                 if scene.itemLabels[i]:
                     imgwidth = scene.itemLabels[i].width1()
-                    wfactor = 95.000/imgwidth
+                    wfactor = 95.000 / imgwidth
                     drawImage(scene.itemLabels[i], (wfactor, -wfactor), (w*.375,h*.5+yI))
                 elif scene.img_empty_label:
                     imgwidth = scene.img_empty_label.width1()
-                    wfactor = 95.000/imgwidth
+                    wfactor = 95.000 / imgwidth
                     drawImage(scene.img_empty_label, (wfactor, -wfactor), (w*.375,h*.5+yI))
                 text = item.album
                 if text == "":
                     text = _("No Album")
                 scale = font.scaleText(text, .2, .0015)
-                font.render(text, (.56, .305-y), scale = scale)
+                font.render(text, (.56, .305-y), scale=scale)
                 text = item.genre
                 if text == "":
                     text = _("No Genre")
                 scale = font.scaleText(text, .2, .0015)
-                font.render(text, (.56, .35-y), scale = scale)
+                font.render(text, (.56, .35-y), scale=scale)
             elif scene.infoPage == 1:
-                r1 = ((1.0/3.0),(2.0/3.0), .5, 1.0)
-                drawImage(scene.img_tab2, scale = (.5, -.5), coord = (w*.5,h*.5+yI))
+                r1 = ((1.0/3.0), (2.0/3.0), .5, 1.0)
+                drawImage(scene.img_tab2, scale=(.5, -.5), coord=(w*.5,h*.5+yI))
             elif scene.infoPage == 2:
-                r2 = ((2.0/3.0),1.0, .5, 1.0)
-                drawImage(scene.img_tab3, scale = (.5, -.5), coord = (w*.5,h*.5+yI))
-            drawImage(scene.img_tabs, scale = (.5*(1.0/3.0), -.25), coord = (w*.36,h*.72+yI), rect = r0)
-            drawImage(scene.img_tabs, scale = (.5*(1.0/3.0), -.25), coord = (w*.51,h*.72+yI), rect = r1)
-            drawImage(scene.img_tabs, scale = (.5*(1.0/3.0), -.25), coord = (w*.66,h*.72+yI), rect = r2)
+                r2 = ((2.0/3.0), 1.0, .5, 1.0)
+                drawImage(scene.img_tab3, scale=(.5, -.5), coord=(w*.5,h*.5+yI))
+            drawImage(scene.img_tabs, scale=(.5*(1.0/3.0), -.25), coord=(w*.36,h*.72+yI), rect=r0)
+            drawImage(scene.img_tabs, scale=(.5*(1.0/3.0), -.25), coord=(w*.51,h*.72+yI), rect=r1)
+            drawImage(scene.img_tabs, scale=(.5*(1.0/3.0), -.25), coord=(w*.66,h*.72+yI), rect=r2)
 
     def renderMiniLobby(self, scene):
         return
+
 
 __all__ = ["LEFT", "CENTER", "RIGHT", "_", "Theme", "shaders", "Setlist"]

@@ -1,5 +1,5 @@
 #####################################################################
-# -*- coding: iso-8859-1 -*-                                        #
+# -*- coding: utf-8 -*-                                             #
 #                                                                   #
 # Frets on Fire                                                     #
 # Copyright (C) 2006 Sami Kyostila                                  #
@@ -28,13 +28,12 @@
 #####################################################################
 
 from copy import deepcopy
+import logging
 import math
 import os
 
 import OpenGL.GL as gl
 import numpy as np
-
-from fretwork import log
 
 from fofix.game.guitarscene.instruments.Instrument import Instrument
 from fofix.game.guitarscene.Neck import Neck
@@ -42,7 +41,10 @@ from fofix.game.song import Note, Tempo
 from fofix.core.Image import draw3Dtex
 from fofix.core.Shader import shaders
 from fofix.core.Mesh import Mesh
-from fofix.core import cmgl
+
+
+log = logging.getLogger(__name__)
+
 
 class Guitar(Instrument):
     def __init__(self, engine, playerObj, scene, player = 0, bass = False):

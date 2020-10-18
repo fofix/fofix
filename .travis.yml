@@ -1,6 +1,7 @@
 language: python
 python:
     - 2.7
+dist: trusty
 
 matrix:
     include:
@@ -13,6 +14,8 @@ matrix:
         - env:
             - GIT_COMMIT=0
           before_install:
+              - LD_LIBRARY_PATH=/usr/local/lib64/:$LD_LIBRARY_PATH
+              - export LD_LIBRARY_PATH
               - sudo apt-get -qq update
               - sudo apt-get install -y
                   libogg-dev
@@ -27,14 +30,16 @@ matrix:
                   libvorbis-dev
                   mesa-utils
                   portaudio19-dev
+              - sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
+              - LD_LIBRARY_PATH=/usr/local/lib64/:$LD_LIBRARY_PATH
+              - export LD_LIBRARY_PATH
+              - sudo apt-get -q update
+              - sudo apt-get install -y gcc-4.9 g++-4.9
 
 install:
     - pip install pytest
     - pip install cython
     - pip install -r requirements.txt
-    # hack: cerealizer
-    - export PY_PACKAGES=`pip --version | cut -d' ' -f4`
-    - wget https://bitbucket.org/jibalamy/cerealizer/raw/ffbb9283c507c2bb7191bb413722a316e9c0718b/__init__.py2 -O $PY_PACKAGES/cerealizer/__init__.py2
     # build ext
     - python setup.py build_ext --inplace --force
 

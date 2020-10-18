@@ -1,5 +1,5 @@
 #####################################################################
-# -*- coding: iso-8859-1 -*-                                        #
+# -*- coding: utf-8 -*-                                             #
 #                                                                   #
 # Frets on Fire                                                     #
 # Copyright (C) 2006 Sami Ky?stil?                                  #
@@ -22,6 +22,7 @@
 # MA  02110-1301, USA.                                              #
 #####################################################################
 
+import logging
 import os
 import sys
 import time
@@ -30,12 +31,15 @@ import stat
 from Queue import Queue, Empty
 from threading import Thread, BoundedSemaphore
 
-from fretwork import log
 from fretwork.task import Task
 
 from fofix.core.VFS import getWritableResourcePath
 from fofix.core import Version
 from fofix.core import Config
+
+
+log = logging.getLogger(__name__)
+
 
 class Loader(Thread):
     def __init__(self, target, name, function, resultQueue, loaderSemaphore, onLoad = None, onCancel = None):
@@ -113,7 +117,7 @@ class Loader(Thread):
             start = time.time()
             self.result = self.function()
             self.time = time.time() - start
-        except:
+        except Exception:
             self.exception = sys.exc_info()
 
     def finish(self):
@@ -123,7 +127,7 @@ class Loader(Thread):
             return
 
         if self.logLoadings == 1:
-            log.notice("Loaded %s.%s in %.3f seconds" % (self.target.__class__.__name__, self.name, self.time))
+            log.info("Loaded %s.%s in %.3f seconds" % (self.target.__class__.__name__, self.name, self.time))
 
         if self.exception:
             raise self.exception[0], self.exception[1], self.exception[2]
@@ -204,22 +208,22 @@ class Resource(Task):
                     # If the original file does not exist, see if we can write to its directory
                     if not os.path.isfile(readOnlyPath) and os.access(os.path.dirname(readOnlyPath), os.W_OK):
                         pass
-                except:
+                except Exception:
                     raise
                 # If the resource exists in the read-only path, make a copy to the
                 # read-write path.
                 readWritePath = os.path.join(getWritableResourcePath(), *name)
                 if not os.path.isfile(readWritePath) and os.path.isfile(readOnlyPath):
-                    log.notice("Copying '%s' to writable data directory." % "/".join(name))
+                    log.info("Copying '%s' to writable data directory." % "/".join(name))
                     try:
                         os.makedirs(os.path.dirname(readWritePath))
-                    except:
+                    except Exception:
                         pass
                     shutil.copy(readOnlyPath, readWritePath)
                     self.makeWritable(readWritePath)
                 # Create directories if needed
                 if not os.path.isdir(readWritePath) and os.path.isdir(readOnlyPath):
-                    log.notice("Creating writable directory '%s'." % "/".join(name))
+                    log.info("Creating writable directory '%s'." % "/".join(name))
                     os.makedirs(readWritePath)
                     self.makeWritable(readWritePath)
                 return readWritePath
@@ -252,7 +256,7 @@ class Resource(Task):
         """
 
         if self.logLoadings == 1:
-            log.notice("Loading %s.%s %s" % (target.__class__.__name__, name, synch and "synchronously" or "asynchronously"))
+            log.info("Loading %s.%s %s" % (target.__class__.__name__, name, synch and "synchronously" or "asynchronously"))
 
         l = Loader(target, name, function, self.resultQueue, self.loaderSemaphore, onLoad = onLoad, onCancel = onCancel)
         if synch:

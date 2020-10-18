@@ -1,5 +1,5 @@
 #####################################################################
-# -*- coding: iso-8859-1 -*-                                        #
+# -*- coding: utf-8 -*-                                             #
 #                                                                   #
 # Frets on Fire                                                     #
 # Copyright (C) 2009 Team FoFiX                                     #
@@ -7,7 +7,7 @@
 #                                                                   #
 # This program is free software; you can redistribute it and/or     #
 # modify it under the terms of the GNU General Public License       #
-# as published by the Free Software Foundation; either version 2    #++-
+# as published by the Free Software Foundation; either version 2    #
 # of the License, or (at your option) any later version.            #
 #                                                                   #
 # This program is distributed in the hope that it will be useful,   #
@@ -21,18 +21,21 @@
 # MA  02110-1301, USA.                                              #
 #####################################################################
 
+import logging
 import os
 import random
 
 import OpenGL.GL as gl
 import numpy as np
 
-from fretwork import log
-
 from fofix.core.Shader import shaders, mixColors
 from fofix.game.song import Bars, \
     MarkerNote, SP_MARKING_NOTE, TK_GUITAR_SOLOS
 from fofix.core import cmgl
+
+
+log = logging.getLogger(__name__)
+
 
 class Neck:
     def __init__(self, engine, instrument, playerObj):
@@ -399,7 +402,7 @@ class Neck:
         if neckTexture:
             neckTexture.texture.bind()
 
-        cmgl.drawArrays(gl.GL_TRIANGLE_STRIP, vertices=self.board_scroll_vtx, colors=self.board_col, texcoords=self.board_tex_static)
+        cmgl.draw_arrays(gl.GL_TRIANGLE_STRIP, vertices=self.board_scroll_vtx, colors=self.board_col, texcoords=self.board_tex_static)
 
         gl.glDisable(gl.GL_TEXTURE_2D)
 
@@ -422,7 +425,7 @@ class Neck:
         if sideBarImg:
             sideBarImg.texture.bind()
 
-        cmgl.drawArrays(gl.GL_TRIANGLE_STRIP, vertices=self.sidebars_scroll_vtx, colors=self.board_col, texcoords=self.board_tex_static)
+        cmgl.draw_arrays(gl.GL_TRIANGLE_STRIP, vertices=self.sidebars_scroll_vtx, colors=self.board_col, texcoords=self.board_tex_static)
 
         gl.glDisable(gl.GL_TEXTURE_2D)
 
@@ -534,7 +537,7 @@ class Neck:
             gl.glBlendFunc(gl.GL_ONE, gl.GL_ONE)
         if neck:
             neck.texture.bind()
-        cmgl.drawArrays(gl.GL_TRIANGLE_STRIP, vertices=self.board_vtx, colors=board_col, texcoords=board_tex)
+        cmgl.draw_arrays(gl.GL_TRIANGLE_STRIP, vertices=self.board_vtx, colors=board_col, texcoords=board_tex)
 
         if alpha == True:
             gl.glBlendFunc(gl.GL_SRC_ALPHA, gl.GL_ONE_MINUS_SRC_ALPHA)
@@ -629,7 +632,7 @@ class Neck:
         if shaders.enable("neck"):
             shaders.setVar("fretcol",neckcol)
             shaders.update()
-            cmgl.drawArrays(gl.GL_TRIANGLE_STRIP, vertices=self.shader_neck_vtx)
+            cmgl.draw_arrays(gl.GL_TRIANGLE_STRIP, vertices=self.shader_neck_vtx)
             shaders.disable()
         else:
             if self.isFailing:
@@ -663,7 +666,7 @@ class Neck:
             if self.centerLines:
                 self.centerLines.texture.bind()
 
-        cmgl.drawArrays(gl.GL_TRIANGLE_STRIP, vertices=self.track_vtx, colors=self.board_col, texcoords=track_tex)
+        cmgl.draw_arrays(gl.GL_TRIANGLE_STRIP, vertices=self.track_vtx, colors=self.board_col, texcoords=track_tex)
 
         gl.glDisable(gl.GL_TEXTURE_2D)
 
@@ -697,16 +700,16 @@ class Neck:
         if self.isFailing and self.failSideBars and v == self.failcount:
             self.failSideBars.texture.bind()
 
-        cmgl.drawArrays(gl.GL_TRIANGLE_STRIP, vertices=self.sidebars_vtx, colors=board_col, texcoords=self.board_tex)
+        cmgl.draw_arrays(gl.GL_TRIANGLE_STRIP, vertices=self.sidebars_vtx, colors=board_col, texcoords=self.board_tex)
         gl.glDisable(gl.GL_TEXTURE_2D)
 
         if shaders.enable("sololight"):
             shaders.modVar("color",shaders.var["solocolor"])
             shaders.setVar("offset",(-3.5,-w/2))
-            cmgl.drawArrays(gl.GL_TRIANGLE_STRIP, vertices=self.soloLightVtx1)
+            cmgl.draw_arrays(gl.GL_TRIANGLE_STRIP, vertices=self.soloLightVtx1)
             shaders.setVar("offset",(-3.5,w/2))
             shaders.setVar("time",shaders.time()+0.5)
-            cmgl.drawArrays(gl.GL_TRIANGLE_STRIP, vertices=self.soloLightVtx2)
+            cmgl.draw_arrays(gl.GL_TRIANGLE_STRIP, vertices=self.soloLightVtx2)
             shaders.disable()
 
     def drawBPM(self, visibility, song, pos):
@@ -737,7 +740,7 @@ class Neck:
             elif event.barType == 2: #measure
                 self.bpm_measure.texture.bind()
 
-            cmgl.drawArrays(gl.GL_TRIANGLE_STRIP, vertices=self.bpm_vtx, colors=self.bpm_col, texcoords=self.bpm_tex)
+            cmgl.draw_arrays(gl.GL_TRIANGLE_STRIP, vertices=self.bpm_vtx, colors=self.bpm_col, texcoords=self.bpm_tex)
 
             gl.glPopMatrix()
 

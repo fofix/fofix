@@ -7,4 +7,5 @@ Misc
    contributing
    translations
    faq
+   releasenotes
    licenses

@@ -4,7 +4,7 @@ Licenses
 Source code
 -----------
 
-GPL v2 license: see the ``COPYING`` file.
+License: GPLv2 or (at your option) any later version, see the ``COPYING`` file and notice in source code.
 
 
 Fonts

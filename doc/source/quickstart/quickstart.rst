@@ -31,7 +31,7 @@ Some themes are already included:
     - MegaLight V4
     - Uberlight
 
-To find other themes, go to the `forum <http://www.fretsonfire.net/forums/viewforum.php?f=11&sid=152eb4b9177971b82d8cd410faa7586b>`_ or create them.
+To find other themes, go to the `forum <https://www.fretsonfire.org/forums/viewtopic.php?f=32&t=24976>`_ or create them.
 
 
 Start the game

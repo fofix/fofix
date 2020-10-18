@@ -1,10 +1,10 @@
 #####################################################################
-# -*- coding: iso-8859-1 -*-                                        #
+# -*- coding: utf-8 -*-                                             #
 #                                                                   #
 # Frets on Fire X (FoFiX)                                           #
 # Copyright (C) 2006 Sami Kyöstilä                                  #
-#               2009 FoFiX Team                                     #
 #               2009 akedrou                                        #
+#               2009-2020 FoFiX Team                                #
 #                                                                   #
 # This program is free software; you can redistribute it and/or     #
 # modify it under the terms of the GNU General Public License       #
@@ -22,14 +22,16 @@
 # MA  02110-1301, USA.                                              #
 #####################################################################
 
-from fofix.core.View import BackgroundLayer
-from fofix.core.Input import KeyListener
-from fofix.core.Camera import Camera
-
 from OpenGL.GL import *
 from OpenGL.GLU import *
 
+from fofix.core.Camera import Camera
+from fofix.core.Input import KeyListener
+from fofix.core.View import BackgroundLayer
+
+
 class Scene(BackgroundLayer, KeyListener):
+
     def __init__(self, engine):
         self.engine  = engine
         self.actors  = []
@@ -41,7 +43,7 @@ class Scene(BackgroundLayer, KeyListener):
         self.players = self.engine.world.getPlayers()
         self.controls = engine.input.controls
 
-        #for simplification of theme writing
+        # for simplification of theme writing
         self.fontDict         = self.engine.data.fontDict
         self.geometry         = self.engine.view.geometry[2:4]
         self.fontScreenBottom = self.engine.data.fontScreenBottom

@@ -1,5 +1,5 @@
 #####################################################################
-# -*- coding: iso-8859-1 -*-                                        #
+# -*- coding: utf-8 -*-                                             #
 #                                                                   #
 # Frets on Fire                                                     #
 # Copyright (C) 2006 Sami Kyöstilä                                  #
@@ -22,8 +22,11 @@
 # MA  02110-1301, USA.                                              #
 #####################################################################
 
+import logging
 import pygame
 
+
+log = logging.getLogger(__name__)
 haveMidi = False
 
 try:
@@ -32,13 +35,13 @@ try:
 except ImportError:
     haveMidi = False
 
-from fretwork import log
 from fretwork.audio import Music
 from fretwork.task import Task
 
 from fofix.core.Player import Controls
 from fofix.core import Player
 from fofix.core import Config
+
 
 class KeyListener(object):
     def keyPressed(self, key, unicode):
@@ -53,6 +56,7 @@ class KeyListener(object):
     def exitRequested(self):
         pass
 
+
 class MouseListener(object):
     def mouseButtonPressed(self, button, pos):
         pass
@@ -62,6 +66,7 @@ class MouseListener(object):
 
     def mouseMoved(self, pos, rel):
         pass
+
 
 class SystemEventListener(object):
     def screenResized(self, size):
@@ -76,7 +81,9 @@ class SystemEventListener(object):
     def quit(self):
         pass
 
+
 MusicFinished = pygame.USEREVENT
+
 
 class Input(Task):
     def __init__(self):
@@ -142,7 +149,7 @@ class Input(Task):
             if len(self.midi) == 0:
                 log.debug("No MIDI input ports found.")
         else:
-            log.notice("MIDI input support is not available; install at least pygame 1.9 to get it.")
+            log.info("MIDI input support is not available; install at least pygame 1.9 to get it.")
 
     def showMouse(self):
         pygame.mouse.set_visible(True)
@@ -430,7 +437,7 @@ class Input(Task):
     # glorandwarf: check that there are no control conflicts #FIXME
     def checkControls(self):
         if self.controls.isKeyMappingOK() is False:
-            log.warn("Conflicting player controls, resetting to defaults")
+            log.warning("Conflicting player controls, resetting to defaults")
             self.controls.restoreDefaultKeyMappings()
             self.reloadControls()
 

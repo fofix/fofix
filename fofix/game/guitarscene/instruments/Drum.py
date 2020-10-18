@@ -1,5 +1,5 @@
 #####################################################################
-# -*- coding: iso-8859-1 -*-                                        #
+# -*- coding: utf-8 -*-                                             #
 #                                                                   #
 # Frets on Fire                                                     #
 # Copyright (C) 2006 Sami Kyostila                                  #
@@ -26,13 +26,12 @@
 # MA  02110-1301, USA.                                              #
 #####################################################################
 
+import logging
 import os
 import math
 
 import numpy as np
 import OpenGL.GL as gl
-
-from fretwork import log
 
 from fofix.game.guitarscene.instruments.Instrument import Instrument
 from fofix.game.guitarscene.Neck import Neck
@@ -40,7 +39,9 @@ from fofix.game.song import Note, Tempo
 from fofix.core.Image import draw3Dtex
 from fofix.core.Shader import shaders
 from fofix.core.Mesh import Mesh
-from fofix.core import cmgl
+
+
+log = logging.getLogger(__name__)
 
 #Normal guitar key color order: Green, Red, Yellow, Blue, Orange
 #Drum fret color order: Red, Yellow, Blue, Green
@@ -106,7 +107,7 @@ class Drum(Instrument):
         self.openFretActivity = 0.0
         self.openFretColor  = self.fretColors[5]
 
-        self.logClassInits = self.engine.config.get("log", "log_class_inits")
+        self.logClassInits = self.engine.config.get("game", "log_class_inits")
         if self.logClassInits == 1:
             log.debug("Drum class initialization!")
 

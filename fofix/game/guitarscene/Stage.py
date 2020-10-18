@@ -26,20 +26,23 @@
 
 from __future__ import with_statement
 
+import logging
 import random
 import math
 import os
 
-from fretwork import log
 import OpenGL.GL as gl
 
 from fofix.core.Image import drawImage
 from fofix.core.Language import _
-from fofix.core.LinedConfigParser import LinedConfigParser
+from fofix.core.Config import MyConfigParser
 from fofix.core.Shader import shaders
 from fofix.core.VideoPlayer import VideoLayer, VideoPlayerError
 from fofix.core.constants import *
 from fofix.game.guitarscene import Rockmeter
+
+
+log = logging.getLogger(__name__)
 
 
 class Layer(object):
@@ -243,7 +246,7 @@ class Stage(object):
     def __init__(self, guitarScene, configFileName):
         self.scene            = guitarScene
         self.engine           = guitarScene.engine
-        self.config           = LinedConfigParser()
+        self.config           = MyConfigParser()
         self.backgroundLayers = []
         self.foregroundLayers = []
         self.textures         = {}
@@ -288,7 +291,7 @@ class Stage(object):
         self.path = os.path.join("themes",self.themename,"backgrounds")
         self.pathfull = self.engine.getPath(self.path)
         if not os.path.exists(self.pathfull): # evilynux
-            log.warn("Stage folder does not exist: %s" % self.pathfull)
+            log.warning("Stage folder does not exist: %s" % self.pathfull)
             self.mode = 1 # Fallback to song-specific stage
 
         self.loadLayers(configFileName)
@@ -361,15 +364,15 @@ class Stage(object):
                 vidSource = songBackgroundVideoPath
                 loop = False
             else:
-                log.warn("Video not found: %s" % songBackgroundVideoPath)
+                log.warning("Video not found: %s" % songBackgroundVideoPath)
 
         if vidSource is None:
             vidSource = os.path.join(self.pathfull, "default.ogv")
             loop = True
 
         if not os.path.isfile(vidSource):
-            log.warn("Video not found: %s" % vidSource)
-            log.warn("Falling back to default stage mode.")
+            log.warning("Video not found: %s" % vidSource)
+            log.warning("Falling back to default stage mode.")
             self.mode = 1 # Fallback
             return
 
@@ -424,13 +427,13 @@ class Stage(object):
             if not self.engine.loadImgDrawing(self, "background", os.path.join("themes",self.themename,"backgrounds",background)):
                 #MFH - must first fall back on the old practice.png before forcing blank stage mode!
                 if not self.engine.loadImgDrawing(self, "background", os.path.join("themes",self.themename,"backgrounds","practice")):
-                    log.warn("No practice stage, falling back on a forced Blank stage mode") # evilynux
+                    log.warning("No practice stage, falling back on a forced Blank stage mode") # evilynux
                     self.mode = 2    #if no practice stage, just fall back on a forced Blank stage mode
 
         elif self.songStage == 1:    #check for song-specific background
             test = True
             if not self.engine.loadImgDrawing(self, "background", os.path.join(libraryName, songName, "background")):
-                log.notice("No song-specific stage found") # evilynux
+                log.info("No song-specific stage found")
                 test = False
             if test:  #does a song-specific background exist?
                 self.rotationMode = 0
@@ -445,7 +448,7 @@ class Stage(object):
             #myfingershurt: assign this first
             if self.mode == 1:   #just use Default.png
                 if not self.engine.loadImgDrawing(self, "background", os.path.join(self.path, "default")):
-                    log.warn("No default stage; falling back on a forced Blank stage mode") # evilynux
+                    log.warning("No default stage; falling back on a forced Blank stage mode") # evilynux
                     self.mode = 2    #if no practice stage, just fall back on a forced Blank stage mode
 
             ##This checks how many Stage-background we have to select from
@@ -463,7 +466,7 @@ class Stage(object):
 
                 # evilynux - improved error handling, fallback to blank background if no background are found
                 if fileIndex == 0:
-                    log.warn("No valid stage found!")
+                    log.warning("No valid stage found!")
                     self.mode = 2;
                 else:
                     i = random.randint(0,len(files)-1)
