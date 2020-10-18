@@ -132,7 +132,6 @@ class Prototype(MutableMapping):
         @param text:       Text description for the key
         @param options:    Either a mapping of values to text descriptions
                            (e.g. {True: 'Yes', False: 'No'}) or a list of possible values
-        @param prototype:  Configuration prototype mapping
         @param tipText:    Helpful tip text to display in option menus.
         """
         if section not in self._data:
