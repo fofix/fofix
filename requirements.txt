@@ -1,4 +1,4 @@
-Cerealizer==0.8.2
+Cerealizer==0.8.3
 Cython==0.27.3
 numpy==1.13.3
 olefile==0.44
