@@ -1,7 +1,7 @@
 Cerealizer==0.8.3
 Cython==0.29.21
 numpy==1.16.6
-olefile==0.44
+olefile==0.46
 Pillow==6.2.2
 PyAudio==0.2.11
 pygame==1.9.3
