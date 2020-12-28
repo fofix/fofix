@@ -142,7 +142,7 @@ if __name__ == '__main__':
             run_command('defaults write org.python.python ApplePersistenceIgnoreState 0')
             atexit.register(run_command, 'defaults write org.python.python ApplePersistenceIgnoreState %s' % data)
 
-    fretworkRequired = (0, 4, 0)
+    fretworkRequired = (0, 5, 0)
     reqVerStr = '.'.join([str(i) for i in fretworkRequired])
     fretworkErrorStr = '''
 
