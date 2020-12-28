@@ -4,7 +4,7 @@ numpy==1.16.6
 olefile==0.46
 Pillow==6.2.2
 PyAudio==0.2.11
-pygame==1.9.3
+pygame==1.9.6
 PyOpenGL==3.1.0
 PyOpenGL-accelerate==3.1.0
 fretwork==0.4.0
