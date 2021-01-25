@@ -44,6 +44,8 @@ OS-specific dependencies:
     - python's developpment headers
     - and: `GLU`, `GLib`, `SDL`, `SDL_mixer`, `libogg`, `libvorbisfile`, `libtheora`, `libsoundtouch`, `libswscale` (part of `ffmpeg`) development headers
 
+To install Unix dependencies in Debian run `sudo apt-get install libogg-dev libportmidi-dev libsdl-image1.2-dev libsdl-mixer1.2-dev libsdl-ttf2.0-dev libsdl1.2-dev libsoundtouch-dev libswscale-dev libtheora-dev libvorbis-dev mesa-utils portaudio19-dev`
+
 
 ### Native modules
 
