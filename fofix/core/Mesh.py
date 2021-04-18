@@ -42,6 +42,15 @@ class Mesh:
         self.fullGeoms = {}
 
     def setupLight(self, light, n, pos):
+        """ Setup light
+
+        :param light: the light to setup
+        :param n: the indice of the light
+        :param pos: the position of the light
+        :type light: collada.light.BoundLight
+        :type n: int
+        :type pos: tuple of 3 elements
+        """
         glEnable(GL_LIGHTING)
         glEnable(GL_LIGHT0 + n)
         glLightfv(GL_LIGHT0 + n, GL_POSITION, np.array([pos[0], pos[1], pos[2], 0.0], dtype=np.float32))
@@ -57,6 +66,17 @@ class Mesh:
             glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT,   effect.ambient)
             glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE,   effect.diffuse)
             glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR,  effect.specular)
+
+    def drawElement(self, indices, offset, array, func):
+        """ Draw an element
+
+        :param array: list of elements to draw
+        :param func: the function to apply
+        :type indices: int
+        :type offset: int
+        """
+        if array is not None:
+            func(*array[indices[offset]])
 
     def render(self, geomName=None):
         if geomName in self.fullGeoms:
@@ -101,9 +121,9 @@ class Mesh:
                                             poly.normal_indices)
 
                                 for i in indices:
-                                    drawElement(i, -1, normals,   glNormal3f)
-                                    drawElement(i,  1, texcoords, glTexCoord2f)
-                                    drawElement(i,  0, vertices,  glVertex3f)
+                                    self.drawElement(i, -1, normals,   glNormal3f)
+                                    self.drawElement(i,  1, texcoords, glTexCoord2f)
+                                    self.drawElement(i,  0, vertices,  glVertex3f)
                                 glEnd()
                         elif isinstance(prim, TriangleSet):
                             glBegin(GL_TRIANGLES)
@@ -117,9 +137,9 @@ class Mesh:
                                             triangle.normal_indices)
 
                                 for i in indices:
-                                    drawElement(i, -1, normals,   glNormal3f)
-                                    drawElement(i,  1, texcoords, glTexCoord2f)
-                                    drawElement(i,  0, vertices,  glVertex3f)
+                                    self.drawElement(i, -1, normals,   glNormal3f)
+                                    self.drawElement(i,  1, texcoords, glTexCoord2f)
+                                    self.drawElement(i,  0, vertices,  glVertex3f)
                             glEnd()
 
         # Prepare a new display list for this particular geometry
