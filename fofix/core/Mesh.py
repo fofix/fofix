@@ -41,13 +41,6 @@ class Mesh:
         self.geoms = {}
         self.fullGeoms = {}
 
-    def _unflatten(self, array, stride):
-        """ Unflatten a list
-
-        Return a list of tuples with <stride> elements per tuples.
-        """
-        return [tuple(array[i * stride:(i + 1) * stride]) for i in range(len(array) / stride)]
-
     def setupLight(self, light, n, pos):
         glEnable(GL_LIGHTING)
         glEnable(GL_LIGHT0 + n)
