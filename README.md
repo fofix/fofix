@@ -1,7 +1,7 @@
 Frets on Fire X - FoFiX
 =======================
 
-[![Build Status](https://travis-ci.org/fofix/fofix.svg?branch=master)](https://travis-ci.org/fofix/fofix)
+[![Tests Status](https://github.com/fofix/fofix/actions/workflows/tests.yml/badge.svg?branch=master)](https://github.com/fofix/fofix/actions/workflows/tests.yml)
 [![Documentation Status](https://readthedocs.org/projects/fofix/badge/?version=latest)](https://fofix.readthedocs.io/en/latest/?badge=latest)
 [![Gitter](https://badges.gitter.im/fofix/fofix.svg)](https://gitter.im/fofix/fofix?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=body_badge)
 
