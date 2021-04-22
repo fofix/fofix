@@ -1,0 +1,78 @@
+name: Tests
+
+on:
+  push:
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  tests:
+    name: tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Install python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 2.7
+
+      - name: Install os dependencies
+        run: |
+          sudo apt-get -qq update
+          sudo apt-get install -yq \
+            libogg-dev \
+            libportmidi-dev \
+            libsdl-image1.2-dev \
+            libsdl-mixer1.2-dev \
+            libsdl-ttf2.0-dev \
+            libsdl1.2-dev \
+            libsoundtouch-dev \
+            libswscale-dev \
+            libtheora-dev \
+            libvorbis-dev \
+            mesa-utils \
+            portaudio19-dev
+          sudo apt-get install -y gcc g++
+
+      - name: Install python dependencies
+        run: |
+          pip install pytest pytest-cov
+          pip install -r requirements.txt
+
+      - name: Build extensions
+        run: python setup.py build_ext --inplace --force
+
+      - name: Run tests
+        uses: GabrielBB/xvfb-action@v1
+        with:
+          run: pytest fofix
+        env:
+          SDL_AUDIODRIVER: dummy
+
+  gitlint:
+    name: gitlint
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: true
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - name: Install python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+
+      - name: Install gitlint
+        run: pip install "gitlint==0.15.1"
+
+      - name: Run gitlint
+        run: gitlint --commits origin..HEAD
+        continue-on-error: true
