@@ -2942,13 +2942,13 @@ def loadSong(engine, name, library=DEFAULT_LIBRARY, playbackOnly=False, notesOnl
             instName = f.split('.')[0].lower()
 
             # Check for numbered audio tracks
-            isNumbered = re.compile('^.*_\d').match(instName)
+            isNumbered = re.compile(r'^.*_\d').match(instName)
             if isNumbered:
                 # take the part of the name before the underscore for the name.
                 instName = instName.split('_')[0]
 
             # get the number of additional tracks
-            instReNumbered = re.compile('^{0}_\d'.format(instName))
+            instReNumbered = re.compile(r'^{0}_\d'.format(instName))
             numCount = len([i for i in songOggFiles if instReNumbered.match(i)])
 
             # skip non numbered ogg files if there are others that are.
