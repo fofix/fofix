@@ -1141,7 +1141,7 @@ class VocalTrack(Track):
                     event.star = True
                 phraseTimes.append(_time)
                 phraseId += 1
-        for _time, tuple in self.allNotes.items():
+        for _time, notes in self.allNotes.items():
             phraseId = 0
             for i, phraseTime in enumerate(self.getAllEvents()):
                 if _time > phraseTime[0] and _time < phraseTime[0] + phraseTime[1].length:
@@ -1149,31 +1149,31 @@ class VocalTrack(Track):
                     if phraseId < 0:
                         phraseId = 0
                     break
-            tuple[1].phrase = phraseId
-            if not tuple[1].tap:
+            notes[1].phrase = phraseId
+            if not notes[1].tap:
                 try:
-                    lyric = self.allWords[tuple[0]]
+                    lyric = self.allWords[notes[0]]
                 except KeyError:
                     lyric = None
                 if lyric:
                     if lyric.find("+") >= 0:
-                        tuple[1].heldNote = True
+                        notes[1].heldNote = True
                     else:
                         if lyric.find("#") >= 0:
-                            tuple[1].speak = True
-                            tuple[1].lyric = lyric.strip("#")
+                            notes[1].speak = True
+                            notes[1].lyric = lyric.strip("#")
                         elif lyric.find("^") >= 0:
-                            tuple[1].extra = True
-                            tuple[1].lyric = lyric.strip("^")
+                            notes[1].extra = True
+                            notes[1].lyric = lyric.strip("^")
                         else:
-                            tuple[1].lyric = lyric
+                            notes[1].lyric = lyric
             else:
                 self.allEvents[phraseId][1].tapPhrase = True
-            self.allEvents[phraseId][1].addEvent(tuple[0], tuple[1])
+            self.allEvents[phraseId][1].addEvent(notes[0], notes[1])
             self.allEvents[phraseId][1].minPitch = min(
-                self.allEvents[phraseId][1].minPitch, tuple[1].note)
+                self.allEvents[phraseId][1].minPitch, notes[1].note)
             self.allEvents[phraseId][1].maxPitch = max(
-                self.allEvents[phraseId][1].maxPitch, tuple[1].note)
+                self.allEvents[phraseId][1].maxPitch, notes[1].note)
         for _time, event in self.getAllEvents():
             if isinstance(event, VocalPhrase):
                 event.sort()
