@@ -357,7 +357,7 @@ class SongInfo(object):
             except KeyError:
                 continue
             for i, base_scores in enumerate(scores[difficulty.id]):
-                score, stars, name, hash = base_scores
+                score, stars, name, _hash = base_scores
                 if scores_ext:
                     # Someone may have mixed extended and non extended
                     try:
@@ -375,8 +375,8 @@ class SongInfo(object):
                     except Exception:
                         hash_ext = 0
                         scoreExt = (0, 0, 0, "RF-mod", 0, "None", 0)
-                if self.getScoreHash(difficulty, score, stars, name) == hash:
-                    if scores_ext and hash == hash_ext:
+                if self.getScoreHash(difficulty, score, stars, name) == _hash:
+                    if scores_ext and _hash == hash_ext:
                         self.addHighscore(difficulty, score, stars, name, part, scoreExt=scoreExt)
                     else:
                         self.addHighscore(difficulty, score, stars, name, part)
