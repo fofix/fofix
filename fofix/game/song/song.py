@@ -1013,11 +1013,11 @@ class Track(object):
     @property
     def length(self):
         lastTime = 0
-        for time, event in self.getAllEvents():
+        for _time, event in self.getAllEvents():
             if not isinstance(event, Note) and not isinstance(event, VocalPhrase):
                 continue
-            if time + event.length > lastTime:
-                lastTime = time + event.length
+            if _time + event.length > lastTime:
+                lastTime = _time + event.length
         return round((lastTime + 1000.0) / 1000.0) * 1000.0
 
     def addEvent(self, time, event):
@@ -1084,7 +1084,7 @@ class Track(object):
         if self.maxIndex:
             self.currentIndex = 0
         for eventList in self.events:
-            for time, event in eventList:
+            for _time, event in eventList:
                 if isinstance(event, Note):
                     event.played = False
                     event.hopod = False
@@ -1114,9 +1114,9 @@ class VocalTrack(Track):
             Track.addEvent(self, time, event)
 
     def removeTempoEvents(self):
-        for time, event in self.allEvents:
+        for _time, event in self.allEvents:
             if isinstance(event, Tempo):
-                self.allEvents.remove((time, event))
+                self.allEvents.remove((_time, event))
                 if self.logTempoEvents == 1:
                     log.debug("Tempo event removed from VocalTrack during cleanup: " +
                               str(event.bpm) + "bpm")
@@ -1129,22 +1129,22 @@ class VocalTrack(Track):
             markStars = True
             log.warning(
                 "This song does not appear to have any vocal star power events - falling back on auto-generation.")
-        for time, event in self.getAllEvents():
+        for _time, event in self.getAllEvents():
             if isinstance(event, VocalPhrase):
-                if time in self.starTimes and not markStars:
+                if _time in self.starTimes and not markStars:
                     event.star = True
-                if time in phraseTimes:
+                if _time in phraseTimes:
                     log.warning("Phrase repeated - some lyric phrase errors may occur.")
                     phraseId += 1
                     continue
                 if markStars and phraseId + 1 % 7 == 0:
                     event.star = True
-                phraseTimes.append(time)
+                phraseTimes.append(_time)
                 phraseId += 1
-        for time, tuple in self.allNotes.iteritems():
+        for _time, tuple in self.allNotes.items():
             phraseId = 0
             for i, phraseTime in enumerate(self.getAllEvents()):
-                if time > phraseTime[0] and time < phraseTime[0] + phraseTime[1].length:
+                if _time > phraseTime[0] and _time < phraseTime[0] + phraseTime[1].length:
                     phraseId = i
                     if phraseId < 0:
                         phraseId = 0
@@ -1174,7 +1174,7 @@ class VocalTrack(Track):
                 self.allEvents[phraseId][1].minPitch, tuple[1].note)
             self.allEvents[phraseId][1].maxPitch = max(
                 self.allEvents[phraseId][1].maxPitch, tuple[1].note)
-        for time, event in self.getAllEvents():
+        for _time, event in self.getAllEvents():
             if isinstance(event, VocalPhrase):
                 event.sort()
 
@@ -1182,9 +1182,9 @@ class VocalTrack(Track):
         if self.maxIndex:
             self.currentIndex = 0
         for eventList in self.events:
-            for time, event in eventList:
+            for _time, event in eventList:
                 if isinstance(event, VocalPhrase):
-                    for time, note in event.allEvents:
+                    for _time, note in event.allEvents:
                         note.played = False
                         note.stopped = False
                         note.accuracy = 0.0
@@ -1200,13 +1200,13 @@ class VocalPhrase(VocalTrack, Event):
     def sort(self):
         eventDict = {}
         newEvents = []
-        for time, event in self.allEvents:
+        for _time, event in self.allEvents:
             if isinstance(event, VocalNote):
-                eventDict[int(time)] = (time, event)
+                eventDict[int(_time)] = (_time, event)
         times = eventDict.keys()
         times.sort()
-        for time in times:
-            newEvents.append(eventDict[time])
+        for _time in times:
+            newEvents.append(eventDict[_time])
         self.allEvents = newEvents
 
 
@@ -1225,8 +1225,8 @@ class TempoTrack(Track):
         if self.currentIndex:
             tempEventHolder = self.getNextEvent()  # check if next BPM change is here yet
             if tempEventHolder:
-                time, event = tempEventHolder
-                if pos >= time:
+                _time, event = tempEventHolder
+                if pos >= _time:
                     self.currentIndex += 1
                     self.currentBpm = event.bpm
         return self.currentBpm
@@ -1241,17 +1241,17 @@ class TempoTrack(Track):
     def searchCurrentTempo(self, pos):
         foundBpm = None
         foundTime = None
-        for time, event in self.allEvents:
+        for _time, event in self.allEvents:
             if not foundBpm or not foundTime:
                 foundBpm = event.bpm
-                foundTime = time
+                foundTime = _time
             else:
                 # want to discard if the foundTime is before pos, but this event is after pos.
                 # -- also want to take newer BPM if time > foundTime >= pos
-                if time <= pos:  # first required condition.
-                    if time > foundTime:  # second required condition for sorting.
+                if _time <= pos:  # first required condition.
+                    if _time > foundTime:  # second required condition for sorting.
                         foundBpm = event.bpm
-                        foundTime = time
+                        foundTime = _time
         if foundBpm:
             return foundBpm
         else:  # return default BPM if no events
@@ -1270,15 +1270,15 @@ class NoteTrack(Track):
         self.logTempoEvents = engine.config.get("log", "log_tempo_events")
 
     def removeTempoEvents(self):
-        for time, event in self.allEvents:
+        for _time, event in self.allEvents:
             if isinstance(event, Tempo):
-                self.allEvents.remove((time, event))
+                self.allEvents.remove((_time, event))
                 if self.logTempoEvents == 1:
                     log.debug("Tempo event removed from NoteTrack during cleanup: " +
                               str(event.bpm) + "bpm")
 
     def flipDrums(self):
-        for time, event in self.allEvents:
+        for _time, event in self.allEvents:
             if isinstance(event, Note):
                 event.number = (5 - event.number) % 5
 
@@ -1337,14 +1337,14 @@ class NoteTrack(Track):
         if self.marked:
             return
 
-        for time, event in self.allEvents:
+        for _time, event in self.allEvents:
             if isinstance(event, Tempo):
-                bpmNotes.append([time, event])
+                bpmNotes.append([_time, event])
                 continue
             if not isinstance(event, Note):
                 continue
 
-            while bpmNotes and time >= bpmNotes[0][0]:
+            while bpmNotes and _time >= bpmNotes[0][0]:
                 # Adjust to new BPM
                 # bpm = bpmNotes[0][1].bpm
                 bpmTime, bpmEvent = bpmNotes.pop(0)
@@ -1353,14 +1353,14 @@ class NoteTrack(Track):
             if not bpm:
                 bpm = DEFAULT_BPM
 
-            tick = (time * bpm * ticksPerBeat) / 60000.0
+            tick = (_time * bpm * ticksPerBeat) / 60000.0
             lastTick = (lastTime * bpm * ticksPerBeat) / 60000.0
 
             # skip first note
             if firstTime == 1:
                 event.tappable = -3
                 lastEvent = event
-                lastTime = time
+                lastTime = _time
                 eventBeforeLast = lastEvent
                 eventBeforeEventBeforeLast = eventBeforeLast
                 firstTime = 0
@@ -1395,7 +1395,7 @@ class NoteTrack(Track):
                 if bpmEvent:
                     hopoNotes.append([bpmTime, bpmEvent])
 
-                hopoNotes.append([time, event])
+                hopoNotes.append([_time, event])
 
             # HOPO definitely over - time since last note too great.
             if tickDelta > hopoDelta:
@@ -1461,16 +1461,16 @@ class NoteTrack(Track):
             eventBeforeEventBeforeLast = eventBeforeLast
             eventBeforeLast = lastEvent
             lastEvent = event
-            lastTime = time
+            lastTime = _time
 
         else:
             # Add last note to HOPO list if applicable
             if noteDelta != 0 and tickDelta > self.chordFudge and tickDelta < hopoDelta and isinstance(event, Note):
 
                 if bpmEvent:
-                    hopoNotes.append([time, bpmEvent])
+                    hopoNotes.append([_time, bpmEvent])
 
-                hopoNotes.append([time, event])
+                hopoNotes.append([_time, event])
 
             # marker: (next - FOR loop)----
 
@@ -1497,13 +1497,13 @@ class NoteTrack(Track):
 
         bpmNotes = []
 
-        for time, note in list(hopoNotes):
+        for _time, note in list(hopoNotes):
             if isinstance(note, Tempo):
-                bpmNotes.append([time, note])
+                bpmNotes.append([_time, note])
                 continue
             if not isinstance(note, Note):
                 continue
-            while bpmNotes and time >= bpmNotes[0][0]:
+            while bpmNotes and _time >= bpmNotes[0][0]:
                 # Adjust to new BPM
                 # bpm = bpmNotes[0][1].bpm
                 bpmTime, bpmEvent = bpmNotes.pop(0)
@@ -1513,7 +1513,7 @@ class NoteTrack(Track):
                 if note.tappable >= 0:
                     note.tappable = 1
                 lastEvent = note
-                lastTime = time
+                lastTime = _time
                 firstTime = 0
                 eventBeforeLast = lastEvent
                 eventBeforeEventBeforeLast = eventBeforeLast
@@ -1525,7 +1525,7 @@ class NoteTrack(Track):
             tickDeltaBeforeTickDeltaBeforeLast = tickDeltaBeforeLast  # 4 notes in the past
             tickDeltaBeforeLast = lastTickDelta  # 3 notes in the past
             lastTickDelta = tickDelta  # 2 notes in the past
-            tick = (time * bpm * ticksPerBeat) / 60000.0
+            tick = (_time * bpm * ticksPerBeat) / 60000.0
             lastTick = (lastTime * bpm * ticksPerBeat) / 60000.0
             tickDelta = tick - lastTick
 
@@ -1642,7 +1642,7 @@ class NoteTrack(Track):
                         eventBeforeEventBeforeLast = eventBeforeLast
                         eventBeforeLast = lastEvent
                         lastEvent = note
-                        lastTime = time
+                        lastTime = _time
                         continue
                     if lastEvent.tappable == -2:
                         # If its the same note again it's invalid
@@ -1725,7 +1725,7 @@ class NoteTrack(Track):
             eventBeforeEventBeforeLast = eventBeforeLast
             eventBeforeLast = lastEvent
             lastEvent = note
-            lastTime = time
+            lastTime = _time
         else:
             if note is not None:
                 # Handle last note
@@ -1753,14 +1753,14 @@ class NoteTrack(Track):
         # song with no tempo events - and go mark all 120BPM bars.
         endBpm = None
         endTime = None
-        for time, event in self.allEvents:
+        for _time, event in self.allEvents:
             if isinstance(event, Tempo):
-                tempoTime.append(time)
+                tempoTime.append(_time)
                 tempoBpm.append(event.bpm)
                 endBpm = event.bpm
                 continue
             if isinstance(event, Note):
-                endTime = time + event.length + 30000
+                endTime = _time + event.length + 30000
                 continue
 
         if endTime:
@@ -1771,12 +1771,12 @@ class NoteTrack(Track):
         # calculate and add the measures/beats/half-beats
         passes = 0
         limit = len(tempoTime)
-        time = tempoTime[0]
+        _time = tempoTime[0]
         THnote = 256.0  # 256th note
         drawBar = True
         i = 0
         while i < (limit - 1):
-            msTotal = tempoTime[i + 1] - time
+            msTotal = tempoTime[i + 1] - _time
             if msTotal == 0:
                 i += 1
                 continue
@@ -1784,40 +1784,40 @@ class NoteTrack(Track):
             nbars = (msTotal * (tempbpm / (240.0 / THnote))) / 1000.0
             inc = msTotal / nbars
 
-            while time < tempoTime[i + 1]:
+            while _time < tempoTime[i + 1]:
                 if drawBar:
                     if passes % (THnote / 1.0) == 0.0:  # 256/1
                         event = Bars(2)  # measure
-                        self.addEvent(time, event)
+                        self.addEvent(_time, event)
                     elif passes % (THnote / 4.0) == 0.0:  # 256/4
                         event = Bars(1)  # beat
-                        self.addEvent(time, event)
+                        self.addEvent(_time, event)
                     elif passes % (THnote / 8.0) == 0.0:  # 256/8
                         event = Bars(0)  # half-beat
-                        self.addEvent(time, event)
+                        self.addEvent(_time, event)
 
                     passes = passes + 1
 
-                time = time + inc
+                _time = _time + inc
                 drawBar = True
 
-            if time > tempoTime[i + 1]:
-                time = time - inc
+            if _time > tempoTime[i + 1]:
+                _time = _time - inc
                 drawBar = False
 
             i += 1
 
         # add the last measure/beat/half-beat
-        if time == tempoTime[i]:
+        if _time == tempoTime[i]:
             if passes % (THnote / 1.0) == 0.0:  # 256/1
                 event = Bars(2)  # measure
-                self.addEvent(time, event)
+                self.addEvent(_time, event)
             elif passes % (THnote / 4.0) == 0.0:  # 256/4
                 event = Bars(1)  # beat
-                self.addEvent(time, event)
+                self.addEvent(_time, event)
             elif passes % (THnote / 8.0) == 0.0:  # 256/8
                 event = Bars(0)  # half-beat
-                self.addEvent(time, event)
+                self.addEvent(_time, event)
 
 
 class Song(object):
@@ -2152,8 +2152,8 @@ class ScriptReader(object):
         for line in self.file:
             if line.startswith("#") or line.isspace():
                 continue
-            time, length, type, data = re.split("[\t ]+", line.strip(), 3)
-            time = float(time)
+            _time, length, type, data = re.split("[\t ]+", line.strip(), 3)
+            _time = float(_time)
             length = float(length)
 
             if type == "text":
@@ -2164,7 +2164,7 @@ class ScriptReader(object):
                 continue
 
             # add an event to the script.txt track
-            self.song.eventTracks[TK_SCRIPT].addEvent(time, event)
+            self.song.eventTracks[TK_SCRIPT].addEvent(_time, event)
 
 
 class MidiReader(midi.MidiOutStream):
@@ -2241,8 +2241,8 @@ class MidiReader(midi.MidiOutStream):
             self.song.track[track].addEvent(time, event)
 
     def addVocalLyric(self, text):
-        time = self.abs_time()
-        assert time >= 0
+        _time = self.abs_time()
+        assert _time >= 0
 
         if not self.useVocalTrack:
             return True
@@ -2254,7 +2254,7 @@ class MidiReader(midi.MidiOutStream):
             if self.partnumber == j:
                 track = i
 
-        self.song.track[track].allWords[time] = text
+        self.song.track[track].allWords[_time] = text
 
     def addVocalStar(self, time):
         if time is None:
@@ -2318,11 +2318,11 @@ class MidiReader(midi.MidiOutStream):
             tempoMarkerTime = 0.0
             currentBpm = self.song.bpm
             for i, marker in enumerate(self.tempoMarkers):
-                time, bpm = marker
-                if time > currentTime:
+                _time, bpm = marker
+                if _time > currentTime:
                     break
-                scaledTime += ticksToBeats(time - tempoMarkerTime, currentBpm)
-                tempoMarkerTime, currentBpm = time, bpm
+                scaledTime += ticksToBeats(_time - tempoMarkerTime, currentBpm)
+                tempoMarkerTime, currentBpm = _time, bpm
             return scaledTime + ticksToBeats(currentTime - tempoMarkerTime, currentBpm)
         return 0.0
 
@@ -2607,11 +2607,11 @@ class MidiSectionReader(midi.MidiOutStream):
             tempoMarkerTime = 0.0
             currentBpm = self.bpm
             for i, marker in enumerate(self.tempoMarkers):
-                time, bpm = marker
-                if time > currentTime:
+                _time, bpm = marker
+                if _time > currentTime:
                     break
-                scaledTime += ticksToBeats(time - tempoMarkerTime, currentBpm)
-                tempoMarkerTime, currentBpm = time, bpm
+                scaledTime += ticksToBeats(_time - tempoMarkerTime, currentBpm)
+                tempoMarkerTime, currentBpm = _time, bpm
             return scaledTime + ticksToBeats(currentTime - tempoMarkerTime, currentBpm)
         return 0.0
 
