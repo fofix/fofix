@@ -19,12 +19,12 @@
 #####################################################################
 
 # Horizontal alignments
-LEFT   = 0
+LEFT = 0
 CENTER = 1
-RIGHT  = 2
+RIGHT = 2
 
 # Vertical alignments
-TOP    = 0
+TOP = 0
 MIDDLE = 1
 BOTTOM = 2
 
@@ -38,7 +38,7 @@ KEEP_ASPECT = 4
 SCREEN_WIDTH = 640.0
 SCREEN_HEIGHT = 480.0
 
-#set of values that define as true when loading string values from a file
-def isTrue(value):
-    return value in ["1", "true", "yes", "on"]
 
+def isTrue(value):
+    """ Check if the value looks like True """
+    return value in ["1", "true", "yes", "on"]
