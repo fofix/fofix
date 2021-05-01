@@ -56,9 +56,6 @@ class Loader(Thread):
         self.time        = 0.0
         self.canceled    = False
 
-        # the following should be global and done ONCE:
-        self.logLoadings = Config.get("game", "log_loadings")
-
         if target and name:
             setattr(target, name, None)
 
@@ -129,8 +126,7 @@ class Loader(Thread):
                 self.onCancel()
             return
 
-        if self.logLoadings == 1:
-            log.info("Loaded %s.%s in %.3f seconds" % (self.target.__class__.__name__, self.name, self.time))
+        log.debug("Loaded %s.%s in %.3f seconds" % (self.target.__class__.__name__, self.name, self.time))
 
         if self.exception:
             e = self.exception[0](self.exception[1])
@@ -168,8 +164,6 @@ class Resource(Task):
 
         if self.baseLibrary and os.path.isdir(self.baseLibrary):
             self.songPath = [self.baseLibrary]
-
-        self.logLoadings = Config.get("game", "log_loadings")
 
     def refreshBaseLib(self):
         """ Refresh the base library after a new one is selected """
@@ -263,8 +257,7 @@ class Resource(Task):
                 else returns an instance of fofix.core.Loader
         """
 
-        if self.logLoadings == 1:
-            log.info("Loading %s.%s %s" % (target.__class__.__name__, name, synch and "synchronously" or "asynchronously"))
+        log.debug("Loading %s.%s %s" % (target.__class__.__name__, name, synch and "synchronously" or "asynchronously"))
 
         loader = Loader(target, name, function, self.resultQueue, self.loaderSemaphore, onLoad=onLoad, onCancel=onCancel)
         if synch:
