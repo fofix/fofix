@@ -41,6 +41,13 @@ from fofix.core import VFS
 log = logging.getLogger(__name__)
 
 
+def decodeString(data):
+    try:
+        return data.decode('utf-8')
+    except UnicodeDecodeError:
+        return data.decode('latin-1')
+
+
 class MyConfigParser(RawConfigParser):
     def _writeSection(self, fp, sectionName, sectionItems):
         fp.write("[%s]\n" % sectionName)
@@ -69,6 +76,8 @@ class MyConfigParser(RawConfigParser):
             try:
                 with open(filename) as fp:
                     configData = fp.read()
+
+                configData = decodeString(configData)
                 configLines = configData.split('\n')
                 configLines = [line for line in configLines
                                    if line.strip()[0:2] != '//']
