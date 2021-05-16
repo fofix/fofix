@@ -21,16 +21,20 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,        #
 # MA  02110-1301, USA.                                              #
 #####################################################################
+
 import importlib
 
-#dictionary of scenes
-sceneInfo = {
-   "SongChoosingScene": "fofix.game.SongChoosingScene",
-   "GuitarScene": "fofix.game.guitarscene",
-   "GameResultsScene": "fofix.game.GameResultsScene",
+
+# dictionary of scenes
+SCENE_INFO = {
+    "SongChoosingScene": "fofix.game.SongChoosingScene",
+    "GuitarScene": "fofix.game.guitarscene",
+    "GameResultsScene": "fofix.game.GameResultsScene",
 }
-scenes = list(sceneInfo.values())
+scenes = list(SCENE_INFO.values())
+
 
 def create(engine, name, **args):
-    scene_name = importlib.import_module(sceneInfo[name])
-    return getattr(scene_name, name)(engine = engine, **args)
+    """Create a scene"""
+    scene_name = importlib.import_module(SCENE_INFO[name])
+    return getattr(scene_name, name)(engine=engine, **args)
