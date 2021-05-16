@@ -19,7 +19,7 @@ class MyConfigParserTest(unittest.TestCase):
 
         with tempfile.TemporaryFile() as tmp:
             # write a complete section manually
-            config._writeSection(tmp, "section", items)
+            config._write_section(tmp, "section", items)
             tmp.seek(0)
             lines = tmp.readlines()
 
