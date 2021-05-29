@@ -78,6 +78,8 @@ def activate_mod(engine, mod_name):
     # add the path to resource data
     if os.path.isdir(mod_path):
         engine.resource.addDataPath(mod_path)
+        # activate the mod
+        engine.config.set("mods", "mod_" + mod_name, True)
         # load the theme of the mod
         if os.path.isfile(theme_mod_path):
             theme = Config.load(theme_mod_path)
@@ -91,3 +93,5 @@ def deactivate_mod(engine, mod_name):
     mod_path = os.path.join(mods_path, mod_name)
     # remove the path from resource data
     engine.resource.removeDataPath(mod_path)
+    # deactivate the mod
+    engine.config.set("mods", "mod_" + mod_name, False)
