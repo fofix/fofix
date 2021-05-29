@@ -31,47 +31,63 @@ from fofix.core import Theme
 log = logging.getLogger(__name__)
 
 
-def _getModPath(engine):
+def _get_mods_path(engine):
+    """Get the path of mods"""
     return engine.resource.fileName("mods")
 
+
 def init(engine):
+    """Init mods"""
     # define configuration keys for all available mods
-    for m in getAvailableMods(engine):
-        Config.define("mods", "mod_" + m, bool, False, text = m,  options = {False: _("Off"), True: _("On")})
+    for mod_name in get_available_mods(engine):
+        Config.define("mods", "mod_" + mod_name, bool, False, text=mod_name, options={False: _("Off"), True: _("On")})
 
     # init all active mods
-    for m in getActiveMods(engine):
-        activateMod(engine, m)
+    for mod in get_active_mods(engine):
+        activate_mod(engine, mod)
 
-def getAvailableMods(engine):
-    modPath = _getModPath(engine)
+
+def get_available_mods(engine):
+    """Get available mods"""
+    mods_path = _get_mods_path(engine)
     try:
-        dirList = os.listdir(modPath)
+        dir_list = os.listdir(mods_path)
     except OSError:
         log.warning("Could not find mods directory")
         return []
-    return [m for m in dirList if os.path.isdir(os.path.join(modPath, m)) and not m.startswith(".")]
+    return [mod for mod in dir_list if os.path.isdir(os.path.join(mods_path, mod)) and not mod.startswith(".")]
 
-def getActiveMods(engine):
+
+def get_active_mods(engine):
+    """Get active mods"""
     mods = []
-    for mod in getAvailableMods(engine):
-        if engine.config.get("mods", "mod_" + mod):
-            mods.append(mod)
+    for mod_name in get_available_mods(engine):
+        if engine.config.get("mods", "mod_" + mod_name):
+            mods.append(mod_name)
     mods.sort()
     return mods
 
-def activateMod(engine, modName):
-    modPath = _getModPath(engine)
-    m = os.path.join(modPath, modName)
-    t = os.path.join(m, "theme.ini")
-    if os.path.isdir(m):
-        engine.resource.addDataPath(m)
-        if os.path.isfile(t):
-            theme = Config.load(t)
+
+def activate_mod(engine, mod_name):
+    """Activate a mod"""
+    # get the path of the mod
+    mods_path = _get_mods_path(engine)
+    mod_path = os.path.join(mods_path, mod_name)
+    theme_mod_path = os.path.join(mod_path, "theme.ini")
+
+    # add the path to resource data
+    if os.path.isdir(mod_path):
+        engine.resource.addDataPath(mod_path)
+        # load the theme of the mod
+        if os.path.isfile(theme_mod_path):
+            theme = Config.load(theme_mod_path)
             Theme.open(theme)
 
 
-def deactivateMod(engine, modName):
-    modPath = _getModPath(engine)
-    m = os.path.join(modPath, modName)
-    engine.resource.removeDataPath(m)
+def deactivate_mod(engine, mod_name):
+    """Deactivate a mod"""
+    # get the path of the mod
+    mods_path = _get_mods_path(engine)
+    mod_path = os.path.join(mods_path, mod_name)
+    # remove the path from resource data
+    engine.resource.removeDataPath(mod_path)
