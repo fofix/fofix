@@ -665,7 +665,7 @@ class SettingsMenu(Menu.Menu):
             self.opt_selected_color = (1,0.75,0)
 
         self.modSettings = [
-          ConfigChoice(engine, engine.config, "mods",  "mod_" + m) for m in Mod.getAvailableMods(engine)
+          ConfigChoice(engine, engine.config, "mods",  "mod_" + m) for m in Mod.get_available_mods(engine)
         ]
         if len(self.modSettings) > 0:
             self.modSettingsMenu = Menu.Menu(self.engine, self.modSettings, pos = (self.opt_text_x, self.opt_text_y), textColor = self.opt_text_color, selectedColor = self.opt_selected_color)
@@ -1119,7 +1119,7 @@ class BasicSettingsMenu(Menu.Menu):
             self.opt_selected_color = (1,0.75,0)
 
         self.modSettings = [
-          ConfigChoice(engine, engine.config, "mods",  "mod_" + m) for m in Mod.getAvailableMods(engine)
+          ConfigChoice(engine, engine.config, "mods",  "mod_" + m) for m in Mod.get_available_mods(engine)
         ]
         if len(self.modSettings) > 0:
             self.modSettingsMenu = Menu.Menu(self.engine, self.modSettings, pos = (self.opt_text_x, self.opt_text_y), textColor = self.opt_text_color, selectedColor = self.opt_selected_color)
