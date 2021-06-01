@@ -8,8 +8,21 @@ on:
 
 jobs:
   tests:
-    name: tests
+    name: "tests on python ${{ matrix.python-version }} (optional: ${{ matrix.experimental }})"
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: [2.7]
+        experimental: [false]
+
+        include:
+          - python-version: 3.6
+            experimental: true
+          - python-version: 3.7
+            experimental: true
+          - python-version: 3.8
+            experimental: true
 
     steps:
       - name: Checkout
@@ -18,7 +31,7 @@ jobs:
       - name: Install python
         uses: actions/setup-python@v2
         with:
-          python-version: 2.7
+          python-version: ${{ matrix.python-version }}
 
       - name: Install os dependencies
         run: |
@@ -46,7 +59,8 @@ jobs:
       - name: Build extensions
         run: python setup.py build_ext --inplace --force
 
-      - name: Run tests
+      - name: "Run tests (optional: ${{ matrix.experimental }})"
+        continue-on-error: ${{ matrix.experimental }}
         uses: GabrielBB/xvfb-action@v1
         with:
           run: pytest fofix
