@@ -16,6 +16,7 @@ This is Frets on Fire X, a highly customizable rhythm game supporting many modes
 
 Setup
 -----
+[How-To-Guide For Linux Users] (/Linux_Setup_Guide.md)
 
 ### Dependencies
 
