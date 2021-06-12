@@ -89,7 +89,7 @@
 2. Enter: `cd ~/Documents/fofix-master`
 3. Enter: `pip install -r requirements.txt`
 
-####Step 14: Run FOFIX
+####Step 14: Run FoFiX
 1. Open *Terminal*
 2. Enter: `cd ~/Documents/fofix-master`
 3. Enter: `python FoFiX.py`
