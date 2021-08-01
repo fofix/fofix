@@ -44,10 +44,11 @@ class ConfigOption:
         return self.id < other.id
 
 
-def sortOptionsByKey(dict):
+def sortOptionsByKey(opts):
+    """ Sort options dictionary by keys. """
     a = {}
-    for k in dict.keys():
-        a[k] = ConfigOption(k, dict[k])
+    for k, v in opts.items():
+        a[k] = ConfigOption(k, v)
     return a
 
 # define configuration keys
