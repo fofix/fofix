@@ -326,7 +326,7 @@ class SongInfo(object):
         if difficulty.id not in highScores:
             highScores[difficulty.id] = []
         highScores[difficulty.id].append((score, stars, name, scoreExt))
-        highScores[difficulty.id].sort(lambda a, b: {True: -1, False: 1}[a[0] > b[0]])
+        highScores[difficulty.id].sort(key=lambda h: h[0], reverse=True)
         highScores[difficulty.id] = highScores[difficulty.id][:5]
         for i, scores in enumerate(highScores[difficulty.id]):
             _score, _stars, _name, _scores_ext = scores
@@ -491,13 +491,13 @@ class SongInfo(object):
             if info.parts == []:
                 raise Exception("No tracks found in %s" % noteFileName)
             self._midiStyle = info.midiStyle
-            info.parts.sort(lambda b, a: cmp(b.id, a.id))
+            info.parts.sort(key=lambda ipart: ipart.id)
             self._parts = info.parts
             for part in info.parts:
                 if self.tutorial:
                     self._partDifficulties[part.id] = [difficulties[HAR_DIF]]
                     continue
-                info.difficulties[part.id].sort(lambda a, b: cmp(a.id, b.id))
+                info.difficulties[part.id].sort(key=lambda idiff: idiff.id)
                 self._partDifficulties[part.id] = info.difficulties[part.id]
         except Exception:
             log.warning("Note file not parsed correctly. Selected part and/or difficulty may not be available.")
@@ -3089,7 +3089,7 @@ def getAvailableLibraries(engine, library=DEFAULT_LIBRARY):
                             libName, os.path.join(libraryRoot, "library.ini")))
                         libraryRoots.append(libraryRoot)
 
-    libraries.sort(lambda a, b: cmp(a.name.lower(), b.name.lower()))
+    libraries.sort(key=lambda lib: lib.name.lower())
 
     return libraries
 
@@ -3101,7 +3101,7 @@ def getAvailableSongs(engine, library=DEFAULT_LIBRARY, includeTutorials=False, p
     if tut:
         includeTutorials = True
 
-    # Career Mode determination:
+    # Career Mode determination
     gameMode1p = engine.world.gameMode
     careerMode = gameMode1p == 2
 
@@ -3143,44 +3143,47 @@ def getAvailableSongs(engine, library=DEFAULT_LIBRARY, includeTutorials=False, p
                 song.setLocked(False)
     instrument = engine.config.get("game", "songlist_instrument")
     theInstrumentDiff = instrumentDiff[instrument]
+
+    # sort songs
     if direction == 0:
         if order == 1:
-            songs.sort(lambda a, b: cmp(a.artist.lower(), b.artist.lower()))
+            songs.sort(key=lambda k_song: k_song.artist.lower())
         elif order == 2:
-            songs.sort(lambda a, b: cmp(int(b.count + str(0)), int(a.count + str(0))))
+            songs.sort(key=lambda k_song: int(k_song.count + str(0)), reverse=True)
         elif order == 0:
-            songs.sort(lambda a, b: cmp(a.name.lower(), b.name.lower()))
+            songs.sort(key=lambda k_song: k_song.name.lower())
         elif order == 3:
-            songs.sort(lambda a, b: cmp(a.album.lower(), b.album.lower()))
+            songs.sort(key=lambda k_song: k_song.album.lower())
         elif order == 4:
-            songs.sort(lambda a, b: cmp(a.genre.lower(), b.genre.lower()))
+            songs.sort(key=lambda k_song: k_song.genre.lower())
         elif order == 5:
-            songs.sort(lambda a, b: cmp(a.year.lower(), b.year.lower()))
+            songs.sort(key=lambda k_song: k_song.year.lower())
         elif order == 6:
-            songs.sort(lambda a, b: cmp(a.diffSong, b.diffSong))
+            songs.sort(key=lambda k_song: k_song.diffSong)
         elif order == 7:
-            songs.sort(lambda a, b: cmp(theInstrumentDiff(a), theInstrumentDiff(b)))
+            songs.sort(key=lambda k_song: theInstrumentDiff(k_song))
         elif order == 8:
-            songs.sort(lambda a, b: cmp(a.icon.lower(), b.icon.lower()))
+            songs.sort(key=lambda k_song: k_song.icon.lower())
     else:
         if order == 1:
-            songs.sort(lambda a, b: cmp(b.artist.lower(), a.artist.lower()))
+            songs.sort(key=lambda k_song: k_song.artist.lower(), reverse=True)
         elif order == 2:
-            songs.sort(lambda a, b: cmp(int(a.count + str(0)), int(b.count + str(0))))
+            songs.sort(key=lambda k_song: int(k_song.count + str(0)))
         elif order == 0:
-            songs.sort(lambda a, b: cmp(b.name.lower(), a.name.lower()))
+            songs.sort(key=lambda k_song: k_song.name.lower(), reverse=True)
         elif order == 3:
-            songs.sort(lambda a, b: cmp(b.album.lower(), a.album.lower()))
+            songs.sort(key=lambda k_song: k_song.album.lower(), reverse=True)
         elif order == 4:
-            songs.sort(lambda a, b: cmp(b.genre.lower(), a.genre.lower()))
+            songs.sort(key=lambda k_song: k_song.genre.lower(), reverse=True)
         elif order == 5:
-            songs.sort(lambda a, b: cmp(b.year.lower(), a.year.lower()))
+            songs.sort(key=lambda k_song: k_song.year.lower(), reverse=True)
         elif order == 6:
-            songs.sort(lambda a, b: cmp(b.diffSong, a.diffSong))
+            songs.sort(key=lambda k_song: k_song.diffSong, reverse=True)
         elif order == 7:
-            songs.sort(lambda a, b: cmp(theInstrumentDiff(b), theInstrumentDiff(a)))
+            songs.sort(key=lambda k_song: theInstrumentDiff(k_song), reverse=True)
         elif order == 8:
-            songs.sort(lambda a, b: cmp(b.icon.lower(), a.icon.lower()))
+            songs.sort(key=lambda k_song: k_song.icon.lower(), reverse=True)
+
     return songs
 
 

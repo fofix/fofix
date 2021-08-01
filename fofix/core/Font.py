@@ -57,7 +57,7 @@ class Cache(object):
     def add(self, key, element):
         self.elements[key] = CacheElement(element)
         if len(self.elements) > self.maxCount:
-            keys = self.elements.keys()
+            keys = list(self.elements.keys())
             keys.sort(key=lambda e: -self.elements[e].lastUse)
             for k in keys[self.maxCount:]:
                 del self.elements[k]
