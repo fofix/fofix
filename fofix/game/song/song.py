@@ -24,6 +24,7 @@
 #####################################################################
 
 from collections import OrderedDict
+from functools import total_ordering
 import binascii
 import cPickle  # Cerealizer and sqlite3 don't seem to like each other that much...
 import copy
@@ -120,18 +121,28 @@ instrumentDiff = {
 }
 
 
+@total_ordering
 class Part(object):
     def __init__(self, uid, text, trackName):
         self.id = uid               # int uid for this instance
         self.text = text            # str friendly name for this instance
         self.trackName = trackName  # list(str) of names which the part is called in the midi
 
-    def __cmp__(self, other):
+    def __eq__(self, other):
+        # if it's not being compared with a part, we probably want its real ID.
         if isinstance(other, Part):
-            return cmp(PART_SORTING[self.id], PART_SORTING[other.id])
+            compare = PART_SORTING[self.id] == PART_SORTING[other.id]
         else:
-            # if it's not being compared with a part, we probably want its real ID.
-            return cmp(self.id, other)
+            compare = self.id == other.id
+        return compare
+
+    def __lt__(self, other):
+        # if it's not being compared with a part, we probably want its real ID.
+        if isinstance(other, Part):
+            compare = PART_SORTING[self.id] < PART_SORTING[other.id]
+        else:
+            compare = self.id < other.id
+        return compare
 
     def __str__(self):
         return self.text
@@ -155,16 +166,17 @@ parts = {
 }
 
 
+@total_ordering
 class Difficulty(object):
     def __init__(self, uid, text):
         self.id = uid
         self.text = text
 
-    def __cmp__(self, other):
-        if isinstance(other, Difficulty):
-            return cmp(self.id, other.id)
-        else:
-            return cmp(self.id, other)
+    def __eq__(self, other):
+        return self.id == other.id
+
+    def __lt__(self, other):
+        return self.id > other.id
 
     def __str__(self):
         return self.text

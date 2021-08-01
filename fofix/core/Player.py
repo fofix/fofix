@@ -24,6 +24,7 @@
 # MA  02110-1301, USA.                                              #
 #####################################################################
 
+from functools import total_ordering
 import logging
 
 import pygame
@@ -38,6 +39,7 @@ from fofix.core import VFS
 log = logging.getLogger(__name__)
 
 
+@total_ordering
 class ConfigOption:
     """ Deprecated: also in fofix.core.ConfigDefs """
 
@@ -51,16 +53,11 @@ class ConfigOption:
     def __repr__(self):
         return self.text
 
-    def __cmp__(self, other):
-        try:
-            if self.id > other.id:
-                return 1
-            elif self.id == other.id:
-                return 0
-            else:
-                return -1
-        except Exception:
-            return -1
+    def __eq__(self, other):
+        return self.id == other.id
+
+    def __lt__(self, other):
+        return self.id < other.id
 
 
 def sortOptionsByKey(dict):
