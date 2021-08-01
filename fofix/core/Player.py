@@ -60,11 +60,11 @@ class ConfigOption:
         return self.id < other.id
 
 
-def sortOptionsByKey(dict):
+def sortOptionsByKey(opts):
     """ Deprecated: also in fofix.core.ConfigDefs """
     a = {}
-    for k in dict.keys():
-        a[k] = ConfigOption(k, dict[k])
+    for k, v in opts.items():
+        a[k] = ConfigOption(k, v)
     return a
 
 # Redoing this, sir. Redoing this...
