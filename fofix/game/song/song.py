@@ -239,6 +239,8 @@ if _mustReinitialize:
 
 
 class SongInfo(object):
+    """ A song object """
+
     def __init__(self, infoFileName, songLibrary=DEFAULT_LIBRARY):
         self.songName = os.path.basename(os.path.dirname(infoFileName))
         self.fileName = infoFileName
@@ -3266,23 +3268,28 @@ def getSortingTitles(engine, songList=[]):
 
 
 def getAvailableTitles(engine, library=DEFAULT_LIBRARY):
+    """ Get available titles / sections for an album """
     gameMode1p = engine.world.gameMode
     if library is None:
         return []
 
+    # get the titles.ini file from the library path
     path = os.path.join(engine.resource.fileName(library, writable=True), "titles.ini")
     if not os.path.isfile(path):
         return []
 
+    # get sections from the config file
     config = Config.MyConfigParser()
     titles = []
     try:
         config.read(path)
         sections = config.get("titles", "sections")
 
+        # add a TitleInfo object for each section
         for section in sections.split():
             titles.append(TitleInfo(config, section))
 
+        # add a BlankSpaceInfo object at the end for career mode
         if gameMode1p == 2:
             titles.append(BlankSpaceInfo(_("End of Career")))
 
@@ -3299,203 +3306,68 @@ def getAvailableSongsAndTitles(engine, library=DEFAULT_LIBRARY, includeTutorials
     if library is None:
         return []
 
-    # Career Mode determination:
+    # Career Mode determination
     careerMode = (engine.world.gameMode == 2)
-    career = False
     quickPlayCareerTiers = engine.config.get("game", "quickplay_tiers")
 
-    titles = []
+    # get avalaible songs
     items = getAvailableSongs(engine, library, includeTutorials, progressCallback=progressCallback)
+
+    # get titles
+    titles = []
     if quickPlayCareerTiers == 1 or careerMode:
         titles = getAvailableTitles(engine, library)
     if titles == []:
         titles = getSortingTitles(engine, items)
     else:
-        career = True
-    items = items + titles
+        # sort songs per unlock id
+        items.sort(key=lambda item: item.getUnlockID())
 
-    items.sort(lambda a, b: compareSongsAndTitles(engine, a, b, career))
+    # sort songs per titles (title, song, song, title, song, song, blank)
+    all_items = sort_songs_per_title(items, titles)
 
-    if (not careerMode) and len(items) != 0:
-        items.insert(0, RandomSongInfo())
+    # random mode
+    if (not careerMode) and len(all_items) != 0:
+        all_items.insert(0, RandomSongInfo())
+
+    return all_items
+
+
+def sort_songs_per_title(songs, titles):
+    """ Group songs by (unlock) title and put titles before each song group """
+    items = list()
+
+    # first title
+    i = 0
+    title = titles[i]
+    items.append(title)
+
+    # next titles and songs
+    for song in songs:
+        # comparison: unlock_id or name
+        if isinstance(title, TitleInfo):
+            # the unlock category
+            compare = title.getUnlockID() not in song.getUnlockID()
+        elif isinstance(title, SortTitleInfo):
+            # SortTitleInfo contains the first letter of songs
+            compare = title.name.lower() != song.name[0].lower()
+        else:
+            compare = False
+
+        # insert the title if the slot is complete
+        if compare:
+            i += 1
+            if i < len(titles):
+                title = titles[i]
+                items.append(title)
+        # insert the song
+        items.append(song)
+
+    # insert the blank title if needed
+    if titles[-1] not in items:
+        items.append(titles[-1])
 
     return items
-
-
-def compareSongsAndTitles(engine, a, b, career):
-    """ Compare songs and titles
-
-    Want to push all non-career songs in a folder below all titles and career
-    songs.
-
-    When an unlock_id does not exist in song.ini, a blank string "" value is returned.
-    Can check for this to determine that this song should be below any
-    titles or non-None unlock_id's.
-    """
-
-    order = engine.config.get("game", "sort_order")
-
-    # must check here for an invalid Sort Order setting and correct it!
-    orderings = engine.config.getOptions("game", "sort_order")[1]
-    if order >= len(orderings):
-        order = 0
-        engine.config.set("game", "sort_order", order)
-
-    instrument = engine.config.get("game", "songlist_instrument")
-    theInstrumentDiff = instrumentDiff[instrument]
-    direction = engine.config.get("game", "sort_direction")
-
-    if not career:  # and quickPlayCareerTiers == 2:
-        Aval = ""
-        Bval = ""
-        if isinstance(a, SongInfo):
-            if order == 0:
-                Aval = removeSongOrderPrefixFromName(a.name)[0].lower()
-                if Aval.isdigit():
-                    Aval = "123"
-                if not Aval.isalnum():
-                    Aval = "!@#"
-            elif order == 1:
-                Aval = a.artist.lower()
-            elif order == 2:
-                Aval = int(a.count + str(0))
-                if Aval == "":
-                    Aval = "0"
-            elif order == 3:
-                Aval = a.album.lower()
-            elif order == 4:
-                Aval = a.genre.lower()
-            elif order == 5:
-                Aval = a.year.lower()
-            elif order == 6:
-                Aval = a.diffSong
-            elif order == 7:
-                Aval = theInstrumentDiff(a)
-            elif order == 8:
-                Aval = a.icon.lower()
-        elif isinstance(a, SortTitleInfo):
-            if order == 2:
-                Aval = int(a.name + str(0))
-            elif order == 6 or order == 7:
-                Aval = int(a.name)
-            else:
-                Aval = a.name.lower()
-
-        if isinstance(b, SongInfo):
-            if order == 0:
-                Bval = removeSongOrderPrefixFromName(b.name)[0].lower()
-                if Bval.isdigit():
-                    Bval = "123"
-                if not Bval.isalnum():
-                    Bval = "!@#"
-            elif order == 1:
-                Bval = b.artist.lower()
-            elif order == 2:
-                Bval = int(b.count + str(0))
-                if Bval == "":
-                    Bval = "0"
-            elif order == 3:
-                Bval = b.album.lower()
-            elif order == 4:
-                Bval = b.genre.lower()
-            elif order == 5:
-                Bval = b.year.lower()
-            elif order == 6:
-                Bval = b.diffSong
-            elif order == 7:
-                Bval = theInstrumentDiff(b)
-            elif order == 8:
-                Bval = b.icon.lower()
-        elif isinstance(b, SortTitleInfo):
-            if order == 2:
-                Bval = int(b.name + str(0))
-            elif order == 6 or order == 7:
-                Bval = int(b.name)
-            else:
-                Bval = b.name.lower()
-
-        # if returned unlock IDs are different, sort by unlock ID (this
-        # roughly sorts the tiers and shoves "bonus" songs to the top)
-        if Aval != Bval:
-            if direction == 0:
-                return cmp(Aval, Bval)
-            else:
-                return cmp(Bval, Aval)
-        elif isinstance(a, SortTitleInfo) and isinstance(b, SortTitleInfo):
-            return 0
-        elif isinstance(a, SortTitleInfo) and isinstance(b, SongInfo):
-            return -1
-        elif isinstance(a, SongInfo) and isinstance(b, SortTitleInfo):
-            return 1
-        else:
-            return cmp(a.name, b.name)
-    else:
-        if a.getUnlockID() == "" and b.getUnlockID() != "":  # a is a bonus song, b is involved in career mode
-            return 1
-        # b is a bonus song, a is involved in career mode - this is fine.
-        elif b.getUnlockID() == "" and a.getUnlockID() != "":
-            return -1
-        # a and b are both bonus songs; apply sorting logic.
-        elif a.getUnlockID() == "" and b.getUnlockID() == "":
-            # catch BlankSpaceInfo ("end of career") marker, ensure it goes to
-            # the top of the bonus songlist
-            # a is a bonus song, b is a blank space (end of career marker)
-            if isinstance(a, SongInfo) and isinstance(b, BlankSpaceInfo):
-                return 1
-            # a is a blank space, b is a bonus song (end of career marker) - this is fine.
-            elif isinstance(a, BlankSpaceInfo) and isinstance(b, SongInfo):
-                return -1
-            else:  # both bonus songs, apply sort order:
-                if direction == 0:
-                    if order == 1:
-                        return cmp(a.artist.lower(), b.artist.lower())
-                    elif order == 2:
-                        return cmp(int(b.count + str(0)), int(a.count + str(0)))
-                    elif order == 0:
-                        return cmp(removeSongOrderPrefixFromName(a.name).lower(), removeSongOrderPrefixFromName(b.name).lower())
-                    elif order == 3:
-                        return cmp(a.album.lower(), b.album.lower())
-                    elif order == 4:
-                        return cmp(a.genre.lower(), b.genre.lower())
-                    elif order == 5:
-                        return cmp(a.year.lower(), b.year.lower())
-                    elif order == 6:
-                        return cmp(a.diffSong, b.diffSong)
-                    elif order == 7:
-                        return cmp(theInstrumentDiff(a), theInstrumentDiff(b))
-                    elif order == 8:
-                        return cmp(a.icon.lower(), b.icon.lower())
-                else:
-                    if order == 1:
-                        return cmp(b.artist.lower(), a.artist.lower())
-                    elif order == 2:
-                        return cmp(int(a.count + str(0)), int(b.count + str(0)))
-                    elif order == 0:
-                        return cmp(removeSongOrderPrefixFromName(b.name).lower(), removeSongOrderPrefixFromName(a.name).lower())
-                    elif order == 3:
-                        return cmp(b.album.lower(), a.album.lower())
-                    elif order == 4:
-                        return cmp(b.genre.lower(), a.genre.lower())
-                    elif order == 5:
-                        return cmp(b.year.lower(), a.year.lower())
-                    elif order == 6:
-                        return cmp(b.diffSong, a.diffSong)
-                    elif order == 7:
-                        return cmp(theInstrumentDiff(b), theInstrumentDiff(a))
-                    elif order == 8:
-                        return cmp(b.icon.lower(), a.icon.lower())
-        # original career sorting logic:
-        elif a.getUnlockID() != b.getUnlockID():  # if returned unlock IDs are different, sort by unlock ID (this roughly sorts the tiers and shoves "bonus" songs to the top)
-            return cmp(a.getUnlockID(), b.getUnlockID())
-        elif isinstance(a, TitleInfo) and isinstance(b, TitleInfo):
-            return 0
-        elif isinstance(a, TitleInfo) and isinstance(b, SongInfo):
-            return -1
-        elif isinstance(a, SongInfo) and isinstance(b, TitleInfo):
-            return 1
-
-        else:  # This is where career songs are sorted within tiers -- we want to force sorting by "name" only:
-            return cmp(a.name.lower(), b.name.lower())  # force sort by name for career songs
 
 
 def removeSongOrderPrefixFromName(name):
