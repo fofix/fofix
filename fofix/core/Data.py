@@ -391,7 +391,7 @@ class Data(object):
                                                             numSounds, soundExtension, soundPath))
 
         sounds = []
-        for i in xrange(1, numSounds + 1):
+        for i in range(1, numSounds + 1):
             filePath = os.path.join(soundPath, "%s%d%s" %
                                     (soundPrefix, i, soundExtension))
             soundObject = Sound(self.resource.fileName(filePath))

@@ -71,10 +71,10 @@ def sortOptionsByKey(dict):
     return a
 
 # Redoing this, sir. Redoing this...
-CONTROL1  = [1 << n for n in xrange(20)]
-CONTROL2  = [1 << n for n in xrange(20, 40)]
-CONTROL3  = [1 << n for n in xrange(40, 60)]
-CONTROL4  = [1 << n for n in xrange(60, 80)]
+CONTROL1  = [1 << n for n in range(20)]
+CONTROL2  = [1 << n for n in range(20, 40)]
+CONTROL3  = [1 << n for n in range(40, 60)]
+CONTROL4  = [1 << n for n in range(60, 80)]
 CONTROLS  = [CONTROL1, CONTROL2, CONTROL3, CONTROL4]
 LEFT      = 0
 RIGHT     = 1
