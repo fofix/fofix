@@ -95,9 +95,9 @@ def hexToColor(color):
         color = color[1:]
 
         if len(color) < 4:
-            colorData = [color[i]+color[i] for i in xrange(0, len(color))]
+            colorData = [color[i]+color[i] for i in range(0, len(color))]
         else:
-            colorData = [color[i:i+2] for i in xrange(0, len(color), 2)]
+            colorData = [color[i:i+2] for i in range(0, len(color), 2)]
 
         rgbColor = tuple([int(i, 16) / 255.0 for i in colorData])
 
