@@ -61,6 +61,7 @@ instrumentDiff = {
 
 
 class SongChoosingScene(Scene):
+
     def __init__(self, engine, libraryName=None, songName=None):
         Scene.__init__(self, engine)
 
@@ -156,7 +157,7 @@ class SongChoosingScene(Scene):
         self.showMoreLabels = self.engine.theme.setlist.showMoreLabels  # whether or not additional unselected labels are rendered on-screen
         self.texturedLabels = self.engine.theme.setlist.texturedLabels  # render the art as a texture?
         self.itemsPerPage = self.engine.theme.setlist.itemsPerPage  # number of items to show on screen
-        self.followItemPos = (self.itemsPerPage + 1) / 2
+        self.followItemPos = (self.itemsPerPage + 1) // 2
         self.showLockedSongs = self.engine.theme.setlist.showLockedSongs  # whether or not to even show locked songs
         self.showSortTiers = self.engine.theme.setlist.showSortTiers  # whether or not to show sorting tiers - career tiers take precedence.
         self.selectTiers = self.engine.theme.setlist.selectTiers  # whether or not tiers should be selectable as a quick setlist.
@@ -441,7 +442,7 @@ class SongChoosingScene(Scene):
             if preload:
                 if time.time() - self.loadStartTime > 3:
                     self.loadStartTime = time.time()
-                    percent = (i * 100) / len(self.items)
+                    percent = (i * 100) // len(self.items)
                     Dialogs.changeLoadingSplashScreenText(self.engine, self.splash, _("Loading Album Artwork...") + " %d%%" % percent)
 
     # FIXME: Queue system

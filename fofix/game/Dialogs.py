@@ -545,7 +545,7 @@ class FileChooser(BackgroundLayer, KeyListener):
     def getDisks(self):
         import win32file, string
         driveLetters = []
-        for drive in string.letters[len(string.letters) / 2:]:
+        for drive in string.letters[len(string.letters) // 2:]:
             if win32file.GetDriveType(drive + ":") == win32file.DRIVE_FIXED:
                 driveLetters.append(drive + u":\\")
         return driveLetters

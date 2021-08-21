@@ -436,16 +436,16 @@ class ShaderList:
         for x in range(size):
             for y in range(size):
                 col1 = noise[x][y]
-                col2 = noise[size/2/(1-c)+x/c][size/2/(1-c)+y/c]
-                noise[x][y] = (1-1/float(c))*col1+1/float(c)*col2
+                col2 = noise[int(size/2/(1-c))+int(x/c)][int(size/2/(1-c))+int(y/c)]
+                noise[x][y] = (1 - 1/float(c)) * col1 + 1/float(c) * col2
 
     def smoothNoise3D(self, size, c, noise):
         for i in range(size):
             for j in range(size):
                 for k in range(size):
                     col1 = noise[i][j][k]
-                    col2 = noise[size/2/(1-c)+i/c][size/2/(1-c)+j/c][size/2/(1-c)+k/c]
-                    noise[i][j][k] = (1-1/float(c))*col1+1/float(c)*col2
+                    col2 = noise[int(size/2/(1-c))+int(i/c)][int(size/2/(1-c))+int(j/c)][int(size/2/(1-c))+int(k/c)]
+                    noise[i][j][k] = (1 - 1/float(c)) * col1 + 1/float(c) * col2
 
     def __getitem__(self, name):
         if name in self.shaders:
