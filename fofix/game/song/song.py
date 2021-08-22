@@ -133,7 +133,7 @@ class Part(object):
         if isinstance(other, Part):
             compare = PART_SORTING[self.id] == PART_SORTING[other.id]
         else:
-            compare = self.id == other.id
+            compare = self.id == other
         return compare
 
     def __lt__(self, other):
@@ -141,7 +141,7 @@ class Part(object):
         if isinstance(other, Part):
             compare = PART_SORTING[self.id] < PART_SORTING[other.id]
         else:
-            compare = self.id < other.id
+            compare = self.id < other
         return compare
 
     def __str__(self):
@@ -173,10 +173,16 @@ class Difficulty(object):
         self.text = text
 
     def __eq__(self, other):
-        return self.id == other.id
+        if isinstance(other, Difficulty):
+            return self.id == other.id
+        else:
+            return self.id == other
 
     def __lt__(self, other):
-        return self.id > other.id
+        if isinstance(other, Difficulty):
+            return self.id < other.id
+        else:
+            return self.id < other
 
     def __str__(self):
         return self.text
@@ -263,7 +269,6 @@ class SongInfo(object):
         self.logClassInits = Config.get("game", "log_class_inits")
         if self.logClassInits == 1:
             log.debug("SongInfo class init (song.py): " + self.name)
-
         self.logSections = Config.get("game", "log_sections")
         self.logUneditedMidis = Config.get("log", "log_unedited_midis")
 
