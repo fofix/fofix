@@ -264,11 +264,10 @@ class SongInfo(object):
 
         self.name = _("NoName")
 
+        log.debug("SongInfo class init (song.py): " + self.name)
+
         self.info.read(infoFileName)
 
-        self.logClassInits = Config.get("game", "log_class_inits")
-        if self.logClassInits == 1:
-            log.debug("SongInfo class init (song.py): " + self.name)
         self.logSections = Config.get("game", "log_sections")
         self.logUneditedMidis = Config.get("log", "log_unedited_midis")
 
@@ -760,9 +759,7 @@ class LibraryInfo(object):
 
         self.artist = None
 
-        self.logClassInits = Config.get("game", "log_class_inits")
-        if self.logClassInits == 1:
-            log.debug("LibraryInfo class init (song.py)...")
+        log.debug("LibraryInfo class init (song.py)...")
 
         try:
             self.info.read(infoFileName)
@@ -825,14 +822,11 @@ class LibraryInfo(object):
 
 class BlankSpaceInfo(object):
     def __init__(self, nameToDisplay=""):
-
-        self.logClassInits = Config.get("game", "log_class_inits")
-        if self.logClassInits == 1:
-            log.debug("BlankSpaceInfo class init (song.py)...")
-
         self.name = nameToDisplay
         self.color = None
         self.artist = None  # prevents search errors
+
+        log.debug("BlankSpaceInfo class init (song.py)...")
 
     def getUnlockID(self):
         return ""
@@ -840,37 +834,29 @@ class BlankSpaceInfo(object):
 
 class CareerResetterInfo(object):
     def __init__(self):
-
-        self.logClassInits = Config.get("game", "log_class_inits")
-        if self.logClassInits == 1:
-            log.debug("CareerResetterInfo class init (song.py)...")
-
         self.name = _("Reset Career")
         self.color = None
         self.artist = None  # prevents search errors
 
+        log.debug("CareerResetterInfo class init (song.py)...")
+
 
 class RandomSongInfo(object):
     def __init__(self):
-        self.logClassInits = Config.get("game", "log_class_inits")
-        if self.logClassInits == 1:
-            log.debug("RandomSongInfo class init (song.py)...")
-
         self.name = _("   (Random Song)")
         self.color = None
         self.artist = None  # prevents search errors
+
+        log.debug("RandomSongInfo class init (song.py)...")
 
 
 class TitleInfo(object):
     def __init__(self, config, section):
         self.info = config
         self.section = section
-
-        self.logClassInits = Config.get("game", "log_class_inits")
-        if self.logClassInits == 1:
-            log.debug("TitleInfo class init (song.py)...")
-
         self.artist = None  # prevents search errors
+
+        log.debug("TitleInfo class init (song.py)...")
 
     def _set(self, attr, value):
         self.info.set(self.section, attr, utf8(value))
@@ -907,14 +893,11 @@ class TitleInfo(object):
 
 class SortTitleInfo(object):
     def __init__(self, nameToDisplay):
-
-        self.logClassInits = Config.get("game", "log_class_inits")
-        if self.logClassInits == 1:
-            log.debug("TitleInfo class init (song.py)...")
-
         self.name = nameToDisplay
         self.color = None
         self.artist = None  # prevents search errors
+
+        log.debug("TitleInfo class init (song.py)...")
 
     def getUnlockID(self):
         return self.name
@@ -1018,10 +1001,7 @@ class Track(object):
         self.currentIndex = None
         self.maxIndex = None
 
-        if engine is not None:
-            self.logClassInits = Config.get("game", "log_class_inits")
-            if self.logClassInits == 1:
-                log.debug("Track class init (song.py)...")
+        log.debug("Track class init (song.py)...")
 
     def __getitem__(self, index):
         return self.allEvents[index]
@@ -1843,9 +1823,7 @@ class Song(object):
     def __init__(self, engine, infoFileName, songTrackNames, noteFileName, scriptFileName=None, partlist=[parts[GUITAR_PART]]):
         self.engine = engine
 
-        self.logClassInits = self.engine.config.get("game", "log_class_inits")
-        if self.logClassInits == 1:
-            log.debug("Song class init (song.py)...")
+        log.debug("Song class init (song.py)...")
 
         self.info = SongInfo(infoFileName)
         self.tracks = []
@@ -2163,9 +2141,7 @@ class ScriptReader(object):
         self.song = song
         self.file = scriptFile
 
-        self.logClassInits = Config.get("game", "log_class_inits")
-        if self.logClassInits == 1:
-            log.debug("ScriptReader class init (song.py)...")
+        log.debug("ScriptReader class init (song.py)...")
 
     def read(self):
         for line in self.file:
@@ -2203,14 +2179,10 @@ class MidiReader(midi.MidiOutStream):
         self.useVocalTrack = False
         self.vocalOverlapCheck = []
 
-        self.logClassInits = Config.get("game", "log_class_inits")
-        if self.logClassInits == 1:
-            log.debug("MidiReader class init (song.py)...")
+        log.debug("MidiReader class init (song.py)...")
 
         self.logMarkerNotes = Config.get("game", "log_marker_notes")
-
         self.logTempoEvents = Config.get("log", "log_tempo_events")
-
         self.logSections = Config.get("game", "log_sections")
 
         self.guitarSoloIndex = 0
@@ -2596,10 +2568,7 @@ class MidiSectionReader(midi.MidiOutStream):
         midi.MidiOutStream.__init__(self)
         self.difficulties = []
 
-        self.logClassInits = Config.get("game", "log_class_inits")
-        if self.logClassInits == 1:
-            log.debug("MidiSectionReader class init (song.py)...")
-
+        log.debug("MidiSectionReader class init (song.py)...")
         self.logSections = Config.get("game", "log_sections")
 
         # practice section support
@@ -2739,9 +2708,7 @@ class SongQueue(object):
         self.totalLibrary = []
         self.scores = []
 
-        self.logClassInits = Config.get("game", "log_class_inits")
-        if self.logClassInits == 1:
-            log.debug("SongQueue class init (song.py)...")
+        log.debug("SongQueue class init (song.py)...")
 
     def __len__(self):
         return len(self.songName)
@@ -2837,11 +2804,8 @@ class MidiPartsDiffReader(midi.MidiOutStream):
         self._ODNoteFound = False
         self._SPNoteFound = False
 
-        self.logClassInits = Config.get("game", "log_class_inits")
-        if self.logClassInits == 1:
-            log.debug("MidiPartsDiffReader class init (song.py)...")
-
         self.logSections = Config.get("game", "log_sections")
+        log.debug("MidiPartsDiffReader class init (song.py)...")
 
     def getMidiStyle(self):
         if self._ODNoteFound:

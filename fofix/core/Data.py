@@ -61,11 +61,8 @@ class Data(object):
     """A collection of globally used data resources such as fonts and sound effects."""
 
     def __init__(self, resource, svg):
-
         # logs
-        logClassInits = Config.get("game", "log_class_inits")
-        if logClassInits == 1:
-            log.debug("Data class init (Data.py)...")
+        log.debug("Data class init (Data.py)...")
         self.logLoadings = Config.get("game", "log_loadings")
         self.logImageNotFound = Config.get("log", "log_image_not_found")
 

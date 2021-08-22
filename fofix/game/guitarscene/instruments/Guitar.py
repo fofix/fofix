@@ -47,8 +47,10 @@ log = logging.getLogger(__name__)
 
 
 class Guitar(Instrument):
-    def __init__(self, engine, playerObj, scene, player = 0, bass = False):
+
+    def __init__(self, engine, playerObj, scene, player=0, bass=False):
         super(Guitar, self).__init__(engine, playerObj, scene, player=player)
+        log.debug("Guitar class init...")
 
         self.isDrum = False
         self.isBassGuitar = bass
@@ -60,10 +62,6 @@ class Guitar(Instrument):
         self.debugMode = False
         self.gameMode2p = self.engine.world.multiMode
         self.matchingNotes = []
-
-        self.logClassInits = self.engine.config.get("game", "log_class_inits")
-        if self.logClassInits == 1:
-            log.debug("Guitar class init...")
 
         self.lastPlayedNotes = []   #MFH - for reverting when game discovers it implied incorrectly
 

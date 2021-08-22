@@ -51,13 +51,12 @@ log = logging.getLogger(__name__)
 
 
 class ConfigChoice(Menu.Choice):
-    def __init__(self, engine, config, section, option, autoApply = False, isQuickset = 0):
+
+    def __init__(self, engine, config, section, option, autoApply=False, isQuickset=0):
+        log.debug("ConfigChoice class init (Settings.py)...")
+
         self.engine    = engine
         self.config    = config
-
-        self.logClassInits = self.engine.config.get("game", "log_class_inits")
-        if self.logClassInits == 1:
-            log.debug("ConfigChoice class init (Settings.py)...")
 
         self.section    = section
         self.option     = option
@@ -118,19 +117,17 @@ class ConfigChoice(Menu.Choice):
         if self.changed:
             self.config.set(self.section, self.option, self.value)
 
+
 class ActiveConfigChoice(ConfigChoice):
-    """
-    ConfigChoice with an additional callback function.
-    """
-    def __init__(self, engine, config, section, option, onChange, autoApply = True, volume = False):
-        ConfigChoice.__init__(self, engine, config, section, option, autoApply = autoApply)
+    """ConfigChoice with an additional callback function."""
+
+    def __init__(self, engine, config, section, option, onChange, autoApply=True, volume=False):
+        ConfigChoice.__init__(self, engine, config, section, option, autoApply=autoApply)
+        log.debug("ActiveConfigChoice class init (Settings.py)...")
+
         self.engine   = engine
         self.onChange = onChange
         self.volume   = volume
-
-        self.logClassInits = self.engine.config.get("game", "log_class_inits")
-        if self.logClassInits == 1:
-            log.debug("ActiveConfigChoice class init (Settings.py)...")
 
     def change(self, value):
         ConfigChoice.change(self, value)
@@ -143,15 +140,14 @@ class ActiveConfigChoice(ConfigChoice):
         ConfigChoice.apply(self)
         self.onChange()
 
+
 class VolumeConfigChoice(ConfigChoice):
-    def __init__(self, engine, config, section, option, autoApply = False):
+
+    def __init__(self, engine, config, section, option, autoApply=False):
         ConfigChoice.__init__(self, engine, config, section, option, autoApply)
+        log.debug("VolumeConfigChoice class init (Settings.py)...")
+
         self.engine = engine
-
-        self.logClassInits = self.engine.config.get("game", "log_class_inits")
-        if self.logClassInits == 1:
-            log.debug("VolumeConfigChoice class init (Settings.py)...")
-
 
     def change(self, value):
         ConfigChoice.change(self, value)
@@ -159,13 +155,13 @@ class VolumeConfigChoice(ConfigChoice):
         sound.setVolume(self.value)
         sound.play()
 
-class KeyConfigChoice(Menu.Choice):
-    def __init__(self, engine, config, section, option, noneOK = False, shift = None):
-        self.engine  = engine
 
-        self.logClassInits = self.engine.config.get("game", "log_class_inits")
-        if self.logClassInits == 1:
-            log.debug("KeyConfigChoice class init (Settings.py)...")
+class KeyConfigChoice(Menu.Choice):
+
+    def __init__(self, engine, config, section, option, noneOK=False, shift=None):
+        log.debug("KeyConfigChoice class init (Settings.py)...")
+
+        self.engine  = engine
 
         self.config  = config
         self.section = section
@@ -298,16 +294,16 @@ def createControl(engine, control = "", edit = False, refresh = None):
     if refresh:
         refresh()
 
+
 class ControlChooser(Menu.Menu):
+
     def __init__(self, engine, mode, options):
+        log.debug("ControlChooser class init (Settings.py)...")
+
         self.engine  = engine
         self.mode    = mode
         self.options = options
         self.default = self.engine.config.get("game", "control0")
-
-        self.logClassInits = self.engine.config.get("game", "log_class_inits")
-        if self.logClassInits == 1:
-            log.debug("ControlChooser class init (Settings.py)...")
 
         self.selected = None
         self.d        = None
@@ -338,14 +334,15 @@ class ControlChooser(Menu.Menu):
             Player.deleteControl(item)
             self.engine.view.popLayer(self)
 
+
 class ControlCreator(BackgroundLayer, KeyListener):
-    def __init__(self, engine, control = "", edit = False):
+
+    def __init__(self, engine, control="", edit=False):
+        log.debug("ControlCreator class init (Settings.py)...")
+
         self.engine  = engine
         self.control = control
         self.edit    = edit
-        self.logClassInits = self.engine.config.get("game", "log_class_inits")
-        if self.logClassInits == 1:
-            log.debug("ControlCreator class init (Settings.py)...")
 
         self.time   = 0.0
         self.badname     = ["defaultg", "defaultd", "defaultm"] #ensures that defaultm is included - duplicate is ok
@@ -627,12 +624,11 @@ class ControlCreator(BackgroundLayer, KeyListener):
 
 
 class SettingsMenu(Menu.Menu):
+
     def __init__(self, engine):
+        log.debug("SettingsMenu class init (Settings.py)...")
 
         self.engine = engine
-        self.logClassInits = self.engine.config.get("game", "log_class_inits")
-        if self.logClassInits == 1:
-            log.debug("SettingsMenu class init (Settings.py)...")
 
         self.keyCheckerMode = Config.get("game", "key_checker_mode")
 
@@ -876,9 +872,8 @@ class SettingsMenu(Menu.Menu):
         ]
         self.audioSettingsMenu = Menu.Menu(engine, self.audioSettings, pos = (self.opt_text_x, self.opt_text_y), textColor = self.opt_text_color, selectedColor = self.opt_selected_color)
 
-        #MFH - new menu
+        # new menu
         self.logfileSettings = [
-          ConfigChoice(engine, engine.config, "game", "log_class_inits", autoApply = True),#myfingershurt
           ConfigChoice(engine, engine.config, "game", "log_loadings", autoApply = True),#myfingershurt
           ConfigChoice(engine, engine.config, "game", "log_sections", autoApply = True),#myfingershurt
           ConfigChoice(engine, engine.config, "game", "log_marker_notes", autoApply = True),#myfingershurt
@@ -1080,15 +1075,13 @@ class SettingsMenu(Menu.Menu):
 
 
 class BasicSettingsMenu(Menu.Menu):
+
     def __init__(self, engine):
+        log.debug("BasicSettingsMenu class init (Settings.py)...")
 
         self.engine = engine
         self.keyActive = True
         self.confirmNeck = False
-
-        self.logClassInits = self.engine.config.get("game", "log_class_inits")
-        if self.logClassInits == 1:
-            log.debug("BasicSettingsMenu class init (Settings.py)...")
 
         self.opt_text_x = self.engine.theme.opt_text_xPos
         self.opt_text_y = self.engine.theme.opt_text_yPos
@@ -1486,12 +1479,11 @@ def quickset(config):
     else:
         log.debug("Quickset Performance - Manual")
 
-class GameSettingsMenu(Menu.Menu):
-    def __init__(self, engine, gTextColor, gSelectedColor, players):
 
-        self.logClassInits = Config.get("game", "log_class_inits")
-        if self.logClassInits == 1:
-            log.debug("GameSettingsMenu class init (Settings.py)...")
+class GameSettingsMenu(Menu.Menu):
+
+    def __init__(self, engine, gTextColor, gSelectedColor, players):
+        log.debug("GameSettingsMenu class init (Settings.py)...")
 
         Cheats = []
 
@@ -1516,12 +1508,12 @@ class GameSettingsMenu(Menu.Menu):
         ]
         Menu.Menu.__init__(self, engine, settings, pos = (.360, .250), viewSize = 5, textColor = gTextColor, selectedColor = gSelectedColor, showTips = False) #Worldrave- Changed Pause-Submenu Position more centered until i add a theme.ini setting.
 
-class GameCareerSettingsMenu(Menu.Menu):
-    def __init__(self, engine, gTextColor, gSelectedColor, players):
 
-        self.logClassInits = Config.get("game", "log_class_inits")
-        if self.logClassInits == 1:
-            log.debug("GameSettingsMenu class init (Settings.py)...")
+class GameCareerSettingsMenu(Menu.Menu):
+
+    def __init__(self, engine, gTextColor, gSelectedColor, players):
+        log.debug("GameSettingsMenu class init (Settings.py)...")
+
         settings = [
           VolumeConfigChoice(engine, engine.config, "audio",  "guitarvol", autoApply = True),
           VolumeConfigChoice(engine, engine.config, "audio",  "songvol", autoApply = True),

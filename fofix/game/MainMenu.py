@@ -51,16 +51,13 @@ class MainMenu(BackgroundLayer):
     """ The main menu """
 
     def __init__(self, engine):
-        """
-        Initialise the main menu
+        """Initialise the main menu
 
         :param engine: the engine
         """
-        self.engine = engine
+        log.debug("MainMenu class init (MainMenu.py)...")
 
-        self.logClassInits = Config.get("game", "log_class_inits")
-        if self.logClassInits == 1:
-            log.debug("MainMenu class init (MainMenu.py)...")
+        self.engine = engine
 
         self.time       = 0.0
         self.nextLayer  = None
