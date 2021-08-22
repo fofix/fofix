@@ -48,12 +48,13 @@ SCALABLE_NAMES = [_("Song Slowdown"), _("Early Hit Window Adjustment")]
 SCORE_MULTIPLIER = [0, 10, 20, 30]
 BASS_GROOVE_SCORE_MULTIPLIER = [0, 10, 20, 30, 40, 50]
 
+
 class ScoreCard(object):
-    def __init__(self, instrument, coOpType = False):
+
+    def __init__(self, instrument, coOpType=False):
+        log.debug("ScoreCard class init...")
+
         self.coOpType = coOpType
-        logClassInits = Config.get("game", "log_class_inits")
-        if logClassInits == 1:
-            log.debug("ScoreCard class init...")
         self.starScoring = Config.get("game", "star_scoring")
         self.updateOnScore = Config.get("performance", "star_score_updates")
         self.avMult = 0.0

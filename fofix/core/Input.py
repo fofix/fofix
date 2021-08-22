@@ -86,11 +86,9 @@ MusicFinished = pygame.USEREVENT
 
 
 class Input(Task):
-    def __init__(self):
 
-        self.logClassInits = Config.get("game", "log_class_inits")
-        if self.logClassInits == 1:
-            log.debug("Input class init (Input.py)...")
+    def __init__(self):
+        log.debug("Input class init (Input.py)...")
 
         Task.__init__(self)
         self.mouse                = pygame.mouse
