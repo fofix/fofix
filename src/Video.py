@@ -111,10 +111,10 @@ class Video:
       # channel to fill up that space - the fourth channel is ignored) and the
       # second is a 1-bit alpha mask.  For some reason, we need to invert the
       # alpha channel before turning it into the mask.
-      bigIconColorData = bigIcon.tostring()
-      bigIconMaskData = bigIcon.split()[3].point(lambda p: 255 - p).convert('1').tostring()
-      smallIconColorData = smallIcon.tostring()
-      smallIconMaskData = smallIcon.split()[3].point(lambda p: 255 - p).convert('1').tostring()
+      bigIconColorData = bigIcon.tobytes()
+      bigIconMaskData = bigIcon.split()[3].point(lambda p: 255 - p).convert('1').tobytes()
+      smallIconColorData = smallIcon.tobytes()
+      smallIconMaskData = smallIcon.split()[3].point(lambda p: 255 - p).convert('1').tobytes()
 
       # Put together icon resource structures - a header, then the pixel data,
       # then the alpha mask.  See documentation for the BITMAPINFOHEADER
