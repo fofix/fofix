@@ -222,7 +222,7 @@ class Sound(object):
 
 import numpy
 def zeros(size):
-return numpy.zeros(size, dtype='h')
+  return numpy.zeros(size, dtype='h')
 
 #stump: mic passthrough
 class MicrophonePassthroughStream(Sound, Task):
