@@ -25,7 +25,7 @@ import re
 import os
 VERSION = '3.122'
 RELEASE_ID = 'Final'
-URL = 'http://fofix.googlecode.com'
+URL = 'https://fofix.org'
 
 def _getTagLine():
     # Look for a git repository.
