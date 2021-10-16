@@ -23,7 +23,7 @@
 import sys
 import re
 import os
-VERSION = '3.122'
+VERSION = '3.123'
 RELEASE_ID = 'Final'
 URL = 'https://fofix.org'
 
