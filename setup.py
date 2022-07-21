@@ -3,7 +3,7 @@
 #####################################################################
 #                                                                   #
 # Frets on Fire X                                                   #
-# Copyright (C) 2009-2018 FoFiX Team                                #
+# Copyright (C) 2009-2020 FoFiX Team                                #
 #               2006 Sami Kyöstilä                                  #
 #                                                                   #
 # This program is free software; you can redistribute it and/or     #
@@ -27,15 +27,12 @@ import distutils.ccompiler
 from distutils.dep_util import newer
 from distutils.command.install import install as _install
 import sys, glob, os, fnmatch
-import subprocess
-import shlex
 
 import numpy
 
 from fofix.core import Version, SceneFactory
 
-from setuptools import setup, Extension, Command
-from Cython.Build import cythonize
+from setuptools import setup, Command
 
 
 def glob_recursive(directory, file_pattern="*"):
@@ -145,7 +142,7 @@ if os.name == 'nt':
                         product_name=Version.PROGRAM_NAME,
                         # when run from the exe, FoFiX will claim to be "FoFiX v" + product_version
                         product_version=Version.version()
-                        ).resource_bytes())]
+                    ).resource_bytes())]
                 }
             ],
             'data_files': data_files
@@ -297,109 +294,6 @@ def find_command(cmd):
     return path
 
 
-# Find pkg-config so we can find the libraries we need.
-pkg_config = find_command('pkg-config')
-
-
-def pc_exists(pkg):
-    '''Check whether pkg-config thinks a library exists.'''
-    return os.spawnl(os.P_WAIT, pkg_config, 'pkg-config', '--exists', pkg) == 0
-
-
-# Blacklist MinGW-specific dependency libraries on Windows.
-if os.name == 'nt':
-    lib_blacklist = ['m', 'mingw32']
-else:
-    lib_blacklist = []
-
-
-def pc_info(pkg, altnames=None):
-    '''Obtain build options for a library from pkg-config and
-    return a dict that can be expanded into the argument list for
-    L{distutils.core.Extension}.'''
-
-    altnames = [] if altnames is None else altnames
-    sys.stdout.write('checking for library %s... ' % pkg)
-    if not pc_exists(pkg):
-        for name in altnames:
-            if pc_exists(name):
-                pkg = name
-                sys.stdout.write('(using alternative name %s) ' % pkg)
-                break
-        else:
-            print('not found')
-            sys.stderr.write('Could not find required library "%s".\n' % pkg)
-            sys.stderr.write('(Also tried the following alternative names: %s)\n' % ', '.join(altnames))
-            if os.name == 'nt':
-                sys.stderr.write('(Check that you have the latest version of the dependency pack installed.)\n')
-            else:
-                sys.stderr.write('(Check that you have the appropriate development package installed.)\n')
-            sys.exit(1)
-
-    cflags = shlex.split(subprocess.check_output([pkg_config, '--cflags', pkg]).decode())
-    libs = shlex.split(subprocess.check_output([pkg_config, '--libs', pkg]).decode())
-
-    # Pick out anything interesting in the cflags and libs, and
-    # silently drop the rest.
-    def def_split(x):
-        pair = list(x.split('=', 1))
-        if len(pair) == 1:
-            pair.append(None)
-        return tuple(pair)
-    info = {
-      'define_macros': [def_split(x[2:]) for x in cflags if x[:2] == '-D'],
-      'include_dirs': [x[2:] for x in cflags if x[:2] == '-I'],
-      'libraries': [x[2:] for x in libs if x[:2] == '-l' and x[2:] not in lib_blacklist],
-      'library_dirs': [x[2:] for x in libs if x[:2] == '-L'],
-    }
-
-    print('ok')
-    return info
-
-
-ogg_info = pc_info('ogg')
-theoradec_info = pc_info('theoradec')
-glib_info = pc_info('glib-2.0')
-swscale_info = pc_info('libswscale')
-if os.name == 'nt':
-    # Windows systems: we just know what the OpenGL library is.
-    gl_info = {'libraries': ['opengl32']}
-    # And glib needs a slight hack to work correctly.
-    glib_info['define_macros'].append(('inline', '__inline'))
-else:
-    # Other systems: we ask pkg-config.
-    try:
-        gl_info = pc_info('gl')
-    except SystemExit:
-        # Work around to include opengl.framwork during compilation on OSX.
-        os.environ['LDFLAGS'] = '-framework opengl'
-        os.environ['CFLAGS'] = '-framework opengl'
-        gl_info = {
-          'define_macros': [],
-          'include_dirs': [],
-          'libraries': [],
-          'library_dirs': [],
-        }
-
-
-def combine_info(*args):
-    '''Combine multiple result dicts from L{pc_info} into one.'''
-
-    info = {
-      'define_macros': [],
-      'include_dirs': [],
-      'libraries': [],
-      'library_dirs': [],
-    }
-
-    for a in args:
-        info['define_macros'].extend(a.get('define_macros', []))
-        info['include_dirs'].extend(a.get('include_dirs', []))
-        info['libraries'].extend(a.get('libraries', []))
-        info['library_dirs'].extend(a.get('library_dirs', []))
-
-    return info
-
 # Make "setup.py install" do nothing until we configure something more sensible.
 class install(_install):
     def run(self, *args, **kw):
@@ -455,23 +349,10 @@ class xgettext(Command):
           py_files)
 
 
-if os.name == 'nt':
-    vidInclude = ['.', 'win32/deps/include/msinttypes']
-else:
-    vidInclude = ['.']
-
-extensions = [
-    Extension('fofix.lib._VideoPlayer',
-              ['fofix/core/VideoPlayer/_VideoPlayer.pyx', 'fofix/core/VideoPlayer/VideoPlayer.c'],
-              **combine_info(gl_info, ogg_info, theoradec_info, glib_info, swscale_info,
-              {'include_dirs': vidInclude}))
-]
-
 # Add the common arguments to setup().
 # This includes arguments to cause FoFiX's extension modules to be built.
 setup_args.update({
   'options': options,
-  'ext_modules': cythonize(extensions),
   'cmdclass': {'install': install, 'msgfmt': msgfmt, 'xgettext': xgettext},
 })
 

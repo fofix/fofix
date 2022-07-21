@@ -56,6 +56,7 @@ Notes:
   - replace the PitchAnalyzer module with the ``pypitch`` one
   - rename the option *uploadurl_w67_starpower* to *uploadurl* in ``fofix.ini``
   - dependencies: bump `Pillow` to 6.2.2
+  - added ``videoplayer`` as a reader for OGG video files (OGV)
 
 
 3.122 (2019-11-28)

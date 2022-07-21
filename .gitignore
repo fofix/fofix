@@ -34,7 +34,6 @@ pyvenv.cfg
 /fofix/*.log
 /fofix/*.idb
 /fofix/core/MixStream/_MixStream.c
-/fofix/core/VideoPlayer/_VideoPlayer.c
 
 # Ignore these app resources
 /data/library.zip

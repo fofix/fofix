@@ -37,7 +37,8 @@ from fofix.core import Version
 from fofix.core.Image import drawImage
 from fofix.core.Input import KeyListener
 from fofix.core.Language import _
-from fofix.core.VideoPlayer import VideoLayer, VideoPlayerError
+from fofix.core.videolayer import VideoLayer
+from fofix.core.videolayer import VideoPlayerError
 from fofix.core.View import Layer
 from fofix.core.constants import *
 

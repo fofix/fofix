@@ -38,7 +38,8 @@ import pygame
 from fofix.core import Version
 from fofix.core import VFS
 
-from fofix.core.VideoPlayer import VideoLayer, VideoPlayerError
+from fofix.core.videolayer import VideoLayer
+from fofix.core.videolayer import VideoPlayerError
 from fofix.core.GameEngine import GameEngine
 from fofix.game.MainMenu import MainMenu
 from fofix.core import Config
