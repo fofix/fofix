@@ -6,5 +6,6 @@ Quickstart
 
    features
    installation
+   Linux_Setup_Guide
    quickstart
    play

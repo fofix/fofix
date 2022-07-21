@@ -18,10 +18,14 @@
 # MA  02110-1301, USA.                                              #
 #####################################################################
 
+from functools import total_ordering
+
 from fofix.game.song import difficulties, parts
 from fofix.core.Language import _
 from fofix.core import Config
 
+
+@total_ordering
 class ConfigOption:
     def __init__(self, id, text):
         self.id   = id
@@ -33,16 +37,18 @@ class ConfigOption:
     def __repr__(self):
         return self.text
 
-    def __cmp__(self, other):
-        try:
-            return cmp(self.id, other.id)
-        except:
-            return -1
+    def __eq__(self, other):
+        return self.id == other.id
 
-def sortOptionsByKey(dict):
+    def __lt__(self, other):
+        return self.id < other.id
+
+
+def sortOptionsByKey(opts):
+    """ Sort options dictionary by keys. """
     a = {}
-    for k in dict.keys():
-        a[k] = ConfigOption(k, dict[k])
+    for k, v in opts.items():
+        a[k] = ConfigOption(k, v)
     return a
 
 # define configuration keys

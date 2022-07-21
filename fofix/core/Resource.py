@@ -42,7 +42,7 @@ log = logging.getLogger(__name__)
 
 
 class Loader(Thread):
-    def __init__(self, target, name, function, resultQueue, loaderSemaphore, onLoad = None, onCancel = None):
+    def __init__(self, target, name, function, resultQueue, loaderSemaphore, onLoad=None, onCancel=None):
         Thread.__init__(self)
         self.semaphore   = loaderSemaphore
         self.target      = target
@@ -56,9 +56,6 @@ class Loader(Thread):
         self.time        = 0.0
         self.canceled    = False
 
-        #myfingershurt: the following should be global and done ONCE:
-        self.logLoadings = Config.get("game", "log_loadings")
-
         if target and name:
             setattr(target, name, None)
 
@@ -67,10 +64,10 @@ class Loader(Thread):
         game_priority = Config.get("performance", "game_priority")
         # Reduce priority on posix
         if os.name == "posix":
-            # evilynux - Beware, os.nice _decreases_ priority, hence the reverse logic
+            # Beware, os.nice _decreases_ priority, hence the reverse logic
             os.nice(5 - game_priority)
         elif os.name == "nt":
-            self.setPriority(priority = game_priority)
+            self.setPriority(priority=game_priority)
         self.load()
         self.semaphore.release()
         self.resultQueue.put(self)
@@ -78,10 +75,13 @@ class Loader(Thread):
     def __str__(self):
         return "%s(%s) %s" % (self.function.__name__, self.name, self.canceled and "(canceled)" or "")
 
-    def setPriority(self, pid = None, priority = 2):
-        """ Set The Priority of a Windows Process.  Priority is a value between 0-5 where
-            2 is normal priority.  Default sets the priority of the current
-            python process but can take any valid process ID. """
+    def setPriority(self, pid=None, priority=2):
+        """ Set the priority of a Windows Process.
+
+        Priority is a value between 0-5 where 2 is normal priority. Default sets
+        the priority of the current python process but can take any valid
+        process ID.
+        """
 
         import win32api, win32process, win32con
 
@@ -93,8 +93,8 @@ class Loader(Thread):
                            win32process.REALTIME_PRIORITY_CLASS]
 
         threadPriorities = [win32process.THREAD_PRIORITY_IDLE,
-                            #win32process.THREAD_PRIORITY_ABOVE_IDLE,
-                            #win32process.THREAD_PRIORITY_LOWEST,
+                            # win32process.THREAD_PRIORITY_ABOVE_IDLE,
+                            # win32process.THREAD_PRIORITY_LOWEST,
                             win32process.THREAD_PRIORITY_BELOW_NORMAL,
                             win32process.THREAD_PRIORITY_NORMAL,
                             win32process.THREAD_PRIORITY_ABOVE_NORMAL,
@@ -126,11 +126,13 @@ class Loader(Thread):
                 self.onCancel()
             return
 
-        if self.logLoadings == 1:
-            log.info("Loaded %s.%s in %.3f seconds" % (self.target.__class__.__name__, self.name, self.time))
+        log.debug("Loaded %s.%s in %.3f seconds" % (self.target.__class__.__name__, self.name, self.time))
 
         if self.exception:
-            raise self.exception[0], self.exception[1], self.exception[2]
+            e = self.exception[0](self.exception[1])
+            e.__traceback__ = self.exception[2]
+            raise e
+            # raise e.with_traceback(self.exception[2])
         if self.target and self.name:
             setattr(self.target, self.name, self.result)
         if self.onLoad:
@@ -141,18 +143,19 @@ class Loader(Thread):
         self.join()
         return self.result
 
-#stump: The VFS is probably going to render a lot of this obsolete.
+
+# The VFS is probably going to render a lot of this obsolete.
 class Resource(Task):
-    def __init__(self, dataPath = os.path.join("..", "data")):
+    def __init__(self, dataPath=os.path.join("..", "data")):
         self.resultQueue = Queue()
         self.dataPaths = [dataPath]
-        self.loaderSemaphore = BoundedSemaphore(value = 1)
+        self.loaderSemaphore = BoundedSemaphore(value=1)
         self.loaders = []
 
-        #myfingershurt: the following should be global, and only done at startup.  Not every damn time a file is loaded.
+        # the following should be global, and only done at startup.  Not every damn time a file is loaded.
         self.songPath = []
         self.baseLibrary = Config.get("setlist", "base_library")
-        #evilynux - Support for songs in ~/.fretsonfire/songs (GNU/Linux and MacOS X)
+        # Support for songs in ~/.fretsonfire/songs (GNU/Linux and MacOS X)
         if self.baseLibrary == "None" and os.name == "posix":
             path = os.path.expanduser("~/." + Version.PROGRAM_UNIXSTYLE_NAME)
             if os.path.isdir(path):
@@ -162,10 +165,8 @@ class Resource(Task):
         if self.baseLibrary and os.path.isdir(self.baseLibrary):
             self.songPath = [self.baseLibrary]
 
-        self.logLoadings = Config.get("game", "log_loadings")
-
-    #myfingershurt: Need a function to refresh the base library after a new one is selected:
     def refreshBaseLib(self):
+        """ Refresh the base library after a new one is selected """
         self.baseLibrary = Config.get("setlist", "base_library")
         if self.baseLibrary and os.path.isdir(self.baseLibrary):
             self.songPath = [self.baseLibrary]
@@ -179,8 +180,7 @@ class Resource(Task):
             self.dataPaths.remove(path)
 
     def fileName(self, *name, **args):
-
-        #myfingershurt: the following should be global, and only done at startup.  Not every damn time a file is loaded.
+        # the following should be global, and only done at startup.  Not every damn time a file is loaded.
         songPath = self.songPath
 
         if not args.get("writable", False):
@@ -232,40 +232,41 @@ class Resource(Task):
     def makeWritable(self, path):
         os.chmod(path, stat.S_IWRITE | stat.S_IREAD | stat.S_IEXEC)
 
-    def load(self, target = None, name = None, function = lambda: None, synch = False, onLoad = None, onCancel = None):
+    def load(self, target=None, name=None, function=lambda: None, synch=False, onLoad=None, onCancel=None):
         """
         Load a file into memory, as either a foreground or background operation.
-        'function' is the user code that actually loads the file. 'synch' controls
-        how 'function' is called: if synch==True, then function is called immediately,
-        and whatever it returns is returned by this function. If sync==False, then a
-        Loader is created to call 'function' on another thread, and the Loader is
-        returned by this function.
 
-        After loading is complete, the loaded object will be assigned to (target).(name)
-        if both are defined.
+        `function` is the user code that actually loads the file.
+        `synch` controls how `function` is called:
+        - if `synch==True`, then function is called immediately, and whatever it
+          returns is returned by this function
+        - if `sync==False`, then a Loader is created to call `function` on
+          another thread, and the Loader is returned by this function.
 
-        :param target: None, or object to receive loaded file.
-        :param name: None, or name of attribute of 'target' to receive loaded file.
+        After loading is complete, the loaded object will be assigned to
+        `(target).(name)` if both are defined.
+
+        :param target: None, or object to receive loaded file
+        :param name: None, or name of attribute of `target` to receive loaded file
         :param function: function to call to perform the loading
-        :param synch: True to do the loading now, False to return now and load the file in a background thread.
-        :param onLoad: function to call when loading is completed.
-        :param onCancel: function to call when loading is canceled.
+        :param synch: True to do the loading now, False to return now and load the file in a background thread
+        :param onLoad: function to call when loading is completed
+        :param onCancel: function to call when loading is canceled
 
-        :return: If synch == True, returns the object returned by 'function';
-                else returns an instance of fofix.core.Loader.
+        :return: If synch == True, returns the object returned by `function`;
+                else returns an instance of fofix.core.Loader
         """
 
-        if self.logLoadings == 1:
-            log.info("Loading %s.%s %s" % (target.__class__.__name__, name, synch and "synchronously" or "asynchronously"))
+        log.debug("Loading %s.%s %s" % (target.__class__.__name__, name, synch and "synchronously" or "asynchronously"))
 
-        l = Loader(target, name, function, self.resultQueue, self.loaderSemaphore, onLoad = onLoad, onCancel = onCancel)
+        loader = Loader(target, name, function, self.resultQueue, self.loaderSemaphore, onLoad=onLoad, onCancel=onCancel)
         if synch:
-            l.load()
-            return l.finish()
+            loader.load()
+            return loader.finish()
         else:
-            self.loaders.append(l)
-            l.start()
-            return l
+            self.loaders.append(loader)
+            loader.start()
+            return loader
 
     def run(self, ticks):
         try:

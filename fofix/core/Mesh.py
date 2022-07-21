@@ -23,41 +23,60 @@
 from __future__ import with_statement
 
 from OpenGL.GL import *
+from collada import Collada
+from collada.polygons import Polygons
+from collada.scene import RotateTransform
+from collada.scene import ScaleTransform
+from collada.scene import TranslateTransform
+from collada.triangleset import TriangleSet
 import numpy as np
 
-from fofix.core import Collada
 from fofix.core import cmgl
 
 
 class Mesh:
-    def __init__(self, fileName):
-        self.doc = Collada.DaeDocument()
-        self.doc.LoadDocumentFromFile(fileName)
+
+    def __init__(self, filename):
+        self.doc = Collada(filename)
         self.geoms = {}
         self.fullGeoms = {}
 
-    def _unflatten(self, array, stride):
-        return [tuple(array[i * stride: (i + 1) * stride]) for i in range(len(array) / stride)]
-
     def setupLight(self, light, n, pos):
-        l = light.techniqueCommon
+        """ Setup light
+
+        :param light: the light to setup
+        :param n: the indice of the light
+        :param pos: the position of the light
+        :type light: collada.light.BoundLight
+        :type n: int
+        :type pos: tuple of 3 elements
+        """
         glEnable(GL_LIGHTING)
         glEnable(GL_LIGHT0 + n)
         glLightfv(GL_LIGHT0 + n, GL_POSITION, np.array([pos[0], pos[1], pos[2], 0.0], dtype=np.float32))
-        glLightfv(GL_LIGHT0 + n, GL_DIFFUSE, np.array([l.color[0], l.color[1], l.color[2], 0.0], dtype=np.float32))
+        glLightfv(GL_LIGHT0 + n, GL_DIFFUSE, np.array([light.color[0], light.color[1], light.color[2], 0.0], dtype=np.float32))
         glLightfv(GL_LIGHT0 + n, GL_AMBIENT, np.array([0.0, 0.0, 0.0, 0.0], dtype=np.float32))
 
     def setupMaterial(self, material):
-        for m in material.techniqueCommon.iMaterials:
-            if m.object:
-                for fx in m.object.iEffects:
-                    if fx.object:
-                        shader = fx.object.profileCommon.technique.shader
-                        if isinstance(shader, Collada.DaeFxShadePhong):
-                            glMaterialf (GL_FRONT_AND_BACK, GL_SHININESS, shader.shininess.float)
-                            glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT,   shader.ambient.color.rgba)
-                            glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE,   shader.diffuse.color.rgba)
-                            glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR,  shader.specular.color.rgba)
+        """ Setup material """
+        effect = material.effect
+
+        if effect.shadingtype == "phong":
+            glMaterialf (GL_FRONT_AND_BACK, GL_SHININESS, effect.shininess)
+            glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT,   effect.ambient)
+            glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE,   effect.diffuse)
+            glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR,  effect.specular)
+
+    def drawElement(self, indices, offset, array, func):
+        """ Draw an element
+
+        :param array: list of elements to draw
+        :param func: the function to apply
+        :type indices: int
+        :type offset: int
+        """
+        if array is not None:
+            func(*array[indices[offset]])
 
     def render(self, geomName=None):
         if geomName in self.fullGeoms:
@@ -66,58 +85,61 @@ class Mesh:
 
         # Prepare a new list for all the geometry
         if not self.geoms:
-            for geom in self.doc.geometriesLibrary.items:
+            # get geometries
+            for geom in self.doc.geometries:
                 self.geoms[geom.name] = cmgl.GList()
                 with self.geoms[geom.name]:
 
-                    for prim in geom.data.primitives:
-                        maxOffset = vertexOffset = normalOffset = 0
-                        vertexOffset = None
-                        normalOffset = None
-                        texcoordOffset = None
+                    # get primitives
+                    for prim in geom.primitives:
                         vertices = None
                         normals = None
                         texcoords = None
 
-                        for input in prim.inputs:
-                            maxOffset = max(maxOffset, input.offset)
-                            if input.semantic == "VERTEX":
-                                vertexOffset = input.offset
-                                vertices = geom.data.FindSource(geom.data.vertices.FindInput("POSITION"))
-                                assert vertices.techniqueCommon.accessor.stride == 3
-                                vertices = self._unflatten(vertices.source.data, vertices.techniqueCommon.accessor.stride)
-                            elif input.semantic == "NORMAL":
-                                normalOffset = input.offset
-                                normals = geom.data.FindSource(input)
-                                normals = self._unflatten(normals.source.data, 3)
-                            elif input.semantic == "TEXCOORD":
-                                texcoordOffset = input.offset
-                                texcoords = geom.data.FindSource(input)
-                                texcoords = self._unflatten(texcoords.source.data, 2)
+                        # get input list
+                        sources = prim.getInputList()
+                        for input_tuple in sources.getList():
+                            ioffset, isemantic, isource, iset = input_tuple
+                            if isemantic == "VERTEX":
+                                vertices = geom.sourceById[isource.lstrip('#')]
+                                assert len(vertices.components) == 3
+                            elif isemantic == "NORMAL":
+                                normals = geom.sourceById[isource.lstrip('#')]
+                            elif isemantic == "TEXCOORD":
+                                texcoords = geom.sourceById[isource.lstrip('#')]
 
-                        if normalOffset is None:
-                            normals = geom.data.FindSource(geom.data.vertices.FindInput("NORMAL"))
-                            normals = self._unflatten(normals.source.data, 3)
-                            normalOffset = vertexOffset
-
-                        def drawElement(indices, offset, array, func):
-                            if offset is not None:
-                                func(*array[indices[offset]])
-
-                        if hasattr(prim, "polygons"):
-                            for poly in prim.polygons:
+                        # draw polygons
+                        if isinstance(prim, Polygons):
+                            for poly in prim:
                                 glBegin(GL_POLYGON)
-                                for indices in self._unflatten(poly, maxOffset + 1):
-                                    drawElement(indices, normalOffset,   normals,   glNormal3f)
-                                    drawElement(indices, texcoordOffset, texcoords, glTexCoord2f)
-                                    drawElement(indices, vertexOffset,   vertices,  glVertex3f)
+                                if len(poly.texcoord_indices) != 0:
+                                    indices = zip(poly.indices,
+                                            poly.texcoord_indices[0],
+                                            poly.normal_indices)
+                                else:
+                                    indices = zip(poly.indices,
+                                            poly.normal_indices)
+
+                                for i in indices:
+                                    self.drawElement(i, -1, normals,   glNormal3f)
+                                    self.drawElement(i,  1, texcoords, glTexCoord2f)
+                                    self.drawElement(i,  0, vertices,  glVertex3f)
                                 glEnd()
-                        elif hasattr(prim, "triangles"):
+                        elif isinstance(prim, TriangleSet):
                             glBegin(GL_TRIANGLES)
-                            for indices in self._unflatten(prim.triangles, maxOffset + 1):
-                                drawElement(indices, normalOffset,   normals,   glNormal3f)
-                                drawElement(indices, texcoordOffset, texcoords, glTexCoord2f)
-                                drawElement(indices, vertexOffset,   vertices,  glVertex3f)
+                            for triangle in prim:
+                                if len(triangle.texcoord_indices) != 0:
+                                    indices = zip(triangle.indices,
+                                            triangle.texcoord_indices[0],
+                                            triangle.normal_indices)
+                                else:
+                                    indices = zip(triangle.indices,
+                                            triangle.normal_indices)
+
+                                for i in indices:
+                                    self.drawElement(i, -1, normals,   glNormal3f)
+                                    self.drawElement(i,  1, texcoords, glTexCoord2f)
+                                    self.drawElement(i,  0, vertices,  glVertex3f)
                             glEnd()
 
         # Prepare a new display list for this particular geometry
@@ -126,34 +148,38 @@ class Mesh:
 
             if self.geoms:
                 # setup lights
-                for scene in self.doc.visualScenesLibrary.items:
+                for scene in self.doc.scenes:
                     for node in scene.nodes:
-                        for n, light in enumerate(node.iLights):
-                            if light.object:
+                        for n, light in enumerate(node.objects('light')):
+                            if light:
                                 # TODO: hierarchical node transformation, other types of lights
                                 pos = [0.0, 0.0, 0.0, 1.0]
                                 for t in node.transforms:
-                                    if t[0] == "translate":
-                                        pos = t[1]
-                                self.setupLight(light.object, n, pos)
+                                    if isinstance(t, TranslateTransform):
+                                        pos = (t.x, t.y, t.z)
+                                self.setupLight(light, n, pos)
 
                 # render geometry
-                for scene in self.doc.visualScenesLibrary.items:
+                for scene in self.doc.scenes:
                     for node in scene.nodes:
-                        if geomName is not None and node.name != geomName:
+                        if geomName is not None and node.id != geomName:
                             continue
-                        for geom in node.iGeometries:
-                            if geom.object:
+                        for geom in node.objects('geometry'):
+                            if geom:
+                                # for matnode in geom.materialnodebysymbol.values():
+                                #     mat = matnode.target
+                                #     self.setupMaterial(mat)
+
                                 glPushMatrix()
                                 for t in node.transforms:
-                                    if t[0] == "translate":
-                                        glTranslatef(*t[1])
-                                    elif t[0] == "rotate":
-                                        glRotatef(t[1][3], t[1][0], t[1][1], t[1][2])
-                                    elif t[0] == "scale":
-                                        glScalef(*t[1])
-                                if geom.object.name in self.geoms:
-                                    self.geoms[geom.object.name]()
+                                    if isinstance(t, TranslateTransform):
+                                        glTranslatef(t.x, t.y, t.z)
+                                    elif isinstance(t, RotateTransform):
+                                        glRotatef(t.angle, t.x, t.y, t.z)
+                                    elif isinstance(t, ScaleTransform):
+                                        glScalef(t.x, t.y, t.z)
+                                if geom.original.name in self.geoms:
+                                    self.geoms[geom.original.name]()
                                 glPopMatrix()
                 glDisable(GL_LIGHTING)
                 for n in range(8):
@@ -163,12 +189,17 @@ class Mesh:
         self.render(geomName)
 
     def find(self, geomName=None):
+        """ Find if a node scene exists
+
+        :param geomName: the node scene name to find
+        :rtype: boolean
+        """
         found = False
         if self.geoms:
             # render geometry
-            for scene in self.doc.visualScenesLibrary.items:
+            for scene in self.doc.scenes:
                 for node in scene.nodes:
-                    if geomName is not None and node.name != geomName:
+                    if geomName is not None and node.id != geomName:
                         continue
                     found = True
         return found

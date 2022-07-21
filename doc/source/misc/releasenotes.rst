@@ -55,7 +55,16 @@ Notes:
   - added ``CMGL`` as a faster OpenGL binding
   - replace the PitchAnalyzer module with the ``pypitch`` one
   - rename the option *uploadurl_w67_starpower* to *uploadurl* in ``fofix.ini``
+  - dependencies: bump `Pillow` to 6.2.2
   - added ``videoplayer`` as a reader for OGG video files (OGV)
+
+
+3.122 (2019-11-28)
+------------------
+
+- Fix PIL imports (to use Pillow)
+- Fix OGG imports
+- Add the `Version.versionNum` function.
 
 
 3.121 (2009-12-06)

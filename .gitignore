@@ -14,6 +14,7 @@
 .project
 .pydevproject
 .settings
+.DS_Store
 
 # Ignore these general development things
 /bin/

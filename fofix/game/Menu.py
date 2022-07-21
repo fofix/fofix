@@ -154,11 +154,9 @@ class Menu(Layer, KeyListener):
         :type showTips: boolean
         :param selectedBox:
         """
-        self.engine = engine
+        log.debug("Menu class init (Menu.py)...")
 
-        self.logClassInits = self.engine.config.get("game", "log_class_inits")
-        if self.logClassInits == 1:
-            log.debug("Menu class init (Menu.py)...")
+        self.engine = engine
 
         # Get theme
         self.themename = self.engine.data.themeLabel

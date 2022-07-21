@@ -4505,7 +4505,7 @@ class GuitarScene(BandPlayBaseScene):
                                     if self.coOpType and self.partImage:
                                         freeX = .05 * (self.numOfPlayers - 1)
                                         freeI = .05 * self.numOfPlayers
-                                        for j in xrange(self.numOfPlayers):
+                                        for j in range(self.numOfPlayers):
                                             drawImage(self.part[j], scale=(.15, -.15), coord=(self.wFull*(.5-freeX+freeI*j), self.hFull*.58), color=(.8, .8, .8, 1))
 
                                     text = "%s" % scoreCard.endingScore
@@ -4566,7 +4566,7 @@ class GuitarScene(BandPlayBaseScene):
                                     if self.coOpType and self.partImage:
                                         freeX = .05 * (self.numOfPlayers - 1)
                                         freeI = .05 * self.numOfPlayers
-                                        for j in xrange(self.numOfPlayers):
+                                        for j in range(self.numOfPlayers):
                                             drawImage(self.part[j], scale=(.15, -.15), coord=(self.wFull*(.5-freeX+freeI*j), self.hFull*.58))
 
                                     text = "%s" % scoreCard.endingScore
@@ -4626,7 +4626,7 @@ class GuitarScene(BandPlayBaseScene):
                                     if self.coOpType and self.partImage:
                                         freeX = .05 * (self.numOfPlayers - 1)
                                         freeI = .05 * self.numOfPlayers
-                                        for j in xrange(self.numOfPlayers):
+                                        for j in range(self.numOfPlayers):
                                             if self.scoring[j].endingStreakBroken:
                                                 partcolor = (.4, .4, .4, 1)
                                             else:

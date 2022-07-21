@@ -126,7 +126,7 @@ class Credits(Layer, KeyListener):
         c2 = (1, .75, 0, 1)
         self.text_size = nf.getLineSpacing(scale=hs)
 
-        # Translatable strings:
+        # Translatable strings
         self.bank = {}
         self.bank['intro']      = [_("Frets on Fire X is a progression of MFH-mod,"),
                                    _("which was built on Alarian's mod,"),
@@ -165,15 +165,10 @@ class Credits(Layer, KeyListener):
         self.bank['themeCreators'] = [_("%s theme credits:") % self.themename]
         self.bank['themeThanks']   = [_("%s theme specific thanks:") % self.themename]
         # Languages
-        self.bank['french']        = [_("French")]
-        self.bank['french90']      = [_("French (reform 1990)")]
-        self.bank['german']        = [_("German")]
-        self.bank['italian']       = [_("Italian")]
-        self.bank['piglatin']      = [_("Pig Latin")]
-        self.bank['portuguese-b']  = [_("Portuguese (Brazilian)")]
-        self.bank['russian']       = [_("Russian")]
-        self.bank['spanish']       = [_("Spanish")]
-        self.bank['swedish']       = [_("Swedish")]
+        self.bank['french'] = [_("French")]
+        self.bank['german'] = [_("German")]
+        self.bank['italian'] = [_("Italian")]
+        self.bank['spanish'] = [_("Spanish")]
 
         self.videoLayer = False
         self.background = None

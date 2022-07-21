@@ -32,11 +32,11 @@ License Agreement.
  (the "Software") consists of TrueType-OpenType formatted font software for
  rendering LIBERATION typefaces in sans-serif, serif, and monospaced character
  styles. You are licensed to use, modify, copy, and distribute the Software
- pursuant to the GNU General Public License v.2 with the following exceptions:  
+ pursuant to the GNU General Public License v.2 with the following exceptions:
 
   (a) As a special exception, if you create a document which uses this font,
-  and embed this font or unaltered portions of this font into the document, 
-  this font does not by itself cause the resulting document to be covered 
+  and embed this font or unaltered portions of this font into the document,
+  this font does not by itself cause the resulting document to be covered
   by the GNU General Public License. This exception does not however invalidate
   any other reasons why the document might be covered by the GNU General Public License.
   If you modify this font, you may extend this exception to your version of the font,
@@ -58,26 +58,26 @@ License Agreement.
  using Red Hat's trademarks. If Client makes a redistribution of a modified version
  of the Software, then Client must modify the files names to remove any reference to
  the Red Hat trademarks and must not use the Red Hat trademarks in any way to reference
- or promote the modified Software. 
+ or promote the modified Software.
 
  3. Limited Warranty. To the maximum extent permitted under applicable law, the Software
  is provided and licensed "as is" without warranty of any kind, expressed or implied,
  including the implied warranties of merchantability, non-infringement or fitness for a
  particular purpose. Red Hat does not warrant that the functions contained in the Software
  will meet Client's requirements or that the operation of the Software will be entirely
- error free or appear precisely as described in the accompanying documentation. 
+ error free or appear precisely as described in the accompanying documentation.
 
  4. Limitation of Remedies and Liability. To the maximum extent permitted by applicable
  law, Red Hat or any Red Hat authorized dealer will not be liable to Client for any
  incidental or consequential damages, including lost profits or lost savings arising out
  of the use or inability to use the Software, even if Red Hat or such dealer has been
- advised of the possibility of such damages. 
+ advised of the possibility of such damages.
 
  5. General. If any provision of this agreement is held to be unenforceable, that shall
  not affect the enforceability of the remaining provisions. This agreement shall be
  governed by the laws of the State of North Carolina and of the United States, without
  regard to any conflict of laws provisions, except that the United Nations Convention
  on the International Sale of Goods shall not apply.
- 
+
 Copyright © 2007 Red Hat, Inc. All rights reserved. LIBERATION is a trademark of
 Red Hat, Inc.

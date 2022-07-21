@@ -24,6 +24,7 @@
 # MA  02110-1301, USA.                                              #
 #####################################################################
 
+from functools import total_ordering
 import logging
 
 import pygame
@@ -38,6 +39,7 @@ from fofix.core import VFS
 log = logging.getLogger(__name__)
 
 
+@total_ordering
 class ConfigOption:
     """ Deprecated: also in fofix.core.ConfigDefs """
 
@@ -51,30 +53,25 @@ class ConfigOption:
     def __repr__(self):
         return self.text
 
-    def __cmp__(self, other):
-        try:
-            if self.id > other.id:
-                return 1
-            elif self.id == other.id:
-                return 0
-            else:
-                return -1
-        except Exception:
-            return -1
+    def __eq__(self, other):
+        return self.id == other.id
+
+    def __lt__(self, other):
+        return self.id < other.id
 
 
-def sortOptionsByKey(dict):
+def sortOptionsByKey(opts):
     """ Deprecated: also in fofix.core.ConfigDefs """
     a = {}
-    for k in dict.keys():
-        a[k] = ConfigOption(k, dict[k])
+    for k, v in opts.items():
+        a[k] = ConfigOption(k, v)
     return a
 
 # Redoing this, sir. Redoing this...
-CONTROL1  = [1 << n for n in xrange(20)]
-CONTROL2  = [1 << n for n in xrange(20, 40)]
-CONTROL3  = [1 << n for n in xrange(40, 60)]
-CONTROL4  = [1 << n for n in xrange(60, 80)]
+CONTROL1  = [1 << n for n in range(20)]
+CONTROL2  = [1 << n for n in range(20, 40)]
+CONTROL3  = [1 << n for n in range(40, 60)]
+CONTROL4  = [1 << n for n in range(60, 80)]
 CONTROLS  = [CONTROL1, CONTROL2, CONTROL3, CONTROL4]
 LEFT      = 0
 RIGHT     = 1
@@ -461,11 +458,9 @@ def pluginControls(activeControls):
 
 
 class Controls:
-    def __init__(self):
 
-        self.logClassInits = Config.get("game", "log_class_inits")
-        if self.logClassInits == 1:
-            log.debug("Controls class init (Player.py)...")
+    def __init__(self):
+        log.debug("Controls class init (Player.py)...")
 
         self.controls = []
         self.controls.append(Config.get("game", "control0"))
@@ -873,11 +868,9 @@ def setNewKeyMapping(engine, config, section, option, key):
 
 
 class Player(object):
-    def __init__(self, name, number):
 
-        self.logClassInits = Config.get("game", "log_class_inits")
-        if self.logClassInits == 1:
-            log.debug("Player class init (Player.py)...")
+    def __init__(self, name, number):
+        log.debug("Player class init (Player.py)...")
 
         self.name = name
 

@@ -95,9 +95,9 @@ def hexToColor(color):
         color = color[1:]
 
         if len(color) < 4:
-            colorData = [color[i]+color[i] for i in xrange(0, len(color))]
+            colorData = [color[i]+color[i] for i in range(0, len(color))]
         else:
-            colorData = [color[i:i+2] for i in xrange(0, len(color), 2)]
+            colorData = [color[i:i+2] for i in range(0, len(color), 2)]
 
         rgbColor = tuple([int(i, 16) / 255.0 for i in colorData])
 
@@ -528,7 +528,7 @@ class Theme(Task):
         self.lobbyPanelAvatarDimension = (get("lobbyPanelAvatarWidth", float, 200.00),
                                           get("lobbyPanelAvatarHeight", float, 110.00))
         self.lobbyTitleText = get("lobbyTitleText", str, "Lobby")
-        self.lobbyTitleTextPos = (get("lobbyTitleTextX", str, 0.3),
+        self.lobbyTitleTextPos = (get("lobbyTitleTextX", float, 0.3),
                                   get("lobbyTitleTextY", float, 0.015))
         self.lobbyTitleTextAlign = halign(get("lobbyTitleTextAlign", str, "CENTER"))
         self.lobbyTitleTextScale = get("lobbyTitleTextScale", float, .001)

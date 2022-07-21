@@ -14,6 +14,10 @@ Here is a list of some packages available for Unix distributions.
 From sources
 -------------
 
+For Debian users, check :doc:`the linux setup guide </quickstart/Linux_Setup_Guide>`.
+
+For all, here are the steps to follow:
+
 - Get the `latest release <https://github.com/fofix/fofix/releases/latest>`_ or `sources <https://github.com/fofix/fofix>`_
 - install dependencies:
     - OS specific dependencies:

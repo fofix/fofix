@@ -56,14 +56,12 @@ log = logging.getLogger(__name__)
 
 
 class GameResultsScene(Scene):
-    def __init__(self, engine, libraryName, songName, scores = None, coOpType = False, careerMode = False):
+
+    def __init__(self, engine, libraryName, songName, scores=None, coOpType=False, careerMode=False):
         Scene.__init__(self, engine)
+        log.debug("GameResultsScene class init...")
 
         self.engine.world.sceneName = "GameResultsScene"
-
-        self.logClassInits = self.engine.config.get("game", "log_class_inits")
-        if self.logClassInits == 1:
-            log.debug("GameResultsScene class init...")
 
         players = self.players
         if coOpType > 0:

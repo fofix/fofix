@@ -57,9 +57,12 @@ log = logging.getLogger(__name__)
 #akedrou - 5-drum support is now available.
 # to enable it, only here and Player.drums should need changing.
 
+
 class Drum(Instrument):
-    def __init__(self, engine, playerObj, scene, player = 0):
+
+    def __init__(self, engine, playerObj, scene, player=0):
         super(Drum, self).__init__(engine, playerObj, scene, player=player)
+        log.debug("Drum class initialization!")
 
         self.isDrum = True
         self.isBassGuitar = False
@@ -106,10 +109,6 @@ class Drum(Instrument):
 
         self.openFretActivity = 0.0
         self.openFretColor  = self.fretColors[5]
-
-        self.logClassInits = self.engine.config.get("game", "log_class_inits")
-        if self.logClassInits == 1:
-            log.debug("Drum class initialization!")
 
         self.freestyleHitFlameCounts = [0] * self.strings2
 
@@ -606,7 +605,7 @@ class Drum(Instrument):
             shaders.globals["breActive"] = self.freestyleActive
             shaders.globals["rockLevel"] = self.rockLevel
 
-        if not self.starNotesSet == True:
+        if not self.starNotesSet:
             self.totalNotes = 0
             for time, event in song.track[self.player].getAllEvents():
                 if not isinstance(event, Note):
@@ -614,11 +613,11 @@ class Drum(Instrument):
                 self.totalNotes += 1
             stars = []
             maxStars = []
-            maxPhrase = self.totalNotes/120
-            for q in range(0,maxPhrase):
-                for n in range(0,10):
-                    stars.append(self.totalNotes/maxPhrase*(q)+n+maxPhrase/4)
-                maxStars.append(self.totalNotes/maxPhrase*(q)+10+maxPhrase/4)
+            maxPhrase = int(self.totalNotes / 120)
+            for q in range(0, maxPhrase):
+                for n in range(0, 10):
+                    stars.append(self.totalNotes/maxPhrase * q + n + maxPhrase/4)
+                maxStars.append(self.totalNotes/maxPhrase * q + 10 + maxPhrase/4)
             i = 0
             for time, event in song.track[self.player].getAllEvents():
                 if not isinstance(event, Note):
@@ -780,7 +779,7 @@ class Drum(Instrument):
                 self.noteSpinFrameIndex = 0
 
         #myfingershurt: must not decrease SP if paused.
-        if self.starPowerActive == True and self.paused == False:
+        if self.starPowerActive and not self.paused:
             self.starPower -= ticks/self.starPowerDecreaseDivisor
             if self.starPower <= 0:
                 self.starPower = 0

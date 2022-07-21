@@ -47,8 +47,10 @@ log = logging.getLogger(__name__)
 
 
 class Guitar(Instrument):
-    def __init__(self, engine, playerObj, scene, player = 0, bass = False):
+
+    def __init__(self, engine, playerObj, scene, player=0, bass=False):
         super(Guitar, self).__init__(engine, playerObj, scene, player=player)
+        log.debug("Guitar class init...")
 
         self.isDrum = False
         self.isBassGuitar = bass
@@ -60,10 +62,6 @@ class Guitar(Instrument):
         self.debugMode = False
         self.gameMode2p = self.engine.world.multiMode
         self.matchingNotes = []
-
-        self.logClassInits = self.engine.config.get("game", "log_class_inits")
-        if self.logClassInits == 1:
-            log.debug("Guitar class init...")
 
         self.lastPlayedNotes = []   #MFH - for reverting when game discovers it implied incorrectly
 
@@ -121,7 +119,7 @@ class Guitar(Instrument):
             y = v / 6
             x = (self.strings / 2 - n) * w
 
-            if self.twoDkeys == True or not self.keyMesh:
+            if self.twoDkeys or not self.keyMesh:
                 fretColor = (1,1,1,1)
                 size = (self.boardWidth / self.strings / 2, self.boardWidth / self.strings / 2.4)
                 texSize = (n / self.lanenumber, n / self.lanenumber + 1 / self.lanenumber)
@@ -258,14 +256,13 @@ class Guitar(Instrument):
                     continue
                 self.totalNotes += 1
 
-
             stars = []
             maxStars = []
-            maxPhrase = self.totalNotes/120
-            for q in range(0,maxPhrase):
-                for n in range(0,10):
-                    stars.append(self.totalNotes/maxPhrase*(q)+n+maxPhrase/4)
-                maxStars.append(self.totalNotes/maxPhrase*(q)+10+maxPhrase/4)
+            maxPhrase = int(self.totalNotes / 120)
+            for q in range(0, maxPhrase):
+                for n in range(0, 10):
+                    stars.append(self.totalNotes/maxPhrase * q + n + maxPhrase/4)
+                maxStars.append(self.totalNotes/maxPhrase * q + 10 + maxPhrase/4)
             i = 0
             for time, event in song.track[self.player].getAllEvents():
                 if not isinstance(event, Note):
@@ -531,7 +528,7 @@ class Guitar(Instrument):
                 self.noteSpinFrameIndex = 0
 
         #myfingershurt: must not decrease SP if paused.
-        if self.starPowerActive == True and self.paused == False:
+        if self.starPowerActive and not self.paused:
             self.starPower -= ticks/self.starPowerDecreaseDivisor
             if self.starPower <= 0:
                 self.starPower = 0

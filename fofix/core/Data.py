@@ -61,11 +61,8 @@ class Data(object):
     """A collection of globally used data resources such as fonts and sound effects."""
 
     def __init__(self, resource, svg):
-
         # logs
-        logClassInits = Config.get("game", "log_class_inits")
-        if logClassInits == 1:
-            log.debug("Data class init (Data.py)...")
+        log.debug("Data class init (Data.py)...")
         self.logLoadings = Config.get("game", "log_loadings")
         self.logImageNotFound = Config.get("log", "log_image_not_found")
 
@@ -391,7 +388,7 @@ class Data(object):
                                                             numSounds, soundExtension, soundPath))
 
         sounds = []
-        for i in xrange(1, numSounds + 1):
+        for i in range(1, numSounds + 1):
             filePath = os.path.join(soundPath, "%s%d%s" %
                                     (soundPrefix, i, soundExtension))
             soundObject = Sound(self.resource.fileName(filePath))

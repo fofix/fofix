@@ -22,11 +22,16 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,        #
 # MA  02110-1301, USA.                                              #
 #####################################################################
+from __future__ import print_function
+from __future__ import division
+from __future__ import absolute_import
 
+from collections import MutableMapping, namedtuple
+from ConfigParser import RawConfigParser
 import logging
 import os
 import StringIO
-from ConfigParser import RawConfigParser
+import sys
 
 from fretwork.unicode import utf8, unicodify
 
@@ -34,57 +39,68 @@ from fofix.core import VFS
 
 
 log = logging.getLogger(__name__)
-config    = None
-prototype = {}
+
+
+def decode_string(data):
+    """Decode a string from utf-8 or latin-1"""
+    try:
+        return data.decode('utf-8')
+    except UnicodeDecodeError:
+        return data.decode('latin-1')
 
 
 class MyConfigParser(RawConfigParser):
-    def _writeSection(self, fp, sectionName, sectionItems):
-        fp.write("[%s]\n" % sectionName)
-        for key, value in sorted(sectionItems):
+
+    def _write_section(self, fp, section_name, section_items):
+        fp.write("[%s]\n" % section_name)
+        for key, value in sorted(section_items):
             if key != "__name__":
-                fp.write("%s = %s\n" % (key, str(value).replace('\n', '\n\t')))
+                fp.write("{} = {}\n".format(key, utf8(value)))
         fp.write("\n")
 
-    def write(self, fp, type = 0):
+    def write(self, fp, type=0):
         if type == 1:
-            return self.writeController(fp)
+            return self.write_controller(fp)
         elif type == 2:
-            return self.writePlayer(fp)
+            return self.write_player(fp)
 
         for section in sorted(self.sections()):
             if section not in ("theme", "controller", "player"):
-                self._writeSection(fp, section, self.items(section))
+                self._write_section(fp, section, self.items(section))
 
     def read(self, filenames):
-        if isinstance(filenames, str) or isinstance(filenames, unicode):
+        if isinstance(filenames, basestring):
             filenames = [filenames]
 
         read_ok = []
         for filename in filenames:
-            configData = None
+            config_data = None
             try:
                 with open(filename) as fp:
-                    configData = fp.read()
-                configLines = configData.split('\n')
-                configLines = [line for line in configLines
-                                   if line.strip()[0:2] != '//']
-                configData = '\n'.join(configLines)
-                strFp = StringIO.StringIO(configData)
-                self._read(strFp, filename)
+                    config_data = fp.read()
+
+                config_data = decode_string(config_data)
+                config_lines = config_data.split('\n')
+                config_lines = [line for line in config_lines
+                                if line.strip()[0:2] != '//']
+                config_data = '\n'.join(config_lines)
+                str_fp = StringIO.StringIO(config_data)
+                self.readfp(str_fp, filename)
             except IOError:
                 continue
             read_ok.append(filename)
 
         return read_ok
 
-    def writeController(self, fp):
+    def write_controller(self, fp):
+        """Write the controller section"""
         if self.has_section('controller'):
-            self._writeSection(fp, 'controller', self.items('controller'))
+            self._write_section(fp, 'controller', self.items('controller'))
 
-    def writePlayer(self, fp):
+    def write_player(self, fp):
+        """Write the player section"""
         if self.has_section('player'):
-            self._writeSection(fp, 'player', self.items('player'))
+            self._write_section(fp, 'player', self.items('player'))
 
     def get(self, section, option):
         return unicodify(RawConfigParser.get(self, section, option))
@@ -94,113 +110,120 @@ class MyConfigParser(RawConfigParser):
             value = utf8(value)
         RawConfigParser.set(self, section, option, value)
 
-class Option(object):
-    """A prototype configuration key."""
-    def __init__(self, **args):
-        for key, value in args.items():
-            setattr(self, key, value)
 
-def define(section, option, type, default = None, text = None, options = None, prototype = prototype, tipText = None):
-    """
-    Define a configuration key.
+Option = namedtuple('Option', ['type', 'default', 'text', 'options', 'tipText'])
 
-    @param section:    Section name
-    @param option:     Option name
-    @param type:       Key type (e.g. str, int, ...)
-    @param default:    Default value for the key
-    @param text:       Text description for the key
-    @param options:    Either a mapping of values to text descriptions
-                      (e.g. {True: 'Yes', False: 'No'}) or a list of possible values
-    @param prototype:  Configuration prototype mapping
-    @param tipText:    Helpful tip text to display in option menus.
-    """
-    if section not in prototype:
-        prototype[section] = {}
 
-    if type == bool and not options:
-        options = [True, False]
+class Prototype(MutableMapping):
+    def __init__(self, *args, **kwargs):
+        self._data = dict()
+        self.update(dict(*args, **kwargs))
 
-    prototype[section][option] = Option(type = type, default = default, text = text, options = options, tipText = tipText)
+    def __getitem__(self, key):
+        return self._data[key]
 
-def load(fileName = None, setAsDefault = False, type = 0):
-    """Load a configuration with the default prototype"""
-    global config
-    c = Config(prototype, fileName, type)
-    if setAsDefault and not config:
-        config = c
-    return c
+    def __setitem__(self, key, value):
+        self._data[key] = value
 
-def _convertValue(value, type, default=False):
-    """
-    Convert a raw config string to the proper data type.
-    @param value: the raw value
-    @param type:  the desired type
-    @return:      the converted value
-    """
-    if type is bool:
-        value = str(value).lower()
-        if value in ("1", "true", "yes", "on"):
-            return True
-        elif value in ("none", ""):
-            return default #allows None-default bools to return None
-        else:
-            return False
-    elif issubclass(type, basestring):
-        return unicodify(value)
-    else:
-        try:
-            return type(value)
-        except Exception:
-            return None
+    def __delitem__(self, key):
+        del self._data[key]
+
+    def __iter__(self):
+        return iter(self._data)
+
+    def __len__(self):
+        return len(self._data)
+
+    def define(self, section, option, type, default=None, text=None, options=None, tipText=None):
+        """
+        Define a configuration key.
+
+        :param section: Section name
+        :param option:  Option name
+        :param type:    Key type (e.g. str, int, ...)
+        :param default: Default value for the key
+        :param text:    Text description for the key
+        :param options: Either a mapping of values to text descriptions
+                        (e.g. {True: 'Yes', False: 'No'}) or a list of possible values
+        :param tipText: Helpful tip text to display in option menus.
+        """
+        if section not in self._data:
+            self._data[section] = dict()
+
+        if type is bool and options is None:
+            options = [True, False]
+
+        self._data[section][option] = Option(type=type, default=default, text=text, options=options, tipText=tipText)
+
 
 class Config(object):
     """A configuration registry."""
-    def __init__(self, prototype, fileName = None, type = 0):
-        """
-        @param prototype:  The configuration prototype mapping
-        @param fileName:   The file that holds this configuration registry
-        """
-        self.prototype = prototype
 
-        # read configuration
+    def __init__(self, prototype=None, filename=None, type=0):
+        """
+        :param prototype: The configuration prototype mapping
+        :param filename:  The file that holds this configuration registry
+        """
+        self.prototype = prototype if prototype is not None else Prototype()
         self.config = MyConfigParser()
-
-        if fileName:
-            if not os.path.isfile(fileName):
-                path = VFS.getWritableResourcePath()
-                fileName = os.path.join(path, fileName)
-            self.config.read(fileName)
-
-        self.fileName  = fileName
         self.type = type
 
-        # fix the defaults and non-existing keys
-        for section, options in prototype.items():
-            if not self.config.has_section(section):
-                self.config.add_section(section)
-            for option in options.keys():
-                type    = options[option].type
-                default = options[option].default
-                if not self.config.has_option(section, option):
-                    self.config.set(section, option, str(default))
+        self.read(filename)
+
+    def read(self, filename):
+        """Read a config file
+
+        :param filename: the config filename
+        """
+        if filename:
+            if not os.path.isfile(filename):
+                path = VFS.getWritableResourcePath()
+                filename = os.path.join(path, filename)
+            self.config.read(filename)
+
+        self.filename = filename
+
+    def _convertValue(self, value, type, default=False):
+        """
+        Convert a raw config string to the proper data type.
+
+        :param value: the raw value
+        :param type: the desired type
+        :return: the converted value
+        """
+        if type is bool:
+            value = str(value).lower()
+            if value in ("1", "true", "yes", "on"):
+                return True
+            elif value in ("none", ""):
+                return default  # allows None-default bools to return None
+            else:
+                return False
+        elif issubclass(type, basestring):
+            return unicodify(value)
+        else:
+            try:
+                return type(value)
+            except Exception:
+                return None
 
     def get(self, section, option):
         """
         Read a configuration key.
 
-        @param section:   Section name
-        @param option:    Option name
-        @return:          Key value
+        :param section: Section name
+        :param option: Option name
+        :return: Key value
         """
 
         try:
             type    = self.prototype[section][option].type
             default = self.prototype[section][option].default
         except KeyError:
-            log.error("Config key %s.%s not defined while reading %s." % (section, option, self.fileName))
+            log.error("Config key %s.%s not defined while reading %s.", section, option, self.filename)
             raise
 
-        value = _convertValue(self.config.get(section, option) if self.config.has_option(section, option) else default, type, default)
+        value = self._convertValue(self.config.get(section, option) if self.config.has_option(section, option) else default, type, default)
 
         return value
 
@@ -208,9 +231,9 @@ class Config(object):
         """
         Read the preset options of a configuration key.
 
-        @param section:   Section name
-        @param option:    Option name
-        @return:          Tuple of Key list and Values list
+        :param section: Section name
+        :param option: Option name
+        :return: Tuple of Key list and Values list
         """
 
         try:
@@ -218,14 +241,14 @@ class Config(object):
             keys    = self.prototype[section][option].options.keys()
             type    = self.prototype[section][option].type
         except KeyError:
-            log.error("Config key %s.%s not defined while reading %s." % (section, option, self.fileName))
+            log.error("Config key %s.%s not defined while reading %s.", section, option, self.filename)
             raise
 
         optionList = []
 
         if type is not None:
             for i in range(len(options)):
-                value = _convertValue(keys[i], type)
+                value = self._convertValue(keys[i], type)
                 optionList.append(value)
 
         return optionList, options
@@ -234,15 +257,15 @@ class Config(object):
         """
         Return the tip text for a configuration key.
 
-        @param section:   Section name
-        @param option:    Option name
-        @return:          Tip Text String
+        :param section: Section name
+        :param option: Option name
+        :return: Tip Text String
         """
 
         try:
             text = self.prototype[section][option].tipText
         except KeyError:
-            log.error("Config key %s.%s not defined while reading %s." % (section, option, self.fileName))
+            log.error("Config key %s.%s not defined while reading %s.", section, option, self.filename)
             raise
 
         return text
@@ -251,19 +274,19 @@ class Config(object):
         """
         Read the default value of a configuration key.
 
-        @param section:   Section name
-        @param option:    Option name
-        @return:          Key value
+        :param section: Section name
+        :param option: Option name
+        :return: Key value
         """
 
         try:
             type    = self.prototype[section][option].type
             default = self.prototype[section][option].default
         except KeyError:
-            log.error("Config key %s.%s not defined while reading %s." % (section, option, self.fileName))
+            log.error("Config key %s.%s not defined while reading %s.", section, option, self.filename)
             raise
 
-        value = _convertValue(default, type)
+        value = self._convertValue(default, type)
 
         return value
 
@@ -271,15 +294,15 @@ class Config(object):
         """
         Set the value of a configuration key.
 
-        @param section:   Section name
-        @param option:    Option name
-        @param value:     Value name
+        :param section: Section name
+        :param option: Option name
+        :param value: Value name
         """
 
         try:
-            prototype[section][option]
+            self.prototype[section][option]
         except KeyError:
-            log.error("Config key %s.%s not defined while writing %s." % (section, option, self.fileName))
+            log.error("Config key %s.%s not defined while writing %s.", section, option, self.filename)
             raise
 
         if not self.config.has_section(section):
@@ -287,57 +310,36 @@ class Config(object):
 
         self.config.set(section, option, utf8(value))
 
-        f = open(self.fileName, "w")
-        self.config.write(f, self.type)
-        f.close()
+        with open(self.filename, "w") as config_file:
+            self.config.write(config_file, self.type)
 
-def get(section, option):
-    """
-    Read the value of a global configuration key.
+    def define(self, *args, **kwargs):
+        self.prototype.define(*args, **kwargs)
 
-    @param section:   Section name
-    @param option:    Option name
-    @return:          Key value
-    """
 
-    return config.get(section, option)
+class _ModuleWrapper(object):
+    def __init__(self, module, default):
+        self.module = module
+        self.default = default
 
-def set(section, option, value):
-    """
-    Write the value of a global configuration key.
+    def __getattr__(self, name):
+        try:
+            return getattr(self.default, name)
+        except AttributeError:
+            return getattr(self.module, name)
 
-    @param section:   Section name
-    @param option:    Option name
-    @param value:     New key value
-    """
-    return config.set(section, option, value)
 
-def getDefault(section, option):
-    """
-    Read the default value of a global configuration key.
+def load(filename=None, setAsDefault=False, type=0):
+    """Load a configuration with the default prototype"""
+    if setAsDefault:
+        default_config.read(filename)
+        return default_config
+    else:
+        return Config(default_config.prototype, filename, type)
 
-    @param section:   Section name
-    @param option:    Option name
-    @return:          Key value
-    """
-    return config.getDefault(section, option)
 
-def getTipText(section, option):
-    """
-    Return the tip text for a global configuration key.
+default_config = Config()
 
-    @param section:   Section name
-    @param option:    Option name
-    @return:          Tip Text String
-    """
-    return config.getTipText(section, option)
-
-def getOptions(section, option):
-    """
-    Read the default value of a global configuration key.
-
-    @param section:   Section name
-    @param option:    Option name
-    @return:          Tuple of Key list and Values list
-    """
-    return config.getOptions(section, option)
+# access default config by default, fallback on module
+# ideally default config should be explicitly passed around
+sys.modules[__name__] = _ModuleWrapper(sys.modules[__name__], default_config)
