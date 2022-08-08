@@ -1237,7 +1237,7 @@ class GuitarScene(BandPlayBaseScene):
                 self.automaticEarlyHitWindow = song.EARLY_HIT_WINDOW_FULL
 
         else:
-            log.debug("No song.ini setting found specifying early_hit_window_size - using automatic detection...")
+            log.warning("No song.ini setting found specifying early_hit_window_size - using automatic detection...")
 
             if self.song.midiStyle == song.MIDI_TYPE_RB:
                 log.debug("Basic RB1/RB2 type MIDI found - early hitwindow of NONE is set as handicap base.")
