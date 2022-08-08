@@ -286,7 +286,7 @@ class MainMenu(BackgroundLayer):
         # Make sure tutorial exists before launching
         tutorialpath = self.engine.tutorialFolder
         if not os.path.isdir(self.engine.resource.fileName(tutorialpath)):
-            log.debug("No folder found: %s" % tutorialpath)
+            log.info("No folder found: %s" % tutorialpath)
             Dialogs.showMessage(self.engine, _("No tutorials found!"))
             return
 

@@ -758,7 +758,7 @@ class Controls:
                     else:
                         return name + " " + guitarkeynames[j]
             else:
-                log.info("Key value not found.")
+                log.error("Key value not found.")
                 return "Error"
 
         if self.keyCheckerMode == 0:

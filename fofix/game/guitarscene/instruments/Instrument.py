@@ -352,7 +352,7 @@ class Instrument(object):
         else:
             if lastResort and not self.engine.fileExists(os.path.join(defaultpath, s_file)):
                 return s_file
-            log.debug("Image not found: " + os.path.join(themepath, s_file))
+            log.warning("Image not found: " + os.path.join(themepath, s_file))
             return os.path.join(defaultpath, s_file)
 
     def loadFlames(self):

@@ -435,11 +435,11 @@ class GameEngine(object):
             selectedAnimatedStage = self.config.get("game", "animated_stage_folder")
             if selectedAnimatedStage != "Normal" and selectedAnimatedStage != "Random":
                 if not os.path.exists(os.path.join(stagespath, selectedAnimatedStage)):
-                    log.warn("Selected animated stage folder " + selectedAnimatedStage + " does not exist, forcing Normal.")
+                    log.warning("Selected animated stage folder " + selectedAnimatedStage + " does not exist, forcing Normal.")
                     self.config.set("game", "animated_stage_folder", "Normal")  # force "Standard" currently selected animated stage folder is invalid
         else:
             Config.define("game", "animated_stage_folder", str, "None", text=_("Animated Stage"), options=["None", _("None")])
-            log.warn("No 'stages/' folder found, forcing None setting for Animated Stage.")
+            log.warning("No 'stages/' folder found, forcing None setting for Animated Stage.")
             self.config.set("game", "animated_stage_folder", "None")  # force "None" when Stages folder can't be found
 
     def setStartupLayer(self, startupLayer):

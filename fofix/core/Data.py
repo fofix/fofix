@@ -190,14 +190,14 @@ class Data(object):
                                     systemFont=not asciiOnly, outline=False, aspectRatio=aspectRatio)
                 resource.load(self, f[1], f[0], synch=True)
             elif self.fileExists(os.path.join("themes", themename, "fonts", "default.ttf")):
-                log.debug("Theme font not found: " + f[2])
+                log.warning("Theme font not found: " + f[2])
                 fn = resource.fileName(os.path.join(
                     "themes", themename, "fonts", "default.ttf"))
                 f[0] = lambda: Font(fn, f[3], scale=scale * .5, reversed=reversed,
                                     systemFont=not asciiOnly, outline=False, aspectRatio=aspectRatio)
                 resource.load(self, f[1], f[0], synch=True)
             else:
-                log.debug(
+                log.info(
                     "Default theme font not found: %s - using built-in default" % str(f[2]))
                 fn = resource.fileName(os.path.join("fonts", "default.ttf"))
                 f[0] = lambda: Font(fn, f[3], scale=scale * .5, reversed=reversed,
@@ -254,12 +254,11 @@ class Data(object):
                 self.loadSoundEffect(self, self.sounds[0], os.path.join(
                     "themes", themename, "sounds", self.sounds[1]))
             elif self.fileExists(os.path.join("sounds", self.sounds[1])):
-                log.debug("Theme sound not found: " + self.sounds[1])
+                log.warning("Theme sound not found: " + self.sounds[1])
                 self.loadSoundEffect(
                     self, self.sounds[0], os.path.join("sounds", self.sounds[1]))
             else:
-                log.warning("File " + self.sounds[1] +
-                            " not found using default instead.")
+                log.warning("File " + self.sounds[1] + " not found using default instead.")
                 self.loadSoundEffect(
                     self, self.sounds[0], os.path.join("sounds", "default.ogg"))
 

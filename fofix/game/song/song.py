@@ -264,7 +264,7 @@ class SongInfo(object):
 
         self.name = _("NoName")
 
-        log.debug("SongInfo class init (song.py): " + self.name)
+        log.debug("SongInfo class init (song.py)")
 
         self.info.read(infoFileName)
 
@@ -280,11 +280,11 @@ class SongInfo(object):
             else:
                 notefile = "notes.mid"
                 if self.logUneditedMidis == 1:
-                    log.debug("notes-unedited.mid not found, using notes.mid - " + self.name)
+                    log.info("notes-unedited.mid not found, using notes.mid - " + self.name)
         else:
             notefile = "notes.mid"
             if self.logUneditedMidis == 1:
-                log.debug("notes-unedited.mid not found, using notes.mid - " + self.name)
+                log.info("notes-unedited.mid not found, using notes.mid - " + self.name)
         self.noteFileName = os.path.join(os.path.dirname(self.fileName), notefile)
 
         for part in parts.values():
@@ -297,7 +297,7 @@ class SongInfo(object):
                 result = _songDB.execute('SELECT `info` FROM `songinfo` WHERE `hash` = ?', [
                                          songhash]).fetchone()
                 if result is None:
-                    log.debug('Song %s was not found in the cache.' % infoFileName)
+                    log.info('Song %s was not found in the cache.' % infoFileName)
             except Exception:
                 log.error('Cache retrieval failed for %s: ' % infoFileName)
                 result = None
@@ -1900,7 +1900,7 @@ class Song(object):
                         self.engine.audio.getChannel(channel), filePath))
                     channel += 1
                 except Exception as e:
-                    log.warning("Unable to load song track: %s" % e)
+                    log.error("Unable to load song track: %s" % e)
 
         self.songTrack = self.songTracks.get('song', [])
         self.guitarTrack = self.songTracks.get('guitar', [])
@@ -2644,8 +2644,7 @@ class MidiSectionReader(midi.MidiOutStream):
 
                 # only log if enabled
                 if self.logSections == 1:
-                    log.debug("Found <section> potential RB-style practice section: " +
-                              str(pos) + " - " + text)
+                    log.debug("Found <section> potential RB-style practice section: " + str(pos) + " - " + text)
 
                 text = "%d:%02d -> " % (pos / 60000, (pos % 60000) / 1000) + text
                 self.sections.append([text, pos])
@@ -2654,8 +2653,7 @@ class MidiSectionReader(midi.MidiOutStream):
 
                 # only log if enabled
                 if self.logSections == 1:
-                    log.debug("Found potential GH1-style practice section: " +
-                              str(pos) + " - " + text)
+                    log.debug("Found potential GH1-style practice section: " + str(pos) + " - " + text)
 
                 text = "%d:%02d -> " % (pos / 60000, (pos % 60000) / 1000) + text
                 self.sections.append([text, pos])
@@ -2664,8 +2662,7 @@ class MidiSectionReader(midi.MidiOutStream):
 
                 # only log if enabled
                 if self.logSections == 1:
-                    log.debug("Found potential GH1-style practice section: " +
-                              str(pos) + " - " + text)
+                    log.debug("Found potential GH1-style practice section: " + str(pos) + " - " + text)
 
                 text = "%d:%02d -> " % (pos / 60000, (pos % 60000) / 1000) + text
                 self.sections.append([text, pos])
@@ -2676,8 +2673,7 @@ class MidiSectionReader(midi.MidiOutStream):
 
                 # only log if enabled
                 if self.logSections == 1:
-                    log.debug("Found potential GH1-style practice section: " +
-                              str(pos) + " - " + text)
+                    log.debug("Found potential GH1-style practice section: " + str(pos) + " - " + text)
 
                 text = "%d:%02d -> " % (pos / 60000, (pos % 60000) / 1000) + text
                 self.sections.append([text, pos])
@@ -2686,8 +2682,7 @@ class MidiSectionReader(midi.MidiOutStream):
 
                 # only log if enabled
                 if self.logSections == 1:
-                    log.debug("Found potential GH1-style practice section: " +
-                              str(pos) + " - " + text)
+                    log.debug("Found potential GH1-style practice section: " + str(pos) + " - " + text)
 
                 text = "%d:%02d -> " % (pos / 60000, (pos % 60000) / 1000) + text
                 self.sections.append([text, pos])
@@ -3263,7 +3258,7 @@ def getAvailableTitles(engine, library=DEFAULT_LIBRARY):
             titles.append(BlankSpaceInfo(_("End of Career")))
 
     except Exception:
-        log.debug("titles.ini could not be read (song.py)")
+        log.warning("titles.ini could not be read (song.py)")
         return []
 
     return titles

@@ -69,7 +69,7 @@ def halign(value, default='center'):
 def valign(value, default='middle'):
     try:
         if value.lower() == 'center':
-            log.info('Use of "center" for vertical alignment is deprecated. Use "middle" instead.')
+            log.warning('Use of "center" for vertical alignment is deprecated. Use "middle" instead.')
         positions = {
             'top': TOP,
             'middle': MIDDLE,  # for consistency with HTML/CSS terminology
@@ -149,7 +149,7 @@ class Theme(Task):
             log.debug("theme.ini loaded")
         else:
             self.config = None
-            log.debug("no theme.ini")
+            log.warning("Theme: no theme.ini found")
 
         def get(value, vtype=str, default=None):
             if self.config:
