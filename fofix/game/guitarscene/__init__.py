@@ -1,1 +1,1 @@
-from GuitarScene import *
+from fofix.game.guitarscene.GuitarScene import *
