@@ -219,8 +219,8 @@ class Vocalist:
                                  outline=(0, 0, 0, 0), fill=(0, 0, 0, 0))
                     dispOverlay = ImgDrawing(self.engine.data.svg, overlay)
                     self.drawnVocalOverlays[degrees] = dispOverlay
-            except Exception:
-                log.error('Could not prebuild vocal overlay textures: ')
+            except Exception as err:
+                log.error('Could not prebuild vocal overlay textures: %s', err)
                 self.vocalContinuousAvailable = False
 
         self.vocalLaneSize        = self.engine.theme.vocalLaneSize
@@ -395,21 +395,21 @@ class Vocalist:
     def drawNoteLane(self, colors, xStartPos, xEndPos, yStartPos, yEndPos):
         """ Draw a vocal note lane, vaguely RB2-style """
         colorArray = np.array([colors[i] for i in (4, 5, 6, 6, 0, 1, 1, 0, 2, 3, 3, 2, 6, 6, 5, 4)], dtype=np.float32)
-        vertexArray = np.array([[xStartPos,                    yStartPos-self.vocalLaneSize, 0],
-                             [xEndPos,                      yEndPos  -self.vocalLaneSize, 0],
-                             [xEndPos,                      yEndPos  -self.vocalGlowSize, 0],
+        vertexArray = np.array([[xStartPos,                 yStartPos-self.vocalLaneSize, 0],
+                             [xEndPos,                      yEndPos-self.vocalLaneSize,   0],
+                             [xEndPos,                      yEndPos-self.vocalGlowSize,   0],
                              [xStartPos,                    yStartPos-self.vocalGlowSize, 0],
                              [xStartPos-self.vocalLaneSize, yStartPos,                    0],
-                             [xEndPos  +self.vocalLaneSize, yEndPos,                      0],
-                             [xEndPos,                      yEndPos  -self.vocalLaneSize, 0],
+                             [xEndPos+self.vocalLaneSize,   yEndPos,                      0],
+                             [xEndPos,                      yEndPos-self.vocalLaneSize,   0],
                              [xStartPos,                    yStartPos-self.vocalLaneSize, 0],
                              [xStartPos,                    yStartPos+self.vocalLaneSize, 0],
-                             [xEndPos,                      yEndPos  +self.vocalLaneSize, 0],
-                             [xEndPos  +self.vocalLaneSize, yEndPos,                      0],
+                             [xEndPos,                      yEndPos+self.vocalLaneSize,   0],
+                             [xEndPos+self.vocalLaneSize,   yEndPos,                      0],
                              [xStartPos-self.vocalLaneSize, yStartPos,                    0],
                              [xStartPos,                    yStartPos+self.vocalGlowSize, 0],
-                             [xEndPos,                      yEndPos  +self.vocalGlowSize, 0],
-                             [xEndPos,                      yEndPos  +self.vocalLaneSize, 0],
+                             [xEndPos,                      yEndPos+self.vocalGlowSize,   0],
+                             [xEndPos,                      yEndPos+self.vocalLaneSize,   0],
                              [xStartPos,                    yStartPos+self.vocalLaneSize, 0]],
                                dtype=np.float32)
         cmgl.draw_arrays(gl.GL_QUADS, vertices=vertexArray, colors=colorArray)
@@ -784,7 +784,8 @@ class Vocalist:
 
         self.starPowerEnable = False
         for startTime, endTime in spActPhrases:
-            if endTime - startTime < 1000: continue
+            if endTime - startTime < 1000:
+                continue
             xStart = startTime - pos
             xEnd = endTime - pos
             if pos > startTime and pos < endTime:
