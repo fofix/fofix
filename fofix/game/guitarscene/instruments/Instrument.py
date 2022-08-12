@@ -163,11 +163,11 @@ class Instrument(object):
 
         self.scoreMultiplier = 1
 
-        #MFH - I do not understand fully how the handicap scorecard works at the moment, nor do I have the time to figure it out.
-        #... so for now, I'm just writing some extra code here for the early hitwindow size handicap.
+        # I do not understand fully how the handicap scorecard works at the moment, nor do I have the time to figure it out.
+        # so for now, I'm just writing some extra code here for the early hitwindow size handicap.
         self.earlyHitWindowSizeFactor = 0.5
 
-        self.hitw = self.engine.config.get("game", "note_hit_window")  #this should be global, not retrieved every BPM change.
+        self.hitw = self.engine.config.get("game", "note_hit_window")  # this should be global, not retrieved every BPM change.
         if self.hitw == 0:
             self.hitw = 2.3
         elif self.hitw == 1:
@@ -1007,7 +1007,6 @@ class Instrument(object):
             return
 
         # this should be retrieved once at init, not repeatedly in-game whenever tails are rendered.
-
         if self.twoDnote:
             noteImage = self.noteButtons
             tailOnly = True
@@ -1096,8 +1095,8 @@ class Instrument(object):
             return
 
         self.bigMax = 0
-        # Update dynamic period
 
+        # Update dynamic period
         self.currentPeriod = self.neckSpeed
         self.targetPeriod = self.neckSpeed
 
@@ -1404,7 +1403,8 @@ class Instrument(object):
             if event.played or event.hopod:
                 # if the note is hit
                 continue
-            elif z < 0: #Notes past frets
+            elif z < 0:
+                # Notes past frets
                 # if none of the below they keep on going, it would be self.notedisappear == 1
                 if self.notedisappear == 0:
                     # Notes disappear
@@ -1534,7 +1534,7 @@ class Instrument(object):
                     gl.glPushMatrix()
                     gl.glTranslatef(x, y, 0)
                     gl.glScalef(.1 + .02 * ms * f, .1 + .02 * ms * f, .1 + .02 * ms * f)
-                    gl.glRotatef( 90, 0, 1, 0)
+                    gl.glRotatef(90,  0, 1, 0)
                     gl.glRotatef(-90, 1, 0, 0)
                     gl.glRotatef(-90, 0, 0, 1)
                     if not self.twoDkeys and not self.keytex:
@@ -1829,7 +1829,7 @@ class Instrument(object):
                                 self.renderFreeStyleTail(length, color, theFret, pos)
                                 gl.glPopMatrix()
 
-                        if self.isDrum and ( self.drumFillsActive and self.drumFillsHits >= 4 and z + length < self.boardLength ):
+                        if self.isDrum and (self.drumFillsActive and self.drumFillsHits >= 4 and z + length < self.boardLength):
                             gl.glPushMatrix()
                             color = (.1 + .8 * c[0], .1 + .8 * c[1], .1 + .8 * c[2], 1.0 * visibility * f)
                             gl.glTranslatef(x, 0.0, z + length)
