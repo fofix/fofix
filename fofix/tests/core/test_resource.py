@@ -4,7 +4,7 @@
 import time
 import unittest
 
-from Queue import Queue
+from six.moves.queue import Queue
 from threading import BoundedSemaphore
 
 from fofix.core.Resource import Loader

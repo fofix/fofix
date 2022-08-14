@@ -28,6 +28,7 @@ import logging
 from OpenGL.GL import *
 from PIL import Image
 import numpy as np
+import six
 
 from fofix.core import cmgl
 from fofix.core.Texture import Texture
@@ -198,7 +199,7 @@ class ImgDrawing(object):
         # Detect the type of data passed in
         if isinstance(ImgData, file):
             self.ImgData = ImgData.read()
-        elif isinstance(ImgData, basestring):
+        elif isinstance(ImgData, six.string_types):
             self.texture = Texture(ImgData)
         elif isinstance(ImgData, Image.Image): # let a PIL image be passed in
             self.texture = Texture()
@@ -206,7 +207,7 @@ class ImgDrawing(object):
 
         # Make sure we have a valid texture
         if not self.texture:
-            if isinstance(ImgData, basestring):
+            if isinstance(ImgData, six.string_types):
                 e = "Unable to load texture for %s." % ImgData
             else:
                 e = "Unable to load texture for SVG file."

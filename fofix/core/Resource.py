@@ -28,10 +28,11 @@ import sys
 import time
 import shutil
 import stat
-from Queue import Queue, Empty
 from threading import Thread, BoundedSemaphore
 
 from fretwork.task import Task
+from six.moves.queue import Empty
+from six.moves.queue import Queue
 
 from fofix.core.VFS import getWritableResourcePath
 from fofix.core import Version

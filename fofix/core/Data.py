@@ -49,12 +49,12 @@ RIGHT = '>'
 STAR3 = STAR1
 STAR4 = STAR2
 
-# STAR1 = unicode('\x10')
-# STAR2 = unicode('\x11')
-# LEFT  = unicode('\x12')
-# RIGHT = unicode('\x13')
-# STAR3 = unicode('\x14')
-# STAR4 = unicode('\x15')
+# STAR1 = six.u('\x10')
+# STAR2 = six.u('\x11')
+# LEFT  = six.u('\x12')
+# RIGHT = six.u('\x13')
+# STAR3 = six.u('\x14')
+# STAR4 = six.u('\x15')
 
 
 class Data(object):
