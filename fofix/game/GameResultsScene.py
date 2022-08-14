@@ -33,13 +33,15 @@ import binascii
 import hashlib
 import logging
 import random
-import urllib
 import os
 
 from OpenGL.GL import *
 from fretwork.audio import Sound
+from six.moves.urllib.parse import urlencode
+from six.moves.urllib.request import urlopen
 import cerealizer
 import pygame
+import six
 
 from fofix.core.Image import drawImage
 from fofix.core.Scene import Scene
@@ -528,7 +530,7 @@ class GameResultsScene(Scene):
             d["scores"] = binascii.hexlify(cerealizer.dumps(scores))
             d["scores_ext"] = binascii.hexlify(cerealizer.dumps(scores_ext))
             url = self.engine.config.get("network", "uploadurl")
-            data = urllib.urlopen(url + "?" + urllib.urlencode(d)).read()
+            data = urlopen(url + "?" + urlencode(d)).read()
             log.debug("Score upload result: %s" % data)
             return data   #MFH - want to return the actual result data.
         except Exception as e:
@@ -1245,10 +1247,10 @@ class GameResultsScene(Scene):
                     score = "%s %.1f%%" % (score, (float(notesHit) / notesTotal) * 100.0)
                 if noteStreak != 0:
                     score = "%s (%d)" % (score, noteStreak)
-                font.render(unicode(score), (x + .05, y + self.offset),   scale = scale)
+                font.render(six.u(score), (x + .05, y + self.offset),   scale = scale)
                 options = ""
                 w2, h2 = font.getStringSize(options, scale = scale / 2)
-                font.render(unicode(options), (.6 - w2, y + self.offset),   scale = scale / 2)
+                font.render(six.u(options), (.6 - w2, y + self.offset),   scale = scale / 2)
                 # evilynux - Fixed star size following Font render bugfix
                 # akedrou  - Fixed stars to render as stars after custom glyph removal... ...beautiful yPos
                 self.engine.drawStarScore(w, h, x+.6, 1.0-((y+self.offset+h2)/self.engine.data.fontScreenBottom), stars, scale * 15)

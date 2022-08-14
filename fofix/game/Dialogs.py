@@ -38,6 +38,7 @@ import os
 from OpenGL.GL import *
 # from fretwork.unicode import unicodify
 import pygame
+import six
 
 from fofix.core.View import Layer, BackgroundLayer
 from fofix.core.Input import KeyListener
@@ -521,7 +522,7 @@ class FileChooser(BackgroundLayer, KeyListener):
         return fileName
 
     def getFiles(self):
-        files = [u".."]
+        files = [six.u("..")]
         for fn in os.listdir(self.path):
             if fn.startswith("."):
                 continue
@@ -543,17 +544,17 @@ class FileChooser(BackgroundLayer, KeyListener):
         driveLetters = []
         for drive in string.letters[len(string.letters) // 2:]:
             if win32file.GetDriveType(drive + ":") == win32file.DRIVE_FIXED:
-                driveLetters.append(drive + u":\\")
+                driveLetters.append(drive + six.u(":\\"))
         return driveLetters
 
     def updateFiles(self):
         if self.menu:
             self.engine.view.popLayer(self.menu)
 
-        if self.path == u"toplevel" and os.name != "nt":
-            self.path = u"/"
+        if self.path == six.u("toplevel") and os.name != "nt":
+            self.path = six.u("/")
 
-        if self.path == u"toplevel":
+        if self.path == six.u("toplevel"):
             self.menu = Menu(self.engine, choices=[(self._getFileText(f), self._getFileCallback(f)) for f in self.getDisks()], onClose=self.close, onCancel=self.cancel)
         else:
             self.menu = Menu(self.engine, choices=[(self._getFileText(f), self._getFileCallback(f)) for f in self.getFiles()], onClose=self.close, onCancel=self.cancel)
@@ -569,14 +570,14 @@ class FileChooser(BackgroundLayer, KeyListener):
                     self.menu = None
                     return
 
-        if self.path == u"toplevel":
-            self.path = u""
+        if self.path == six.u("toplevel"):
+            self.path = six.u("")
         path = os.path.abspath(os.path.join(self.path, fileName))
 
         if os.path.isdir(path):
 
-            if path == self.path and fileName == u"..":
-                self.path = u"toplevel"
+            if path == self.path and fileName == six.u(".."):
+                self.path = six.u("toplevel")
             else:
                 self.path = path
             self.updateFiles()
@@ -1870,7 +1871,7 @@ def getKey(engine, prompt, key=None, specialKeyList=None):
     return d.key
 
 
-def chooseFile(engine, masks=["*.*"], path=u".", prompt=_("Choose a File"), dirSelect=False):
+def chooseFile(engine, masks=["*.*"], path=six.u("."), prompt=_("Choose a File"), dirSelect=False):
     """
     Ask the user to select a file.
 

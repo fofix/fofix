@@ -25,6 +25,8 @@ import os
 import re
 import sys
 
+import six
+
 
 MAJOR_VERSION = 4
 MINOR_VERSION = 0
@@ -93,7 +95,7 @@ def version():
     if isWindowsExe():
         # stump: if we've been py2exe'd, read our version string from the exe.
         import win32api
-        us = os.path.abspath(unicode(sys.executable, sys.getfilesystemencoding()))
+        us = os.path.abspath(six.u(sys.executable, sys.getfilesystemencoding()))
         version = win32api.GetFileVersionInfo(us, r'\StringFileInfo\%04x%04x\ProductVersion' % win32api.GetFileVersionInfo(us, r'\VarFileInfo\Translation')[0])
     else:
         version = "%s %s" % (versionNum(), revision())

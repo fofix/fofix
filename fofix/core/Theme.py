@@ -33,6 +33,7 @@ import sys
 from OpenGL.GL import *
 from OpenGL.GLU import *
 from fretwork.task import Task
+import six
 
 from fofix.core import Config
 from fofix.core import Version
@@ -85,7 +86,7 @@ def valign(value, default='middle'):
 def hexToColor(color):
     ''' Convert hexadecimal color string to tuple containing rgb or rgba values '''
 
-    if not (isinstance(color, str) or isinstance(color, unicode)):
+    if not (isinstance(color, str) or isinstance(color, six.text_type)):
         raise TypeError('Invalid input type: {}'.format(type(color)))
 
     elif color[0] != '#':
@@ -2298,7 +2299,7 @@ class Setlist:
                             score = "%s %.1f%%" % (score, (float(notesHit) / notesTotal) * 100.0)
                         if noteStreak != 0:
                             score = "%s (%d)" % (score, noteStreak)
-                    font.render(unicode(score), (x + .15, y),     scale=scale)
+                    font.render(six.u(score), (x + .15, y),     scale=scale)
                     font.render(name,       (x + .15, y + fh),     scale=scale)
                     y += 2 * fh
             elif isinstance(item, song.LibraryInfo):
@@ -2386,7 +2387,7 @@ class Setlist:
                             score = "%s %.1f%%" % (score, (float(notesHit) / notesTotal) * 100.0)
                         if noteStreak != 0:
                             score = "%s (%d)" % (score, noteStreak)
-                    font.render(unicode(score), (x + .15, y),     scale=scale)
+                    font.render(six.u(score), (x + .15, y),     scale=scale)
                     font.render(name,       (x + .15, y + fh),     scale=scale)
                     y += 2 * fh + f / 4.0
         elif self.setlist_type == 3:

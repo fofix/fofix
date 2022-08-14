@@ -28,13 +28,14 @@ from __future__ import division
 from __future__ import absolute_import
 
 from collections import MutableMapping, namedtuple
-from ConfigParser import RawConfigParser
 import logging
 import os
-import StringIO
 import sys
 
 # from fretwork.unicode import utf8, unicodify
+from six.moves.configparser import RawConfigParser
+from six import StringIO
+import six
 
 from fofix.core import VFS
 from fofix.core.utils import utf8, unicodify
@@ -71,7 +72,7 @@ class MyConfigParser(RawConfigParser):
                 self._write_section(fp, section, self.items(section))
 
     def read(self, filenames):
-        if isinstance(filenames, basestring):
+        if isinstance(filenames, six.string_types):
             filenames = [filenames]
 
         read_ok = []
@@ -86,7 +87,7 @@ class MyConfigParser(RawConfigParser):
                 config_lines = [line for line in config_lines
                                 if line.strip()[0:2] != '//']
                 config_data = '\n'.join(config_lines)
-                str_fp = StringIO.StringIO(config_data)
+                str_fp = StringIO(config_data)
                 self.readfp(str_fp, filename)
             except IOError:
                 continue
@@ -201,7 +202,7 @@ class Config(object):
                 return default  # allows None-default bools to return None
             else:
                 return False
-        elif issubclass(type, basestring):
+        elif issubclass(type, six.string_types):
             return unicodify(value)
         else:
             try:

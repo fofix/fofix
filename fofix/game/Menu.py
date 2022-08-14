@@ -30,6 +30,7 @@ import os
 
 from OpenGL.GL import *
 import pygame
+import six
 
 from fofix.core.Input import KeyListener
 from fofix.core.Image import drawImage
@@ -62,7 +63,7 @@ class Choice:
         :param tipText: the tip for the item
         :type tipText: string
         """
-        self.text       = unicode(text)
+        self.text       = six.u(text)
         self.callback   = callback
         self.name       = name
         self.values     = values

@@ -26,7 +26,6 @@
 from collections import OrderedDict
 from functools import total_ordering
 import binascii
-import cPickle  # Cerealizer and sqlite3 don't seem to like each other that much...
 import copy
 import glob
 import hashlib
@@ -35,12 +34,15 @@ import os
 import random
 import re
 import time
-import urllib
 
 from fretwork import midi
 from fretwork.audio import StreamingSound
 # from fretwork.unicode import utf8
+from six.moves import cPickle  # Cerealizer and sqlite3 don't seem to like each other that much
+from six.moves.urllib.parse import urlencode
+from six.moves.urllib.request import urlopen
 import cerealizer
+import six
 
 from fofix.core import Config
 from fofix.core import VFS
@@ -576,7 +578,7 @@ class SongInfo(object):
     def getScoreHash(self, difficulty, score, stars, name):
         if isinstance(difficulty, Difficulty):
             difficulty = difficulty.id
-        return hashlib.sha1("%d%d%d%s" % (difficulty, score, stars, name)).hexdigest()
+        return hashlib.sha1(six.b("%d%d%d%s" % (difficulty, score, stars, six.b(name)))).hexdigest()
 
     @property
     def delay(self):
@@ -641,7 +643,7 @@ class SongInfo(object):
                 "version":  "%s-3.100" % Version.PROGRAM_NAME,
                 "songPart": part
             }
-            data = urllib.urlopen(url + "?" + urllib.urlencode(d)).read()
+            data = urlopen(url + "?" + urlencode(d)).read()
             log.debug("Score upload result: %s" % data)
             return data  # want to return the actual result data.
         except Exception as e:
@@ -1898,7 +1900,7 @@ class Song(object):
                     self.songTracks[instrument] = []
                 try:
                     self.songTracks[instrument].append(StreamingSound(
-                        self.engine.audio.getChannel(channel), filePath))
+                        self.engine.audio.getChannel(channel), six.b(filePath)))
                     channel += 1
                 except Exception as e:
                     log.error("Unable to load song track: %s" % e)

@@ -23,11 +23,15 @@
 # MA  02110-1301, USA.                                              #
 #####################################################################
 
-from fofix.core.Theme import *
+import math
+
 from OpenGL.GL import *
 from OpenGL.GLU import *
-import math
+import six
+
+from fofix.core.Theme import *
 from fofix.game import song
+
 
 class CustomTheme(Theme):
     def __init__(self, path, name):
@@ -343,7 +347,7 @@ class CustomSetlist(Setlist):
                         score = "%s %.1f%%" % (score, (float(notesHit) / notesTotal) * 100.0)
                     if noteStreak != 0:
                         score = "%s (%d)" % (score, noteStreak)
-                font.render(unicode(score), (x + .15, y),     scale = scale)
+                font.render(six.u(score), (x + .15, y),     scale = scale)
                 font.render(name,       (x + .15, y + fh),     scale = scale)
                 y += 2 * fh
         elif isinstance(item, song.LibraryInfo):
