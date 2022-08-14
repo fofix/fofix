@@ -35,9 +35,9 @@ import logging
 import math
 import os
 
-import pygame
 from OpenGL.GL import *
-from fretwork.unicode import unicodify
+# from fretwork.unicode import unicodify
+import pygame
 
 from fofix.core.View import Layer, BackgroundLayer
 from fofix.core.Input import KeyListener
@@ -49,6 +49,7 @@ from fofix.game.Menu import Menu
 from fofix.core import Microphone
 from fofix.core import Player
 from fofix.core import Config
+from fofix.core.utils import unicodify
 
 
 log = logging.getLogger(__name__)

@@ -39,7 +39,7 @@ import urllib
 
 from fretwork import midi
 from fretwork.audio import StreamingSound
-from fretwork.unicode import utf8
+# from fretwork.unicode import utf8
 import cerealizer
 
 from fofix.core import Config
@@ -48,6 +48,7 @@ from fofix.core import Version
 from fofix.core.Language import _
 from fofix.core.Theme import *
 from fofix.core.Theme import hexToColor, colorToHex
+from fofix.core.utils import utf8
 from fofix.game.song.songconstants import *
 
 

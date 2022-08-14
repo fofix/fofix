@@ -22,6 +22,7 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,        #
 # MA  02110-1301, USA.                                              #
 #####################################################################
+
 from __future__ import print_function
 from __future__ import division
 from __future__ import absolute_import
@@ -33,9 +34,10 @@ import os
 import StringIO
 import sys
 
-from fretwork.unicode import utf8, unicodify
+# from fretwork.unicode import utf8, unicodify
 
 from fofix.core import VFS
+from fofix.core.utils import utf8, unicodify
 
 
 log = logging.getLogger(__name__)
