@@ -23,6 +23,7 @@
 #####################################################################
 
 from __future__ import with_statement
+from io import IOBase
 import logging
 
 from OpenGL.GL import *
@@ -197,7 +198,7 @@ class ImgDrawing(object):
         self.filename = ImgData
 
         # Detect the type of data passed in
-        if isinstance(ImgData, file):
+        if isinstance(ImgData, IOBase):
             self.ImgData = ImgData.read()
         elif isinstance(ImgData, six.string_types):
             self.texture = Texture(ImgData)
