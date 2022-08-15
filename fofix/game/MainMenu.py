@@ -27,7 +27,6 @@
 import logging
 import os
 import random
-import string
 import warnings
 
 from fretwork.audio import Music
@@ -133,7 +132,7 @@ class MainMenu(BackgroundLayer):
             allfiles = os.listdir(filepath)
             for name in allfiles:
                 if os.path.splitext(name)[1] == ".ogg":
-                    if string.find(name, "menu") > -1:
+                    if name.find("menu") > -1:
                         self.files.append(name)
 
         ## get a random music
