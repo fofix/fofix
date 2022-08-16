@@ -50,6 +50,8 @@ def decode_string(data):
         return data.decode('utf-8')
     except UnicodeDecodeError:
         return data.decode('latin-1')
+    except AttributeError:
+        return data
 
 
 class MyConfigParser(RawConfigParser):

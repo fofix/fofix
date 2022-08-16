@@ -260,10 +260,10 @@ class GameEngine(object):
         fullscreen    = self.config.get("video", "fullscreen")
         multisamples  = self.config.get("video", "multisamples")
         self.video.setMode((width, height), fullscreen=fullscreen, multisamples=multisamples)
-        log.debug("OpenGL version: " + glGetString(GL_VERSION))
-        log.debug("OpenGL vendor: " + glGetString(GL_VENDOR))
-        log.debug("OpenGL renderer: " + glGetString(GL_RENDERER))
-        log.debug("OpenGL extensions: " + ' '.join(sorted(glGetString(GL_EXTENSIONS).split())))
+        log.debug("OpenGL version: %s" % glGetString(GL_VERSION))
+        log.debug("OpenGL vendor: %s" % glGetString(GL_VENDOR))
+        log.debug("OpenGL renderer: %s" % glGetString(GL_RENDERER))
+        # log.debug("OpenGL extensions: " + ' '.join(sorted(glGetString(GL_EXTENSIONS).split())))
 
         if self.video.default:
             self.config.set("video", "fullscreen", False)
