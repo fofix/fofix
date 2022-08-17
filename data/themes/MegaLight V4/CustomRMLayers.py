@@ -1,5 +1,5 @@
-
 from fofix.game.guitarscene import Rockmeter
+
 
 class CoOpMeter(Rockmeter.Group):
     def __init__(self, stage, section):
@@ -9,8 +9,6 @@ class CoOpMeter(Rockmeter.Group):
         self.ySpacingExpr = self.getexpr("yspacing", "0.0")
         self.ySpacing = 0.0
         self.condition = "True"
-
-        print self.layers.values()
 
     def updateLayer(self, playerNum):
         super(CoOpMeter, self).updateLayer(playerNum)
@@ -41,11 +39,11 @@ class CoOpMeter(Rockmeter.Group):
                 layer.position = [layer.position[n] + self.position[n] for n in range(2)]
                 layer.position[1] -= (self.ySpacing*scale/h)*(i/2)
 
-            #flips across screen for every other player
+            # flips across screen for every other player
             if i % 2 == 1:
                 layer.position[0] = w - layer.position[0]
                 layer.scale[0] *= -1
                 layer.angle *= -1
 
-            #layer.scale = [s/(2.0*(len(self.stage.scene.players)/2)) for s in layer.scale]
+            # layer.scale = [s/(2.0*(len(self.stage.scene.players)/2)) for s in layer.scale]
             layer.render(visibility, playerNum)

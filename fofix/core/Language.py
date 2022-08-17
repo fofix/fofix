@@ -54,7 +54,7 @@ if language:
         language = None
         # Config.set("game", "language", "")
 
-_ = catalog.ugettext
+_ = catalog.gettext
 
 # Define the config key again now that we have some options for it
 langOptions = {"": "English"}

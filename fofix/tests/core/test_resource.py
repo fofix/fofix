@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import time
+import traceback
 import unittest
 
 from six.moves.queue import Queue
@@ -74,15 +75,15 @@ class LoaderTest(unittest.TestCase):
 
     def test_finish(self):
         # not canceled
-        ## with exception
+        # - with exception
         err = TypeError("unsupported operand type(s) for +: 'int' and 'str'")
-        self.loader.exception = [err.__class__, err, ""]
+        self.loader.exception = [err.__class__, err, traceback.print_stack()]
         with self.assertRaises(TypeError) as cm:
             self.loader.finish()
         self.assertEqual(cm.expected, err.__class__)
         self.assertEqual(str(cm.exception), str(err))
 
-        ## without exception
+        # - without exception
         self.loader.exception = None
         self.loader.load()
         self.loader.finish()

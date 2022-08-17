@@ -24,7 +24,6 @@ import logging
 import os
 import sys
 import time
-import string
 from random import random
 
 import pygame.image
@@ -137,7 +136,7 @@ class ShaderList:
         """
 
         for line in open(fname):
-            aline = line[:string.find(line, ";")]
+            aline = line[:line.find(";")]
             aline = aline.split(' ')
             if '(' in aline[0]:
                 break

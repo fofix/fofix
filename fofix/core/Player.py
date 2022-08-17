@@ -602,7 +602,12 @@ class Controls:
         kills = []
 
         for i, config in enumerate(self.config):
-            if self.type[i] in DRUMTYPES: #drum set
+            if self.type[i] is None:
+                # self.type[i] = -1
+                controlMapping = {}
+                continue
+
+            if self.type[i] in DRUMTYPES:  # drum set
                 drum1s.extend([CONTROLS[i][DRUM1], CONTROLS[i][DRUM1A]])
                 drum2s.extend([CONTROLS[i][DRUM2], CONTROLS[i][DRUM2A]])
                 drum3s.extend([CONTROLS[i][DRUM3], CONTROLS[i][DRUM3A]])

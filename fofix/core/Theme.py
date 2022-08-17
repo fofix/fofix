@@ -27,7 +27,6 @@ import imp
 import logging
 import math
 import os
-import string
 import sys
 
 from OpenGL.GL import *
@@ -1109,7 +1108,7 @@ class Setlist:
                     text = "    " + text
 
             if isinstance(item, song.TitleInfo) or isinstance(item, song.SortTitleInfo):
-                text = string.upper(text)
+                text = text.upper()
 
             scale = lfont.scaleText(text, maxwidth=0.440)
 
@@ -1137,7 +1136,7 @@ class Setlist:
                 glColor3f(c1, c2, c3)
 
                 # Force uppercase display for artist name
-                text = string.upper(item.artist) + suffix + yeartag
+                text = item.artist.upper() + suffix + yeartag
 
                 # automatically scale artist name and year
                 scale = lfont.scaleText(text, maxwidth=0.440, scale=scale)
@@ -1225,7 +1224,7 @@ class Setlist:
                 if scene.tiersPresent:
                     text = "    " + text
             if isinstance(item, song.TitleInfo) or isinstance(item, song.SortTitleInfo):
-                text = string.upper(text)
+                text = text.upper()
             scale = font.scaleText(text, maxwidth=0.45)
             font.render(text, (self.song_listcd_list_xpos, .09*(n+1)), scale=scale)
             if isinstance(item, song.SongInfo) and not item.getLocked():
@@ -1243,7 +1242,7 @@ class Setlist:
                 c1, c2, c3 = self.artist_text_color
                 glColor4f(c1, c2, c3, 1)
 
-                text = string.upper(item.artist) + suffix + yeartag
+                text = item.artist.upper() + suffix + yeartag
 
                 scale = font.scaleText(text, maxwidth=0.4, scale=scale)
                 font.render(text, (self.song_listcd_list_xpos + .05, .09*(n+1)+.05), scale=scale)
@@ -1311,7 +1310,7 @@ class Setlist:
             maxwidth = .55
 
             if isinstance(item, song.TitleInfo) or isinstance(item, song.SortTitleInfo):
-                text = string.upper(text)
+                text = text.upper()
 
             scale = .0015
             wt, ht = font.getStringSize(text, scale=scale)
@@ -1419,7 +1418,7 @@ class Setlist:
                     text = "    " + text
 
             if isinstance(item, song.TitleInfo) or isinstance(item, song.SortTitleInfo):
-                text = string.upper(text)
+                text = text.upper()
 
             scale = sfont.scaleText(text, maxwidth=0.440)
 
@@ -1447,7 +1446,7 @@ class Setlist:
                 glColor3f(c1, c2, c3)
 
                 # Force uppercase display for artist name
-                text = string.upper(item.artist) + suffix + yeartag
+                text = item.artist.upper() + suffix + yeartag
 
                 # automatically scale artist name and year
                 scale = lfont.scaleText(text, maxwidth=0.440, scale=scale)
@@ -1580,7 +1579,7 @@ class Setlist:
                     text = "    " + text
 
             elif isinstance(item, song.TitleInfo) or isinstance(item, song.SortTitleInfo):
-                text = string.upper(text)
+                text = text.upper()
 
             scale = font.scaleText(text, maxwidth=0.45)
             font.render(text, (self.song_listcd_list_xpos, .09*(n+1)), scale=scale)
@@ -1599,7 +1598,7 @@ class Setlist:
                 scale = .0014
                 c1, c2, c3 = self.artist_selected_color
                 glColor4f(c1, c2, c3, 1)
-                text = string.upper(item.artist) + suffix + yeartag
+                text = item.artist.upper() + suffix + yeartag
 
                 scale = font.scaleText(text, maxwidth=0.4, scale=scale)
                 font.render(text, (self.song_listcd_list_xpos + .05, .09*(n+1)+.05), scale=scale)
@@ -1704,7 +1703,7 @@ class Setlist:
             # Force uppercase display for Career titles
             if isinstance(item, song.TitleInfo) or isinstance(item, song.SortTitleInfo):
                 maxwidth = .55
-                text = string.upper(text)
+                text = text.upper()
 
             scale = .0015
             wt, ht = font.getStringSize(text, scale=scale)
@@ -2412,7 +2411,7 @@ class Setlist:
                 c1, c2, c3 = self.artist_text_color
                 glColor3f(c1, c2, c3)
 
-                text = string.upper(text)
+                text = text.upper()
                 font.render(text, (.095, .44), scale=scale)
 
                 if scene.img_diff3 is not None:
@@ -2420,7 +2419,7 @@ class Setlist:
                     wfactor1 = 13.0 / imgwidth
 
                 albumtag = item.album
-                albumtag = string.upper(albumtag)
+                albumtag = albumtag.upper()
                 wt, ht = font.getStringSize(albumtag, scale=scale)
 
                 while wt > .21:
