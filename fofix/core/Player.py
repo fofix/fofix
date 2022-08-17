@@ -728,7 +728,7 @@ class Controls:
                 }
             else:
                 controlMapping = {}
-            controlMapping = self.checkMapping(controlMapping, i)
+            controlMapping = self.checkMapping(controlMapping)
             self.controlMapping.update(controlMapping)
 
         self.reverseControlMapping = dict((value, key) for key, value in self.controlMapping.items())
@@ -736,7 +736,7 @@ class Controls:
         # Multiple key support
         self.heldKeys = {}
 
-    def checkMapping(self, newDict, i):
+    def checkMapping(self, newDict):
         def keyName(value):
             if value in CONTROL1:
                 name = "Controller 1"
