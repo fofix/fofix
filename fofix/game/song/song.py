@@ -37,7 +37,6 @@ import time
 
 from fretwork import midi
 from fretwork.audio import StreamingSound
-# from fretwork.unicode import utf8
 from six.moves import cPickle  # Cerealizer and sqlite3 don't seem to like each other that much
 from six.moves.urllib.parse import urlencode
 from six.moves.urllib.request import urlopen
@@ -50,7 +49,6 @@ from fofix.core import Version
 from fofix.core.Language import _
 from fofix.core.Theme import *
 from fofix.core.Theme import hexToColor, colorToHex
-from fofix.core.utils import utf8
 from fofix.game.song.songconstants import *
 
 
@@ -407,7 +405,7 @@ class SongInfo(object):
     def _set(self, attr, value):
         if not self.info.has_section("song"):
             self.info.add_section("song")
-        self.info.set("song", attr, utf8(value))
+        self.info.set("song", attr, value)
 
     def getObfuscatedScores(self, part=parts[GUITAR_PART]):
         s = {}
@@ -788,7 +786,7 @@ class LibraryInfo(object):
     def _set(self, attr, value):
         if not self.info.has_section("library"):
             self.info.add_section("library")
-        self.info.set("library", attr, utf8(value))
+        self.info.set("library", attr, value)
 
     def save(self):
         if os.access(os.path.dirname(self.fileName), os.W_OK):
@@ -862,7 +860,7 @@ class TitleInfo(object):
         log.debug("TitleInfo class init (song.py)...")
 
     def _set(self, attr, value):
-        self.info.set(self.section, attr, utf8(value))
+        self.info.set(self.section, attr, value)
 
     def _get(self, attr, type=None, default=""):
         try:

@@ -32,13 +32,13 @@ import logging
 import os
 import sys
 
-# from fretwork.unicode import utf8, unicodify
+# from fretwork.unicode import unicodify
 from six.moves.configparser import RawConfigParser
 from six import StringIO
 import six
 
 from fofix.core import VFS
-from fofix.core.utils import utf8, unicodify
+from fofix.core.utils import unicodify
 
 
 log = logging.getLogger(__name__)
@@ -60,7 +60,7 @@ class MyConfigParser(RawConfigParser):
         fp.write("[%s]\n" % section_name)
         for key, value in sorted(section_items):
             if key != "__name__":
-                fp.write("{} = {}\n".format(key, utf8(value)))
+                fp.write("{} = {}\n".format(key, value))
         fp.write("\n")
 
     def write(self, fp, type=0):
@@ -81,7 +81,7 @@ class MyConfigParser(RawConfigParser):
         for filename in filenames:
             config_data = None
             try:
-                with open(filename) as fp:
+                with open(filename, 'rb') as fp:
                     config_data = fp.read()
 
                 config_data = decode_string(config_data)
@@ -111,8 +111,6 @@ class MyConfigParser(RawConfigParser):
         return unicodify(RawConfigParser.get(self, section, option))
 
     def set(self, section, option, value=None):
-        if value is not None:
-            value = utf8(value)
         RawConfigParser.set(self, section, option, value)
 
 
@@ -313,7 +311,7 @@ class Config(object):
         if not self.config.has_section(section):
             self.config.add_section(section)
 
-        self.config.set(section, option, utf8(value))
+        self.config.set(section, option, value)
 
         with open(self.filename, "w") as config_file:
             self.config.write(config_file, self.type)
