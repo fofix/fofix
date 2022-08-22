@@ -56,9 +56,6 @@ jobs:
           pip install pytest pytest-cov
           pip install -r requirements.txt
 
-      - name: Build extensions
-        run: python setup.py build_ext --inplace --force
-
       - name: "Run tests (optional: ${{ matrix.experimental }})"
         continue-on-error: ${{ matrix.experimental }}
         uses: GabrielBB/xvfb-action@v1
