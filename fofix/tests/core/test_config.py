@@ -6,8 +6,6 @@
 import tempfile
 import unittest
 
-import six
-
 from fofix.core.Config import MyConfigParser
 
 
@@ -16,7 +14,8 @@ class MyConfigParserTest(unittest.TestCase):
     def test_write(self):
         config = MyConfigParser()
         items = [
-            ("selected_song", six.b("Mötley Crüe").decode("latin-1")),
+            # ("selected_song", six.u("Mötley Crüe").encode("latin-1")),
+            ("selected_song", "Mötley Crüe"),
         ]
 
         with tempfile.TemporaryFile(mode='w+') as tmp:
@@ -27,4 +26,4 @@ class MyConfigParserTest(unittest.TestCase):
 
         self.assertIn("[section]\n", lines)
         for option, value in items:
-            self.assertIn("{} = {}\n".format(option, value.encode("utf-8")), lines)
+            self.assertIn("{} = {}\n".format(option, value), lines)
