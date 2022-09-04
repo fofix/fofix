@@ -275,7 +275,7 @@ class Menu(Layer, KeyListener):
         self.tipDelay = 700
         self.tipTimerEnabled = False
         self.tipScroll = 0
-        self.tipScrollB = None
+        self.tipScrollB = 0
         self.tipScrollSpace = self.engine.theme.menuTipTextScrollSpace
         self.tipScale = self.engine.theme.menuTipTextScale
         self.tipDir = 0
@@ -454,7 +454,7 @@ class Menu(Layer, KeyListener):
             self.tipDir = 0
         else:
             self.tipScroll = .5 - tipW / 2
-            self.tipScrollB = None
+            self.tipScrollB = 0
             self.tipTimerEnabled = False
             self.tipDir = 0
             self.tipSize = tipW
