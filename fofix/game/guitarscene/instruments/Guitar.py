@@ -358,7 +358,7 @@ class Guitar(Instrument):
             chords[time].append((time, note))
 
         # Make sure the notes are in the right time order
-        chordlist = chords.values()
+        chordlist = list(chords.values())
         chordlist.sort(key=lambda a: a[0][0])
 
         self.missedNotes = []
