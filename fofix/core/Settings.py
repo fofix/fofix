@@ -68,7 +68,7 @@ class ConfigChoice(Menu.Choice):
         o = config.prototype[section][option]
         v = config.get(section, option)
         if isinstance(o.options, dict):
-            values     = o.options.values()
+            values = list(o.options.values())
             values.sort()
             try:
                 valueIndex = values.index(o.options[v])
@@ -82,7 +82,7 @@ class ConfigChoice(Menu.Choice):
                 valueIndex = 0
         else:
             raise RuntimeError("No usable options for %s.%s." % (section, option))
-        Menu.Choice.__init__(self, text = o.text, callback = self.change, values = values, valueIndex = valueIndex, tipText = tipText)
+        Menu.Choice.__init__(self, text=o.text, callback=self.change, values=values, valueIndex=valueIndex, tipText=tipText)
 
     def change(self, value):
         o = self.config.prototype[self.section][self.option]

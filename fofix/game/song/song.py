@@ -1203,7 +1203,7 @@ class VocalPhrase(VocalTrack, Event):
         for _time, event in self.allEvents:
             if isinstance(event, VocalNote):
                 eventDict[int(_time)] = (_time, event)
-        times = eventDict.keys()
+        times = list(eventDict.keys())
         times.sort()
         for _time in times:
             newEvents.append(eventDict[_time])
