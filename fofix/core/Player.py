@@ -399,7 +399,7 @@ def loadControls():
     controllerDict = dict([(str(controllers[n]), controllers[n]) for n in range(0, i)])
     controllerDict["defaultg"] = _("Default Guitar")
     controllerDict["defaultd"] = _("Default Drum")
-    defMic = None
+    defMic = "None"
     if Microphone.supported:
         controllerDict["defaultm"] = _("Default Microphone")
         defMic = "defaultm"
@@ -408,11 +408,11 @@ def loadControls():
     i = 1
     Config.define("game", "control0", str, "defaultg", text=tsControl % 1, options=controllerDict, tipText=tsControlTip % 1)
 
-    controllerDict[_("None")] = None
+    controllerDict[_("None")] = "None"
 
     Config.define("game", "control1", str, "defaultd", text=tsControl % 2, options=controllerDict, tipText=tsControlTip % 2)
     Config.define("game", "control2", str, defMic,     text=tsControl % 3, options=controllerDict, tipText=tsControlTip % 3)
-    Config.define("game", "control3", str, None,       text=tsControl % 4, options=controllerDict, tipText=tsControlTip % 4)
+    Config.define("game", "control3", str, "None",     text=tsControl % 4, options=controllerDict, tipText=tsControlTip % 4)
 
 
 def deleteControl(control):
@@ -425,9 +425,9 @@ def deleteControl(control):
                 Config.set("game", "control%d" % i, "defaultg")
                 defaultUsed = 0
             else:
-                Config.set("game", "control%d" % i, None)
+                Config.set("game", "control%d" % i, "None")
         if get == "defaultg" and defaultUsed > -1:
-            Config.set("game", "control%d" % i, None)
+            Config.set("game", "control%d" % i, "None")
     loadControls()
 
 
