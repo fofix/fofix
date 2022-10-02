@@ -9,7 +9,7 @@ This is Frets on Fire X, a highly customizable rhythm game supporting many modes
 
 [![Tests Status](https://github.com/fofix/fofix/actions/workflows/tests.yml/badge.svg?branch=master)](https://github.com/fofix/fofix/actions/workflows/tests.yml)
 [![Documentation Status](https://readthedocs.org/projects/fofix/badge/?version=latest)](https://fofix.readthedocs.io/en/latest/?badge=latest)
-[![Gitter](https://badges.gitter.im/fofix/fofix.svg)](https://gitter.im/fofix/fofix?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=body_badge)
+[![[matrix]](https://img.shields.io/badge/chat-on%20%5Bmatrix%5D-%2346BC99)](https://matrix.to/#/#fofix:matrix.org)
 [![Latest packaged version(s)](https://repology.org/badge/latest-versions/fofix.svg)](https://repology.org/project/fofix/versions)
 
 
@@ -42,5 +42,5 @@ The source code is licensed under the terms of the GNU GPLv2. Other licenses can
 - Repository: https://github.com/fofix/fofix
 - Chat:
     - IRC: #fofix on oftc.net ([web interface](https://webchat.oftc.net/))
-    - Gitter: [web interface](https://gitter.im/fofix/fofix)
+    - [matrix]: #fofix:matrix.org [web interface](https://matrix.to/#/#fofix:matrix.org)
 - Unofficial forum: https://www.fretsonfire.org/forums/viewforum.php?f=32
