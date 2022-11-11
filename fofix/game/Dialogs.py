@@ -2060,7 +2060,7 @@ class LoadingSplashScreen(Layer, KeyListener):
 # expanding on LoadingSplashScreen so there can be overlay and song dependant backgrounds
 class SongLoadingSplashScreen(LoadingSplashScreen):
     def __init__(self, engine, text, songName, libraryName):
-        super(SongLoadingSplashScreen, self).__init__(engine, text)
+        super().__init__(engine, text)
 
         self.engine.loadImgDrawing(self, "songBack", os.path.join(libraryName, songName, "loading.png"))
         if self.songBack:

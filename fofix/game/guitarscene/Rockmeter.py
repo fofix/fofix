@@ -130,7 +130,7 @@ class Layer(ConfigGetMixin):
         :param stage: the rockmeter stage
         :param section: the section of rockmeter.ini involving this layer
         """
-        super(Layer, self).__init__()
+        super().__init__()
 
         # init vars
         self.stage       = stage  # the rockmeter
@@ -226,7 +226,7 @@ class ImageLayer(Layer):
         """
         :param drawing: the filename of the image to draw
         """
-        super(ImageLayer, self).__init__(stage, section)
+        super().__init__(stage, section)
 
         # these are the images that are drawn when the layer is visible
         self.drawing = self.engine.loadImgDrawing(self, None, drawing)
@@ -236,7 +236,7 @@ class ImageLayer(Layer):
         self.rect = [0.0, 1.0, 0.0, 1.0]
 
     def updateLayer(self, playerNum):
-        super(ImageLayer, self).updateLayer(playerNum)
+        super().updateLayer(playerNum)
 
         # don't try to update an image layer if the texture doesn't even exist
         if not self.drawing:
@@ -281,7 +281,7 @@ class ImageLayer(Layer):
             self.position[1] *= h
 
     def render(self, visibility, playerNum):
-        super(ImageLayer, self).render(visibility, playerNum)
+        super().render(visibility, playerNum)
 
         # don't try to render an image layer if the texture doesn't even exist
         if not self.drawing:
@@ -309,7 +309,7 @@ class FontLayer(Layer):
         """
         :param font: the font to use
         """
-        super(FontLayer, self).__init__(stage, section)
+        super().__init__(stage, section)
 
         self.font        = self.engine.data.fontDict[font]
         self.text        = ""                                       # the text that will be rendered to screen
@@ -325,7 +325,7 @@ class FontLayer(Layer):
         self.shadowOpacity = self.get("shadowOpacity", float, 1.0)  # the opacity of the shadow on the text
 
     def updateLayer(self, playerNum):
-        super(FontLayer, self).updateLayer(playerNum)
+        super().updateLayer(playerNum)
 
         #
         # update the text
@@ -374,7 +374,7 @@ class CircleLayer(ImageLayer):
     """ A layer that is shaped like a pie-slice/circle instead of a rectangle """
 
     def __init__(self, stage, section, drawing):
-        super(CircleLayer, self).__init__(stage, section, drawing)
+        super().__init__(stage, section, drawing)
 
         # this number (between 0 and 1) determines how much
         # of the circle should be filled (0 to 360 degrees)
@@ -414,7 +414,7 @@ class CircleLayer(ImageLayer):
             self.drawnOverlays[degrees] = dispOverlay
 
     def updateLayer(self, playerNum):
-        super(CircleLayer, self).updateLayer(playerNum)
+        super().updateLayer(playerNum)
 
         ratio = eval(self.ratioexpr)
         self.ratio = ratio
@@ -446,7 +446,7 @@ class Effect(ConfigGetMixin):
         :param layer: the rockmeter layer
         :param section: the section of rockmeter.ini involving this layer
         """
-        super(Effect, self).__init__()
+        super().__init__()
 
         # init vars
         self.layer = layer
@@ -486,7 +486,7 @@ class IncrementEffect(Effect):
     """ A base for effects that deal with incrementing values that provide smooth transitions and animations """
 
     def __init__(self, layer, section):
-        super(IncrementEffect, self).__init__(layer, section)
+        super().__init__(layer, section)
 
         # determines if the values should increment back when the condition is
         # false or just jump back instantly
@@ -596,7 +596,7 @@ class Slide(IncrementEffect):
     """
 
     def __init__(self, layer, section):
-        super(Slide, self).__init__(layer, section)
+        super().__init__(layer, section)
 
         w, h, = self.engine.view.geometry[2:4]
         # position of the image
@@ -649,7 +649,7 @@ class Slide(IncrementEffect):
             self.current[1] = .75 - self.current[1]
             self.current[1] /= .75
 
-        super(Slide, self).updateValues()
+        super().updateValues()
 
         # because of the y position being flipped on fonts it needs to be caught
         if isinstance(self.layer, FontLayer):
@@ -657,7 +657,7 @@ class Slide(IncrementEffect):
             self.current[1] = .75 - self.current[1]
 
     def update(self):
-        super(Slide, self).update()
+        super().update()
 
         self.layer.position = self.current[:]
 
@@ -669,7 +669,7 @@ class Scale(IncrementEffect):
     """
 
     def __init__(self, layer, section):
-        super(Scale, self).__init__(layer, section)
+        super().__init__(layer, section)
 
         # position of the image
         self.start = [eval(self.getexpr("startX", "0.0")), eval(self.getexpr("startY", "0.0"))]
@@ -717,7 +717,7 @@ class Scale(IncrementEffect):
             self.fixScale()
             self.fixedScale = True
 
-        super(Scale, self).update()
+        super().update()
 
         self.layer.scale = self.current[:]
 
@@ -729,7 +729,7 @@ class Fade(IncrementEffect):
     """
 
     def __init__(self, layer, section):
-        super(Fade, self).__init__(layer, section)
+        super().__init__(layer, section)
 
         # starting color
         color = list(hexToColor(self.get("color", str, "#FFFFFF")))
@@ -752,7 +752,7 @@ class Fade(IncrementEffect):
         self.reverse = bool(eval(self.getexpr("reverse", "True")))
 
     def update(self):
-        super(Fade, self).update()
+        super().update()
 
         self.layer.color = self.current[:]
 
@@ -761,7 +761,7 @@ class Replace(Effect):
     """ Replace the image of the layer when the condition is met. """
 
     def __init__(self, layer, section):
-        super(Replace, self).__init__(layer, section)
+        super().__init__(layer, section)
 
         if isinstance(layer, ImageLayer):
             # load textures
@@ -844,7 +844,7 @@ class Animate(Effect):
     """
 
     def __init__(self, layer, section):
-        super(Animate, self).__init__(layer, section)
+        super().__init__(layer, section)
 
         self.frames = self.get("frames", int, 1)
         self.fps = self.get("fps", int, 30)
@@ -890,14 +890,14 @@ class Group(Layer):
     """
 
     def __init__(self, stage, section):
-        super(Group, self).__init__(stage, section)
+        super().__init__(stage, section)
 
         self.layers = {}  # the layers the group controls
         for num in self.get("layers", str, "").split(","):
             self.layers[int(num)] = self.stage.layers[int(num)]
 
     def updateLayer(self, playerNum):
-        super(Group, self).updateLayer(playerNum)
+        super().updateLayer(playerNum)
 
         w, h, = self.engine.view.geometry[2:4]
 

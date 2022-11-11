@@ -61,7 +61,7 @@ log = logging.getLogger(__name__)
 class Drum(Instrument):
 
     def __init__(self, engine, playerObj, scene, player=0):
-        super(Drum, self).__init__(engine, playerObj, scene, player=player)
+        super().__init__(engine, playerObj, scene, player=player)
         log.debug("Drum class initialization")
 
         self.isDrum = True
@@ -138,7 +138,7 @@ class Drum(Instrument):
         self.neck = Neck(self.engine, self, playerObj)
 
     def loadNotes(self):
-        super(Drum, self).loadNotes()
+        super().loadNotes()
         engine = self.engine
 
         get = lambda file: self.checkPath("tails", file)
@@ -197,7 +197,7 @@ class Drum(Instrument):
                 self.engine.loadImgDrawing(self, "opentexture_stara", get("opentex_stara.png"))
 
     def loadFrets(self):
-        super(Drum, self).loadFrets()
+        super().loadFrets()
         engine = self.engine
         themename = self.engine.data.themeLabel
 
