@@ -45,7 +45,7 @@ log = logging.getLogger(__name__)
 class Guitar(Instrument):
 
     def __init__(self, engine, playerObj, scene, player=0, bass=False):
-        super(Guitar, self).__init__(engine, playerObj, scene, player=player)
+        super().__init__(engine, playerObj, scene, player=player)
         log.debug("Guitar class init...")
 
         self.isDrum = False

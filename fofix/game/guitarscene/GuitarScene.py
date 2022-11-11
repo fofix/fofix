@@ -63,8 +63,7 @@ log = logging.getLogger(__name__)
 # The plan with this is to move gamemodes to being subclasses of this
 class BandPlayBaseScene(Scene):
     def __init__(self, engine, libraryName, songName):
-        superClass = super(BandPlayBaseScene, self)
-        superClass.__init__(engine)
+        super().__init__(engine)
 
         log.debug("BandPlayBaseScene init...")
 
@@ -606,16 +605,15 @@ class BandPlayBaseScene(Scene):
             return -1
 
     def render(self, visibility, topMost):
-        super(BandPlayBaseScene, self).render(visibility, topMost)
+        super().render(visibility, topMost)
 
     def run(self, ticks):
-        super(BandPlayBaseScene, self).run(ticks)
+        super().run(ticks)
 
 
 class GuitarScene(BandPlayBaseScene):
     def __init__(self, engine, libraryName, songName):
-        superClass = super(GuitarScene, self)
-        superClass.__init__(engine, libraryName, songName)
+        super().__init__(engine, libraryName, songName)
 
         self.battle = False
         self.coOp = False
@@ -2849,7 +2847,7 @@ class GuitarScene(BandPlayBaseScene):
         self.minusRock[playerNum] += self.minGain / 10 / self.coOpMulti
 
     def run(self, ticks):
-        super(GuitarScene, self).run(ticks)
+        super().run(ticks)
 
         if self.song and self.song.readyToGo and not self.pause and not self.failed:
             sngPos = self.song.getPosition()
@@ -3887,7 +3885,7 @@ class GuitarScene(BandPlayBaseScene):
                 if self.countdown > 0:
                     self.countdownOK = True
 
-            super(GuitarScene, self).render(visibility, topMost)
+            super().render(visibility, topMost)
 
             self.visibility = v = 1.0 - ((1 - visibility) ** 2)
 
