@@ -445,7 +445,7 @@ class StreamingSound(Sound, Task):
     self.channel.setVolume(volume)
 
   def streamIsPlaying(self):  #MFH - adding function to check if sound is playing
-    return Sound.get_num_channels()
+    return Sound.isPlaying()
 
 
   def fadeout(self, time):
